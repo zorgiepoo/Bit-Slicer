@@ -43,6 +43,7 @@
 @implementation ZGCodeInjectionHandler
 {
 	__weak ZGBreakPointController *_breakPointController;
+	NSUndoManager *_undoManager;
 	ZGInstruction *_toIslandInstruction;
 	ZGInstruction *_fromIslandInstruction;
 	ZGMemoryAddress _islandAddress;
@@ -50,9 +51,10 @@
 	ZGProcess *_process;
 }
 
-- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner
+- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner undoManager:(NSUndoManager *)undoManager
 {
 	_breakPointController = breakPointController;
+	_undoManager = undoManager;
 	_owner = owner;
 	_toIslandInstruction = toIslandInstruction;
 	_fromIslandInstruction = fromIslandInstruction;
@@ -60,11 +62,26 @@
 	_processType = processType;
 	_process = process;
 	
-	return [breakPointController addCodeInjectionHandler:self];
+	return [self addCodeInjection];
+}
+
+- (BOOL)addCodeInjection
+{
+	[_undoManager registerUndoWithTarget:self handler:^(id  _Nonnull __unused target) {
+		[self removeCodeInjection];
+	}];
+	
+	return [_breakPointController addCodeInjectionHandler:self];
 }
 
 - (void)removeCodeInjection
 {
+	// Note: keep self retained until the undoManager is cleared because the breakpoint controller
+	// will not be holding onto us anymore
+	[_undoManager registerUndoWithTarget:self handler:^(id  _Nonnull __unused target) {
+		[self addCodeInjection];
+	}];
+	
 	[_breakPointController removeObserver:self];
 }
 
