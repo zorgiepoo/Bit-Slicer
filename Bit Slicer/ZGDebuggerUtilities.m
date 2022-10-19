@@ -487,7 +487,7 @@ actionName:(NSString *)actionName
 }
 
 #define INJECT_ERROR_DOMAIN @"INJECT_CODE_FAILED"
-+ (ZGCodeInjectionHandler * _Nullable)
++ (BOOL)
 injectCode:(NSData *)codeData
 intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
@@ -502,7 +502,7 @@ error:(NSError * __autoreleasing *)error
 	
 	if (hookedInstructions == nil)
 	{
-		return nil;
+		return NO;
 	}
 	
 	ZGSuspendTask(process.processTask);
@@ -531,7 +531,7 @@ error:(NSError * __autoreleasing *)error
 
 		free(nopBuffer);
 		ZGResumeTask(process.processTask);
-		return nil;
+		return NO;
 	}
 	
 	free(nopBuffer);
@@ -545,7 +545,7 @@ error:(NSError * __autoreleasing *)error
 		}
 		
 		ZGResumeTask(process.processTask);
-		return nil;
+		return NO;
 	}
 	
 	ZGMemorySize hookedInstructionsLength = 0;
@@ -606,7 +606,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			ZG_LOG(@"Error generating nop data for jumpFromIslandData");
 			ZGResumeTask(process.processTask);
-			return nil;
+			return NO;
 		}
 		
 		[newInstructionsData appendData:jumpFromIslandData];
@@ -682,7 +682,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			ZG_LOG(@"Error generating jumpFromIslandData");
 			ZGResumeTask(process.processTask);
-			return nil;
+			return NO;
 		}
 		
 		[newInstructionsData appendData:jumpFromIslandData];
@@ -704,13 +704,13 @@ error:(NSError * __autoreleasing *)error
 		if (![codeInjectionHandler addBreakPointWithToIslandInstruction:firstInstruction fromIslandInstruction:instructionBack islandAddress:allocatedAddress process:process processType:processType breakPointController:breakPointController owner:owner undoManager:undoManager])
 		{
 			ZG_LOG(@"Error: Failed to add breakpoints for code injection..");
-			return nil;
+			return NO;
 		}
 	}
 	
 	ZGResumeTask(process.processTask);
 	
-	return codeInjectionHandler;
+	return YES;
 }
 
 + (NSArray<ZGInstruction *> *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController processType:(ZGProcessType)processType

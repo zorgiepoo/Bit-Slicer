@@ -90,7 +90,7 @@ actionName:(nullable NSString *)actionName;
 
 + (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController processType:(ZGProcessType)processType;
 
-+ (ZGCodeInjectionHandler * _Nullable)
++ (BOOL)
 injectCode:(NSData *)codeData
 intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions

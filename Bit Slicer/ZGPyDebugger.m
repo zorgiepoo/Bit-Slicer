@@ -826,7 +826,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		
 		NSError *error = nil;
 		BOOL injectedCode =
-		([ZGDebuggerUtilities
+		[ZGDebuggerUtilities
 		 injectCode:codeData
 		 intoAddress:destinationAddress
 		 hookingIntoOriginalInstructions:originalInstructions
@@ -835,7 +835,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		 breakPointController:self->objcSelf->_breakPointController
 		 owner:self->breakPointDelegate
 		 undoManager:nil
-		 error:&error] != nil);
+		 error:&error];
 		
 		if (!injectedCode)
 		{

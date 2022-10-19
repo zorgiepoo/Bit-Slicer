@@ -176,8 +176,7 @@
 	NSError *error = nil;
 	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_processType error:&error];
 	
-	ZGCodeInjectionHandler *injectionHandler = nil;
-	if (injectedCode.length == 0 || error != nil || (injectionHandler = [ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPointController:_breakPointController owner:_owner undoManager:ZGUnwrapNullableObject(_undoManager) error:&error]) == nil)
+	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPointController:_breakPointController owner:_owner undoManager:ZGUnwrapNullableObject(_undoManager) error:&error])
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);
