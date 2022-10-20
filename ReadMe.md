@@ -24,7 +24,7 @@ It allows you to cheat in video games by searching and modifying values such as 
 	* View live disassembly of instructions
 	* Modify instruction's bytes directly, or by assembling instructions (including nopping)
 	* Set breakpoints, resume from them when they're hit, view backtraces, manipulate thread registers, and step into/out/over instructions
-	* Inject new assembly code on the fly (Intel only)
+	* Inject new assembly code on the fly
 * Save slice documents so that you can send cheats to your friends
 * Write Scripts to automate tasks that involve using virtual memory and debugger methods
 * Pause and un-pause current process
