@@ -42,6 +42,7 @@
 @class ZGRunningProcess;
 @class ZGAppTerminationState;
 @class ZGScriptingInterpreter;
+@class ZGCodeInjectionHandler;
 
 typedef NS_ENUM(uint8_t, ZGWatchPointType)
 {
@@ -62,6 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process callback:(PyObject *)callback delegate:(id)delegate;
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer callback:(PyObject *)callback delegate:(id)delegate;
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate;
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process emulated:(BOOL)emulated delegate:(id)delegate;
 - (ZGBreakPoint * _Nullable)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (ZGBreakPoint *)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint;
@@ -69,6 +71,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint;
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint * _Nullable * _Nonnull)returnedBreakPoint;
+
+- (BOOL)addCodeInjectionHandler:(ZGCodeInjectionHandler *)codeInjectionHandler;
+
+- (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForInstruction:(ZGInstruction *)instruction process:(ZGProcess *)process;
+- (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForMemoryAddress:(ZGMemoryAddress)memoryAddress process:(ZGProcess *)process;
 
 - (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer;
 - (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;

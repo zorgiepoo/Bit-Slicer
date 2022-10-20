@@ -61,6 +61,7 @@
 #import "ZGDataValueExtracting.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGNullability.h"
+#import "ZGCodeInjectionHandler.h"
 
 #import <TargetConditionals.h>
 
@@ -108,7 +109,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	NSArray<ZGInstruction *> *_instructions;
 	NSRange _instructionBoundary;
 	
-	ZGCodeInjectionWindowController * _Nullable _codeInjectionController;
+	ZGCodeInjectionWindowController * _Nullable _codeInjectionWindowController;
 	
 	NSPopover * _Nullable _breakPointConditionPopover;
 	NSMutableArray<ZGBreakPointCondition *> * _Nullable _breakPointConditions;
@@ -495,7 +496,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 					if (size >= sizeof(gBreakpointOpcode) && memcmp(bytes, gBreakpointOpcode, sizeof(gBreakpointOpcode)) == 0 && (size == sizeof(gBreakpointOpcode) || memcmp((uint8_t *)bytes + sizeof(gBreakpointOpcode), (uint8_t *)instruction.variable.rawValue + sizeof(gBreakpointOpcode), size - sizeof(gBreakpointOpcode)) == 0))
 					{
 						foundBreakPoint = [_breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
-							return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.rawValue == *(uint8_t *)instruction.variable.rawValue);
+							return (BOOL)(breakPoint.type == ZGBreakPointInstruction && !breakPoint.emulated && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.rawValue == *(uint8_t *)instruction.variable.rawValue);
 						}];
 					}
 					
@@ -856,24 +857,41 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 - (IBAction)jumpToOperandOffset:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	ZGProcess *process = self.currentProcess;
 	
-	id<ZGDisassemblerObject> disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask processType:_disassemblerProcessType address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:_breakPointController.breakPoints];
-	
-	if (disassemblerObject != nil)
+	ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:selectedInstruction process:process];
+	if (injectionHandler != nil)
 	{
-		NSString *branchDestination = [disassemblerObject readBranchOperand];
-		if (branchDestination != nil)
+		ZGInstruction *toIslandInstruction = injectionHandler.toIslandInstruction;
+		if (toIslandInstruction.variable.address == selectedInstruction.variable.address)
 		{
-			[self jumpToMemoryAddressStringValue:branchDestination inProcess:self.currentProcess];
+			[self jumpToMemoryAddress:injectionHandler.islandAddress inProcess:process];
 		}
 		else
 		{
-			ZG_LOG(@"Failed to jump to branch address on %@", selectedInstruction.text);
+			[self jumpToMemoryAddress:(toIslandInstruction.variable.address + toIslandInstruction.variable.size) inProcess:process];
 		}
 	}
 	else
 	{
-		ZG_LOG(@"Failed to disassemble bytes to jump to branch address on %@", selectedInstruction.text);
+		id<ZGDisassemblerObject> disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:process.processTask processType:_disassemblerProcessType address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:_breakPointController.breakPoints];
+		
+		if (disassemblerObject != nil)
+		{
+			NSString *branchDestination = [disassemblerObject readBranchOperand];
+			if (branchDestination != nil)
+			{
+				[self jumpToMemoryAddressStringValue:branchDestination inProcess:process];
+			}
+			else
+			{
+				ZG_LOG(@"Failed to jump to branch address on %@", selectedInstruction.text);
+			}
+		}
+		else
+		{
+			ZG_LOG(@"Failed to disassemble bytes to jump to branch address on %@", selectedInstruction.text);
+		}
 	}
 }
 
@@ -1186,7 +1204,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	NSIndexSet *tableIndexSet = _instructionsTableView.selectedRowIndexes;
 	NSInteger clickedRow = _instructionsTableView.clickedRow;
 	
-	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
+	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow] && (NSUInteger)clickedRow < _instructions.count) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
 - (NSArray<ZGInstruction *> *)selectedInstructions
@@ -1453,7 +1471,11 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		
 		ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
-		if ([ZGDisassemblerObject isCallMnemonic:selectedInstruction.mnemonic processType:_disassemblerProcessType])
+		if ([_breakPointController codeInjectionHandlerForInstruction:selectedInstruction process:self.currentProcess] != nil)
+		{
+			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToBranchAddress");
+		}
+		else if ([ZGDisassemblerObject isCallMnemonic:selectedInstruction.mnemonic processType:_disassemblerProcessType])
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToCallAddress");
 		}
@@ -1475,8 +1497,9 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else if (userInterfaceItem.action == @selector(requestCodeInjection:))
 	{
-		// Code injection is not supported on arm64
-		if (_disassemblerProcessType == ZGProcessTypeARM64)
+		// Code injection is not supported for Rosetta on arm64
+		// because Rosetta doesn't like our emulated far-away branching
+		if (_disassemblerProcessType == ZGProcessTypeARM64 && self.currentProcess.translated)
 		{
 			return NO;
 		}
@@ -1646,7 +1669,37 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
-			result = instruction.text;
+			ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:instruction process:self.currentProcess];
+			if (injectionHandler != nil)
+			{
+				ZGInstruction *toIslandInstruction = injectionHandler.toIslandInstruction;
+				if (toIslandInstruction.variable.address == instruction.variable.address)
+				{
+					if (ZG_PROCESS_TYPE_IS_X86_FAMILY(_disassemblerProcessType))
+					{
+						result = [NSString stringWithFormat:@"jmp 0x%llX ;(emulated)", injectionHandler.islandAddress];
+					}
+					else
+					{
+						result = [NSString stringWithFormat:@"b 0x%llX ;(emulated)", injectionHandler.islandAddress];
+					}
+				}
+				else
+				{
+					if (ZG_PROCESS_TYPE_IS_X86_FAMILY(_disassemblerProcessType))
+					{
+						result = [NSString stringWithFormat:@"jmp 0x%llX ;(emulated)", toIslandInstruction.variable.address + toIslandInstruction.variable.size];
+					}
+					else
+					{
+						result = [NSString stringWithFormat:@"b 0x%llX ;(emulated)", toIslandInstruction.variable.address + toIslandInstruction.variable.size];
+					}
+				}
+			}
+			else
+			{
+				result = instruction.text;
+			}
 		}
 		else if ([tableColumn.identifier isEqualToString:@"symbols"])
 		{
@@ -1720,10 +1773,18 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
-			BOOL enabled = [self disassemblerProcessTypeIsNative];
-			
 			NSButtonCell *buttonCell = (NSButtonCell *)cell;
-			buttonCell.enabled = enabled;
+			
+			if (![self disassemblerProcessTypeIsNative])
+			{
+				buttonCell.enabled = NO;
+			}
+			else
+			{
+				ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
+				ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:instruction process:self.currentProcess];
+				buttonCell.enabled = (injectionHandler == nil);
+			}
 		}
 	}
 }
@@ -1856,7 +1917,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 					
 					ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldValue size:newWriteSize address:instruction.variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
 					
-					[ZGDebuggerUtilities replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] inProcess:self.currentProcess breakPoints:_breakPointController.breakPoints undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoInstructionChange")];
+					[ZGDebuggerUtilities replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] inProcess:self.currentProcess breakPointController:_breakPointController undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoInstructionChange")];
 				}
 				
 				free(oldValue);
@@ -1869,22 +1930,23 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (IBAction)nopVariables:(id)__unused sender
 {
-	[ZGDebuggerUtilities nopInstructions:[self selectedInstructions] inProcess:self.currentProcess processType:_disassemblerProcessType breakPoints:_breakPointController.breakPoints undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoNOPChange")];
+	[ZGDebuggerUtilities nopInstructions:[self selectedInstructions] inProcess:self.currentProcess processType:_disassemblerProcessType breakPointController:_breakPointController undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoNOPChange")];
 }
 
 - (IBAction)requestCodeInjection:(id)__unused sender
 {
-	if (_codeInjectionController == nil)
+	if (_codeInjectionWindowController == nil)
 	{
-		_codeInjectionController = [[ZGCodeInjectionWindowController alloc] init];
+		_codeInjectionWindowController = [[ZGCodeInjectionWindowController alloc] init];
 	}
 	
-	[_codeInjectionController
+	[_codeInjectionWindowController
 	 attachToWindow:ZGUnwrapNullableObject(self.window)
 	 process:self.currentProcess
 	 processType:_disassemblerProcessType
 	 instruction:[[self selectedInstructions] objectAtIndex:0]
-	 breakPoints:_breakPointController.breakPoints
+	 breakPointController:_breakPointController
+	 owner:self
 	 undoManager:self.undoManager];
 }
 

@@ -68,6 +68,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
+#import "ZGCodeInjectionHandler.h"
 #import "ZGAppTerminationState.h"
 
 #import <mach/task.h>
@@ -83,6 +84,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	mach_port_t _exceptionPort;
 	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
 	dispatch_source_t _Nullable _watchPointTimer;
+	NSMutableDictionary<NSNumber *, NSMutableArray<ZGCodeInjectionHandler *> *> *_codeInjectionMappings;
 	BOOL _delayedTermination;
 }
 
@@ -809,7 +811,9 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		{
 			if (processID <= 0 || (processID == breakPoint.process.processID && breakPoint.variable.address == address))
 			{
-				if (breakPoint.delegate == observer && (!process || breakPoint.process.processID == process.processIdentifier))
+				// Also check for code injection handlers which we will automatically remove when removing another observer
+				id<ZGBreakPointDelegate> breakPointDelegate = breakPoint.delegate;
+				if ((breakPointDelegate == observer || ([breakPointDelegate isKindOfClass:[ZGCodeInjectionHandler class]] && [(ZGCodeInjectionHandler *)breakPointDelegate owner] == observer)) && (!process || breakPoint.process.processID == process.processIdentifier))
 				{
 					BOOL isDead = ![runningProcesses zgHasObjectMatchingCondition:^(ZGRunningProcess *runningProcess) {
 						return (BOOL)(runningProcess.processIdentifier == breakPoint.process.processID);
@@ -1120,25 +1124,30 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process callback:(PyObject *)callback delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO condition:NULL callback:callback delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO emulated:NO condition:NULL callback:callback delegate:delegate];
 }
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO condition:condition callback:NULL delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO emulated:NO condition:condition callback:NULL delegate:delegate];
 }
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES condition:NULL callback:NULL delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES emulated:NO condition:NULL callback:NULL delegate:delegate];
 }
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer callback:(PyObject *)callback delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES condition:NULL callback:callback delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES emulated:NO condition:NULL callback:callback delegate:delegate];
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer hidden:(BOOL)isHidden condition:(PyObject *)condition callback:(PyObject *)callback delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process emulated:(BOOL)emulated delegate:(id)delegate
+{
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO emulated:emulated condition:NULL callback:NULL delegate:delegate];
+}
+
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer hidden:(BOOL)isHidden emulated:(BOOL)emulated condition:(PyObject *)condition callback:(PyObject *)callback delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
@@ -1189,6 +1198,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	breakPoint.variable = variable;
 	breakPoint.hidden = isHidden;
+	breakPoint.emulated = emulated;
 	breakPoint.thread = thread;
 	breakPoint.basePointer = basePointer;
 #if TARGET_CPU_ARM64
@@ -1237,6 +1247,25 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	{
 		NSMutableArray<ZGBreakPoint *> *currentBreakPoints = [NSMutableArray arrayWithArray:[self breakPoints]];
 		[currentBreakPoints removeObject:breakPoint];
+		
+		// Remove any code injection handlers associated with this breakpoint
+		NSNumber *breakPointKey = @(breakPoint.variable.address);
+		NSMutableArray<ZGCodeInjectionHandler *> *codeInjectionHandlers = _codeInjectionMappings[breakPointKey];
+		if (codeInjectionHandlers != nil)
+		{
+			ZGProcess *breakPointProcess = breakPoint.process;
+			NSMutableArray *newCodeInjectionHandlers = [NSMutableArray array];
+			for (ZGCodeInjectionHandler *injectionHandler in codeInjectionHandlers)
+			{
+				if (injectionHandler.process.processTask != breakPointProcess.processTask)
+				{
+					[newCodeInjectionHandlers addObject:injectionHandler];
+				}
+			}
+			
+			_codeInjectionMappings[breakPointKey] = newCodeInjectionHandlers;
+		}
+		
 		_breakPoints = [NSArray arrayWithArray:currentBreakPoints];
 	}
 }
@@ -1247,6 +1276,82 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	{
 		return _breakPoints;
 	}
+}
+
+- (BOOL)addCodeInjectionHandler:(ZGCodeInjectionHandler *)codeInjectionHandler
+{
+	ZGProcess *process = codeInjectionHandler.process;
+	
+	ZGInstruction *toIslandInstruction = codeInjectionHandler.toIslandInstruction;
+	
+	[self removeBreakPointOnInstruction:toIslandInstruction inProcess:process];
+	
+	if (![self addBreakPointOnInstruction:toIslandInstruction inProcess:process emulated:YES delegate:codeInjectionHandler])
+	{
+		return NO;
+	}
+	
+	ZGInstruction *fromIslandInstruction = codeInjectionHandler.fromIslandInstruction;
+	
+	[self removeBreakPointOnInstruction:fromIslandInstruction inProcess:process];
+		
+	if (![self addBreakPointOnInstruction:fromIslandInstruction inProcess:process emulated:YES delegate:codeInjectionHandler])
+	{
+		[self removeBreakPointOnInstruction:toIslandInstruction inProcess:process];
+		return NO;
+	}
+	
+	@synchronized(self)
+	{
+		if (_codeInjectionMappings == nil)
+		{
+			_codeInjectionMappings = [NSMutableDictionary dictionary];
+		}
+		
+		NSNumber *toIslandMemoryAddressKey = @(toIslandInstruction.variable.address);
+		NSMutableArray<ZGCodeInjectionHandler *> *toIslandHandlers = _codeInjectionMappings[toIslandMemoryAddressKey];
+		if (toIslandHandlers == nil)
+		{
+			toIslandHandlers = [NSMutableArray array];
+		}
+		
+		[toIslandHandlers addObject:codeInjectionHandler];
+		
+		_codeInjectionMappings[toIslandMemoryAddressKey] = toIslandHandlers;
+		
+		NSNumber *fromIslandMemoryAddressKey = @(fromIslandInstruction.variable.address);
+		NSMutableArray<ZGCodeInjectionHandler *> *fromIslandHandlers = _codeInjectionMappings[fromIslandMemoryAddressKey];
+		if (fromIslandHandlers == nil)
+		{
+			fromIslandHandlers = [NSMutableArray array];
+		}
+		
+		[fromIslandHandlers addObject:codeInjectionHandler];
+		
+		_codeInjectionMappings[fromIslandMemoryAddressKey] = fromIslandHandlers;
+	}
+	
+	return YES;
+}
+
+- (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForInstruction:(ZGInstruction *)instruction process:(ZGProcess *)process
+{
+	return [self codeInjectionHandlerForMemoryAddress:instruction.variable.address process:process];
+}
+
+- (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForMemoryAddress:(ZGMemoryAddress)memoryAddress process:(ZGProcess *)process
+{
+	@synchronized(self)
+	{
+		for (ZGCodeInjectionHandler *codeInjectionHandler in _codeInjectionMappings[@(memoryAddress)])
+		{
+			if (codeInjectionHandler.process.processTask == process.processTask)
+			{
+				return codeInjectionHandler;
+			}
+		}
+	}
+	return nil;
 }
 
 @end

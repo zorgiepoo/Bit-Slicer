@@ -124,6 +124,9 @@
 /* Error indicating current instructions could not be NOP'ed for code injection */
 "failedNOPInstructionsForInjectingCode" = "failed to NOP current instructions";
 
+/* Error indicating code injection for rosetta is not supported */
+"failedInjectCodeForRosetta" = "code injection is not supported for Rosetta targets";
+
 /* Alert Title for failing to allocate memory for code injection */
 "failedAllocateMemoryForInjectingCodeAlertTitle" = "Failed to Allocate Memory";
 

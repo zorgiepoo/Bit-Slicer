@@ -47,6 +47,8 @@ extern const uint8_t gBreakpointOpcode[1];
 @protocol ZGDisassemblerObject;
 @class ZGMachBinary;
 @class ZGBreakPoint;
+@class ZGBreakPointController;
+@class ZGCodeInjectionHandler;
 
 typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 {
@@ -55,8 +57,9 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	ZGDisassemblerModeARM
 };
 
-#define INJECTED_NOP_SLIDE_LENGTH 0x10
+#define INJECTED_X86_NOP_SLIDE_LENGTH 0x10
 #define X86_NOP_VALUE 0x90
+#define ARM64_NOP_VALUE 0xD503201F
 
 #define ZGLocalizedStringFromDebuggerTable(string) NSLocalizedStringFromTable((string), @"[Code] Debugger", nil)
 
@@ -65,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ZGDebuggerUtilities : NSObject
 
 + (nullable NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
-+ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
++ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPointController:(ZGBreakPointController *)breakPointController;
 
 + (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer processType:(ZGProcessType)processType error:(NSError **)error;
 
@@ -79,13 +82,13 @@ replaceInstructions:(NSArray<ZGInstruction *> *)instructions
 fromOldStringValues:(NSArray<NSString *> *)oldStringValues
 toNewStringValues:(NSArray<NSString *> *)newStringValues
 inProcess:(ZGProcess *)process
-breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
+breakPointController:(ZGBreakPointController *)breakPointController
 undoManager:(nullable NSUndoManager *)undoManager
 actionName:(nullable NSString *)actionName;
 
-+ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager actionName:(nullable NSString *)actionName;
++ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController undoManager:(nullable NSUndoManager *)undoManager actionName:(nullable NSString *)actionName;
 
-+ (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints processType:(ZGProcessType)processType;
++ (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController processType:(ZGProcessType)processType;
 
 + (BOOL)
 injectCode:(NSData *)codeData
@@ -93,9 +96,10 @@ intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
 processType:(ZGProcessType)processType
-breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
-undoManager:(nullable NSUndoManager *)undoManager
-error:(NSError  **)error;
+breakPointController:(ZGBreakPointController *)breakPointController
+owner:(id)owner
+undoManager:(NSUndoManager *)undoManager
+error:(NSError * __autoreleasing *)error;
 
 @end
 

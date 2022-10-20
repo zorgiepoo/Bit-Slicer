@@ -31,6 +31,7 @@
  */
 
 #import "ZGCodeInjectionWindowController.h"
+#import "ZGBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGMemoryTypes.h"
 #import "ZGVirtualMemory.h"
@@ -50,7 +51,8 @@
 	ZGProcess * _Nullable _process;
 	ZGProcessType _processType;
 	NSArray<ZGInstruction *> *_instructions;
-	NSArray<ZGBreakPoint *> *_breakPoints;
+	ZGBreakPointController *_breakPointController;
+	__weak id _owner;
 }
 
 - (NSString *)windowNibName
@@ -70,7 +72,7 @@
 	_suggestedCode = [_textView.textStorage.mutableString copy];
 }
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner undoManager:(NSUndoManager *)undoManager
 {
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
@@ -84,14 +86,25 @@
 	}
 	
 	void *nopBuffer = malloc(numberOfAllocatedBytes);
-	memset(nopBuffer, X86_NOP_VALUE, numberOfAllocatedBytes);
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
+	{
+		size_t elementCount = numberOfAllocatedBytes / 4;
+		for (size_t elementIndex = 0; elementIndex < elementCount; elementIndex++)
+		{
+			*((uint32_t *)nopBuffer + elementIndex) = ARM64_NOP_VALUE;
+		}
+	}
+	else
+	{
+		memset(nopBuffer, X86_NOP_VALUE, numberOfAllocatedBytes);
+	}
 	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
 	{
 		NSLog(@"Failed to nop allocated memory for code injection"); // not a fatal error
 	}
 	free(nopBuffer);
 	
-	NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process withBreakPoints:breakPoints processType:processType];
+	NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process breakPointController:breakPointController processType:processType];
 	
 	if (instructions == nil)
 	{
@@ -106,21 +119,31 @@
 		return;
 	}
 	
-	NSMutableString *suggestedCode = [NSMutableString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"newlyCodeInjectedAtMessage"), allocatedAddress + INJECTED_NOP_SLIDE_LENGTH];
+	NSUInteger nopSlideLength;
+	if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
+	{
+		nopSlideLength = INJECTED_X86_NOP_SLIDE_LENGTH;
+	}
+	else
+	{
+		nopSlideLength = 0;
+	}
+	
+	NSMutableString *suggestedCode = [NSMutableString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"newlyCodeInjectedAtMessage"), allocatedAddress + nopSlideLength];
 	
 	for (ZGInstruction *suggestedInstruction in instructions)
 	{
 		NSMutableString *instructionText = [NSMutableString stringWithString:[suggestedInstruction text]];
-		if (ZG_PROCESS_TYPE_IS_X86_64(process.type) && [instructionText rangeOfString:@"rip"].location != NSNotFound)
+		if (ZG_PROCESS_TYPE_IS_X86_64(processType) && [instructionText rangeOfString:@"rip"].location != NSNotFound)
 		{
 			NSString *ripReplacement = nil;
 			if (allocatedAddress > instruction.variable.address)
 			{
-				ripReplacement = [NSString stringWithFormat:@"rip-0x%llX", allocatedAddress + INJECTED_NOP_SLIDE_LENGTH + (suggestedInstruction.variable.address - instruction.variable.address) - suggestedInstruction.variable.address];
+				ripReplacement = [NSString stringWithFormat:@"rip-0x%llX", allocatedAddress + nopSlideLength + (suggestedInstruction.variable.address - instruction.variable.address) - suggestedInstruction.variable.address];
 			}
 			else
 			{
-				ripReplacement = [NSString stringWithFormat:@"rip+0x%llX", suggestedInstruction.variable.address + (suggestedInstruction.variable.address - instruction.variable.address) - allocatedAddress - INJECTED_NOP_SLIDE_LENGTH];
+				ripReplacement = [NSString stringWithFormat:@"rip+0x%llX", suggestedInstruction.variable.address + (suggestedInstruction.variable.address - instruction.variable.address) - allocatedAddress - nopSlideLength];
 			}
 			
 			[instructionText replaceOccurrencesOfString:@"rip" withString:ripReplacement options:NSLiteralSearch range:NSMakeRange(0, instructionText.length)];
@@ -139,7 +162,8 @@
 	_allocatedAddress = allocatedAddress;
 	_numberOfAllocatedBytes = numberOfAllocatedBytes;
 	_instructions = instructions;
-	_breakPoints = breakPoints;
+	_owner = owner;
+	_breakPointController = breakPointController;
 	
 	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
 	}];
@@ -152,7 +176,7 @@
 	NSError *error = nil;
 	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_processType error:&error];
 	
-	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPoints:_breakPoints undoManager:_undoManager error:&error])
+	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPointController:_breakPointController owner:_owner undoManager:ZGUnwrapNullableObject(_undoManager) error:&error])
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);
