@@ -601,7 +601,7 @@ error:(NSError * __autoreleasing *)error
 				{
 					ZG_LOG(@"Error: Failed to assemble pop rax");
 					ZGResumeTask(process.processTask);
-					return nil;
+					return NO;
 				}
 				[newInstructionsData appendData:popRaxData	];
 			}
@@ -660,7 +660,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			ZG_LOG(@"Error generating jumpToIslandData");
 			ZGResumeTask(process.processTask);
-			return nil;
+			return NO;
 		}
 		
 		ZGVariable *variable =
