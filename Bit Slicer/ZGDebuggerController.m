@@ -290,7 +290,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	if (hotKey == _pauseAndUnpauseHotKey)
 	{
-		if ([self canContinueOrStepIntoExecution])
+		if ([self canContinueExecution])
 		{
 			[self continueExecution:nil];
 		}
@@ -319,7 +319,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else if (hotKey == _stepInHotKey)
 	{
-		if ([self canContinueOrStepIntoExecution])
+		if ([self canStepIntoExecution])
 		{
 			[self stepInto:nil];
 		}
@@ -1273,9 +1273,39 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 }
 
-- (BOOL)canContinueOrStepIntoExecution
+- (BOOL)canContinueExecution
 {
 	return [self currentBreakPoint] != nil && [self disassemblerProcessTypeIsNative];
+}
+
+- (BOOL)canStepIntoExecution
+{
+	if ([self currentBreakPoint] == nil)
+	{
+		return NO;
+	}
+	
+	if (![self disassemblerProcessTypeIsNative])
+	{
+		return NO;
+	}
+	
+	ZGProcessType processType = _disassemblerProcessType;
+	
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:_registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:_breakPointController.breakPoints processType:processType machBinaries:machBinaries];
+	if (!currentInstruction)
+	{
+		return NO;
+	}
+	
+	if ([_breakPointController codeInjectionHandlerForInstruction:currentInstruction process:self.currentProcess] != nil)
+	{
+		return NO;
+	}
+	
+	return YES;
 }
 
 - (BOOL)canStepOverExecution
@@ -1300,10 +1330,20 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return NO;
 	}
 	
+	if ([_breakPointController codeInjectionHandlerForInstruction:currentInstruction process:self.currentProcess] != nil)
+	{
+		return NO;
+	}
+	
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic processType:self.currentProcess.type])
 	{
 		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:_breakPointController.breakPoints processType:processType machBinaries:machBinaries];
 		if (!nextInstruction)
+		{
+			return NO;
+		}
+		
+		if ([_breakPointController codeInjectionHandlerForInstruction:nextInstruction process:self.currentProcess] != nil)
 		{
 			return NO;
 		}
@@ -1339,14 +1379,19 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return NO;
 	}
 	
+	if ([_breakPointController codeInjectionHandlerForInstruction:returnInstruction process:self.currentProcess] != nil)
+	{
+		return NO;
+	}
+	
 	return YES;
 }
 
 - (void)updateExecutionButtons
 {
-	[_continueButton setEnabled:[self canContinueOrStepIntoExecution]];
+	[_continueButton setEnabled:[self canContinueExecution]];
 	
-	[_stepExecutionSegmentedControl setEnabled:[self canContinueOrStepIntoExecution] forSegment:ZGStepIntoExecution];
+	[_stepExecutionSegmentedControl setEnabled:[self canStepIntoExecution] forSegment:ZGStepIntoExecution];
 	[_stepExecutionSegmentedControl setEnabled:[self canStepOverExecution] forSegment:ZGStepOverExecution];
 	[_stepExecutionSegmentedControl setEnabled:[self canStepOutOfExecution] forSegment:ZGStepOutExecution];
 }
@@ -1380,9 +1425,16 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			return NO;
 		}
 	}
-	else if (userInterfaceItem.action == @selector(continueExecution:) || userInterfaceItem.action == @selector(stepInto:))
+	else if (userInterfaceItem.action == @selector(continueExecution:))
 	{
-		if (![self canContinueOrStepIntoExecution])
+		if (![self canContinueExecution])
+		{
+			return NO;
+		}
+	}
+	else if (userInterfaceItem.action == @selector(stepInto:))
+	{
+		if (![self canStepIntoExecution])
 		{
 			return NO;
 		}

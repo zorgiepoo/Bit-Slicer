@@ -541,6 +541,16 @@ static ZGBreakPointController *gBreakPointController;
 			continue;
 		}
 		
+		BOOL foundSingleStepBreakPoint = [[self breakPoints] zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
+			return (BOOL)((candidateBreakPoint.needsToRestore || candidateBreakPoint.type == ZGBreakPointSingleStepInstruction) && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread);
+		}];
+		
+		// If we encounter an emulated breakpoint and a single step breakpoint, prioritize handling the latter
+		if (breakPoint.emulated && foundSingleStepBreakPoint)
+		{
+			continue;
+		}
+		
 		breakPoint.thread = thread;
 		
 		// Remove single-stepping
@@ -564,10 +574,6 @@ static ZGBreakPointController *gBreakPointController;
 		foundInstructionAddress = instructionPointer;
 #else
 		// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
-		BOOL foundSingleStepBreakPoint = [[self breakPoints] zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
-			return (BOOL)((candidateBreakPoint.needsToRestore || candidateBreakPoint.type == ZGBreakPointSingleStepInstruction) && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread);
-		}];
-		
 		if (foundSingleStepBreakPoint)
 		{
 			foundInstructionAddress = instructionPointer;
@@ -1249,21 +1255,25 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		[currentBreakPoints removeObject:breakPoint];
 		
 		// Remove any code injection handlers associated with this breakpoint
-		NSNumber *breakPointKey = @(breakPoint.variable.address);
-		NSMutableArray<ZGCodeInjectionHandler *> *codeInjectionHandlers = _codeInjectionMappings[breakPointKey];
-		if (codeInjectionHandlers != nil)
+		// Need to check the breakpoint is emulated to ignore single stepping breakpoints
+		if (breakPoint.emulated)
 		{
-			ZGProcess *breakPointProcess = breakPoint.process;
-			NSMutableArray *newCodeInjectionHandlers = [NSMutableArray array];
-			for (ZGCodeInjectionHandler *injectionHandler in codeInjectionHandlers)
+			NSNumber *breakPointKey = @(breakPoint.variable.address);
+			NSMutableArray<ZGCodeInjectionHandler *> *codeInjectionHandlers = _codeInjectionMappings[breakPointKey];
+			if (codeInjectionHandlers != nil)
 			{
-				if (injectionHandler.process.processTask != breakPointProcess.processTask)
+				ZGProcess *breakPointProcess = breakPoint.process;
+				NSMutableArray *newCodeInjectionHandlers = [NSMutableArray array];
+				for (ZGCodeInjectionHandler *injectionHandler in codeInjectionHandlers)
 				{
-					[newCodeInjectionHandlers addObject:injectionHandler];
+					if (injectionHandler.process.processTask != breakPointProcess.processTask)
+					{
+						[newCodeInjectionHandlers addObject:injectionHandler];
+					}
 				}
+				
+				_codeInjectionMappings[breakPointKey] = newCodeInjectionHandlers;
 			}
-			
-			_codeInjectionMappings[breakPointKey] = newCodeInjectionHandlers;
 		}
 		
 		_breakPoints = [NSArray arrayWithArray:currentBreakPoints];
