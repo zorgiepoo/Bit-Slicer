@@ -164,17 +164,28 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 		NSString *sanitizedInstructionText;
 		if ([instructionText hasPrefix:@";"])
 		{
-			// Skip the first comment line which may come from the code injection prompt
+			// Process out all comments which may come from the code injection prompt
 			// Keystone doesn't support feeding in comments
-			NSRange newlineRange = [instructionText rangeOfString:@"\n"];
-			if (newlineRange.location != NSNotFound)
-			{
-				sanitizedInstructionText = [instructionText substringFromIndex:newlineRange.location];
-			}
-			else
-			{
-				sanitizedInstructionText = instructionText;
-			}
+			NSMutableArray<NSString *> *newInstructionLines = [NSMutableArray array];
+			[instructionText enumerateLinesUsingBlock:^(NSString * _Nonnull line, BOOL * _Nonnull __unused stop) {
+				NSString *regularLine;
+				NSRange commentRange = [line rangeOfString:@";"];
+				if (commentRange.location != NSNotFound)
+				{
+					regularLine = [line substringToIndex:commentRange.location];
+				}
+				else
+				{
+					regularLine = line;
+				}
+				
+				if (regularLine.length > 0)
+				{
+					[newInstructionLines addObject:regularLine];
+				}
+			}];
+			
+			sanitizedInstructionText = [newInstructionLines componentsJoinedByString:@"\n"];
 		}
 		else
 		{
