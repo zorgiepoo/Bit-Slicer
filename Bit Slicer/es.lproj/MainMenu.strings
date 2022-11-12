@@ -197,6 +197,9 @@
 /* Class = "NSMenuItem"; title = "Store All Values"; ObjectID = "811"; */
 "811.title" = "Almacenar todos los valores";
 
+/* Class = "NSMenuItem"; title = "Store All Values After Searches"; ObjectID = "aRT-pt-mFr"; */
+"aRT-pt-mFr.title" = "Almacenar todos los valores después de las búsquedas";
+
 /* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "830"; */
 "830.title" = "matriz de bytes";
 

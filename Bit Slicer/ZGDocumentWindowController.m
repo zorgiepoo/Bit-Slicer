@@ -895,8 +895,6 @@
 	{
 		[menuItem setState:_storeValuesAfterSearch ? NSControlStateValueOn : NSControlStateValueOff];
 		
-		menuItem.title = ZGLocalizableSearchDocumentString(@"storeAllValuesAfterSearchesTitle");
-		
 		if (![_searchController canStartTask] || !_searchController.hasSavedValues)
 		{
 			return NO;

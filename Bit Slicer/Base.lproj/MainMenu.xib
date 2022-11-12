@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21503.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21503.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -693,8 +693,7 @@ CA
                                     <action selector="storeAllValues:" target="-1" id="847"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="STORE_ALL_VALUES_AFTER_SEARCHES" keyEquivalent="g" id="aRT-pt-mFr">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                            <menuItem title="Store All Values After Searches" state="on" keyEquivalent="G" id="aRT-pt-mFr">
                                 <connections>
                                     <action selector="storeAllValuesAfterSearches:" target="-1" id="dXY-T4-oZM"/>
                                 </connections>
