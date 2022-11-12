@@ -176,8 +176,5 @@
 /* Alert Message indicating that searching is failing due to the target runnning with elevated privileges */
 "searchFailureElevatedPrivilegesAlertMessageFormat" = "%@ cannot be searched because it may be running with elevated privileges.";
 
-/* Store all values now and after searches title */
-"storeAllValuesNowAndAfterSearchesTitle" = "Store All Values Now and After Searches";
-
 /* Store all values after searches title */
 "storeAllValuesAfterSearchesTitle" = "Store All Values After Searches";

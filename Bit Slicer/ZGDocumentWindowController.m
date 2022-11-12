@@ -895,16 +895,9 @@
 	{
 		[menuItem setState:_storeValuesAfterSearch ? NSControlStateValueOn : NSControlStateValueOff];
 		
-		if (!_searchController.hasSavedValues)
-		{
-			menuItem.title = ZGLocalizableSearchDocumentString(@"storeAllValuesNowAndAfterSearchesTitle");
-		}
-		else
-		{
-			menuItem.title = ZGLocalizableSearchDocumentString(@"storeAllValuesAfterSearchesTitle");
-		}
+		menuItem.title = ZGLocalizableSearchDocumentString(@"storeAllValuesAfterSearchesTitle");
 		
-		if (!self.currentProcess.valid || ![_searchController canStartTask])
+		if (![_searchController canStartTask] || !_searchController.hasSavedValues)
 		{
 			return NO;
 		}
@@ -1391,26 +1384,25 @@
 	BOOL optionKeyHeldDown = ([NSEvent modifierFlags] & NSEventModifierFlagOption) != 0;
 	if (optionKeyHeldDown)
 	{
-		[self storeAllValuesAfterSearches:nil];
+		[self _storeAllValuesAfterSearchesAndUpdateStoreValuesButton:NO];
 	}
-	else
+	
+	[self _storeAllValues];
+}
+
+- (void)_storeAllValuesAfterSearchesAndUpdateStoreValuesButton:(BOOL)updateStoreValuesButton
+{
+	_storeValuesAfterSearch = !_storeValuesAfterSearch;
+	
+	if (updateStoreValuesButton)
 	{
-		[self _storeAllValues];
+		[_searchController updateStoreValuesButtonImageWithStoringValuesAfterSearches:_storeValuesAfterSearch];
 	}
 }
 
 - (IBAction)storeAllValuesAfterSearches:(id)__unused sender
 {
-	_storeValuesAfterSearch = !_storeValuesAfterSearch;
-	
-	if (!_searchController.hasSavedValues)
-	{
-		[self _storeAllValues];
-	}
-	else
-	{
-		[_searchController updateStoreValuesButtonImageWithStoringValuesAfterSearches:_storeValuesAfterSearch];
-	}
+	[self _storeAllValuesAfterSearchesAndUpdateStoreValuesButton:YES];
 }
 
 - (IBAction)showAdvancedOptions:(id)sender
