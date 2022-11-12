@@ -55,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) ZGSearchResults *searchResults;
 @property (nonatomic, readonly) ZGSearchProgress *searchProgress;
 
+@property (nonatomic, readonly) BOOL hasSavedValues;
+
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;
 - (void)cancelTask;
@@ -65,8 +67,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables;
 - (void)fetchVariablesFromResults;
 
-- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing;
-- (void)storeAllValues;
+- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing storeValuesAfterSearch:(BOOL)storeValuesAfterSearch;
+- (void)storeAllValuesAndAfterSearches:(BOOL)storeValuesAfterSearches;
+
+- (void)updateStoreValuesButtonImageWithStoringValuesAfterSearches:(BOOL)storingValuesAfterSearches;
 
 - (void)cleanUp;
 

@@ -73,6 +73,8 @@
 		724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4C19A8EDD700E72C9D /* [Code] Logger Window.stringsdict */; };
 		724A9F5119A8F54600E72C9D /* [Code] Search Document.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4F19A8F54600E72C9D /* [Code] Search Document.stringsdict */; };
 		7257EFF31B87EF220045991F /* OSCSingleThreadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 7257EFF21B87EF220045991F /* OSCSingleThreadQueue.m */; };
+		7259370A291B7A1B0002502B /* container_filled_record@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 72593709291B7A1B0002502B /* container_filled_record@2x.pdf */; };
+		7259370C291B7ABA0002502B /* container_filled_record.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7259370B291B7ABA0002502B /* container_filled_record.pdf */; };
 		725DEC881A24F7610095C9B3 /* [Code] Script Manager.strings in Resources */ = {isa = PBXBuildFile; fileRef = 725DEC861A24F7610095C9B3 /* [Code] Script Manager.strings */; };
 		726B7CA61A23E849004354BC /* Script Prompt Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */; };
 		726B7CA91A23F0EE004354BC /* ZGScriptPromptWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */; };
@@ -436,6 +438,8 @@
 		724A9F5019A8F54600E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Search Document.stringsdict"; sourceTree = "<group>"; };
 		7257EFF11B87EF220045991F /* OSCSingleThreadQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSCSingleThreadQueue.h; path = deps/OSCSingleThreadQueue.h; sourceTree = "<group>"; };
 		7257EFF21B87EF220045991F /* OSCSingleThreadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSCSingleThreadQueue.m; path = deps/OSCSingleThreadQueue.m; sourceTree = "<group>"; };
+		72593709291B7A1B0002502B /* container_filled_record@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "container_filled_record@2x.pdf"; path = "Bit Slicer/docicons/container_filled_record@2x.pdf"; sourceTree = "<group>"; };
+		7259370B291B7ABA0002502B /* container_filled_record.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled_record.pdf; path = "Bit Slicer/docicons/container_filled_record.pdf"; sourceTree = "<group>"; };
 		725DEC851A24EE6F0095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Script Prompt Dialog.strings"; sourceTree = "<group>"; };
 		725DEC871A24F7610095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
 		726B7CA51A23E849004354BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Script Prompt Dialog.xib"; sourceTree = "<group>"; };
@@ -1202,6 +1206,8 @@
 				723FC6EC24F4BEE80083F568 /* container@2x.pdf */,
 				77988F1B185804AC00476A37 /* container_filled.pdf */,
 				723FC6ED24F4BEE90083F568 /* container_filled@2x.pdf */,
+				7259370B291B7ABA0002502B /* container_filled_record.pdf */,
+				72593709291B7A1B0002502B /* container_filled_record@2x.pdf */,
 			);
 			name = "Document Icons";
 			sourceTree = "<group>";
@@ -1575,6 +1581,7 @@
 				724A9F2519A1657500E72C9D /* [Code] Memory Viewer Status Bar.strings in Resources */,
 				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
 				77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */,
+				7259370A291B7A1B0002502B /* container_filled_record@2x.pdf in Resources */,
 				726CA2C819606E1D00A6AD40 /* Edit Value Dialog.xib in Resources */,
 				724A9F1F19A1657500E72C9D /* [Code] Debugger.strings in Resources */,
 				726CA2A919606D0000A6AD40 /* Code Injection Window.xib in Resources */,
@@ -1611,6 +1618,7 @@
 				726CA2C519606E0100A6AD40 /* Scripts View.xib in Resources */,
 				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
 				726CA2C219606DFC00A6AD40 /* Shortcuts View.xib in Resources */,
+				7259370C291B7ABA0002502B /* container_filled_record.pdf in Resources */,
 				724A9F4819A8792000E72C9D /* [Code] Memory Window.strings in Resources */,
 				724A9F4519A863A800E72C9D /* [Code] Watch Variable.strings in Resources */,
 				723FC6EA24F4BEB10083F568 /* stepout@2x.pdf in Resources */,

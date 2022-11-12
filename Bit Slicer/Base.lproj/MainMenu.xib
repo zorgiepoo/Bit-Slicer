@@ -693,6 +693,13 @@ CA
                                     <action selector="storeAllValues:" target="-1" id="847"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="STORE_ALL_VALUES_AFTER_SEARCHES" keyEquivalent="g" id="aRT-pt-mFr">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="storeAllValuesAfterSearches:" target="-1" id="dXY-T4-oZM"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="kWF-ky-5nK"/>
                             <menuItem title="Search Pointer to Variable" keyEquivalent="0" id="dr1-2H-Uqa">
                                 <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>

@@ -768,7 +768,7 @@
 	});
 }
 
-- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing
+- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
 {
 	_dataType = dataType;
 	_functionType = functionType;
@@ -821,6 +821,11 @@
 			}
 			
 			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
+			
+			if (storeValuesAfterSearch && self->_searchData.savedData != nil)
+			{
+				[self storeAllValuesAndAfterSearches:YES];
+			}
 		}
 	}];
 }
@@ -842,7 +847,30 @@
 
 #pragma mark Storing all values
 
-- (void)storeAllValues
+- (BOOL)hasSavedValues
+{
+	return _searchData.savedData != nil;
+}
+
+- (void)updateStoreValuesButtonImageWithStoringValuesAfterSearches:(BOOL)storingValuesAfterSearches
+{
+	ZGDocumentWindowController *windowController = _windowController;
+	
+	if (_searchData.savedData == nil)
+	{
+		windowController.storeValuesButton.image = [NSImage imageNamed:@"container"];
+	}
+	else if (storingValuesAfterSearches)
+	{
+		windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled_record"];
+	}
+	else
+	{
+		windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
+	}
+}
+
+- (void)storeAllValuesAndAfterSearches:(BOOL)storeValuesAfterSearches
 {
 	[self prepareTask];
 	
@@ -865,7 +893,7 @@
 			{
 				self->_searchData.savedData = tempSavedData;
 				tempSavedData = nil;
-				windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
+				[self updateStoreValuesButtonImageWithStoringValuesAfterSearches:storeValuesAfterSearches];
 				
 				if (![[self class] hasStoredValueTokenFromExpression:self->_documentData.searchValue])
 				{

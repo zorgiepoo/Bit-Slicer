@@ -89,6 +89,7 @@
 	ZGWatchVariableWindowController * _Nullable _watchVariableWindowController;
 	
 	BOOL _preferringNewTab;
+	BOOL _storeValuesAfterSearch;
 	
 	ZGEditValueWindowController * _Nullable _editValueWindowController;
 	ZGEditAddressWindowController * _Nullable _editAddressWindowController;
@@ -291,6 +292,7 @@
 	
 	[_storeValuesButton.image setTemplate:YES];
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
+	[[NSImage imageNamed:@"container_filled_record"] setTemplate:YES];
 	
 	_storeValuesButton.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
 	
@@ -889,6 +891,25 @@
 		}
 	}
 	
+	else if (menuItem.action == @selector(storeAllValuesAfterSearches:))
+	{
+		[menuItem setState:_storeValuesAfterSearch ? NSControlStateValueOn : NSControlStateValueOff];
+		
+		if (!_searchController.hasSavedValues)
+		{
+			menuItem.title = ZGLocalizableSearchDocumentString(@"storeAllValuesNowAndAfterSearchesTitle");
+		}
+		else
+		{
+			menuItem.title = ZGLocalizableSearchDocumentString(@"storeAllValuesAfterSearchesTitle");
+		}
+		
+		if (!self.currentProcess.valid || ![_searchController canStartTask])
+		{
+			return NO;
+		}
+	}
+	
 	else if (menuItem.action == @selector(searchPointerToSelectedVariable:))
 	{
 		if (!self.currentProcess.valid || ![_searchController canStartTask] || self.selectedVariables.count != 1)
@@ -1268,7 +1289,7 @@
 					[[self undoManager] removeAllActions];
 				}
 				
-				[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES];
+				[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES storeValuesAfterSearch:_storeValuesAfterSearch];
 			}
 		}
 		else
@@ -1356,13 +1377,40 @@
 - (IBAction)searchPointerToSelectedVariable:(id)__unused sender
 {
 	ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
-	[_searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO];
+	[_searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO storeValuesAfterSearch:_storeValuesAfterSearch];
+}
+
+- (void)_storeAllValues
+{
+	_documentData.searchValue = _searchValueTextField.stringValue;
+	[_searchController storeAllValuesAndAfterSearches:_storeValuesAfterSearch];
 }
 
 - (IBAction)storeAllValues:(id)__unused sender
 {
-	_documentData.searchValue = _searchValueTextField.stringValue;
-	[_searchController storeAllValues];
+	BOOL optionKeyHeldDown = ([NSEvent modifierFlags] & NSEventModifierFlagOption) != 0;
+	if (optionKeyHeldDown)
+	{
+		[self storeAllValuesAfterSearches:nil];
+	}
+	else
+	{
+		[self _storeAllValues];
+	}
+}
+
+- (IBAction)storeAllValuesAfterSearches:(id)__unused sender
+{
+	_storeValuesAfterSearch = !_storeValuesAfterSearch;
+	
+	if (!_searchController.hasSavedValues)
+	{
+		[self _storeAllValues];
+	}
+	else
+	{
+		[_searchController updateStoreValuesButtonImageWithStoringValuesAfterSearches:_storeValuesAfterSearch];
+	}
 }
 
 - (IBAction)showAdvancedOptions:(id)sender
