@@ -17,7 +17,6 @@
 		720C192C271B4F9700740C8E /* ZGSearchProtectionMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */; };
 		721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
 		7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
 		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
 		722CAA5B19AD4AED009C6AAE /* scripts.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5719AD4AED009C6AAE /* scripts.png */; };
@@ -319,7 +318,6 @@
 		720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGSearchProtectionMode.m; path = "Bit Slicer/ZGSearchProtectionMode.m"; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
-		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
 		722CAA5719AD4AED009C6AAE /* scripts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = scripts.png; path = "Bit Slicer/preficons/scripts.png"; sourceTree = "<group>"; };
@@ -889,7 +887,6 @@
 				77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */,
 				72DBC8EF1B7657F20092ED75 /* LICENSE */,
 				77F115B217D2EAFE009E002A /* Credits.rtf */,
-				7216F7D01AC66133005288A8 /* dsa_pub.pem */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1638,7 +1635,6 @@
 				72D051CB1960A41F00EC532A /* Registers View.xib in Resources */,
 				72D051AC1960891900EC532A /* Backtrace View.xib in Resources */,
 				72DBC8F01B7657F20092ED75 /* LICENSE in Resources */,
-				7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */,
 				72D051A91960890800EC532A /* Data Inspector View.xib in Resources */,
 				726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */,
 				724A9F2119A1657500E72C9D /* [Code] Dump Memory Range.strings in Resources */,
