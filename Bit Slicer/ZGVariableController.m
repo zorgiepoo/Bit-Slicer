@@ -406,7 +406,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		 type:variableType
 		 qualifier:qualifier
 		 pointerSize:windowController.currentProcess.pointerSize
-		 description:[[NSAttributedString alloc] initWithString:variableType == ZGScript ? ZGLocalizedStringFromVariableActionsTable(@"defaultScriptDescription") : @""]
+		 description:[[NSAttributedString alloc] initWithString:variableType == ZGScript ? ZGLocalizedStringFromVariableActionsTable(@"defaultScriptDescription") : @"" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]
 		 enabled:NO
 		 byteOrder:byteOrder];
 	
