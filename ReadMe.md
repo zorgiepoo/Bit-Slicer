@@ -34,7 +34,8 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Enjoy OS level features such as auto-saving, document versioning, window restoration, notification center, app nap, dark mode, etc.
 
 ## System Requirements
-* **Current Release**: macOS 10.11 or newer
+* **Current Release**: macOS 10.13 or newer
+* [1.7.11](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.7.11/Bit.Slicer.dmg): macOS 10.11
 * [1.7.9](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.7.9/Bit.Slicer.dmg): macOS 10.10
 * [1.7.8](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.7.8/Bit.Slicer.dmg): macOS 10.8
 * [1.6.2](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.6.2/Bit_Slicer_1.6.2.zip): macOS 10.6.8, a 64-bit intel Mac
