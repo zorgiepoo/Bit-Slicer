@@ -36,6 +36,7 @@
 #import "ZGVariableController.h"
 #import "ZGEditValueWindowController.h"
 #import "ZGEditAddressWindowController.h"
+#import "ZGDocumentLabelManager.h"
 #import "ZGEditDescriptionWindowController.h"
 #import "ZGEditSizeWindowController.h"
 #import "ZGScriptManager.h"
@@ -279,6 +280,7 @@
 	_variableController = [[ZGVariableController alloc] initWithWindowController:self];
 	_searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
 	_scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
+	_documentLabelManager = [[ZGDocumentLabelManager alloc] initWithDocumentData:_documentData];
 	
 	_searchValueTextField.target = self;
 	_searchValueTextField.action = @selector(searchValue:);

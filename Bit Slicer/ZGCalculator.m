@@ -32,10 +32,12 @@
 
 #import "ZGCalculator.h"
 #import "NSStringAdditions.h"
+#import "ZGDocumentLabelManager.h"
 #import "ZGVirtualMemory.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGRegion.h"
+#import "ZGLabel.h"
 #import "ZGProcess.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-umbrella"
@@ -49,7 +51,9 @@
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
 #define ZGFindSymbolFunction @"symbol"
+#define ZGFindLabelFunction @"label"
 #define ZGProcessVariable @"ZGProcessVariable"
+#define ZGDocumentLabelManagerVariable @"ZGDocumentLabelManagerVariable"
 #define ZGFailedImagesVariable @"ZGFailedImagesVariable"
 #define ZGSymbolicatesVariable @"ZGSymbolicatesVariable"
 #define ZGDidFindSymbol @"ZGDidFindSymbol"
@@ -57,9 +61,14 @@
 
 @implementation ZGVariable (ZGCalculatorAdditions)
 
+- (BOOL)usesDynamicLabelAddress
+{
+	return _addressFormula != nil && [_addressFormula rangeOfString:ZGFindLabelFunction].location != NSNotFound;
+}
+
 - (BOOL)usesDynamicPointerAddress
 {
-	return _addressFormula != nil && [_addressFormula rangeOfString:@"["].location != NSNotFound && [_addressFormula rangeOfString:@"]"].location != NSNotFound;
+	return _addressFormula != nil && ([_addressFormula rangeOfString:@"["].location != NSNotFound && [_addressFormula rangeOfString:@"]"].location != NSNotFound);
 }
 
 - (BOOL)usesDynamicBaseAddress
@@ -236,6 +245,62 @@
 	return findSymbolFunction;
 }
 
++ (DDMathFunction)registerFindLabelFunctionWithEvaluator:(DDMathEvaluator *)evaluator
+{
+	DDMathFunction findLabelFunction = ^DDExpression *(NSArray<DDExpression *> *args, NSDictionary<NSString *, id> *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
+		ZGDocumentLabelManager *documentLabelManager = [vars objectForKey:ZGDocumentLabelManagerVariable];
+		
+		__block NSNumber *labelAddressNumber = @(0);
+
+		if (args.count == 0 || args.count > 1)
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGFindLabelFunction @" expects 1 argument"}];
+			}
+		}
+		else if (documentLabelManager == nil || [documentLabelManager.labels count] == 0)
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindLabelFunction @" expects a labels variable"}];
+			}
+		}
+		else
+		{
+			DDExpression *labelExpression = [args objectAtIndex:0];
+
+			if (labelExpression.expressionType != DDExpressionTypeVariable)
+			{
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindLabelFunction @" expects a string variable"}];
+				}
+			}
+			else
+			{
+				NSString *labelString = labelExpression.variable;
+				ZGLabel *label = [documentLabelManager.labels objectForKey:labelString];
+				
+				labelAddressNumber = @(label.address);
+				if (labelAddressNumber == nil)
+				{
+					if (error != NULL)
+					{
+						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindLabelFunction @" could not find requested label"}];
+					}
+				}
+			}
+		}
+		
+		return [DDExpression numberExpressionWithNumber:labelAddressNumber];
+	};
+	
+	[evaluator registerFunction:findLabelFunction forName:ZGFindLabelFunction];
+	
+	return findLabelFunction;
+}
+
 + (void)registerFunctionResolverWithEvaluator:(DDMathEvaluator *)evaluator findSymbolFunction:(DDMathFunction)findSymbolFunction
 {
 	evaluator.functionResolver = (DDFunctionResolver)^(NSString *name) {
@@ -262,6 +327,7 @@
 		DDMathEvaluator *evaluator = [DDMathEvaluator defaultMathEvaluator];
 		[self registerCalculatePointerFunctionWithEvaluator:evaluator];
 		[self registerBaseAddressFunctionWithEvaluator:evaluator];
+		[self registerFindLabelFunctionWithEvaluator:evaluator];
 		DDMathFunction findSymbolFunction = [self registerFindSymbolFunctionWithEvaluator:evaluator];
 		[self registerFunctionResolverWithEvaluator:evaluator findSymbolFunction:findSymbolFunction];
 	});
@@ -479,12 +545,17 @@
 	return [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression documentLabelManager:(ZGDocumentLabelManager * __unsafe_unretained)documentLabelManager process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
 {
 	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
 	
 	NSMutableDictionary<NSString *, id> *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process, ZGSymbolicatesVariable : @(symbolicates), ZGLastSearchInfoVariable : @(currentAddress), ZGDidFindSymbol : @(NO)}];
 
+	if (documentLabelManager != nil)
+	{
+		[substitutions setObject:documentLabelManager forKey:ZGDocumentLabelManagerVariable];
+	}
+	
 	if (failedImages != nil)
 	{
 		[substitutions setObject:failedImages forKey:ZGFailedImagesVariable];
@@ -501,12 +572,12 @@
 
 + (NSString *)evaluateAndSymbolicateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process currentAddress:(ZGMemoryAddress)currentAddress didSymbolicate:(BOOL *)didSymbolicate error:(NSError * __autoreleasing *)error
 {
-	return [self evaluateExpression:expression process:process failedImages:nil symbolicates:YES foundSymbol:didSymbolicate currentAddress:currentAddress error:error];
+	return [self evaluateExpression:expression documentLabelManager:NULL process:process failedImages:nil symbolicates:YES foundSymbol:didSymbolicate currentAddress:currentAddress error:error];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression documentLabelManager:(ZGDocumentLabelManager * __unsafe_unretained)documentLabelManager process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages error:(NSError * __autoreleasing *)error
 {
-	return [self evaluateExpression:expression process:process failedImages:failedImages symbolicates:NO foundSymbol:NULL currentAddress:0x0 error:error];
+	return [self evaluateExpression:expression documentLabelManager:documentLabelManager process:process failedImages:failedImages symbolicates:NO foundSymbol:NULL currentAddress:0x0 error:error];
 }
 
 @end

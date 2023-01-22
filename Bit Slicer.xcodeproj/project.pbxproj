@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E1220AD297C747000E3166F /* ZGDocumentLabelManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E1220AC297C747000E3166F /* ZGDocumentLabelManager.m */; };
+		4E1220AF297D432D00E3166F /* ZGLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E1220AE297D432D00E3166F /* ZGLabel.m */; };
 		72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */ = {isa = PBXBuildFile; fileRef = 72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */; };
 		720844FA24E0715C00F3D449 /* DataInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 720844F924E0715C00F3D449 /* DataInspector.m */; };
 		720844FD24E072DB00F3D449 /* DataInspectorScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 720844FC24E072DB00F3D449 /* DataInspectorScrollView.m */; };
@@ -301,6 +303,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4E1220AB297C745900E3166F /* ZGDocumentLabelManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGDocumentLabelManager.h; path = "Bit Slicer/ZGDocumentLabelManager.h"; sourceTree = "<group>"; };
+		4E1220AC297C747000E3166F /* ZGDocumentLabelManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentLabelManager.m; path = "Bit Slicer/ZGDocumentLabelManager.m"; sourceTree = "<group>"; };
+		4E1220AE297D432D00E3166F /* ZGLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGLabel.m; path = "Bit Slicer/ZGLabel.m"; sourceTree = "<group>"; };
+		4E1220B0297D433700E3166F /* ZGLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGLabel.h; path = "Bit Slicer/ZGLabel.h"; sourceTree = "<group>"; };
 		72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptingInterpreter.h; path = "Bit Slicer/ZGScriptingInterpreter.h"; sourceTree = "<group>"; };
 		72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptingInterpreter.m; path = "Bit Slicer/ZGScriptingInterpreter.m"; sourceTree = "<group>"; };
 		720844F824E0715C00F3D449 /* DataInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DataInspector.h; path = deps/HexFiend/DataInspector.h; sourceTree = "<group>"; };
@@ -1324,6 +1330,8 @@
 				77FFC104186BDA3600122357 /* ZGWatchVariableWindowController.h */,
 				77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */,
 				7739728017D26A1600B958EE /* Scripting */,
+				4E1220AB297C745900E3166F /* ZGDocumentLabelManager.h */,
+				4E1220AC297C747000E3166F /* ZGDocumentLabelManager.m */,
 			);
 			name = Documents;
 			sourceTree = "<group>";
@@ -1461,6 +1469,8 @@
 				77F1162B17D2EF50009E002A /* ZGVariable.m */,
 				7231440619C607C700FBE342 /* ZGWatchVariable.h */,
 				7231440719C607C700FBE342 /* ZGWatchVariable.m */,
+				4E1220AE297D432D00E3166F /* ZGLabel.m */,
+				4E1220B0297D433700E3166F /* ZGLabel.h */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1701,6 +1711,7 @@
 				770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,
 				772D1268190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m in Sources */,
+				4E1220AD297C747000E3166F /* ZGDocumentLabelManager.m in Sources */,
 				771A931D18791A8D0098511D /* ZGTableView.m in Sources */,
 				77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */,
 				77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */,
@@ -1791,6 +1802,7 @@
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
 				774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */,
 				7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */,
+				4E1220AF297D432D00E3166F /* ZGLabel.m in Sources */,
 				77179F6B18CD34F100BCB6D0 /* ZGAppUpdaterController.m in Sources */,
 				77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */,
 				77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */,

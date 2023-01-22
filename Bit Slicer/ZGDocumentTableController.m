@@ -33,6 +33,8 @@
 #import "ZGDocumentTableController.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGVariableController.h"
+#import "ZGDocumentLabelManager.h"
+#import "ZGLabel.h"
 #import "ZGProcess.h"
 #import "ZGSearchProgress.h"
 #import "ZGCalculator.h"
@@ -201,12 +203,13 @@
 {
 	BOOL needsToReload = NO;
 	ZGDocumentWindowController *windowController = _windowController;
-	if (windowController != nil && variable.usesDynamicAddress && !variable.finishedEvaluatingDynamicAddress)
+	if (windowController != nil && (variable.usesDynamicLabelAddress || variable.usesDynamicAddress) && !variable.finishedEvaluatingDynamicAddress)
 	{
 		NSError *error = nil;
 		NSString *newAddressString =
 			[ZGCalculator
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
+			 documentLabelManager:windowController.documentLabelManager
 			 process:windowController.currentProcess
 			 failedImages:_failedExecutableImages
 			 error:&error];
@@ -229,7 +232,9 @@
 - (void)updateWatchVariablesTable:(NSTimer *)__unused timer
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	if (windowController == nil)
+	ZGDocumentLabelManager *documentLabelManager = windowController.documentLabelManager;
+	
+	if (windowController == nil || documentLabelManager == nil)
 	{
 		return;
 	}
@@ -259,6 +264,10 @@
 	// We don't want to update this when the user is editing something in the table
 	if (!isOccluded && windowController.currentProcess.hasGrantedAccess && _variablesTableView.editedRow == -1)
 	{
+		for (ZGLabel *label in _documentData.labels)
+		{
+			[self updateDynamicVariableAddress:label.variable];
+		}
 		for (ZGVariable *variable in [_documentData.variables subarrayWithRange:visibleRowsRange])
 		{
 			if ([self updateDynamicVariableAddress:variable])
