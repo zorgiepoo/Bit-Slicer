@@ -35,6 +35,7 @@
 #import "ZGDocumentData.h"
 #import "ZGSearchData.h"
 #import "ZGVariable.h"
+#import "ZGLabel.h"
 #import "ZGScriptManager.h"
 
 @implementation ZGDocument
@@ -90,12 +91,18 @@
 	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:writeData];
 	
 	NSArray<ZGVariable *> *watchVariablesArrayToSave = nil;
+	NSArray<ZGLabel *> *labelsArrayToSave = nil;
 	
 	watchVariablesArrayToSave = _data.variables;
+	labelsArrayToSave = _data.labels;
 	
 	[keyedArchiver
 	 encodeObject:watchVariablesArrayToSave
 	 forKey:ZGWatchVariablesArrayKey];
+	
+	[keyedArchiver
+	 encodeObject:labelsArrayToSave
+	 forKey:ZGLabelsArrayKey];
 	
 	[keyedArchiver
 	 encodeObject:_data.desiredProcessInternalName != nil ? _data.desiredProcessInternalName : [NSNull null]
@@ -184,6 +191,16 @@
 	else
 	{
 		_data.variables = [NSArray array];
+	}
+	
+	NSArray<ZGLabel *> *newLabels = [keyedUnarchiver decodeObjectOfClass:[NSArray class] forKey:ZGLabelsArrayKey];
+	if (newLabels != nil)
+	{
+		_data.labels = newLabels;
+	}
+	else
+	{
+		_data.labels = [NSArray array];
 	}
 	
 	id desiredProcessInternalName = [keyedUnarchiver decodeObjectOfClass:[NSObject class] forKey:ZGProcessInternalNameKey];

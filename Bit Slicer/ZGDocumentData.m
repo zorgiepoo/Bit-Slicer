@@ -35,6 +35,7 @@
 #import "ZGSearchData.h"
 #import "ZGSearchFunctions.h"
 #import "ZGVariable.h"
+#import "ZGLabel.h"
 
 @implementation ZGDocumentData
 
@@ -44,6 +45,7 @@
 	if (self != nil)
 	{
 		_variables = [[NSArray alloc] init];
+		_labels = [[NSArray alloc] init];
 		_beginningAddressStringValue = @"";
 		_endingAddressStringValue = @"";
 		_searchValue = @"";

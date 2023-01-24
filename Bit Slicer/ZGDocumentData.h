@@ -33,6 +33,7 @@
 #import <Foundation/Foundation.h>
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
+#define ZGLabelsArrayKey @"ZGLabelsArrayKey"
 #define ZGProcessInternalNameKey @"ZGProcessNameKey"
 
 #define ZGSelectedDataTypeTag @"ZGSelectedDataTypeTag"
@@ -55,6 +56,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ZGVariable;
+@class ZGLabel;
 
 @interface ZGDocumentData : NSObject
 
@@ -67,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) NSString *endingAddressStringValue;
 @property (copy, nonatomic) NSString *searchValue;
 @property (nonatomic) NSArray<ZGVariable *> *variables;
+@property (nonatomic) NSArray<ZGLabel *> *labels;
 @property (copy, nonatomic, nullable) NSString *desiredProcessInternalName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;
 @property (copy, nonatomic, nullable) NSString *lastAboveRangeValue;

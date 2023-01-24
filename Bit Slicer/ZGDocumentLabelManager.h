@@ -31,31 +31,20 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "pythonlib.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
 
-@class ZGScriptingInterpreter;
-@class ZGScriptManager;
-@class ZGDocumentLabelManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
+@class ZGLabel;
+@class ZGDocumentData;
+
+@interface ZGDocumentLabelManager : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
+@property (nonatomic, readonly) NSMutableDictionary<NSString *, ZGLabel *> *labels;
 
-+ (nullable PyObject *)loadPythonClassInMainModule:(PyObject *)module;
+- (id)initWithDocumentData:(ZGDocumentData *)documentData;
 
-- (nullable id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter documentLabelManager:(ZGDocumentLabelManager *)documentLabelManager scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
-
-@property (nonatomic, weak, readonly) ZGScriptManager *scriptManager;
-@property (nonatomic, readonly, nullable) PyObject *object;
+- (void)addLabel:(ZGLabel *)label;
+- (void)removeLabel:(NSString *)name;
 
 @end
 

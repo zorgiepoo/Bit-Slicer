@@ -51,6 +51,7 @@
 @class ZGDebuggerController;
 @class ZGBreakPointController;
 @class ZGScriptingInterpreter;
+@class ZGDocumentLabelManager;
 @class ZGLoggerWindowController;
 @class ZGHotKeyCenter;
 @class ZGDocument;
@@ -76,6 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ZGVariableController *variableController;
 @property (nonatomic, readonly) ZGDocumentSearchController *searchController;
 @property (nonatomic, readonly) ZGScriptManager *scriptManager;
+@property (nonatomic, readonly) ZGDocumentLabelManager *documentLabelManager;
 
 @property (nonatomic, readonly) ZGDocumentData *documentData;
 @property (nonatomic, readonly) ZGSearchData *searchData;

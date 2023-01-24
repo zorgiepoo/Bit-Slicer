@@ -30,33 +30,61 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "pythonlib.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
+#import "ZGDocumentLabelManager.h"
+#import "ZGVariable.h"
+#import "ZGDocumentData.h"
+#import "ZGLabel.h"
 
-@class ZGScriptingInterpreter;
-@class ZGScriptManager;
-@class ZGDocumentLabelManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
+@implementation ZGDocumentLabelManager
+{
+	NSMutableDictionary<NSString *, ZGLabel *> * _labels;
+	ZGDocumentData * _documentData;
+}
 
-NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
+- (id)initWithDocumentData:(ZGDocumentData *)documentData
+{
+	if ((self = [super init]))
+	{
+		_documentData = documentData;
+		_labels = [[NSMutableDictionary alloc] init];
+		
+		for (ZGLabel *label in documentData.labels)
+		{
+			if(label.name != nil)
+			{
+				[_labels setObject:label forKey:label.name];
+			}
+		}
+	}
+	
+	return self;
+}
 
-+ (nullable PyObject *)loadPythonClassInMainModule:(PyObject *)module;
+- (void)addLabel:(ZGLabel *)label
+{
+	[_labels setObject:label forKey:label.name];
+	
+	NSMutableArray<ZGLabel *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.labels];
+	[temporaryArray addObject:label];
+	
+	_documentData.labels = [NSArray arrayWithArray:temporaryArray];
+}
 
-- (nullable id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter documentLabelManager:(ZGDocumentLabelManager *)documentLabelManager scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
-
-@property (nonatomic, weak, readonly) ZGScriptManager *scriptManager;
-@property (nonatomic, readonly, nullable) PyObject *object;
+- (void)removeLabel:(NSString *)name
+{
+	ZGLabel *label = [_labels objectForKey:name];
+	
+	if(label == nil) {
+		return;
+	}
+	
+	[_labels removeObjectForKey:label.name];
+	
+	NSMutableArray<ZGLabel *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.labels];
+	[temporaryArray removeObject:label];
+	
+	_documentData.labels = [NSArray arrayWithArray:temporaryArray];
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

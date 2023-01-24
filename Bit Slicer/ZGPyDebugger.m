@@ -44,6 +44,7 @@
 #import "ZGBreakPoint.h"
 #import "ZGRegistersState.h"
 #import "ZGInstruction.h"
+#import "ZGDocumentLabelManager.h"
 #import "ZGThreadStates.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
@@ -54,6 +55,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
+#import "ZGLabel.h"
 #import "ZGScriptPrompt.h"
 #import "ZGNullability.h"
 
@@ -106,6 +108,8 @@ declareDebugPrototypeMethod(stepOver)
 declareDebugPrototypeMethod(stepOut)
 declareDebugPrototypeMethod(backtrace)
 declareDebugPrototypeMethod(writeRegisters)
+declareDebugPrototypeMethod(addLabel)
+declareDebugPrototypeMethod(removeLabel)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
 #define declareDebugMethod(name) declareDebugMethod2(name, METH_VARARGS)
@@ -139,6 +143,8 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(stepOut)
 	declareDebugMethod(backtrace)
 	declareDebugMethod(writeRegisters)
+	declareDebugMethod(addLabel)
+	declareDebugMethod(removeLabel)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -191,6 +197,7 @@ static PyTypeObject DebuggerType =
 	
 	__weak ZGScriptManager * _Nullable _scriptManager;
 	ZGBreakPointController * _Nonnull _breakPointController;
+	ZGDocumentLabelManager * _Nonnull _documentLabelManager;
 	ZGLoggerWindowController * _Nonnull _loggerWindowController;
 	NSMutableDictionary<NSNumber *, NSNumber *> * _Nonnull _cachedInstructionPointers;
 	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
@@ -227,7 +234,7 @@ static PyTypeObject DebuggerType =
 	return debuggerException;
 }
 
-- (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter documentLabelManager:(ZGDocumentLabelManager *)documentLabelManager scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super init];
 	if (self != nil)
@@ -240,6 +247,7 @@ static PyTypeObject DebuggerType =
 		}
 		
 		_scriptManager = scriptManager;
+		_documentLabelManager = documentLabelManager;
 		_scriptingInterpreter = scriptingInterpreter;
 		_process = [[ZGProcess alloc] initWithProcess:process];
 		_breakPointController = breakPointController;
@@ -686,6 +694,43 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 			});
 		}
 	}
+	return retValue;
+}
+
+static PyObject *Debugger_addLabel(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0x0;
+	char *identifier = NULL;
+	
+	if (PyArg_ParseTuple(args, "sK:addLabel", &identifier, &memoryAddress))
+	{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			ZGLabel *label = [[ZGLabel alloc] initWithName:[NSString stringWithUTF8String:identifier] address:memoryAddress qualifier:ZGSigned pointerSize:self->objcSelf->_process.pointerSize];
+			
+			[self->objcSelf->_documentLabelManager addLabel:label];
+		});
+		
+		retValue = Py_BuildValue("");
+	}
+	
+	return retValue;
+}
+
+static PyObject *Debugger_removeLabel(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	char *identifier = NULL;
+	
+	if (PyArg_ParseTuple(args, "s:removeLabel", &identifier))
+	{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self->objcSelf->_documentLabelManager removeLabel:[NSString stringWithUTF8String:identifier]];
+		});
+		
+		retValue = Py_BuildValue("");
+	}
+	
 	return retValue;
 }
 
