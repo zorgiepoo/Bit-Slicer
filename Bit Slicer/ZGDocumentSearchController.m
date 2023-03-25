@@ -246,19 +246,26 @@
 
 - (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
 {
-	if (!_searchProgress.shouldCancelSearch)
+	ZGDocumentWindowController *windowController = _windowController;
+	if (!_searchProgress.shouldCancelSearch && windowController != nil)
 	{
 		NSUInteger currentVariableCount = _documentData.variables.count;
 		
-		if (currentVariableCount < MAX_NUMBER_OF_VARIABLES_TO_FETCH && resultSet.length > 0)
+		NSTableView *variablesTableView = windowController.variablesTableView;
+		
+		// Limit the number of intermediate search results to show to be relatively small
+		// (a little bit larger than what can be displayed on screen without scrolling)
+		// This is so we don't spend to much time annotating/relativizing variables before the search is finished
+		NSUInteger maxNumberOfVariablesToFetch = MIN((NSUInteger)(variablesTableView.visibleRect.size.height / variablesTableView.rowHeight * 1.5), MAX_NUMBER_OF_VARIABLES_TO_FETCH);
+		if (currentVariableCount < maxNumberOfVariablesToFetch && resultSet.length > 0)
 		{
 			// These progress search results are thrown away,
 			// so doesn't matter if accesses are unaligned or not
 			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:_searchData.dataSize pointerSize:_searchData.pointerSize unalignedAccess:YES];
 			searchResults.dataType = _dataType;
 			searchResults.enabled = _allowsNarrowing;
-			[self fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH - currentVariableCount fromResults:searchResults];
-			[_windowController.variablesTableView reloadData];
+			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch - currentVariableCount fromResults:searchResults];
+			[variablesTableView reloadData];
 		}
 		
 		[self updateProgressBarFromProgress:searchProgress];
