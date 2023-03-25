@@ -36,6 +36,7 @@
 @class ZGProcess;
 
 #define ZGBaseAddressFunction @"base"
+#define ZGFindSymbolFunction @"symbol"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) BOOL usesDynamicPointerAddress;
 @property (nonatomic, readonly) BOOL usesDynamicBaseAddress;
+@property (nonatomic, readonly) BOOL usesDynamicSymbolAddress;
 
 @end
 

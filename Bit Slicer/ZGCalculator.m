@@ -48,10 +48,10 @@
 #import "ZGNullability.h"
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
-#define ZGFindSymbolFunction @"symbol"
 #define ZGProcessVariable @"ZGProcessVariable"
 #define ZGFailedImagesVariable @"ZGFailedImagesVariable"
 #define ZGSymbolicatesVariable @"ZGSymbolicatesVariable"
+#define ZGSymbolicationRequiresExactMatch @"ZGSymbolicationRequiresExactMatch"
 #define ZGDidFindSymbol @"ZGDidFindSymbol"
 #define ZGLastSearchInfoVariable @"ZGLastSearchInfoVariable"
 
@@ -64,7 +64,12 @@
 
 - (BOOL)usesDynamicBaseAddress
 {
-	return _addressFormula != nil && [_addressFormula rangeOfString:ZGBaseAddressFunction].location != NSNotFound;
+	return _addressFormula != nil && [_addressFormula rangeOfString:[ZGBaseAddressFunction stringByAppendingString:@"("]].location != NSNotFound;
+}
+
+- (BOOL)usesDynamicSymbolAddress
+{
+	return _addressFormula != nil && [_addressFormula rangeOfString:[ZGFindSymbolFunction stringByAppendingString:@"("]].location != NSNotFound;
 }
 
 @end
@@ -161,6 +166,7 @@
 {
 	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray<DDExpression *> *args, NSDictionary<NSString *, id> *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
 		NSNumber *symbolicatesNumber = vars[ZGSymbolicatesVariable];
+		NSNumber *symbolicationRequiresExactMatch = vars[ZGSymbolicationRequiresExactMatch];
 		ZGProcess *process = vars[ZGProcessVariable];
 		NSNumber *currentAddressNumber = vars[ZGLastSearchInfoVariable];
 
@@ -216,7 +222,7 @@
 				
 				if (!encounteredError)
 				{
-					symbolAddressNumber = [process.symbolicator findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:[currentAddressNumber unsignedLongLongValue] allowsWrappingToBeginning:YES];
+					symbolAddressNumber = [process.symbolicator findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:symbolicationRequiresExactMatch.boolValue pastAddress:[currentAddressNumber unsignedLongLongValue] allowsWrappingToBeginning:YES];
 					if (symbolAddressNumber == nil)
 					{
 						if (error != NULL)
@@ -479,11 +485,11 @@
 	return [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates symbolicationRequiresExactMatch:(BOOL)symbolicationRequiresExactMatch foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
 {
 	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
 	
-	NSMutableDictionary<NSString *, id> *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process, ZGSymbolicatesVariable : @(symbolicates), ZGLastSearchInfoVariable : @(currentAddress), ZGDidFindSymbol : @(NO)}];
+	NSMutableDictionary<NSString *, id> *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process, ZGSymbolicatesVariable : @(symbolicates), ZGSymbolicationRequiresExactMatch : @(symbolicationRequiresExactMatch), ZGLastSearchInfoVariable : @(currentAddress), ZGDidFindSymbol : @(NO)}];
 
 	if (failedImages != nil)
 	{
@@ -501,12 +507,12 @@
 
 + (NSString *)evaluateAndSymbolicateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process currentAddress:(ZGMemoryAddress)currentAddress didSymbolicate:(BOOL *)didSymbolicate error:(NSError * __autoreleasing *)error
 {
-	return [self evaluateExpression:expression process:process failedImages:nil symbolicates:YES foundSymbol:didSymbolicate currentAddress:currentAddress error:error];
+	return [self evaluateExpression:expression process:process failedImages:nil symbolicates:YES symbolicationRequiresExactMatch:NO foundSymbol:didSymbolicate currentAddress:currentAddress error:error];
 }
 
 + (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages error:(NSError * __autoreleasing *)error
 {
-	return [self evaluateExpression:expression process:process failedImages:failedImages symbolicates:NO foundSymbol:NULL currentAddress:0x0 error:error];
+	return [self evaluateExpression:expression process:process failedImages:failedImages symbolicates:YES symbolicationRequiresExactMatch:YES foundSymbol:NULL currentAddress:0x0 error:error];
 }
 
 @end
