@@ -1,8 +1,13 @@
 Source: https://github.com/sparkle-project/Sparkle
 Branch: 2.x
-Tag: 2.3.0
+Commit: b7b858dbf385cdd1fe1ab8a3f3ee8586fa850d5d
 
 Instructions:
-rm -rf deps/Sparkle/Sparkle.framework/Versions/B/XPCServices
-rm -f deps/Sparkle/Sparkle.framework/XPCServices
-codesign -f -s "-" deps/Sparkle/Sparkle.framework/Versions/B/Sparkle
+In ConfigCommon.xcconfig disable:
+SPARKLE_EMBED_INSTALLER_LAUNCHER_XPC_SERVICE
+SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE
+SPARKLE_BUILD_LEGACY_SUUPDATER
+SPARKLE_BUILD_LEGACY_DSA_SUPPORT (and remove -DSPARKLE_BUILD_LEGACY_DSA_SUPPORT)
+SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
+SPARKLE_BUILD_PACKAGE_SUPPORT (and remove -DSPARKLE_BUILD_PACKAGE_SUPPORT)
+SPARKLE_BUILD_DMG_SUPPORT (and remove -DSPARKLE_BUILD_DMG_SUPPORT)

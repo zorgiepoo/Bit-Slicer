@@ -72,7 +72,7 @@
 		_updater = _updaterController.updater;
 		
 		// Clear feed URL so we don't use its cache
-		[_updater setFeedURL:nil];
+		[_updater clearFeedURLFromUserDefaults];
 		
 		[_updaterController startUpdater];
 	}
@@ -114,6 +114,11 @@
 - (void)setChecksForAlphaUpdates:(BOOL)checksForAlphaUpdates
 {
 	[[NSUserDefaults standardUserDefaults] setBool:checksForAlphaUpdates forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+	
+	if (checksForAlphaUpdates)
+	{
+		[_updater resetUpdateCycleAfterShortDelay];
+	}
 }
 
 - (BOOL)sendsAnonymousInfo
