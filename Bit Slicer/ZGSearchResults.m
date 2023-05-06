@@ -43,7 +43,7 @@
 		_pointerSize = pointerSize;
 		for (NSData *result in _resultSets)
 		{
-			_addressCount += result.length / _pointerSize;
+			_count += result.length / _pointerSize;
 		}
 		_dataSize = dataSize;
 		_unalignedAccess = unalignedAccess;
@@ -51,12 +51,12 @@
 	return self;
 }
 
-- (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses
+- (void)_removeNumberOfEntries:(ZGMemorySize)numberOfEntries
 {
-	_addressIndex += numberOfAddresses;
-	_addressCount -= numberOfAddresses;
+	_index += numberOfEntries;
+	_count -= numberOfEntries;
 	
-	if (_addressCount == 0)
+	if (_count == 0)
 	{
 		_resultSets = @[];
 	}
@@ -107,20 +107,7 @@
 			const void *resultBytes = resultSet.bytes;
 			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += pointerSize)
 			{
-				ZGMemoryAddress address;
-				switch (pointerSize)
-				{
-					case sizeof(ZGMemoryAddress):
-						address = *(const ZGMemoryAddress *)(const void *)((const uint8_t *)resultBytes + offset);
-						break;
-					case sizeof(ZG32BitMemoryAddress):
-						address = *(const ZG32BitMemoryAddress *)(const void *)((const uint8_t *)resultBytes + offset);
-						break;
-					default:
-						assert("Retrieved unexpected pointer size" == NULL);
-				}
-				
-				addressCallback(address, &shouldStopEnumerating);
+				addressCallback((const void *)((const uint8_t *)resultBytes + offset), &shouldStopEnumerating);
 				
 				if (shouldStopEnumerating)
 				{
@@ -136,14 +123,11 @@
 	}
 }
 
-- (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback
+- (void)enumerateWithCount:(ZGMemorySize)count usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
-	[self enumerateInRange:NSMakeRange(_addressIndex, addressCount) usingBlock:addressCallback];
-}
-
-- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback
-{
-	[self enumerateWithCount:_addressCount usingBlock:addressCallback];
+	[self enumerateInRange:NSMakeRange(_index, count) usingBlock:addressCallback];
+	
+	[self _removeNumberOfEntries:count];
 }
 
 @end

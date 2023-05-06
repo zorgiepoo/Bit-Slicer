@@ -406,7 +406,7 @@
 
 - (void)updateNumberOfValuesDisplayedStatus
 {
-	NSUInteger variableCount = _documentData.variables.count + _searchController.searchResults.addressCount;
+	NSUInteger variableCount = _documentData.variables.count + _searchController.searchResults.count;
 	
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 	[numberOfVariablesFormatter setNumberStyle:NSNumberFormatterDecimalStyle];

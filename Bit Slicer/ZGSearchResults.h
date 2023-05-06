@@ -37,8 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGSearchResults : NSObject
 
-@property (nonatomic, readonly) ZGMemorySize addressIndex;
-@property (nonatomic, readonly) ZGMemorySize addressCount;
+@property (nonatomic, readonly) ZGMemorySize index;
+@property (nonatomic, readonly) ZGMemorySize count;
+
 @property (nonatomic, readonly) ZGMemorySize pointerSize;
 @property (nonatomic, readonly) ZGMemorySize dataSize;
 @property (nonatomic, readonly) BOOL unalignedAccess;
@@ -48,14 +49,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSInteger dataType;
 @property (nonatomic) BOOL enabled;
 
-typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
+typedef void (^zg_enumerate_search_results_t)(const void *data, BOOL *stop);
 
 - (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize unalignedAccess:(BOOL)unalignedAccess;
 
-- (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses;
-
-- (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback;
-- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback;
+- (void)enumerateWithCount:(ZGMemorySize)count usingBlock:(zg_enumerate_search_results_t)addressCallback;
 
 @end
 

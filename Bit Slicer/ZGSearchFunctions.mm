@@ -1479,9 +1479,9 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 				if (resultSetIndex >= firstSearchResults.resultSets.count)
 				{
 					ZGMemorySize absoluteIndex = laterResultSetsAbsoluteIndexes[resultSetIndex - firstSearchResults.resultSets.count];
-					if (absoluteIndex < laterSearchResults.addressIndex * pointerSize)
+					if (absoluteIndex < laterSearchResults.index * pointerSize)
 					{
-						startIndex = (laterSearchResults.addressIndex * pointerSize - absoluteIndex);
+						startIndex = (laterSearchResults.index * pointerSize - absoluteIndex);
 					}
 				}
 				

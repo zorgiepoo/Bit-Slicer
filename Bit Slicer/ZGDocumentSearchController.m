@@ -284,11 +284,11 @@
 
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables fromResults:(ZGSearchResults *)searchResults
 {
-	if (searchResults.addressCount == 0) return;
+	if (searchResults.count == 0) return;
 	
-	if (numberOfVariables > searchResults.addressCount)
+	if (numberOfVariables > searchResults.count)
 	{
-		numberOfVariables = searchResults.addressCount;
+		numberOfVariables = searchResults.count;
 	}
 	
 	NSMutableArray<ZGVariable *> *allVariables = [[NSMutableArray alloc] initWithArray:_documentData.variables];
@@ -303,7 +303,20 @@
 	
 	ZGMemorySize dataSize = searchResults.dataSize;
 	BOOL enabled = searchResults.enabled;
-	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL * __unused stop) {
+	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(const void *data, BOOL * __unused stop) {
+		ZGMemoryAddress variableAddress;
+		switch (pointerSize)
+		{
+			case sizeof(ZGMemoryAddress):
+				variableAddress = *((const ZGMemoryAddress *)data);
+				break;
+			case sizeof(ZG32BitMemoryAddress):
+				variableAddress = *((const ZG32BitMemoryAddress *)data);
+				break;
+			default:
+				abort();
+		}
+		
 		ZGVariable *newVariable =
 		[[ZGVariable alloc]
 		 initWithValue:NULL
@@ -318,8 +331,6 @@
 		
 		[newVariables addObject:newVariable];
 	}];
-	
-	[searchResults removeNumberOfAddresses:numberOfVariables];
 	
 	dispatch_async(_machBinaryAnnotationInfoQueue, ^{
 		__block ZGMachBinaryAnnotationInfo annotationInfo;
@@ -369,7 +380,7 @@
 	{
 		ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:_searchProgress], nil);
 		
-		if (notSearchedVariables.count + _temporarySearchResults.addressCount != oldVariables.count)
+		if (notSearchedVariables.count + _temporarySearchResults.count != oldVariables.count)
 		{
 			windowController.undoManager.actionName = ZGLocalizableSearchDocumentString(@"undoSearchAction");
 			[(ZGDocumentWindowController *)[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:_searchResults];

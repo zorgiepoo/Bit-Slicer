@@ -646,11 +646,25 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 	{
 		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, self->objcSelf, ZGByteArray, 0, ZGEquals);
 		
-		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.addressCount);
+		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.count);
 		PyObject *pythonResults = PyList_New((Py_ssize_t)numberOfEntries);
 		
 		__block Py_ssize_t addressIndex = 0;
-		[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL * __unused stop) {
+		ZGMemorySize pointerSize = results.pointerSize;
+		
+		[results enumerateWithCount:numberOfEntries usingBlock:^(const void *data, BOOL * __unused stop) {
+			ZGMemoryAddress address;
+			switch (pointerSize)
+			{
+				case sizeof(ZGMemoryAddress):
+					address = *((const ZGMemoryAddress *)data);
+					break;
+				case sizeof(ZG32BitMemoryAddress):
+					address = *((const ZG32BitMemoryAddress *)data);
+					break;
+				default:
+					abort();
+			}
 			PyList_SET_ITEM(pythonResults, addressIndex, Py_BuildValue("K", address));
 			addressIndex++;
 		}];
