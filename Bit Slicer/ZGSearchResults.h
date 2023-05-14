@@ -37,7 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGSearchResults : NSObject
 
-@property (nonatomic, readonly) ZGMemorySize index;
 @property (nonatomic, readonly) ZGMemorySize count;
 
 @property (nonatomic, readonly) ZGMemorySize pointerSize;

@@ -1450,22 +1450,8 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 		});
 	}
 	
-	ZGMemorySize *laterResultSetsAbsoluteIndexes = static_cast<ZGMemorySize *>(malloc(sizeof(*laterResultSetsAbsoluteIndexes) * laterSearchResults.resultSets.count));
-	ZGMemorySize laterResultSetsAbsoluteIndexAccumulator = 0;
-	
 	const void **newResultSets = static_cast<const void **>(calloc(newResultSetCount, sizeof(*newResultSets)));
 	assert(newResultSets != NULL);
-	
-	for (NSUInteger regionIndex = 0; regionIndex < newResultSetCount; regionIndex++)
-	{
-		if (regionIndex >= firstSearchResults.resultSets.count)
-		{
-			laterResultSetsAbsoluteIndexes[regionIndex - firstSearchResults.resultSets.count] = laterResultSetsAbsoluteIndexAccumulator;
-			
-			NSData *data = [laterSearchResults.resultSets objectAtIndex:regionIndex - firstSearchResults.resultSets.count];
-			laterResultSetsAbsoluteIndexAccumulator += data.length;
-		}
-	}
 	
 	dispatch_apply(newResultSetCount, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t resultSetIndex) {
 		@autoreleasepool
@@ -1476,15 +1462,6 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 				
 				// Don't scan addresses that have been popped out from laterSearchResults
 				NSUInteger startIndex = 0;
-				if (resultSetIndex >= firstSearchResults.resultSets.count)
-				{
-					ZGMemorySize absoluteIndex = laterResultSetsAbsoluteIndexes[resultSetIndex - firstSearchResults.resultSets.count];
-					if (absoluteIndex < laterSearchResults.index * pointerSize)
-					{
-						startIndex = (laterSearchResults.index * pointerSize - absoluteIndex);
-					}
-				}
-				
 				NSData *results = nil;
 				
 				if (oldResultSet.length >= pointerSize && startIndex < oldResultSet.length)
@@ -1506,8 +1483,6 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 			}
 		}
 	});
-	
-	free(laterResultSetsAbsoluteIndexes);
 	
 	NSArray<NSData *> *resultSets;
 	

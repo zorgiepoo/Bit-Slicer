@@ -34,100 +34,91 @@
 
 @implementation ZGSearchResults
 
+static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize pointerSize)
+{
+	NSUInteger count = 0;
+	for (NSData *result in resultSets)
+	{
+		count += result.length / pointerSize;
+	}
+	return count;
+}
+
 - (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize unalignedAccess:(BOOL)unalignedAccess
 {
 	self = [super init];
 	if (self != nil)
 	{
-		_resultSets = resultSets;
-		_pointerSize = pointerSize;
-		for (NSData *result in _resultSets)
+		NSMutableArray<NSData *> *newResultSets = [NSMutableArray array];
+		for (NSData *resultData in resultSets)
 		{
-			_count += result.length / _pointerSize;
+			if (resultData.length > 0)
+			{
+				[newResultSets addObject:resultData];
+			}
 		}
+		
+		_resultSets = [newResultSets copy];
+		_pointerSize = pointerSize;
+		_count = _resultCount(newResultSets, pointerSize);
 		_dataSize = dataSize;
 		_unalignedAccess = unalignedAccess;
 	}
 	return self;
 }
 
-- (void)_removeNumberOfEntries:(ZGMemorySize)numberOfEntries
-{
-	_index += numberOfEntries;
-	_count -= numberOfEntries;
-	
-	if (_count == 0)
-	{
-		_resultSets = @[];
-	}
-}
-
-- (void)enumerateInRange:(NSRange)range usingBlock:(zg_enumerate_search_results_t)addressCallback
-{
-	ZGMemoryAddress absoluteLocation = range.location * _pointerSize;
-	ZGMemoryAddress absoluteLength = range.length * _pointerSize;
-	
-	BOOL setBeginOffset = NO;
-	BOOL setEndOffset = NO;
-	ZGMemoryAddress beginOffset = 0;
-	ZGMemoryAddress endOffset = 0;
-	ZGMemoryAddress accumulator = 0;
-	
-	BOOL shouldStopEnumerating = NO;
-	
-	ZGMemorySize pointerSize = _pointerSize;
-	
-	for (NSData *resultSet in _resultSets)
-	{
-		NSUInteger resultSetLength = resultSet.length;
-		accumulator += resultSetLength;
-		
-		if (!setBeginOffset && accumulator > absoluteLocation)
-		{
-			beginOffset = resultSetLength - (accumulator - absoluteLocation);
-			setBeginOffset = YES;
-		}
-		else if (setBeginOffset)
-		{
-			beginOffset = 0;
-		}
-		
-		if (!setEndOffset && accumulator >= absoluteLocation + absoluteLength)
-		{
-			endOffset = resultSetLength - (accumulator - (absoluteLocation + absoluteLength));
-			setEndOffset = YES;
-		}
-		else
-		{
-			endOffset = resultSetLength;
-		}
-		
-		if (setBeginOffset)
-		{
-			const void *resultBytes = resultSet.bytes;
-			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += pointerSize)
-			{
-				addressCallback((const void *)((const uint8_t *)resultBytes + offset), &shouldStopEnumerating);
-				
-				if (shouldStopEnumerating)
-				{
-					break;
-				}
-			}
-			
-			if (setEndOffset || shouldStopEnumerating)
-			{
-				break;
-			}
-		}
-	}
-}
-
 - (void)enumerateWithCount:(ZGMemorySize)count usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
-	[self enumerateInRange:NSMakeRange(_index, count) usingBlock:addressCallback];
+	if (count == 0)
+	{
+		return;
+	}
 	
-	[self _removeNumberOfEntries:count];
+	NSMutableArray<NSData *> *newResultSets = [NSMutableArray array];
+
+	ZGMemorySize pointerSize = _pointerSize;
+	
+	NSUInteger resultsProcessed = 0;
+	
+	BOOL shouldStopEnumerating = NO;
+	NSUInteger resultSetIndex = 0;
+	NSArray<NSData *> *resultSets = _resultSets;
+	for (NSData *resultSet in resultSets)
+	{
+		const void *resultBytes = resultSet.bytes;
+		ZGMemoryAddress resultSetLength = resultSet.length;
+		for (ZGMemoryAddress offset = 0; offset < resultSetLength; offset += pointerSize)
+		{
+			addressCallback((const void *)((const uint8_t *)resultBytes + offset), &shouldStopEnumerating);
+			resultsProcessed++;
+			
+			if (resultsProcessed >= count || shouldStopEnumerating)
+			{
+				// Is there any left over data from current result set
+				if (offset + pointerSize < resultSetLength)
+				{
+					[newResultSets addObject:[resultSet subdataWithRange:NSMakeRange(offset + pointerSize, resultSetLength - offset - pointerSize)]];
+				}
+				
+				// Grab the remaining result sets we haven't processed
+				NSUInteger resultSetsCount = resultSets.count;
+				if (resultSetIndex + 1 < resultSetsCount)
+				{
+					NSArray<NSData *> *remainingResultSets = [resultSets subarrayWithRange:NSMakeRange(resultSetIndex + 1, resultSetsCount - resultSetIndex - 1)];
+					
+					[newResultSets addObjectsFromArray:remainingResultSets];
+				}
+				
+				goto FINISH_ENUMERATING;
+			}
+		}
+		
+		resultSetIndex++;
+	}
+	
+FINISH_ENUMERATING:
+	_resultSets = [newResultSets copy];
+	_count = _resultCount(newResultSets, pointerSize);
 }
 
 @end

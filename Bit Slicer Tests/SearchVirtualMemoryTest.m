@@ -177,23 +177,23 @@
 	XCTAssertNotNil(searchData.savedData);
 	
 	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEquals);
-	XCTAssertEqual(equalResults.addressCount, 89U);
+	XCTAssertEqual(equalResults.count, 89U);
 	
 	ZGSearchResults *equalSignedResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGSigned, ZGEquals);
-	XCTAssertEqual(equalSignedResults.addressCount, 89U);
+	XCTAssertEqual(equalSignedResults.count, 89U);
 	
 	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGNotEquals);
-	XCTAssertEqual(notEqualResults.addressCount, _data.length - 89U);
+	XCTAssertEqual(notEqualResults.count, _data.length - 89U);
 	
 	ZGSearchResults *greaterThanResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGGreaterThan);
-	XCTAssertEqual(greaterThanResults.addressCount, 6228U);
+	XCTAssertEqual(greaterThanResults.count, 6228U);
 	
 	ZGSearchResults *lessThanResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGLessThan);
-	XCTAssertEqual(lessThanResults.addressCount, 14163U);
+	XCTAssertEqual(lessThanResults.count, 14163U);
 	
 	searchData.shouldCompareStoredValues = YES;
 	ZGSearchResults *storedEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEqualsStored);
-	XCTAssertEqual(storedEqualResults.addressCount, _data.length);
+	XCTAssertEqual(storedEqualResults.count, _data.length);
 	searchData.shouldCompareStoredValues = NO;
 	
 	if (!ZGWriteBytes(_processTask, address + 0x1, (uint8_t []){valueToFind - 1}, 0x1))
@@ -204,30 +204,30 @@
 	ZGSearchResults *emptyResults = [[ZGSearchResults alloc] init];
 	
 	ZGSearchResults *equalNarrowResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEquals, emptyResults, equalResults);
-	XCTAssertEqual(equalNarrowResults.addressCount, 88U);
+	XCTAssertEqual(equalNarrowResults.count, 88U);
 	
 	ZGSearchResults *notEqualNarrowResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGNotEquals, emptyResults, equalResults);
-	XCTAssertEqual(notEqualNarrowResults.addressCount, 1U);
+	XCTAssertEqual(notEqualNarrowResults.count, 1U);
 	
 	ZGSearchResults *greaterThanNarrowResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGGreaterThan, emptyResults, equalResults);
-	XCTAssertEqual(greaterThanNarrowResults.addressCount, 0U);
+	XCTAssertEqual(greaterThanNarrowResults.count, 0U);
 	
 	ZGSearchResults *lessThanNarrowResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGLessThan, emptyResults, equalResults);
-	XCTAssertEqual(lessThanNarrowResults.addressCount, 1U);
+	XCTAssertEqual(lessThanNarrowResults.count, 1U);
 	
 	searchData.shouldCompareStoredValues = YES;
 	ZGSearchResults *storedEqualResultsNarrowed = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEqualsStored, emptyResults, storedEqualResults);
-	XCTAssertEqual(storedEqualResultsNarrowed.addressCount, _data.length - 1);
+	XCTAssertEqual(storedEqualResultsNarrowed.count, _data.length - 1);
 	searchData.shouldCompareStoredValues = NO;
 	
 	searchData.protectionMode = ZGProtectionExecute;
 	
 	ZGSearchResults *equalExecuteResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEquals);
-	XCTAssertEqual(equalExecuteResults.addressCount, 34U);
+	XCTAssertEqual(equalExecuteResults.count, 34U);
 	
 	// this will ignore the 2nd byte we changed since it's out of range
 	ZGSearchResults *equalExecuteNarrowResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEquals, emptyResults, equalResults);
-	XCTAssertEqual(equalExecuteNarrowResults.addressCount, 34U);
+	XCTAssertEqual(equalExecuteNarrowResults.count, 34U);
 	
 	ZGMemoryAddress *addressesRemoved = calloc(2, sizeof(*addressesRemoved));
 	if (addressesRemoved == NULL) XCTFail(@"Failed to allocate memory for addressesRemoved");
@@ -246,18 +246,18 @@
 	addressesRemoved[0] ^= addressesRemoved[1];
 	
 	ZGSearchResults *equalExecuteNarrowTwiceResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEquals, emptyResults, equalExecuteNarrowResults);
-	XCTAssertEqual(equalExecuteNarrowTwiceResults.addressCount, 32U);
+	XCTAssertEqual(equalExecuteNarrowTwiceResults.count, 32U);
 	
 	ZGSearchResults *searchResultsRemoved = [[ZGSearchResults alloc] initWithResultSets:@[[NSData dataWithBytes:addressesRemoved length:2 * sizeof(*addressesRemoved)]] dataSize:sizeof(uint8_t) pointerSize:8 unalignedAccess:NO];
 	
 	ZGSearchResults *equalExecuteNarrowTwiceAgainResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEquals, searchResultsRemoved, equalExecuteNarrowResults);
-	XCTAssertEqual(equalExecuteNarrowTwiceAgainResults.addressCount, 34U);
+	XCTAssertEqual(equalExecuteNarrowTwiceAgainResults.count, 34U);
 	
 	free(addressesRemoved);
 	
 	searchData.shouldCompareStoredValues = YES;
 	ZGSearchResults *storedEqualExecuteNarrowResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEqualsStored, emptyResults, storedEqualResults);
-	XCTAssertEqual(storedEqualExecuteNarrowResults.addressCount, _pageSize * 2);
+	XCTAssertEqual(storedEqualExecuteNarrowResults.count, _pageSize * 2);
 	searchData.shouldCompareStoredValues = NO;
 	
 	if (!ZGWriteBytes(_processTask, address + 0x1, (uint8_t []){valueToFind}, 0x1))
@@ -274,23 +274,23 @@
 	ZGSearchData *searchData = [self searchDataFromBytes:&valueToFind size:sizeof(valueToFind) dataType:ZGInt16 address:address alignment:sizeof(valueToFind)];
 	
 	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGInt16, ZGSigned, ZGEquals);
-	XCTAssertEqual(equalResults.addressCount, 1U);
+	XCTAssertEqual(equalResults.count, 1U);
 	
 	searchData.beginAddress += 0x291;
 	ZGSearchResults *misalignedEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGInt16, ZGSigned, ZGEquals);
-	XCTAssertEqual(misalignedEqualResults.addressCount, 1U);
+	XCTAssertEqual(misalignedEqualResults.count, 1U);
 	searchData.beginAddress -= 0x291;
 	
 	ZGSearchData *noAlignmentSearchData = [self searchDataFromBytes:&valueToFind size:sizeof(valueToFind) dataType:ZGInt16 address:address alignment:1];
 	ZGSearchResults *noAlignmentEqualResults = ZGSearchForData(_processTask, noAlignmentSearchData, nil, ZGInt16, ZGSigned, ZGEquals);
-	XCTAssertEqual(noAlignmentEqualResults.addressCount, 2U);
+	XCTAssertEqual(noAlignmentEqualResults.count, 2U);
 	
 	ZGMemoryAddress oldEndAddress = searchData.endAddress;
 	searchData.beginAddress += 0x291;
 	searchData.endAddress = searchData.beginAddress + 0x3;
 	
 	ZGSearchResults *noAlignmentRestrictedEqualResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt16, ZGSigned, ZGEquals, [[ZGSearchResults alloc] init], noAlignmentEqualResults);
-	XCTAssertEqual(noAlignmentRestrictedEqualResults.addressCount, 1U);
+	XCTAssertEqual(noAlignmentRestrictedEqualResults.count, 1U);
 	
 	searchData.beginAddress -= 0x291;
 	searchData.endAddress = oldEndAddress;
@@ -300,7 +300,7 @@
 	swappedSearchData.bytesSwapped = YES;
 	
 	ZGSearchResults *equalSwappedResults = ZGSearchForData(_processTask, swappedSearchData, nil, ZGInt16, ZGUnsigned, ZGEquals);
-	XCTAssertEqual(equalSwappedResults.addressCount, 1U);
+	XCTAssertEqual(equalSwappedResults.count, 1U);
 }
 
 - (void)testInt32Search
@@ -314,7 +314,7 @@
 	searchData.rangeValue = topBound;
 	
 	ZGSearchResults *betweenResults = ZGSearchForData(_processTask, searchData, nil, ZGInt32, ZGSigned, ZGGreaterThan);
-	XCTAssertEqual(betweenResults.addressCount, 746U);
+	XCTAssertEqual(betweenResults.count, 746U);
 	
 	int32_t *belowBound = malloc(sizeof(*belowBound));
 	*belowBound = -600000000;
@@ -323,7 +323,7 @@
 	searchData.bytesSwapped = YES;
 	
 	ZGSearchResults *betweenSwappedResults = ZGSearchForData(_processTask, searchData, nil, ZGInt32, ZGSigned, ZGLessThan);
-	XCTAssertEqual(betweenSwappedResults.addressCount, 354U);
+	XCTAssertEqual(betweenSwappedResults.count, 354U);
 	
 	searchData.savedData = [ZGStoredData storedDataFromProcessTask:_processTask beginAddress:searchData.beginAddress endAddress:searchData.endAddress protectionMode:searchData.protectionMode includeSharedMemory:NO];
 	XCTAssertNotNil(searchData.savedData);
@@ -358,7 +358,7 @@
 	}
 	
 	ZGSearchResults *narrowedSwappedAndStoredResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGInt32, ZGSigned, ZGEqualsStoredLinear, [[ZGSearchResults alloc] init], betweenSwappedResults);
-	XCTAssertEqual(narrowedSwappedAndStoredResults.addressCount, 1U);
+	XCTAssertEqual(narrowedSwappedAndStoredResults.count, 1U);
 }
 
 - (void)testInt64Search
@@ -368,18 +368,18 @@
 	
 	ZGSearchData *searchData = [self searchDataFromBytes:&value size:sizeof(value) dataType:ZGInt64 address:address alignment:sizeof(value)];
 	ZGSearchResults *results = ZGSearchForData(_processTask, searchData, nil, ZGInt64, ZGUnsigned, ZGLessThan);
-	XCTAssertEqual(results.addressCount, 132U);
+	XCTAssertEqual(results.count, 132U);
 	
 	searchData.dataAlignment = sizeof(uint32_t);
 	
 	ZGSearchResults *resultsWithHalfAlignment = ZGSearchForData(_processTask, searchData, nil, ZGInt64, ZGUnsigned, ZGLessThan);
-	XCTAssertEqual(resultsWithHalfAlignment.addressCount, 256U);
+	XCTAssertEqual(resultsWithHalfAlignment.count, 256U);
 	
 	searchData.dataAlignment = sizeof(uint64_t);
 	
 	searchData.bytesSwapped = YES;
 	ZGSearchResults *bigEndianResults = ZGSearchForData(_processTask, searchData, nil, ZGInt64, ZGUnsigned, ZGLessThan);
-	XCTAssertEqual(bigEndianResults.addressCount, 101U);
+	XCTAssertEqual(bigEndianResults.count, 101U);
 }
 
 - (void)testFloatSearch
@@ -390,11 +390,11 @@
 	searchData.epsilon = 0.0000001;
 	
 	ZGSearchResults *results = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
-	XCTAssertEqual(results.addressCount, 1U);
+	XCTAssertEqual(results.count, 1U);
 	
 	searchData.epsilon = 0.01;
 	ZGSearchResults *resultsWithBigEpsilon = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
-	XCTAssertEqual(resultsWithBigEpsilon.addressCount, 5U);
+	XCTAssertEqual(resultsWithBigEpsilon.count, 5U);
 	
 	float *bigEndianValue = malloc(sizeof(*bigEndianValue));
 	if (bigEndianValue == NULL) XCTFail(@"bigEndianValue malloc'd is NULL");
@@ -404,11 +404,11 @@
 	searchData.bytesSwapped = YES;
 	
 	ZGSearchResults *bigEndianResults = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
-	XCTAssertEqual(bigEndianResults.addressCount, 1U);
+	XCTAssertEqual(bigEndianResults.count, 1U);
 	
 	searchData.epsilon = 100.0;
 	ZGSearchResults *bigEndianResultsWithBigEpsilon = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
-	XCTAssertEqual(bigEndianResultsWithBigEpsilon.addressCount, 2U);
+	XCTAssertEqual(bigEndianResultsWithBigEpsilon.count, 2U);
 }
 
 - (void)testDoubleSearch
@@ -419,13 +419,13 @@
 	ZGSearchData *searchData = [self searchDataFromBytes:&value size:sizeof(value) dataType:ZGDouble address:address alignment:sizeof(value)];
 	
 	ZGSearchResults *results = ZGSearchForData(_processTask, searchData, nil, ZGDouble, 0, ZGGreaterThan);
-	XCTAssertEqual(results.addressCount, 616U);
+	XCTAssertEqual(results.count, 616U);
 	
 	searchData.dataAlignment = sizeof(float);
 	searchData.endAddress = searchData.beginAddress + _pageSize;
 	
 	ZGSearchResults *resultsWithHalfAlignment = ZGSearchForData(_processTask, searchData, nil, ZGDouble, 0, ZGGreaterThan);
-	XCTAssertEqual(resultsWithHalfAlignment.addressCount, 250U);
+	XCTAssertEqual(resultsWithHalfAlignment.count, 250U);
 	
 	searchData.dataAlignment = sizeof(double);
 	
@@ -438,7 +438,7 @@
 	searchData.epsilon = 1e57;
 	
 	ZGSearchResults *swappedResults = ZGSearchForData(_processTask, searchData, nil, ZGDouble, 0, ZGEquals);
-	XCTAssertEqual(swappedResults.addressCount, 302U);
+	XCTAssertEqual(swappedResults.count, 302U);
 }
 
 - (void)test8BitStringSearch
@@ -454,41 +454,41 @@
 	searchData.dataSize -= 1; // ignore null terminator for now
 	
 	ZGSearchResults *results = ZGSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals);
-	XCTAssertEqual(results.addressCount, 3U);
+	XCTAssertEqual(results.count, 3U);
 	
 	if (!ZGWriteBytes(_processTask, address + 96, "m", 1)) XCTFail(@"Failed to write m");
 	
 	ZGSearchResults *narrowedResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals, [[ZGSearchResults alloc] init], results);
-	XCTAssertEqual(narrowedResults.addressCount, 2U);
+	XCTAssertEqual(narrowedResults.count, 2U);
 	
 	// .shouldIncludeNullTerminator field isn't "really" used for search functions; it's just a hint for UI state
 	searchData.dataSize++;
 	
 	ZGSearchResults *narrowedTerminatedResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals, [[ZGSearchResults alloc] init], narrowedResults);
-	XCTAssertEqual(narrowedTerminatedResults.addressCount, 1U);
+	XCTAssertEqual(narrowedTerminatedResults.count, 1U);
 	
 	searchData.dataSize--;
 	if (!ZGWriteBytes(_processTask, address + 150, "HeLLo", strlen(hello))) XCTFail(@"Failed to write mixed case string");
 	searchData.shouldIgnoreStringCase = YES;
 	
 	ZGSearchResults *narrowedIgnoreCaseResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals, [[ZGSearchResults alloc] init], narrowedResults);
-	XCTAssertEqual(narrowedIgnoreCaseResults.addressCount, 2U);
+	XCTAssertEqual(narrowedIgnoreCaseResults.count, 2U);
 	
 	if (!ZGWriteBytes(_processTask, address + 150, "M", 1)) XCTFail(@"Failed to write capital M");
 	
 	ZGSearchResults *narrowedIgnoreCaseNotEqualsResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGNotEquals, [[ZGSearchResults alloc] init], narrowedIgnoreCaseResults);
-	XCTAssertEqual(narrowedIgnoreCaseNotEqualsResults.addressCount, 1U);
+	XCTAssertEqual(narrowedIgnoreCaseNotEqualsResults.count, 1U);
 	
 	searchData.shouldIgnoreStringCase = NO;
 	
 	ZGSearchResults *equalResultsAgain = ZGSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals);
-	XCTAssertEqual(equalResultsAgain.addressCount, 1U);
+	XCTAssertEqual(equalResultsAgain.count, 1U);
 	
 	searchData.beginAddress = address + _pageSize;
 	searchData.endAddress = address + _pageSize * 2;
 	
 	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGNotEquals);
-	XCTAssertEqual(notEqualResults.addressCount, _pageSize - 1 - (strlen(hello) - 1)); // take account for bytes at end that won't be compared
+	XCTAssertEqual(notEqualResults.count, _pageSize - 1 - (strlen(hello) - 1)); // take account for bytes at end that won't be compared
 }
 
 - (void)test16BitStringSearch
@@ -512,15 +512,15 @@
 	searchData.dataSize -= sizeof(unichar);
 	
 	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResults.addressCount, 4U);
+	XCTAssertEqual(equalResults.count, 4U);
 	
 	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals);
-	XCTAssertEqual(notEqualResults.addressCount, _data.length / sizeof(unichar) - 3 - 4*5);
+	XCTAssertEqual(notEqualResults.count, _data.length / sizeof(unichar) - 3 - 4*5);
 	
 	searchData.dataAlignment = 1;
 	
 	ZGSearchResults *equalResultsWithNoAlignment = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResultsWithNoAlignment.addressCount, 4U);
+	XCTAssertEqual(equalResultsWithNoAlignment.count, 4U);
 	
 	searchData.dataAlignment = 2;
 	
@@ -536,14 +536,14 @@
 	ZGSearchData *mooSearchData = [self searchDataFromBytes:mooBytes size:mooLength dataType:ZGString16 address:address alignment:sizeof(unichar)];
 	
 	ZGSearchResults *equalNarrowedResults = ZGNarrowSearchForData(_processTask, mooSearchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResults);
-	XCTAssertEqual(equalNarrowedResults.addressCount, 1U);
+	XCTAssertEqual(equalNarrowedResults.count, 1U);
 	
 	mooSearchData.shouldIgnoreStringCase = YES;
 	const char *mooMixedCase = [@"MoO" cStringUsingEncoding:NSUTF16LittleEndianStringEncoding];
 	if (!ZGWriteBytes(_processTask, address + 5000, mooMixedCase, mooLength)) XCTFail(@"Failed to write moo mixed string");
 	
 	ZGSearchResults *equalNarrowedIgnoreCaseResults = ZGNarrowSearchForData(_processTask, mooSearchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResults);
-	XCTAssertEqual(equalNarrowedIgnoreCaseResults.addressCount, 1U);
+	XCTAssertEqual(equalNarrowedIgnoreCaseResults.count, 1U);
 	
 	NSString *nooString = @"noo";
 	unichar *nooBytes = calloc(nooString.length + 1, sizeof(unichar));
@@ -555,20 +555,20 @@
 	if (!ZGWriteBytes(_processTask, address + 5000, nooBytes, nooLength)) XCTFail(@"Failed to write noo string");
 	
 	ZGSearchResults *equalNarrowedIgnoreCaseFalseResults = ZGNarrowSearchForData(_processTask, mooSearchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResults);
-	XCTAssertEqual(equalNarrowedIgnoreCaseFalseResults.addressCount, 0U);
+	XCTAssertEqual(equalNarrowedIgnoreCaseFalseResults.count, 0U);
 	
 	ZGSearchResults *notEqualNarrowedIgnoreCaseResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResults);
-	XCTAssertEqual(notEqualNarrowedIgnoreCaseResults.addressCount, 1U);
+	XCTAssertEqual(notEqualNarrowedIgnoreCaseResults.count, 1U);
 	
 	ZGSearchData *nooSearchData = [self searchDataFromBytes:nooBytes size:nooLength dataType:ZGString16 address:address alignment:sizeof(unichar)];
 	nooSearchData.beginAddress = address + _pageSize;
 	nooSearchData.endAddress = address + _pageSize * 2;
 	
 	ZGSearchResults *nooEqualResults = ZGSearchForData(_processTask, nooSearchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(nooEqualResults.addressCount, 1U);
+	XCTAssertEqual(nooEqualResults.count, 1U);
 	
 	ZGSearchResults *nooNotEqualResults = ZGSearchForData(_processTask, nooSearchData, nil, ZGString16, 0, ZGNotEquals);
-	XCTAssertEqual(nooNotEqualResults.addressCount, _pageSize / 2 - 1 - 2);
+	XCTAssertEqual(nooNotEqualResults.count, _pageSize / 2 - 1 - 2);
 	
 	unichar *helloBigBytes = calloc(helloString.length + 1, sizeof(unichar));
 	if (helloBigBytes == NULL) XCTFail(@"Failed to write calloc helloBigBytes");
@@ -580,10 +580,10 @@
 	searchData.bytesSwapped = YES;
 	
 	ZGSearchResults *equalResultsBig = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResultsBig.addressCount, 1U);
+	XCTAssertEqual(equalResultsBig.count, 1U);
 	
 	ZGSearchResults *equalResultsBigNarrow = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsBig);
-	XCTAssertEqual(equalResultsBigNarrow.addressCount, 1U);
+	XCTAssertEqual(equalResultsBigNarrow.count, 1U);
 	
 	unichar capitalHByte = 0x0;
 	[@"H" getBytes:&capitalHByte maxLength:sizeof(capitalHByte) usedLength:NULL encoding:NSUTF16BigEndianStringEncoding options:NSStringEncodingConversionAllowLossy range:NSMakeRange(0, 1) remainingRange:NULL];
@@ -591,60 +591,60 @@
 	if (!ZGWriteBytes(_processTask, address + 7000, &capitalHByte, sizeof(capitalHByte))) XCTFail(@"Failed to write capital H string");
 	
 	ZGSearchResults *equalResultsBigNarrowTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsBigNarrow);
-	XCTAssertEqual(equalResultsBigNarrowTwice.addressCount, 0U);
+	XCTAssertEqual(equalResultsBigNarrowTwice.count, 0U);
 
 	ZGSearchResults *notEqualResultsBigNarrowTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResultsBigNarrow);
-	XCTAssertEqual(notEqualResultsBigNarrowTwice.addressCount, 1U);
+	XCTAssertEqual(notEqualResultsBigNarrowTwice.count, 1U);
 
 	searchData.shouldIgnoreStringCase = YES;
 
 	ZGSearchResults *equalResultsBigNarrowThrice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsBigNarrow);
-	XCTAssertEqual(equalResultsBigNarrowThrice.addressCount, 1U);
+	XCTAssertEqual(equalResultsBigNarrowThrice.count, 1U);
 	
 	ZGSearchResults *equalResultsBigCaseInsenitive = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResultsBigCaseInsenitive.addressCount, 1U);
+	XCTAssertEqual(equalResultsBigCaseInsenitive.count, 1U);
 	
 	searchData.dataSize += sizeof(unichar);
 	// .shouldIncludeNullTerminator is not necessary to set, only used for UI state
 	
 	ZGSearchResults *equalResultsBigCaseInsenitiveNullTerminatedNarrowed = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsBigCaseInsenitive);
-	XCTAssertEqual(equalResultsBigCaseInsenitiveNullTerminatedNarrowed.addressCount, 0U);
+	XCTAssertEqual(equalResultsBigCaseInsenitiveNullTerminatedNarrowed.count, 0U);
 
 	unichar zero = 0x0;
 	if (!ZGWriteBytes(_processTask, address + 7000 + helloLength, &zero, sizeof(zero))) XCTFail(@"Failed to write zero");
 	
 	ZGSearchResults *equalResultsBigCaseInsenitiveNullTerminatedNarrowedTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsBigCaseInsenitive);
-	XCTAssertEqual(equalResultsBigCaseInsenitiveNullTerminatedNarrowedTwice.addressCount, 1U);
+	XCTAssertEqual(equalResultsBigCaseInsenitiveNullTerminatedNarrowedTwice.count, 1U);
 
 	ZGSearchResults *equalResultsBigCaseInsensitiveNullTerminated = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResultsBigCaseInsensitiveNullTerminated.addressCount, 1U);
+	XCTAssertEqual(equalResultsBigCaseInsensitiveNullTerminated.count, 1U);
 
 	const ZGMemorySize regionCount = 5;
 	const ZGMemorySize chancesMissedPerRegion = 5;
 	ZGSearchResults *notEqualResultsBigCaseInsensitiveNullTerminated = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals);
-	XCTAssertEqual(notEqualResultsBigCaseInsensitiveNullTerminated.addressCount, _data.length / sizeof(unichar) - regionCount * chancesMissedPerRegion - equalResultsBigCaseInsensitiveNullTerminated.addressCount);
+	XCTAssertEqual(notEqualResultsBigCaseInsensitiveNullTerminated.count, _data.length / sizeof(unichar) - regionCount * chancesMissedPerRegion - equalResultsBigCaseInsensitiveNullTerminated.count);
 
 	searchData.shouldIgnoreStringCase = NO;
 	searchData.bytesSwapped = NO;
 
 	ZGSearchResults *equalResultsNullTerminated = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResultsNullTerminated.addressCount, 0U);
+	XCTAssertEqual(equalResultsNullTerminated.count, 0U);
 
 	if (!ZGWriteBytes(_processTask, address + 96 + helloLength, &zero, sizeof(zero))) XCTFail(@"Failed to write zero 2nd time");
 
 	ZGSearchResults *equalResultsNullTerminatedTwice = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResultsNullTerminatedTwice.addressCount, 1U);
+	XCTAssertEqual(equalResultsNullTerminatedTwice.count, 1U);
 
 	ZGSearchResults *equalResultsNullTerminatedNarrowed = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsNullTerminatedTwice);
-	XCTAssertEqual(equalResultsNullTerminatedNarrowed.addressCount, 1U);
+	XCTAssertEqual(equalResultsNullTerminatedNarrowed.count, 1U);
 
 	if (!ZGWriteBytes(_processTask, address + 96 + helloLength, helloBytes, sizeof(zero))) XCTFail(@"Failed to write first character");
 
 	ZGSearchResults *equalResultsNullTerminatedNarrowedTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsNullTerminatedNarrowed);
-	XCTAssertEqual(equalResultsNullTerminatedNarrowedTwice.addressCount, 0U);
+	XCTAssertEqual(equalResultsNullTerminatedNarrowedTwice.count, 0U);
 
 	ZGSearchResults *notEqualResultsNullTerminatedNarrowedTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResultsNullTerminatedNarrowed);
-	XCTAssertEqual(notEqualResultsNullTerminatedNarrowedTwice.addressCount, 1U);
+	XCTAssertEqual(notEqualResultsNullTerminatedNarrowedTwice.count, 1U);
 }
 
 - (void)testByteArraySearch
@@ -655,10 +655,10 @@
 	ZGSearchData *searchData = [self searchDataFromBytes:bytes size:sizeof(bytes) dataType:ZGByteArray address:address alignment:1];
 	
 	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
-	XCTAssertEqual(equalResults.addressCount, 1U);
+	XCTAssertEqual(equalResults.count, 1U);
 	
 	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGNotEquals);
-	XCTAssertEqual(notEqualResults.addressCount, _data.length - 1 - 3*5);
+	XCTAssertEqual(notEqualResults.count, _data.length - 1 - 3*5);
 	
 	uint8_t changedBytes[] = {0xC8, 0xED, 0xBF, 0x0D};
 	if (!ZGWriteBytes(_processTask, address + 0x21D4, changedBytes, sizeof(changedBytes))) XCTFail(@"Failed to write changed bytes");
@@ -671,16 +671,16 @@
 	searchData.searchValue = ZGValueFromString(ZGProcessTypeX86_64, wildcardExpression, ZGByteArray, NULL);
 	
 	ZGSearchResults *equalResultsWildcards = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
-	XCTAssertEqual(equalResultsWildcards.addressCount, 1U);
+	XCTAssertEqual(equalResultsWildcards.count, 1U);
 	
 	uint8_t changedBytesAgain[] = {0xD9, 0xED, 0xBF, 0x0D};
 	if (!ZGWriteBytes(_processTask, address + 0x21D4, changedBytesAgain, sizeof(changedBytesAgain))) XCTFail(@"Failed to write changed bytes again");
 	
 	ZGSearchResults *equalResultsWildcardsNarrowed = ZGNarrowSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsWildcards);
-	XCTAssertEqual(equalResultsWildcardsNarrowed.addressCount, 0U);
+	XCTAssertEqual(equalResultsWildcardsNarrowed.count, 0U);
 	
 	ZGSearchResults *notEqualResultsWildcardsNarrowed = ZGNarrowSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResultsWildcards);
-	XCTAssertEqual(notEqualResultsWildcardsNarrowed.addressCount, 1U);
+	XCTAssertEqual(notEqualResultsWildcardsNarrowed.count, 1U);
 }
 
 @end
