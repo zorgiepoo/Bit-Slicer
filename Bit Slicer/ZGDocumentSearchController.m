@@ -739,6 +739,7 @@
 - (void)searchVariables:(NSArray<ZGVariable *> *)variables byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGDocumentWindowController *windowController = _windowController;
+	ZGDocumentTableController *tableController = windowController.tableController;
 	ZGProcess *currentProcess = windowController.currentProcess;
 	ZGVariableType dataType = _dataType;
 	ZGSearchResults *firstSearchResults = nil;
@@ -750,6 +751,11 @@
 		NSMutableData *firstResultSets = [NSMutableData data];
 		for (ZGVariable *variable in variables)
 		{
+			if (variable.usesDynamicAddress)
+			{
+				[tableController updateDynamicVariableAddress:variable];
+			}
+			
 			ZGMemoryAddress variableAddress = variable.address;
 			if (_searchData.pointerSize == sizeof(ZGMemoryAddress))
 			{
