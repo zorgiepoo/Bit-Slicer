@@ -235,7 +235,7 @@
 	
 	__block NSUInteger addressIndex = 0;
 	[equalExecuteNarrowResults enumerateWithCount:2 usingBlock:^(const void *resultAddressData, __unused BOOL *stop) {
-		ZGMemoryAddress resultAddress = (const ZGMemoryAddress *)resultAddressData;
+		ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
 		addressesRemoved[addressIndex] = resultAddress;
 		addressIndex++;
 	}];
