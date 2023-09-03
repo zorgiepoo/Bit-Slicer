@@ -2657,6 +2657,7 @@
 					"-Wno-c++98-compat",
 					"-Wno-auto-import",
 					"-Wno-c11-extensions",
+					"-Wno-declaration-after-statement",
 				);
 			};
 			name = Debug;
@@ -2763,6 +2764,7 @@
 					"-Wno-c++98-compat",
 					"-Wno-auto-import",
 					"-Wno-c11-extensions",
+					"-Wno-declaration-after-statement",
 				);
 			};
 			name = Release;
