@@ -62,7 +62,7 @@
 
 #define ZGRemoveRootlessProcessesKey @"ZGRemoveRootlessProcessesKey"
 
-@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>
+@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, NSWindowRestoration, ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>
 
 @end
 
