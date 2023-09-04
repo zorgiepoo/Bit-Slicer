@@ -120,8 +120,11 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(registerHotkey)
 	declareDebugMethod(unregisterHotkey)
 	declareDebugMethod(isRegisteredHotkey)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-function-type"
 	declareDebugMethodWithKeywords(assemble)
 	declareDebugMethodWithKeywords(disassemble)
+#pragma clang diagnostic pop
 	declareDebugMethod(findSymbol)
 	declareDebugMethod(symbolAt)
 	declareDebugMethod(readBytes)
