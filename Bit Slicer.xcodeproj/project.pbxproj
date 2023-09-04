@@ -128,6 +128,7 @@
 		72DBC8F01B7657F20092ED75 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC8EF1B7657F20092ED75 /* LICENSE */; };
 		72DBC91F1B7690BA0092ED75 /* [Code] About Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC91D1B7690BA0092ED75 /* [Code] About Window.strings */; };
 		72DBC9541B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
+		72E07FDB2AA563AF00BBEED1 /* LEB128Type.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E07FDA2AA563AF00BBEED1 /* LEB128Type.m */; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
 		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
@@ -586,6 +587,9 @@
 		72DBC9521B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPrivateCoreSymbolicator.h; path = "Bit Slicer/ZGPrivateCoreSymbolicator.h"; sourceTree = "<group>"; };
 		72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPrivateCoreSymbolicator.m; path = "Bit Slicer/ZGPrivateCoreSymbolicator.m"; sourceTree = "<group>"; };
 		72DBC9551B77C2A10092ED75 /* ZGSymbolicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSymbolicator.h; path = "Bit Slicer/ZGSymbolicator.h"; sourceTree = "<group>"; };
+		72E07FD82AA563A500BBEED1 /* DataInspectorType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DataInspectorType.h; path = deps/HexFiend/DataInspectorType.h; sourceTree = "<group>"; };
+		72E07FD92AA563AA00BBEED1 /* LEB128Type.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LEB128Type.h; path = deps/HexFiend/LEB128Type.h; sourceTree = "<group>"; };
+		72E07FDA2AA563AF00BBEED1 /* LEB128Type.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LEB128Type.m; path = deps/HexFiend/LEB128Type.m; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; usesTabs = 1; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -917,6 +921,9 @@
 				720844FF24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m */,
 				720844FB24E072DB00F3D449 /* DataInspectorScrollView.h */,
 				720844FC24E072DB00F3D449 /* DataInspectorScrollView.m */,
+				72E07FD82AA563A500BBEED1 /* DataInspectorType.h */,
+				72E07FD92AA563AA00BBEED1 /* LEB128Type.h */,
+				72E07FDA2AA563AF00BBEED1 /* LEB128Type.m */,
 			);
 			name = "Data Inspector";
 			sourceTree = "<group>";
@@ -1733,6 +1740,7 @@
 				77F1160C17D2EECA009E002A /* ZGPyScript.m in Sources */,
 				777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */,
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,
+				72E07FDB2AA563AF00BBEED1 /* LEB128Type.m in Sources */,
 				77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */,
 				7208450024E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m in Sources */,
 				77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */,

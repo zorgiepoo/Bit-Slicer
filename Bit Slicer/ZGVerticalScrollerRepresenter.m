@@ -38,7 +38,7 @@
 	
 	HFController *controller = [self controller];
 	//HFASSERT(controller != NULL);
-	HFFPRange displayedRange = [[self controller] displayedLineRange];
+	HFFPRange displayedRange = [controller displayedLineRange];
 	if (linesInt < 0) {
 		displayedRange.location += MIN((long double)linesInt, displayedRange.location);
 	}

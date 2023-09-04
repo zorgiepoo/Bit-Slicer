@@ -25,6 +25,7 @@
 #import <HexFiend/HFFunctions.h>
 #import <HexFiend/HFController.h>
 #import <HexFiend/HFRepresenter.h>
+#import <HexFiend/HFAssert.h>
 #import <HexFiend/HFFullMemoryByteArray.h>
 #import <HexFiend/HFFullMemoryByteSlice.h>
 #import <HexFiend/HFHexTextRepresenter.h>
@@ -55,6 +56,7 @@
 #import <HexFiend/HFByteRangeAttributeArray.h>
 #import <HexFiend/HFNSStringEncoding.h>
 
+#import <HexFiend/HFByteThemeColor.h>
 
 /* The following is all for Doxygen */
 

@@ -1,5 +1,6 @@
 /* Functions and convenience methods for working with HFTypes */
 
+#import <HexFiend/HFFrameworkPrefix.h>
 #import <HexFiend/HFTypes.h>
 #import <libkern/OSAtomic.h>
 
@@ -9,17 +10,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define HFDEFAULT_FONTSIZE ((CGFloat)10.)
 
 #define HFZeroRange (HFRange){0, 0}
-
-#if !TARGET_OS_IPHONE
-@class NSView;
-@class NSColor;
-#else
-@class UIColor;
-#endif
-
-#ifndef NDEBUG
-#define NDEBUG 1
-#endif
 
 /*!
   Makes an HFRange.  An HFRange is like an NSRange except it uses unsigned long longs.
@@ -231,10 +221,7 @@ static inline BOOL HFIntersectsRange(HFRange a, HFRange b) {
 /*! Returns YES if the given ranges intersect. Two ranges are considered to intersect if any fraction overlaps; zero-length ranges do not intersect anything. */
 static inline BOOL HFFPIntersectsRange(HFFPRange a, HFFPRange b) {
     // Ranges are said to intersect if they share at least one value.  Therefore, zero length ranges never intersect anything.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wfloat-equal"
     if (a.length == 0 || b.length == 0) return NO;
-#pragma clang diagnostic pop
     
     if (a.location <= b.location && a.location + a.length >= b.location) return YES;
     if (b.location <= a.location && b.location + b.length >= a.location) return YES;
@@ -335,10 +322,7 @@ static inline CGFloat HFMax(CGFloat a, CGFloat b) {
 
 /*! Returns true if the given HFFPRanges are equal.  */
 static inline BOOL HFFPRangeEqualsRange(HFFPRange a, HFFPRange b) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wfloat-equal"
     return a.location == b.location && a.length == b.length;
-#pragma clang diagnostic pop
 }
 
 /*! copysign() for a CGFloat */
@@ -352,7 +336,6 @@ static inline CGFloat HFCopysign(CGFloat a, CGFloat b) {
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-
 /*! Atomically increments an NSUInteger, returning the new value.  Optionally invokes a memory barrier. */
 static inline NSUInteger HFAtomicIncrement(volatile NSUInteger *ptr, BOOL barrier) {
     return _Generic(ptr,
@@ -360,7 +343,7 @@ static inline NSUInteger HFAtomicIncrement(volatile NSUInteger *ptr, BOOL barrie
 #if ULONG_MAX == UINT32_MAX
         volatile unsigned long *:      (barrier ? OSAtomicIncrement32Barrier : OSAtomicIncrement32)((volatile int32_t *)ptr),
 #else
-        volatile unsigned long *:      (NSUInteger)(barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr),
+        volatile unsigned long *:      (barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr),
 #endif
         volatile unsigned long long *: (barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr));
 }
@@ -372,9 +355,14 @@ static inline NSUInteger HFAtomicDecrement(volatile NSUInteger *ptr, BOOL barrie
 #if ULONG_MAX == UINT32_MAX
         volatile unsigned long *:      (barrier ? OSAtomicDecrement32Barrier : OSAtomicDecrement32)((volatile int32_t *)ptr),
 #else
-        volatile unsigned long *:      (NSUInteger)(barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr),
+        volatile unsigned long *:      (barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr),
 #endif
         volatile unsigned long long *: (barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr));
+}
+
+/* Function for OSAtomicAdd64 that just does a non-atomic add on PowerPC.  This should not be used where atomicity is critical; an example where this is used is updating a progress bar. */
+static inline int64_t HFAtomicAdd64(int64_t a, volatile int64_t *b) {
+    return OSAtomicAdd64(a, b);
 }
 #pragma clang diagnostic pop
 
@@ -383,10 +371,7 @@ static inline unsigned long long HFFPToUL(long double val) {
     assert(val >= 0);
     assert(val <= ULLONG_MAX);
     unsigned long long result = (unsigned long long)val;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wfloat-equal"
     assert((long double)result == val);
-#pragma clang diagnostic pop
     return result;
 }
 
@@ -438,6 +423,10 @@ static inline NSUInteger ll2l(unsigned long long val) { assert(val <= ULONG_MAX)
 /*! Converts an unsigned long long to uintptr_t.  The unsigned long long should be no more than UINTPTR_MAX. */
 static inline uintptr_t ll2p(unsigned long long val) { assert(val <= UINTPTR_MAX); return (uintptr_t)val; }
 
+static inline unsigned long long llmin(unsigned long long a, unsigned long long b) {
+    return a < b ? a : b;
+}
+
 /*! Returns an unsigned long long, which must be no more than ULLONG_MAX, as an unsigned long. */
 static inline CGFloat ld2f(long double val) {
 #if ! NDEBUG
@@ -477,6 +466,7 @@ void HFUnregisterViewForWindowAppearanceChanges(NSView *view, BOOL appToo);
 
 /*! Returns a description of the given byte count (e.g. "24 kilobytes") */
 NSString *HFDescribeByteCount(unsigned long long count);
+NSString *HFDescribeByteCountWithPrefixAndSuffix(const char *_Nullable stringPrefix, unsigned long long count, const char *_Nullable stringSuffix);
 
 /*! @brief An object wrapper for the HFRange type.
 
@@ -562,5 +552,20 @@ CGContextRef HFGraphicsGetCurrentContext(void);
 
 HFColor* HFColorWithWhite(CGFloat white, CGFloat alpha);
 HFColor* HFColorWithRGB(CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+
+/* Returns an NSData from an NSString containing hexadecimal characters.  Characters that are not hexadecimal digits are silently skipped.  Returns by reference whether the last byte contains only one nybble, in which case it will be returned in the low 4 bits of the last byte. */
+NSData *HFDataFromHexString(NSString *string, BOOL *_Nullable isMissingLastNybble);
+
+NSString *HFHexStringFromData(NSData *data, BOOL includePrefix);
+
+/* Helper for Swift to catch exceptions from Objective-C */
+NS_INLINE NSException * _Nullable HFTry(dispatch_block_t block) {
+    @try {
+        block();
+    } @catch (NSException *exception) {
+        return exception;
+    }
+    return nil;
+}
 
 NS_ASSUME_NONNULL_END

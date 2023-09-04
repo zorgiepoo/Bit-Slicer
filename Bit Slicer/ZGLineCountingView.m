@@ -23,15 +23,14 @@
 
 // This class is *largely* copied from HFLineCountingView.m - The major difference is that we draw according to a beginning offset
 
-#import <CoreGraphics/CoreGraphics.h> // needed for HexFiend
-#import <Cocoa/Cocoa.h> // needed for HexFiend
-
 #import "ZGLineCountingView.h"
 #import <HexFiend/HexFiend.h>
 #import "ZGLineCountingRepresenter.h"
 #import <math.h>
 
+#ifndef HFASSERT
 #define HFASSERT assert
+#endif
 
 #ifndef check_malloc
 #define check_malloc(x) ({ size_t _count = x; void* result = malloc(_count); if (! result) { fprintf(stderr, "Out of memory allocating %lu bytes\n", (unsigned long)_count); exit(EXIT_FAILURE); } result; })
