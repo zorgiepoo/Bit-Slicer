@@ -10,7 +10,7 @@
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		HQy4MsUQfuQUvzsOlLitO3Zs3Wc=
+		4Sjq3lZBKZT1aFcVnydC71aut2Y=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -117,7 +117,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			1LoF1DYlkta/ZEDlvcafvh0OMRWUX6mhRns8A9p2NSY=
+			c+7ut6Ov+U3AkAdaRIse1SInNJGUPO+eQ7V3XxZIeBQ=
 			</data>
 		</dict>
 		<key>Headers/HFCustomEncoding.h</key>
@@ -341,7 +341,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			TcrsjoWh7B6YgVnt6WRqL9BRYu4HyBeX31bxE7+qLko=
+			M1odCIYETnAZ8J5B3rMujWu86SeQuU1itqIIZUsYDJw=
 			</data>
 		</dict>
 		<key>Headers/HexFiend.h</key>
@@ -355,14 +355,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			wQRwDtYO3OE1lJWrEuu3Kc7yG/d9tJTWtUUBdmHumO4=
+			L6V2YUl9sD2n2wFKhDJ5QdUk/d8m4TT0DWgrGxSn5o0=
 			</data>
 		</dict>
 		<key>Modules/HexFiend.swiftmodule/Project/x86_64-apple-macos.swiftsourceinfo</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			VuVw4/46+hO707Ez+dXiSSUtW7aKLA94/c+IBxdrrTU=
+			gYuwIhEL7oW+HLUE6PnxXPvzic+qFf2H/4zz+Gg5jFQ=
 			</data>
 		</dict>
 		<key>Modules/HexFiend.swiftmodule/arm64-apple-macos.abi.json</key>
@@ -376,14 +376,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			HsdpZoTOlGgckR4zjuWGehhN292XYYf2pVJBXNvahYc=
+			Fc2HTfbnMXXlwqB9FBJXLhiFSWnjhwttn7yIbpmZiRc=
 			</data>
 		</dict>
 		<key>Modules/HexFiend.swiftmodule/arm64-apple-macos.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			anC6LkGwQ9xd13rPkDw2zZy4K4kyoOtgcQPGmaXpBWw=
+			9pjajrIzf2g3TyrhBFdJ8iFqWbwO3sCzXhUVs2ydCpQ=
 			</data>
 		</dict>
 		<key>Modules/HexFiend.swiftmodule/x86_64-apple-macos.abi.json</key>
@@ -397,14 +397,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			o/J1VzjZ4OYEM2e+yaSi0Ts1AA9f8hYuQKgTJeZEMbE=
+			F9otYhgM/36EAyNaAvdqJDrGdzZ6AWBhDKGz2jj3Fd8=
 			</data>
 		</dict>
 		<key>Modules/HexFiend.swiftmodule/x86_64-apple-macos.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			khAYaQ++/kuq0Opa2dELdshqFRVDFSDVLEtF9O7+gtM=
+			ehtDQ7IX9WAiy97Ta1ON0LgJF/JmxsW+sSq+AJJOZMY=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
@@ -425,7 +425,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Y6zGBdfN+6bezNZ6HTdaZeV6Ub/MwU0VyV45xphi9BM=
+			gYEQsnpLYRjI8WfXxHdJDbFqUQJod6myCe6fl7NE5w4=
 			</data>
 		</dict>
 	</dict>
