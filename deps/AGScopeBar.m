@@ -1070,8 +1070,8 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 			
 			[mGroupPopupButton.menu setFont:mScopeBar.scopeBarAppearance.menuItemFont];
 			[mGroupPopupButton setFont:mScopeBar.scopeBarAppearance.itemButtonFont];
-			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
-			[mGroupPopupButton setButtonType:NSPushOnPushOffButton];
+			[mGroupPopupButton setBezelStyle:NSBezelStyleAccessoryBar];
+			[mGroupPopupButton setButtonType:NSButtonTypePushOnPushOff];
 			[mGroupPopupButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 			[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
 			[mGroupPopupButton.cell setAltersStateOfSelectedItem:NO];
@@ -1146,7 +1146,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	}
 	
 	for (AGScopeBarItem * item in self.items) {
-		item.menuItem.state = (item.isSelected ? NSOnState : NSOffState);
+		item.menuItem.state = (item.isSelected ? NSControlStateValueOn : NSControlStateValueOff);
 	}
 	
 	
@@ -1484,7 +1484,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	[mMenuItem setTarget:self];
 	[mMenuItem setImage:self.image];
 	[mMenuItem setSubmenu:self.menu];
-	[mMenuItem setState:(self.isSelected ? NSOnState : NSOffState)];
+	[mMenuItem setState:(self.isSelected ? NSControlStateValueOn : NSControlStateValueOff)];
 	
 	return mMenuItem;
 }
@@ -1560,8 +1560,8 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	[button setToolTip:self.toolTip];
 	[button setTarget:self];
 	[button setAction:@selector(scopeButtonClicked:)];
-	[button setBezelStyle:NSRecessedBezelStyle];
-	[button setButtonType:NSPushOnPushOffButton];
+	[button setBezelStyle:NSBezelStyleAccessoryBar];
+	[button setButtonType:NSButtonTypePushOnPushOff];
 	[button.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 	[button setShowsBorderOnlyWhileMouseInside:YES];
 	[button.cell setBackgroundStyle:NSBackgroundStyleRaised];
@@ -1600,7 +1600,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	
 	[[mButton cell] setImageScaling:NSImageScaleProportionallyDown];
 	
-	mButton.state = (self.isSelected ? NSOnState : NSOffState);
+	mButton.state = (self.isSelected ? NSControlStateValueOn : NSControlStateValueOff);
 	[self _updateEnabling];
 	
 	[mButton sizeToFit];
@@ -1662,11 +1662,11 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	// The title/image is always drawn by this AGScopeBarPopupButtonCell itself.
 	mRecessedButton = [[NSButton alloc] initWithFrame:NSZeroRect];
 	mRecessedButton.title = @"";
-	mRecessedButton.buttonType = NSPushOnPushOffButton;
-	mRecessedButton.bezelStyle = NSRecessedBezelStyle;
+	mRecessedButton.buttonType = NSButtonTypePushOnPushOff;
+	mRecessedButton.bezelStyle = NSBezelStyleAccessoryBar;
 	mRecessedButton.showsBorderOnlyWhileMouseInside = NO;
 	[mRecessedButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
-	mRecessedButton.state = NSOnState;
+	mRecessedButton.state = NSControlStateValueOn;
 	
 	// We use another popup cell so that the font of the displayed menu does not
 	// have to be the font of the cell itself. The only other solid way around

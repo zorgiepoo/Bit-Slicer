@@ -77,7 +77,7 @@
 
 - (IBAction)changeIgnoreDataAlignment:(id)sender
 {
-	_documentData.ignoreDataAlignment = ([(NSCell *)sender state] == NSOnState);
+	_documentData.ignoreDataAlignment = ([(NSCell *)sender state] == NSControlStateValueOn);
 	
 	ZGDocument *document = _document;
 	[document markChange];
@@ -85,7 +85,7 @@
 
 - (IBAction)changeIncludeSharedMemory:(id)sender
 {
-	_searchData.includeSharedMemory = ([(NSCell *)sender state] == NSOnState);
+	_searchData.includeSharedMemory = ([(NSCell *)sender state] == NSControlStateValueOn);
 	
 	ZGDocument *document = _document;
 	[document markChange];

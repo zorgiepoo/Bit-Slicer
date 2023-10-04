@@ -160,12 +160,12 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 + (void)copyVariableAddress:(ZGVariable *)variable
 {
 	[NSPasteboard.generalPasteboard
-	 declareTypes:@[NSStringPboardType]
+	 declareTypes:@[NSPasteboardTypeString]
 	 owner:self];
 	
 	[NSPasteboard.generalPasteboard
 	 setString:variable.addressFormula
-	 forType:NSStringPboardType];
+	 forType:NSPasteboardTypeString];
 }
 
 - (void)copyAddress
@@ -177,7 +177,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 + (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables
 {
 	[NSPasteboard.generalPasteboard
-	 declareTypes:@[NSStringPboardType, ZGVariablePboardType]
+	 declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType]
 	 owner:self];
 	
 	NSMutableArray<NSString *> *linesToWrite = [[NSMutableArray alloc] init];
@@ -192,7 +192,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	[NSPasteboard.generalPasteboard
 	 setString:[linesToWrite componentsJoinedByString:@"\n"]
-	 forType:NSStringPboardType];
+	 forType:NSPasteboardTypeString];
 	
 	[NSPasteboard.generalPasteboard
 	 setData:[NSKeyedArchiver archivedDataWithRootObject:variables]

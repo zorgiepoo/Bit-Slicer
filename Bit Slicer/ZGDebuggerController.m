@@ -267,7 +267,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	[self updateExecutionButtons];
 	
-	[self toggleBacktraceAndRegistersViews:NSOffState];
+	[self toggleBacktraceAndRegistersViews:NSControlStateValueOff];
 	
 	// Don't set these in IB; can't trust setting these at the right time and not screwing up the saved positions
 	_splitView.autosaveName = ZGDebuggerSplitViewAutosaveName;
@@ -350,7 +350,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	if (currentBreakpoint != nil)
 	{
-		[self toggleBacktraceAndRegistersViews:NSOnState];
+		[self toggleBacktraceAndRegistersViews:NSControlStateValueOn];
 		[_registersViewController updateRegistersFromBreakPoint:currentBreakpoint];
 		[self updateBacktrace];
 		
@@ -358,7 +358,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else
 	{
-		[self toggleBacktraceAndRegistersViews:NSOffState];
+		[self toggleBacktraceAndRegistersViews:NSControlStateValueOff];
 		if (oldProcess != nil)
 		{
 			[self readMemory:nil];
@@ -420,17 +420,17 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	[_splitView display];
 }
 
-- (void)toggleBacktraceAndRegistersViews:(NSCellStateValue)state
+- (void)toggleBacktraceAndRegistersViews:(NSControlStateValue)state
 {	
 	switch (state)
 	{
-		case NSOnState:
+		case NSControlStateValueOn:
 			if ([_splitView isSubviewCollapsed:[_splitView.subviews objectAtIndex:1]])
 			{
 				[self uncollapseBottomSubview];
 			}
 			break;
-		case NSOffState:
+		case NSControlStateValueOff:
 			if (![_splitView isSubviewCollapsed:[_splitView.subviews objectAtIndex:1]])
 			{
 				[self.undoManager removeAllActionsWithTarget:_registersViewController];
@@ -1624,8 +1624,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			[variablesArray addObject:instruction.variable];
 		}
 		
-		[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
-		[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
+		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType] owner:self];
+		[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSPasteboardTypeString];
 		[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 	}];
 }
@@ -1634,8 +1634,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	[self annotateInstructions:@[selectedInstruction] symbols:NO async:NO completionHandler:^{
-		[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
-		[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSStringPboardType];
+		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
+		[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSPasteboardTypeString];
 	}];
 }
 
@@ -2254,7 +2254,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		
 		[_registersViewController updateRegistersFromBreakPoint:breakPoint];
 		
-		[self toggleBacktraceAndRegistersViews:NSOnState];
+		[self toggleBacktraceAndRegistersViews:NSControlStateValueOn];
 		
 		[self jumpToMemoryAddress:_registersViewController.instructionPointer];
 		
@@ -2314,7 +2314,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	[_breakPointController removeSingleStepBreakPointsFromBreakPoint:breakPoint];
 	[self resumeBreakPoint:breakPoint];
-	[self toggleBacktraceAndRegistersViews:NSOffState];
+	[self toggleBacktraceAndRegistersViews:NSControlStateValueOff];
 }
 
 - (IBAction)continueExecution:(id)__unused sender

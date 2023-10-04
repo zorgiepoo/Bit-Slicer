@@ -195,8 +195,8 @@
 		[variablesArray addObject:instruction.variable];
 	}
 	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSPasteboardTypeString];
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
 
@@ -204,8 +204,8 @@
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
+	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSPasteboardTypeString];
 }
 
 - (IBAction)showMemoryViewer:(id)__unused sender
