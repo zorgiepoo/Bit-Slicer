@@ -1663,7 +1663,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	mRecessedButton = [[NSButton alloc] initWithFrame:NSZeroRect];
 	mRecessedButton.title = @"";
 	mRecessedButton.buttonType = NSButtonTypePushOnPushOff;
-	mRecessedButton.bezelStyle = NSBezelStyleAccessoryBar;
+	mRecessedButton.bezelStyle = NSRecessedBezelStyle;
 	mRecessedButton.showsBorderOnlyWhileMouseInside = NO;
 	[mRecessedButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 	mRecessedButton.state = NSControlStateValueOn;
