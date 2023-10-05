@@ -12,7 +12,7 @@
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
     self = [super initWithCoder:coder];
-	[self setBezelStyle:NSBezelStyleAccessoryBarAction];
+	[self setBezelStyle:NSRoundRectBezelStyle];
     return self;
 }
 
