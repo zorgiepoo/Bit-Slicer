@@ -1070,7 +1070,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 			
 			[mGroupPopupButton.menu setFont:mScopeBar.scopeBarAppearance.menuItemFont];
 			[mGroupPopupButton setFont:mScopeBar.scopeBarAppearance.itemButtonFont];
-			[mGroupPopupButton setBezelStyle:NSBezelStyleAccessoryBar];
+			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
 			[mGroupPopupButton setButtonType:NSButtonTypePushOnPushOff];
 			[mGroupPopupButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 			[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
@@ -1560,7 +1560,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	[button setToolTip:self.toolTip];
 	[button setTarget:self];
 	[button setAction:@selector(scopeButtonClicked:)];
-	[button setBezelStyle:NSBezelStyleAccessoryBar];
+	[button setBezelStyle:NSRecessedBezelStyle];
 	[button setButtonType:NSButtonTypePushOnPushOff];
 	[button.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 	[button setShowsBorderOnlyWhileMouseInside:YES];
