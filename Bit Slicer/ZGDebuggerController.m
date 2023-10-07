@@ -136,7 +136,13 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		NSData *emptyHotKeyData = [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKey]];
+		NSError *emptyArchiveError = nil;
+		NSData *emptyHotKeyData = [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKey] requiringSecureCoding:YES error:&emptyArchiveError];
+		if (emptyHotKeyData == nil)
+		{
+			NSLog(@"Error: failed to create archive of empty hotkey: %@", emptyArchiveError);
+			assert(false);
+		}
 
 		// Versions before 1.7 have pause/unpause hot key stored in different default keys, so do a migration
 		NSNumber *oldPauseAndUnpauseHotKeyCode = [[NSUserDefaults standardUserDefaults] objectForKey:ZGOldPauseAndUnpauseHotKeyCode];
@@ -149,9 +155,19 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			{
 				oldCode = INVALID_KEY_CODE;
 			}
+			
+			NSError *archiveError = nil;
+			NSData *archivedHotKeyData = [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = oldCode, .flags = oldFlags}] requiringSecureCoding:YES error:&archiveError];
 
-			[[NSUserDefaults standardUserDefaults]
-			 registerDefaults:@{ZGPauseAndUnpauseHotKey : [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = oldCode, .flags = oldFlags}]]}];
+			if (archivedHotKeyData != nil)
+			{
+				[[NSUserDefaults standardUserDefaults]
+				 registerDefaults:@{ZGPauseAndUnpauseHotKey : archivedHotKeyData}];
+			}
+			else
+			{
+				NSLog(@"Error: failed to create archive of old pause/unpause hotkey: %@", archiveError);
+			}
 
 			[[NSUserDefaults standardUserDefaults] removeObjectForKey:ZGOldPauseAndUnpauseHotKeyCode];
 			[[NSUserDefaults standardUserDefaults] removeObjectForKey:ZGOldPauseAndUnpauseHotKeyFlags];
@@ -180,10 +196,13 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		_instructions = @[];
 		_haltedBreakPoints = [[NSMutableArray alloc] init];
 		
-		_pauseAndUnpauseHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey])]);
-		_stepInHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepInHotKey])]);
-		_stepOverHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOverHotKey])]);
-		_stepOutHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOutHotKey])]);
+		_pauseAndUnpauseHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey]) error:NULL]);
+		
+		_stepInHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepInHotKey]) error:NULL]);
+		
+		_stepOverHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOverHotKey]) error:NULL]);
+		
+		_stepOutHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOutHotKey]) error:NULL]);
 
 		[hotKeyCenter registerHotKey:_pauseAndUnpauseHotKey delegate:self];
 		[hotKeyCenter registerHotKey:_stepInHotKey delegate:self];
@@ -1626,7 +1645,17 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType] owner:self];
 		[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSPasteboardTypeString];
-		[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+		
+		NSError *archiveError = nil;
+		NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variablesArray requiringSecureCoding:YES error:&archiveError];
+		if (data == nil)
+		{
+			NSLog(@"Error: failed to write debugger variables to pasteboard for copy: %@", archiveError);
+		}
+		else
+		{
+			[[NSPasteboard generalPasteboard] setData:data forType:ZGVariablePboardType];
+		}
 	}];
 }
 
@@ -1673,7 +1702,17 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return instruction.variable;
 	}];
 	
-	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
+	NSError *archiveError = nil;
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
+	if (data == nil)
+	{
+		NSLog(@"Error: failed to write debugger variables to pasteboard: %@", archiveError);
+		return NO;
+	}
+	else
+	{
+		return [pboard setData:data forType:ZGVariablePboardType];
+	}
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)__unused aNotification

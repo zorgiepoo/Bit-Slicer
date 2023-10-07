@@ -194,9 +194,18 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 setString:[linesToWrite componentsJoinedByString:@"\n"]
 	 forType:NSPasteboardTypeString];
 	
-	[NSPasteboard.generalPasteboard
-	 setData:[NSKeyedArchiver archivedDataWithRootObject:variables]
-	 forType:ZGVariablePboardType];
+	NSError *archiveError = nil;
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
+	if (data != nil)
+	{
+		[NSPasteboard.generalPasteboard
+		 setData:data
+		 forType:ZGVariablePboardType];
+	}
+	else
+	{
+		NSLog(@"Error: failed to copy variables to pasteboard: %@", archiveError);
+	}
 }
 
 - (void)copyVariables
@@ -211,14 +220,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (pasteboardData)
 	{
 		ZGDocumentWindowController *windowController = _windowController;
-		NSArray<ZGVariable *> *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
-		NSUInteger currentIndex = windowController.selectedVariableIndexes.count == 0 ? 0 : windowController.selectedVariableIndexes.firstIndex + 1;
 		
-		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
-		
-		[self
-		 addVariables:variablesToInsertArray
-		 atRowIndexes:indexesToInsert];
+		NSError *unarchiveError = nil;
+		NSArray<ZGVariable *> *variablesToInsertArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [ZGVariable class]]] fromData:pasteboardData error:&unarchiveError];
+		if (variablesToInsertArray != nil)
+		{
+			NSUInteger currentIndex = windowController.selectedVariableIndexes.count == 0 ? 0 : windowController.selectedVariableIndexes.firstIndex + 1;
+			
+			NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
+			
+			[self
+			 addVariables:variablesToInsertArray
+			 atRowIndexes:indexesToInsert];
+		}
+		else
+		{
+			NSLog(@"Error: failed to unarchive variables from pastboard for pasting with error %@", unarchiveError);
+		}
 	}
 }
 

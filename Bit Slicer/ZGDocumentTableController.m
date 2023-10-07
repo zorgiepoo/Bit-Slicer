@@ -391,7 +391,20 @@
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType])
 	{
-		NSArray<ZGVariable *> *variables = [NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[draggingInfo draggingPasteboard] dataForType:ZGVariablePboardType])];
+		NSData *pasteboardData = [[draggingInfo draggingPasteboard] dataForType:ZGVariablePboardType];
+		if (pasteboardData == nil)
+		{
+			NSLog(@"Error: failed to get draggingPasteboard for variables");
+			return NO;
+		}
+		
+		NSError *unarchiveError = nil;
+		NSArray<ZGVariable *> *variables = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [ZGVariable class]]] fromData:pasteboardData error:&unarchiveError];
+		if (variables == nil)
+		{
+			NSLog(@"Error: failed to unarchive variables in drag-dsop: %@", unarchiveError);
+			return NO;
+		}
 		
 		NSMutableIndexSet *rowIndexes = [NSMutableIndexSet indexSet];
 		for (NSUInteger rowIndex = 0; rowIndex < variables.count; rowIndex++)
@@ -417,9 +430,19 @@
 	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableReorderType];
 	
 	NSArray<ZGVariable *> *variables = [_documentData.variables objectsAtIndexes:rowIndexes];
-	[pasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 	
-	return YES;
+	NSError *archiveError = nil;
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
+	if (data == nil)
+	{
+		NSLog(@"Error: failed to write document variables to pasteboard: %@", archiveError);
+		return NO;
+	}
+	else
+	{
+		[pasteboard setData:data forType:ZGVariablePboardType];
+		return YES;
+	}
 }
 
 #pragma mark Table View Data Source Methods
