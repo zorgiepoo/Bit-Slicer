@@ -86,8 +86,7 @@
 
 - (NSFileWrapper *)fileWrapperOfType:(NSString *)__unused typeName error:(NSError * __autoreleasing *)__unused outError
 {
-	NSMutableData *writeData = [[NSMutableData alloc] init];
-	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:writeData];
+	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
 	
 	NSArray<ZGVariable *> *watchVariablesArrayToSave = nil;
 	
@@ -163,7 +162,7 @@
 	
 	[keyedArchiver finishEncoding];
 	
-	return [[NSFileWrapper alloc] initRegularFileWithContents:writeData];
+	return [[NSFileWrapper alloc] initRegularFileWithContents:keyedArchiver.encodedData];
 }
 
 - (NSString *)parseStringSafely:(NSString *)string
@@ -171,12 +170,23 @@
 	return string != nil ? string : @"";
 }
 
-- (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)__unused typeName error:(NSError * __autoreleasing *)__unused outError
+- (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)__unused typeName error:(NSError * __autoreleasing *)outError
 {
 	NSData *readData = [fileWrapper regularFileContents];
-	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
-	NSArray<ZGVariable *> *newVariables = [keyedUnarchiver decodeObjectOfClass:[NSArray class] forKey:ZGWatchVariablesArrayKey];
+	NSError *readError = nil;
+	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:readData error:&readError];
+	if (keyedUnarchiver == nil)
+	{
+		if (outError != NULL)
+		{
+			*outError = readError;
+		}
+		
+		return NO;
+	}
+	
+	NSArray<ZGVariable *> *newVariables = [keyedUnarchiver decodeObjectOfClasses:[NSSet setWithArray:@[NSArray.class, ZGVariable.class]] forKey:ZGWatchVariablesArrayKey];
 	if (newVariables != nil)
 	{
 		_data.variables = newVariables;
@@ -186,7 +196,7 @@
 		_data.variables = [NSArray array];
 	}
 	
-	id desiredProcessInternalName = [keyedUnarchiver decodeObjectOfClass:[NSObject class] forKey:ZGProcessInternalNameKey];
+	id desiredProcessInternalName = [keyedUnarchiver decodeObjectOfClasses:[NSSet setWithArray:@[NSString.class, NSNull.class]] forKey:ZGWatchVariablesArrayKey];
 	if (desiredProcessInternalName == [NSNull null] || ![(id<NSObject>)desiredProcessInternalName isKindOfClass:[NSString class]])
 	{
 		_data.desiredProcessInternalName = nil;
@@ -234,6 +244,8 @@
 	
 	_data.lastAboveRangeValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGAboveValueKey];
 	_data.lastBelowRangeValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBelowValueKey];
+	
+	[keyedUnarchiver finishDecoding];
 	
 	return YES;
 }
