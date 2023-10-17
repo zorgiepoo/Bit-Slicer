@@ -183,6 +183,26 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	});
 }
 
+static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
+{
+	NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:keyValue];
+	if (data == nil)
+	{
+		NSLog(@"Error: HotKey data is not available for %@", keyValue);
+		return [ZGHotKey hotKey];
+	}
+	
+	NSError *decodeError = nil;
+	ZGHotKey *decodedHotKey = [NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:data error:&decodeError];
+	if (decodedHotKey == nil)
+	{
+		NSLog(@"Error: failed to decode HotKey instance from data with key %@ and error %@", keyValue, decodeError.localizedDescription);
+		return [ZGHotKey hotKey];
+	}
+	
+	return decodedHotKey;
+}
+
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
@@ -196,13 +216,10 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		_instructions = @[];
 		_haltedBreakPoints = [[NSMutableArray alloc] init];
 		
-		_pauseAndUnpauseHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey]) error:NULL]);
-		
-		_stepInHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepInHotKey]) error:NULL]);
-		
-		_stepOverHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOverHotKey]) error:NULL]);
-		
-		_stepOutHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchivedObjectOfClass:[ZGHotKey class] fromData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOutHotKey]) error:NULL]);
+		_pauseAndUnpauseHotKey = _decodeHotKeyForKey(ZGPauseAndUnpauseHotKey);
+		_stepInHotKey = _decodeHotKeyForKey(ZGStepInHotKey);
+		_stepOverHotKey = _decodeHotKeyForKey(ZGStepOverHotKey);
+		_stepOutHotKey = _decodeHotKeyForKey(ZGStepOutHotKey);
 
 		[hotKeyCenter registerHotKey:_pauseAndUnpauseHotKey delegate:self];
 		[hotKeyCenter registerHotKey:_stepInHotKey delegate:self];
