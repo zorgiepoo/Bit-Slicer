@@ -114,7 +114,7 @@
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGMemoryViewerShowsDataInspector : @NO}];
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGMemoryViewerShowsDataInspector : @YES}];
 	});
 }
 
