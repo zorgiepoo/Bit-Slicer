@@ -196,7 +196,7 @@
 		_data.variables = [NSArray array];
 	}
 	
-	id desiredProcessInternalName = [keyedUnarchiver decodeObjectOfClasses:[NSSet setWithArray:@[NSString.class, NSNull.class]] forKey:ZGWatchVariablesArrayKey];
+	id desiredProcessInternalName = [keyedUnarchiver decodeObjectOfClasses:[NSSet setWithArray:@[NSString.class, NSNull.class]] forKey:ZGProcessInternalNameKey];
 	if (desiredProcessInternalName == [NSNull null] || ![(id<NSObject>)desiredProcessInternalName isKindOfClass:[NSString class]])
 	{
 		_data.desiredProcessInternalName = nil;
