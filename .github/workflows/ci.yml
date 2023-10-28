@@ -18,7 +18,13 @@ jobs:
         env:
             DEVELOPER_DIR: '/Applications/Xcode_15.0.1.app/Contents/Developer'
         run: |
-          xcodebuild build-for-testing -target 'Bit Slicer Tests' -scheme 'Bit Slicer' CODE_SIGN_IDENTITY="-"
+          xcodebuild build-for-testing -target 'Bit Slicer Tests' -scheme 'Bit Slicer' -derivedDataPath build CODE_SIGN_IDENTITY="-"
       - name: Test
         run: |
-          xcodebuild test-without-building -target 'Bit Slicer Tests' -scheme 'Bit Slicer'
+          xcodebuild test-without-building -target 'Bit Slicer Tests' -scheme 'Bit Slicer' -derivedDataPath build
+      - name: Archive Test Results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+            name: 'build-logs'
+            path: build/Logs
