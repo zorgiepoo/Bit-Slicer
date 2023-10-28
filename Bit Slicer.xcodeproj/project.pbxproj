@@ -2465,6 +2465,7 @@
 					"-Wno-reserved-id-macro",
 					"-Wno-partial-availability",
 					"-Wno-objc-messaging-id",
+					"-Wno-declaration-after-statement",
 				);
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -2557,6 +2558,7 @@
 					"-Wno-reserved-id-macro",
 					"-Wno-partial-availability",
 					"-Wno-objc-messaging-id",
+					"-Wno-declaration-after-statement",
 				);
 				WRAPPER_EXTENSION = xctest;
 			};
