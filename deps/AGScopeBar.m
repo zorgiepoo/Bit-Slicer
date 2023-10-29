@@ -1070,7 +1070,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 			
 			[mGroupPopupButton.menu setFont:mScopeBar.scopeBarAppearance.menuItemFont];
 			[mGroupPopupButton setFont:mScopeBar.scopeBarAppearance.itemButtonFont];
-			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
+			[mGroupPopupButton setBezelStyle:NSBezelStyleAccessoryBar];
 			[mGroupPopupButton setButtonType:NSButtonTypePushOnPushOff];
 			[mGroupPopupButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 			[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
@@ -1560,7 +1560,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	[button setToolTip:self.toolTip];
 	[button setTarget:self];
 	[button setAction:@selector(scopeButtonClicked:)];
-	[button setBezelStyle:NSRecessedBezelStyle];
+	[button setBezelStyle:NSBezelStyleAccessoryBar];
 	[button setButtonType:NSButtonTypePushOnPushOff];
 	[button.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 	[button setShowsBorderOnlyWhileMouseInside:YES];
@@ -1663,7 +1663,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	mRecessedButton = [[NSButton alloc] initWithFrame:NSZeroRect];
 	mRecessedButton.title = @"";
 	mRecessedButton.buttonType = NSButtonTypePushOnPushOff;
-	mRecessedButton.bezelStyle = NSRecessedBezelStyle;
+	mRecessedButton.bezelStyle = NSBezelStyleAccessoryBar;
 	mRecessedButton.showsBorderOnlyWhileMouseInside = NO;
 	[mRecessedButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 	mRecessedButton.state = NSControlStateValueOn;
