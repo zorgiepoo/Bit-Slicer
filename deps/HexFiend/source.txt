@@ -1,4 +1,3 @@
-Source: https://github.com/ridiculousfish/HexFiend.git
-Commit: b86a0d28e4b792b01dd5b806cd4cb684d8a34d40
-Branch: master
-Config: Use Framework Only (Release) scheme, fix warnings, update HFLineCountingView.h, and check if anything has changed in the classes Bit Slicer overrides compared to official repository. See changes in Data Inspector View.xib too. Check boyer_moore_helper() signature is the same as the one we expect.
+Source: git@github.com:zorgiepoo/HexFiend.git
+Commit: ba2f714bca18c34fe16304bf2e10e3a46f2f3796 (master)
+Config: Use Framework Only (Release) scheme, fix warnings, update HFLineCountingView.h, and check if anything has changed in the classes Bit Slicer overrides compared to official repository. See changes in Data Inspector View.xib too. For the Data Inspector make sure custom localization specific changes are preserved. Check boyer_moore_helper() signature is the same as the one we expect. Make sure deployment target still satisfies framework dependency.

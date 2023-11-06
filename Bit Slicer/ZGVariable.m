@@ -227,8 +227,23 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (id)copyWithZone:(NSZone *)__unused zone
 {
-	NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:self];
-	return ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:archivedData]);
+	NSError *archiveError = nil;
+	NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:&archiveError];
+	if (archivedData == nil)
+	{
+		NSLog(@"Error: failed to archive ZGVariable %@ for copy with error: %@", self, archiveError);
+		return nil;
+	}
+	
+	NSError *unarchiveError = nil;
+	ZGVariable *variable = [NSKeyedUnarchiver unarchivedObjectOfClass:[ZGVariable class] fromData:archivedData error:&unarchiveError];
+	if (variable == nil)
+	{
+		NSLog(@"Error: failed to unarchive copied variable with error: %@", unarchiveError);
+		return nil;
+	}
+	
+	return variable;
 }
 
 + (ZGMemorySize)sizeFromType:(ZGVariableType)type pointerSize:(ZGMemorySize)pointerSize

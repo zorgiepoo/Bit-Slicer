@@ -1,0 +1,11 @@
+framework module HexFiend {
+  umbrella header "HexFiend.h"
+  export *
+
+  module * { export * }
+}
+
+module HexFiend.Swift {
+  header "HexFiend-Swift.h"
+  requires objc
+}

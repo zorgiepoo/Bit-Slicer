@@ -100,7 +100,16 @@
 	NSArray<ZGVariable *> *variables = [[_backtrace.instructions objectsAtIndexes:rowIndexes] zgMapUsingBlock:^(ZGInstruction *instruction) {
 		return instruction.variable;
 	}];
-	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
+	
+	NSError *archiveError = nil;
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
+	if (data == nil)
+	{
+		NSLog(@"Error: failed to write backtrace rows to pasteboard: %@", archiveError);
+		return NO;
+	}
+	
+	return [pboard setData:data forType:ZGVariablePboardType];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
@@ -195,17 +204,28 @@
 		[variablesArray addObject:instruction.variable];
 	}
 	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
-	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSPasteboardTypeString];
+	
+	NSError *archiveError = nil;
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variablesArray requiringSecureCoding:YES error:&archiveError];
+	
+	if (data == nil)
+	{
+		NSLog(@"Error: failed to copy backtrace variables to pasteboard: %@", archiveError);
+	}
+	else
+	{
+		[[NSPasteboard generalPasteboard] setData:data forType:ZGVariablePboardType];
+	}
 }
 
 - (IBAction)copyAddress:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
+	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSPasteboardTypeString];
 }
 
 - (IBAction)showMemoryViewer:(id)__unused sender

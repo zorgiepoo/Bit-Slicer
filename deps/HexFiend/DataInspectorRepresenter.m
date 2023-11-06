@@ -1,27 +1,3 @@
-/* Copyright (c) 2005-2011, Peter Ammon
- * All rights reserved.
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-
 //
 //  DataInspectorRepresenter.m
 //  HexFiend_2
@@ -30,20 +6,16 @@
 //  Copyright 2009 ridiculous_fish. All rights reserved.
 //
 
+#define ZGDataInspectorLocalizationTable @"[Code] Data Inspector"
+
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wobjc-messaging-id"
+#pragma clang diagnostic ignored "-Wused-but-marked-unused"
+
 #import "DataInspectorRepresenter.h"
 #import "DataInspector.h"
-
-// Don't want to include these macros, so not using them
-
-#ifndef HFASSERT
-#define HFASSERT(x) ;
-#endif
-
-#ifndef USE
-#define USE(x) (void)(x)
-#endif
-
-#define ZGDataInspectorLocalizationTable @"[Code] Data Inspector"
 
 /* NSTableColumn identifiers */
 #define kInspectorTypeColumnIdentifier @"inspector_type"
@@ -54,9 +26,6 @@
 
 #define kScrollViewExtraPadding ((CGFloat)2.)
 
-/* Declaration of SnowLeopard only property so we can build on Leopard */
-#define NSTableViewSelectionHighlightStyleNone (-1)
-
 #define INVALID_EDITING_BYTE_COUNT NSUIntegerMax
 
 #define kDataInspectorUserDefaultsKey @"DataInspectorDefaults"
@@ -65,9 +34,6 @@ NSString * const DataInspectorDidChangeRowCount = @"DataInspectorDidChangeRowCou
 NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows";
 
 @implementation DataInspectorRepresenter
-{
-    NSMutableArray *_topLevelObjects;
-}
 
 - (instancetype)init {
     self = [super init];
@@ -123,14 +89,18 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
     if (! loaded || ! outletView) {
         [NSException raise:NSInternalInconsistencyException format:@"Unable to load nib named DataInspectorView"];
     }
-    _topLevelObjects = topLevelObjects;
-    
     NSView *resultView = outletView; //want to inherit its retain here
     outletView = nil;
     [table setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
     [table setRefusesFirstResponder:YES];
     [table setTarget:self];
     [table setDoubleAction:@selector(doubleClickedTable:)];    
+#if defined(MAC_OS_X_VERSION_10_15) && MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_15
+    // TODO: remove once GitHub supports Xcode 12.2+
+    if (@available(macOS 11.0, *)) {
+        table.style = NSTableViewStyleFullWidth;
+    }
+#endif
     return resultView;
 }
 
@@ -148,30 +118,26 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     USE(tableView);
-    return (NSInteger)[self rowCount];
+    return [self rowCount];
 }
 
 /* returns the number of bytes that are selected, or NSUIntegerMax if there is more than one selection, or the selection is larger than MAX_EDITABLE_BYTE_COUNT */
-- (NSUInteger)selectedByteCountForEditing {
+- (NSInteger)selectedByteCountForEditing {
     NSArray *selectedRanges = [[self controller] selectedContentsRanges];
     if ([selectedRanges count] != 1) return INVALID_EDITING_BYTE_COUNT;
-    HFRange selectedRange = [(HFRangeWrapper *)selectedRanges[0] HFRange];
+    HFRange selectedRange = [selectedRanges[0] HFRange];
     if (selectedRange.length > MAX_EDITABLE_BYTE_COUNT) return INVALID_EDITING_BYTE_COUNT;
     return ll2l(selectedRange.length);
 }
 
-- (id)valueFromInspector:(DataInspector *)inspector isError:(BOOL *)outIsError{
+- (NSAttributedString *)valueFromInspector:(DataInspector *)inspector isError:(BOOL *)outIsError{
     HFController *controller = [self controller];
     return [inspector valueForController:controller ranges:[controller selectedContentsRanges] isError:outIsError];
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     USE(tableView);
-    if (row < 0) {
-        NSLog(@"row < 0: %ld", row);
-        return nil;
-    }
-    DataInspector *inspector = inspectors[(NSUInteger)row];
+    DataInspector *inspector = inspectors[row];
     NSString *ident = [tableColumn identifier];
     if ([ident isEqualToString:kInspectorTypeColumnIdentifier]) {
         return @([inspector type]);
@@ -194,15 +160,15 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     NSString *ident = [tableColumn identifier];
     /* This gets called after clicking on the + or - button.  If you delete the last row, then this gets called with a row >= the number of inspectors, so bail out for +/- buttons before pulling out our inspector */
-    if ([ident isEqualToString:kInspectorSubtractButtonColumnIdentifier] || row < 0) return;
+    if ([ident isEqualToString:kInspectorSubtractButtonColumnIdentifier]) return;
     
-    DataInspector *inspector = inspectors[(NSUInteger)row];
+    DataInspector *inspector = inspectors[row];
     if ([ident isEqualToString:kInspectorTypeColumnIdentifier]) {
-        [inspector setType:(enum InspectorType_t)[(NSString *)object intValue]];
+        [inspector setType:[object intValue]];
         [tableView reloadData];
     }
     else if ([ident isEqualToString:kInspectorSubtypeColumnIdentifier]) {
-        const NSInteger index = [(NSString *)object integerValue];
+        const NSInteger index = [object integerValue];
         HFASSERT(index >= -1 && index <= 5 && index != 3); // 3 is the separator
         if (index == 1 || index == 2) {
             inspector.endianness = index == 1 ? eEndianLittle : eEndianBig;
@@ -213,8 +179,12 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
         [self saveDefaultInspectors];
     }
     else if ([ident isEqualToString:kInspectorValueColumnIdentifier]) {
+        // Make sure to avoid modifications if the value didn't actually change,
+        // otherwise the document gets marked as edited/dirty unnecessarily.
+        NSAttributedString *oldValue = [self valueFromInspector:inspector isError:NULL];
+        const BOOL valueChanged = ![oldValue.string isEqual:object];
         NSUInteger byteCount = [self selectedByteCountForEditing];
-        if (byteCount != INVALID_EDITING_BYTE_COUNT) {
+        if (byteCount != INVALID_EDITING_BYTE_COUNT && valueChanged) {
             unsigned char bytes[MAX_EDITABLE_BYTE_COUNT];
             memset(bytes, 0, sizeof(bytes));
             HFASSERT(byteCount <= sizeof(bytes));
@@ -235,27 +205,23 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
     }
 }
 
-- (void)tableView:(NSTableView *)__unused tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (void)tableView:(NSTableView *)__unused tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)__unused row
 {
-    if (row < 0) {
-        return;
-    }
-    
     NSString *ident = [tableColumn identifier];
     if ([ident isEqualToString:kInspectorSubtypeColumnIdentifier]) {
-        const DataInspector *inspector = inspectors[(NSUInteger)row];
+        const DataInspector *inspector = inspectors[row];
         const bool allowsEndianness = (inspector.type == eInspectorTypeSignedInteger ||
                                  inspector.type == eInspectorTypeUnsignedInteger ||
                                  inspector.type == eInspectorTypeFloatingPoint);
         const bool allowsNumberBase = (inspector.type == eInspectorTypeSignedInteger ||
                                  inspector.type == eInspectorTypeUnsignedInteger);
-        [(NSCell *)cell setEnabled:allowsEndianness || allowsNumberBase];
+        [cell setEnabled:allowsEndianness || allowsNumberBase];
         NSPopUpButtonCell *popUpCell = (NSPopUpButtonCell*)cell;
         HFASSERT(popUpCell.numberOfItems == 6);
-        [popUpCell itemAtIndex:1].state = NSOffState;
-        [popUpCell itemAtIndex:2].state = NSOffState;
-        [popUpCell itemAtIndex:4].state = NSOffState;
-        [popUpCell itemAtIndex:5].state = NSOffState;
+		[popUpCell itemAtIndex:1].state = NSControlStateValueOff;
+		[popUpCell itemAtIndex:2].state = NSControlStateValueOff;
+		[popUpCell itemAtIndex:4].state = NSControlStateValueOff;
+		[popUpCell itemAtIndex:5].state = NSControlStateValueOff;
         [popUpCell itemAtIndex:1].enabled = NO;
         [popUpCell itemAtIndex:2].enabled = NO;
         [popUpCell itemAtIndex:4].enabled = NO;
@@ -265,12 +231,12 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
             NSInteger endianIndex;
             if (inspector.endianness == eEndianLittle) {
                 endianIndex = 1;
-                [titleItems addObject:NSLocalizedStringFromTable(@"littleEndian", ZGDataInspectorLocalizationTable, nil)];
+				[titleItems addObject:NSLocalizedStringFromTable(@"littleEndian", ZGDataInspectorLocalizationTable, nil)];
             } else {
                 endianIndex = 2;
-                [titleItems addObject:NSLocalizedStringFromTable(@"bigEndian", ZGDataInspectorLocalizationTable, nil)];
+				[titleItems addObject:NSLocalizedStringFromTable(@"bigEndian", ZGDataInspectorLocalizationTable, nil)];
             }
-            [popUpCell itemAtIndex:endianIndex].state = NSOnState;
+			[popUpCell itemAtIndex:endianIndex].state = NSControlStateValueOn;
             [popUpCell itemAtIndex:1].enabled = YES;
             [popUpCell itemAtIndex:2].enabled = YES;
         }
@@ -278,12 +244,12 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
             NSInteger numberBaseIndex;
             if (inspector.numberBase == eNumberBaseDecimal) {
                 numberBaseIndex = 4;
-                [titleItems addObject:NSLocalizedStringFromTable(@"decimalBase", ZGDataInspectorLocalizationTable, nil)];
+				[titleItems addObject:NSLocalizedStringFromTable(@"decimalBase", ZGDataInspectorLocalizationTable, nil)];
             } else {
                 numberBaseIndex = 5;
-                [titleItems addObject:NSLocalizedStringFromTable(@"hexadecimalBase", ZGDataInspectorLocalizationTable, nil)];
+				[titleItems addObject:NSLocalizedStringFromTable(@"hexadecimalBase", ZGDataInspectorLocalizationTable, nil)];
             }
-            [popUpCell itemAtIndex:numberBaseIndex].state = NSOnState;
+			[popUpCell itemAtIndex:numberBaseIndex].state = NSControlStateValueOn;
             [popUpCell itemAtIndex:4].enabled = YES;
             [popUpCell itemAtIndex:5].enabled = YES;
         }
@@ -300,7 +266,7 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
 
 - (void)resizeTableViewAfterChangingRowCount {
     [table noteNumberOfRowsChanged];
-    NSInteger rowCount = [table numberOfRows];
+    NSUInteger rowCount = [table numberOfRows];
     if (rowCount > 0) {
         NSScrollView *scrollView = [table enclosingScrollView];
         NSSize newTableViewBoundsSize = [table frame].size;
@@ -317,41 +283,36 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
 - (void)addRow:(id)sender {
     USE(sender);
     DataInspector *x = [DataInspector dataInspectorSupplementing:inspectors];
-    NSInteger clickedRow = [table clickedRow];
-    if (clickedRow > 0) {
-        [inspectors insertObject:x atIndex:(NSUInteger)clickedRow+1];
-        [self saveDefaultInspectors];
-        [self resizeTableViewAfterChangingRowCount];
-    }
+    [inspectors insertObject:x atIndex:[table clickedRow]+1];
+    [self saveDefaultInspectors];
+    [self resizeTableViewAfterChangingRowCount];
 }
 
 - (void)removeRow:(id)sender {
     USE(sender);
     if ([self rowCount] == 1) {
-	[[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidDeleteAllRows object:self userInfo:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidDeleteAllRows object:self userInfo:nil];
     }
     else {
         NSInteger clickedRow = [table clickedRow];
-        if (clickedRow > 0) {
-            [inspectors removeObjectAtIndex:(NSUInteger)clickedRow];
-            [self saveDefaultInspectors];
-            [self resizeTableViewAfterChangingRowCount];
-        }
+        [inspectors removeObjectAtIndex:clickedRow];
+        [self saveDefaultInspectors];
+        [self resizeTableViewAfterChangingRowCount];
     }
 }
 
 - (IBAction)doubleClickedTable:(id)sender {
     USE(sender);
     NSInteger column = [table clickedColumn], row = [table clickedRow];
-    if (column >= 0 && row >= 0 && [[[table tableColumns][(NSUInteger)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
-	BOOL isError;
-	[self valueFromInspector:inspectors[(NSUInteger)row] isError:&isError];
-	if (! isError) {
-	    [table editColumn:column row:row withEvent:[NSApp currentEvent] select:YES];
-	}
-	else {
-	    NSBeep();
-	}
+    if (self.controller.editable && column >= 0 && row >= 0 && [[[table tableColumns][column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
+        BOOL isError = NO;
+        [self valueFromInspector:inspectors[row] isError:&isError];
+        if (! isError) {
+            [table editColumn:column row:row withEvent:[NSApp currentEvent] select:YES];
+        }
+        else {
+            NSBeep();
+        }
     }
 }
 
@@ -363,10 +324,9 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
     NSUInteger byteCount = [self selectedByteCountForEditing];
     if (byteCount == INVALID_EDITING_BYTE_COUNT) return NO;
     
-    DataInspector *inspector = inspectors[(NSUInteger)row];
+    DataInspector *inspector = inspectors[row];
     return [inspector acceptStringValue:[fieldEditor string] replacingByteCount:byteCount intoData:NULL];
 }
-
 
 /* Prevent all row selection */
 
@@ -384,7 +344,6 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
     return YES;
 }
 
-
 - (void)refreshTableValues {
     [table reloadData];
 }
@@ -397,3 +356,5 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
 }
 
 @end
+
+#pragma clang diagnostic pop

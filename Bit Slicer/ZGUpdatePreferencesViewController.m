@@ -64,28 +64,28 @@
 {
 	if (_appUpdaterController.checksForUpdates)
 	{
-		_checkForUpdatesButton.state = NSOnState;
+		_checkForUpdatesButton.state = NSControlStateValueOn;
 		
 		_checkForAlphaUpdatesButton.enabled = YES;
-		_checkForAlphaUpdatesButton.state = _appUpdaterController.checksForAlphaUpdates ? NSOnState : NSOffState;
+		_checkForAlphaUpdatesButton.state = _appUpdaterController.checksForAlphaUpdates ? NSControlStateValueOn : NSControlStateValueOff;
 		
 		_sendProfileInfoButton.enabled = YES;
-		_sendProfileInfoButton.state = _appUpdaterController.sendsAnonymousInfo ? NSOnState : NSOffState;
+		_sendProfileInfoButton.state = _appUpdaterController.sendsAnonymousInfo ? NSControlStateValueOn : NSControlStateValueOff;
 	}
 	else
 	{
 		_checkForAlphaUpdatesButton.enabled = NO;
 		_sendProfileInfoButton.enabled = NO;
 		
-		_checkForUpdatesButton.state = NSOffState;
-		_checkForAlphaUpdatesButton.state = NSOffState;
-		_sendProfileInfoButton.state = NSOffState;
+		_checkForUpdatesButton.state = NSControlStateValueOff;
+		_checkForAlphaUpdatesButton.state = NSControlStateValueOff;
+		_sendProfileInfoButton.state = NSControlStateValueOff;
 	}
 }
 
 - (IBAction)checkForUpdatesButton:(id)__unused sender
 {
-	if (_checkForUpdatesButton.state == NSOffState)
+	if (_checkForUpdatesButton.state == NSControlStateValueOff)
 	{
 		_appUpdaterController.checksForAlphaUpdates = NO;
 		_appUpdaterController.checksForUpdates = NO;
@@ -101,13 +101,13 @@
 
 - (IBAction)checkForAlphaUpdatesButton:(id)__unused sender
 {
-	_appUpdaterController.checksForAlphaUpdates = (_checkForAlphaUpdatesButton.state == NSOnState);
+	_appUpdaterController.checksForAlphaUpdates = (_checkForAlphaUpdatesButton.state == NSControlStateValueOn);
 	[self updateCheckingForUpdateButtons];
 }
 
 - (IBAction)changeSendProfileInformation:(id)__unused sender
 {
-	_appUpdaterController.sendsAnonymousInfo = (_sendProfileInfoButton.state == NSOnState);
+	_appUpdaterController.sendsAnonymousInfo = (_sendProfileInfoButton.state == NSControlStateValueOn);
 	[self updateCheckingForUpdateButtons];
 }
 

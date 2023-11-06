@@ -103,17 +103,17 @@
 		{
 			ZGMemoryProtection protection = VM_PROT_NONE;
 			
-			if (_readButton.state == NSOnState)
+			if (_readButton.state == NSControlStateValueOn)
 			{
 				protection |= VM_PROT_READ;
 			}
 			
-			if (_writeButton.state == NSOnState)
+			if (_writeButton.state == NSControlStateValueOn)
 			{
 				protection |= VM_PROT_WRITE;
 			}
 			
-			if (_executeButton.state == NSOnState)
+			if (_executeButton.state == NSControlStateValueOn)
 			{
 				protection |= VM_PROT_EXECUTE;
 			}
@@ -168,9 +168,9 @@
 		else
 		{
 			// Turn everything off if we couldn't find the current memory protection
-			_readButton.state = NSOffState;
-			_writeButton.state = NSOffState;
-			_executeButton.state = NSOffState;
+			_readButton.state = NSControlStateValueOff;
+			_writeButton.state = NSControlStateValueOff;
+			_executeButton.state = NSControlStateValueOff;
 		}
 	}
 	

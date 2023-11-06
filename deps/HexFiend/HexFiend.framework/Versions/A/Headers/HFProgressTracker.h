@@ -6,9 +6,9 @@
 //  Copyright 2008 ridiculous_fish. All rights reserved.
 //
 
-NS_ASSUME_NONNULL_BEGIN
+#import <HexFiend/HFFrameworkPrefix.h>
 
-@class NSProgressIndicator;
+NS_ASSUME_NONNULL_BEGIN
 
 /*!
 @class HFProgressTracker

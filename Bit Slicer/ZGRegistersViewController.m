@@ -460,7 +460,16 @@
 	NSArray<ZGVariable *> *variables = [[_registers objectsAtIndexes:rowIndexes] zgMapUsingBlock:^id _Nonnull(ZGRegister *theRegister) {
 		return theRegister.variable;
 	}];
-	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
+	
+	NSError *archiveError = nil;
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
+	if (data == nil)
+	{
+		NSLog(@"Error: failed to write registers to pasteboard: %@", archiveError);
+		return NO;
+	}
+	
+	return [pboard setData:data forType:ZGVariablePboardType];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
@@ -603,9 +612,19 @@
 		[variablesArray addObject:theRegister.variable];
 	}
 	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
-	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSPasteboardTypeString];
+	
+	NSError *archiveError = nil;
+	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variablesArray requiringSecureCoding:YES error:&archiveError];
+	if (data != nil)
+	{
+		[[NSPasteboard generalPasteboard] setData:data forType:ZGVariablePboardType];
+	}
+	else
+	{
+		NSLog(@"Error: failed to copy registers data: %@", archiveError);
+	}
 }
 
 @end

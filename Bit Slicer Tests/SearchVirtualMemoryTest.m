@@ -39,6 +39,8 @@
 #import "ZGStoredData.h"
 #import "ZGDataValueExtracting.h"
 
+#include <TargetConditionals.h>
+
 @interface SearchVirtualMemoryTest : XCTestCase
 
 @end
@@ -53,6 +55,10 @@
 - (void)setUp
 {
     [super setUp];
+	
+#if TARGET_CPU_ARM64
+	XCTSkip("Virtual Memory Tests are not supported for arm64 yet");
+#endif
 	
 	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 	NSString *randomDataPath = [bundle pathForResource:@"random_data" ofType:@""];

@@ -149,7 +149,16 @@
 			hotKey.keyCombo = newCarbonKeyCode;
 			[_hotKeyCenter registerHotKey:hotKey delegate:_debuggerController];
 			
-			[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:hotKey] forKey:hotKeyDefaultsKey];
+			NSError *archiveError = nil;
+			NSData *data = [NSKeyedArchiver archivedDataWithRootObject:hotKey requiringSecureCoding:YES error:&archiveError];
+			if (data == nil)
+			{
+				NSLog(@"Error: failed to record hotkey data with error %@", archiveError);
+			}
+			else
+			{
+				[[NSUserDefaults standardUserDefaults] setObject:data forKey:hotKeyDefaultsKey];
+			}
 		}
 	}
 }

@@ -48,11 +48,11 @@ case value: \
 		result = description; \
 		break;
 
-#ifndef MAC_OS_VERSION_13_1
-#define MAC_OS_VERSION_13_1 130100
+#ifndef MAC_OS_VERSION_14_0
+#define MAC_OS_VERSION_14_0 140000
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_VERSION_13_1
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_VERSION_14_2
 #pragma message("Need to update the user tag descriptions")
 #endif
 
