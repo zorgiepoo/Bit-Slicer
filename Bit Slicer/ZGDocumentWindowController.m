@@ -1280,7 +1280,7 @@
 					[[self undoManager] removeAllActions];
 				}
 				
-				[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES storeValuesAfterSearch:_storeValuesAfterSearch];
+				[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] indirectDataType:nil functionType:functionType storeValuesAfterSearch:_storeValuesAfterSearch];
 			}
 		}
 		else
@@ -1368,7 +1368,7 @@
 - (IBAction)searchPointerToSelectedVariable:(id)__unused sender
 {
 	ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
-	[_searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO storeValuesAfterSearch:_storeValuesAfterSearch];
+	[_searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer indirectDataType:@(variable.type) functionType:ZGEquals storeValuesAfterSearch:_storeValuesAfterSearch];
 }
 
 - (void)_storeAllValues

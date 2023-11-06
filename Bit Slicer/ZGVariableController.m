@@ -992,6 +992,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		if (segmentName != nil)
 		{
+			BOOL isIndirectVariable = NO;
 			NSString *partialPath = [machFilePath lastPathComponent];
 			if (machBinaryInfo.slide > 0 && !variable.usesDynamicAddress)
 			{
@@ -1020,12 +1021,34 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
 				}
 				
-				variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machBinary.headerAddress];
+				NSString *baseFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machBinary.headerAddress];
+				
+				// Test if this is a variable that uses a pointer address
+				// but has not been evaluated to use a dynamic address yet
+				if (variable.usesDynamicPointerAddress)
+				{
+					NSString *pointerReference = [NSString stringWithFormat:@"[0x%llX]", variable.address];
+					if ([variable.addressFormula containsString:pointerReference])
+					{
+						variable.addressFormula = [variable.addressFormula stringByReplacingOccurrencesOfString:pointerReference withString:[NSString stringWithFormat:@"[%@]", baseFormula]];
+						
+						isIndirectVariable = YES;
+					}
+					else
+					{
+						variable.addressFormula = baseFormula;
+					}
+				}
+				else
+				{
+					variable.addressFormula = baseFormula;
+				}
+				
 				variable.usesDynamicAddress = YES;
 				variable.finishedEvaluatingDynamicAddress = YES;
 			}
 			
-			staticVariableDescription = [NSString stringWithFormat:@"%@ %@ (static)", partialPath, segmentName];
+			staticVariableDescription = [NSString stringWithFormat:@"%@ %@ (%@)", partialPath, segmentName, (isIndirectVariable ? @"static, indirect" : @"static")];
 		}
 	}
 	
@@ -1088,10 +1111,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		for (ZGVariable *variable in variables)
 		{
+			[variableAddresses addObject:@(variable.address)];
+			
 			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
 			
 			[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
-			[variableAddresses addObject:@(variable.address)];
 		}
 		
 		*staticDescriptionsRef = staticDescriptions;

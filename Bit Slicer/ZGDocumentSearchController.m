@@ -67,8 +67,8 @@
 	ZGSearchResults * _Nullable _temporarySearchResults;
 	BOOL _isBusy;
 	ZGVariableType _dataType;
+	NSNumber *_indirectDataType;
 	ZGFunctionType _functionType;
-	BOOL _allowsNarrowing;
 	NSString *_searchValueString;
 	ZGSearchData * _Nonnull _searchData;
 	ZGMachBinaryAnnotationInfo _machBinaryAnnotationInfo;
@@ -261,9 +261,8 @@
 		{
 			// These progress search results are thrown away,
 			// so doesn't matter if accesses are unaligned or not
-			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:_searchData.dataSize pointerSize:_searchData.pointerSize unalignedAccess:YES];
-			searchResults.dataType = _dataType;
-			searchResults.enabled = _allowsNarrowing;
+			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] resultType:ZGSearchResultTypeDirect dataType:_dataType stride:_searchData.pointerSize unalignedAccess:YES];
+			
 			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch - currentVariableCount fromResults:searchResults];
 			[variablesTableView reloadData];
 		}
@@ -301,35 +300,104 @@
 	ZGProcess *currentProcess = windowController.currentProcess;
 	ZGMemorySize pointerSize = currentProcess.pointerSize;
 	
-	ZGMemorySize dataSize = searchResults.dataSize;
-	BOOL enabled = searchResults.enabled;
+	ZGMemorySize dataSize = _searchData.dataSize;
+	ZGSearchResultType resultType = searchResults.resultType;
+	
 	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(const void *data, BOOL * __unused stop) {
-		ZGMemoryAddress variableAddress;
-		switch (pointerSize)
+		switch (resultType)
 		{
-			case sizeof(ZGMemoryAddress):
-				variableAddress = *((const ZGMemoryAddress *)data);
+			case ZGSearchResultTypeDirect:
+			{
+				ZGMemoryAddress variableAddress;
+				switch (pointerSize)
+				{
+					case sizeof(ZGMemoryAddress):
+						variableAddress = *((const ZGMemoryAddress *)data);
+						break;
+					case sizeof(ZG32BitMemoryAddress):
+						variableAddress = *((const ZG32BitMemoryAddress *)data);
+						break;
+					default:
+						abort();
+				}
+				
+				ZGVariable *newVariable =
+				[[ZGVariable alloc]
+				 initWithValue:NULL
+				 size:dataSize
+				 address:variableAddress
+				 type:searchResults.dataType
+				 qualifier:qualifier
+				 pointerSize:pointerSize
+				 description:[[NSAttributedString alloc] initWithString:@""]
+				 enabled:YES
+				 byteOrder:byteOrder];
+				
+				[newVariables addObject:newVariable];
+				
 				break;
-			case sizeof(ZG32BitMemoryAddress):
-				variableAddress = *((const ZG32BitMemoryAddress *)data);
+			}
+			case ZGSearchResultTypeIndirect:
+			{
+				//	Struct {
+				//		uintptr_t baseAddress;
+				//		uint16_t numLevels;
+				//		uint16_t offsets[MAX_NUM_LEVELS];
+				//		uint8_t padding[N];
+				//	}
+				
+				ZGMemoryAddress baseAddress;
+				switch (pointerSize)
+				{
+					case sizeof(ZGMemoryAddress):
+						baseAddress = *((const ZGMemoryAddress *)data);
+						break;
+					case sizeof(ZG32BitMemoryAddress):
+						baseAddress = *((const ZG32BitMemoryAddress *)data);
+						break;
+					default:
+						abort();
+				}
+				
+				uint16_t numberOfLevels = *(const uint16_t *)((const void *)((const uint8_t *)data) + pointerSize);
+				const uint16_t *offsets = (const uint16_t *)((const void *)((const uint8_t *)data + pointerSize + sizeof(numberOfLevels)));
+				
+				uint16_t firstOffset = offsets[0];
+				NSString *addressFormula =
+					firstOffset != 0x0 ?
+					[NSString stringWithFormat:@"[0x%llX] + 0x%X", baseAddress, firstOffset] :
+					[NSString stringWithFormat:@"[0x%llX]", baseAddress];
+				
+				for (ZGMemorySize level = 1; level < numberOfLevels; level++)
+				{
+					uint16_t offset = offsets[level];
+					addressFormula =
+						offset != 0x0 ?
+						[NSString stringWithFormat:@"[%@ + 0x%X]", addressFormula, offset] :
+						[NSString stringWithFormat:@"[%@]", addressFormula];
+				}
+				
+				ZGVariable *newVariable =
+				[[ZGVariable alloc]
+				 initWithValue:NULL
+				 size:dataSize
+				 address:baseAddress
+				 type:searchResults.dataType
+				 qualifier:qualifier
+				 pointerSize:pointerSize
+				 description:[[NSAttributedString alloc] initWithString:@""]
+				 enabled:YES
+				 byteOrder:byteOrder];
+				
+				newVariable.addressFormula = addressFormula;
+				newVariable.usesDynamicAddress = YES;
+				
+				[newVariables addObject:newVariable];
+				//TODO: annotations below need to look at baseAddress, not finally evaulated address
+				
 				break;
-			default:
-				abort();
+			}
 		}
-		
-		ZGVariable *newVariable =
-		[[ZGVariable alloc]
-		 initWithValue:NULL
-		 size:dataSize
-		 address:variableAddress
-		 type:searchResults.dataType
-		 qualifier:qualifier
-		 pointerSize:pointerSize
-		 description:[[NSAttributedString alloc] initWithString:@""]
-		 enabled:enabled
-		 byteOrder:byteOrder];
-		
-		[newVariables addObject:newVariable];
 	}];
 	
 	dispatch_async(_machBinaryAnnotationInfoQueue, ^{
@@ -409,30 +477,23 @@
 	
 	[windowController updateNumberOfValuesDisplayedStatus];
 	
-	if (_allowsNarrowing)
+	BOOL shouldMakeSearchFieldFirstResponder = YES;
+	
+	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
+	if (!_searchProgress.shouldCancelSearch && _documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
 	{
-		BOOL shouldMakeSearchFieldFirstResponder = YES;
+		NSArray<ZGVariable *> *filteredVariables = [_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
+			return variable.enabled;
+		}];
 		
-		// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
-		if (!_searchProgress.shouldCancelSearch && _documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+		if (filteredVariables.count == 1)
 		{
-			NSArray<ZGVariable *> *filteredVariables = [_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
-				return variable.enabled;
-			}];
-			
-			if (filteredVariables.count == 1)
-			{
-				[windowController.window makeFirstResponder:windowController.variablesTableView];
-				shouldMakeSearchFieldFirstResponder = NO;
-			}
+			[windowController.window makeFirstResponder:windowController.variablesTableView];
+			shouldMakeSearchFieldFirstResponder = NO;
 		}
-		
-		[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
 	}
-	else
-	{
-		[self resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
-	}
+	
+	[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
 }
 
 #define ZGRetrieveFlagsErrorDomain @"ZGRetrieveFlagsErrorDomain"
@@ -733,6 +794,9 @@
 		return NO;
 	}
 	
+	_searchData.indirectMaxOffset = 256;
+	_searchData.indirectMaxLevels = 5;
+	
 	return YES;
 }
 
@@ -772,32 +836,36 @@
 				unalignedAddressAccess = YES;
 			}
 		}
-		firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] dataSize:_searchData.dataSize pointerSize:_searchData.pointerSize unalignedAccess:unalignedAddressAccess];
+		firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] resultType:ZGSearchResultTypeDirect dataType:dataType stride:_searchData.pointerSize unalignedAccess:unalignedAddressAccess];
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
+			if (self->_indirectDataType == nil)
+			{
+				self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
+			}
+			else
+			{
+				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, (ZGVariableType)[self->_indirectDataType integerValue]);
+			}
 		}
 		else
 		{
-			self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.pointerSize) ? self->_searchResults : nil);
+			self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.stride) ? self->_searchResults : nil);
 		}
-		
-		self->_temporarySearchResults.dataType = dataType;
-		self->_temporarySearchResults.enabled = self->_allowsNarrowing;
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});
 }
 
-- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
+- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType indirectDataType:(NSNumber *)indirectDataType functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
 {
 	_dataType = dataType;
+	_indirectDataType = indirectDataType;
 	_functionType = functionType;
 	_searchValueString = [searchStringValue copy];
-	_allowsNarrowing = allowsNarrowing;
 	
 	NSError *error = nil;
 	if (![self retrieveSearchDataWithError:&error])
@@ -809,7 +877,7 @@
 	NSMutableArray<ZGVariable *> *notSearchedVariables = [[NSMutableArray alloc] init];
 	NSMutableArray<ZGVariable *> *searchedVariables = [[NSMutableArray alloc] init];
 	
-	BOOL isNarrowingSearch = allowsNarrowing && [self isInNarrowSearchMode];
+	BOOL isNarrowingSearch = (indirectDataType == nil) && [self isInNarrowSearchMode];
 	
 	// Add all variables whose value should not be searched for, first
 	for (ZGVariable *variable in _documentData.variables)

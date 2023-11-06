@@ -34,17 +34,32 @@
 
 @implementation ZGSearchResults
 
-static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize pointerSize)
+static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize stride)
 {
 	NSUInteger count = 0;
 	for (NSData *result in resultSets)
 	{
-		count += result.length / pointerSize;
+		count += result.length / stride;
 	}
 	return count;
 }
 
-- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize unalignedAccess:(BOOL)unalignedAccess
++ (ZGMemorySize)indirectStrideWithMaxNumberOfLevels:(ZGMemorySize)numberOfLevels pointerSize:(ZGMemorySize)pointerSize
+{
+	//	Struct {
+	//		uintptr_t baseAddress;
+	//		uint16_t numLevels;
+	//		uint16_t offsets[MAX_NUM_LEVELS];
+	//		uint8_t padding[N];
+	//	}
+	
+	ZGMemorySize minimumSize = pointerSize + sizeof(uint16_t) + numberOfLevels * sizeof(uint16_t);
+	ZGMemorySize remainder = minimumSize % pointerSize;
+	ZGMemorySize padding = (remainder == 0) ? 0 : (pointerSize - remainder);
+	return minimumSize + padding;
+}
+
+- (id)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess
 {
 	self = [super init];
 	if (self != nil)
@@ -59,9 +74,10 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 		}
 		
 		_resultSets = [newResultSets copy];
-		_pointerSize = pointerSize;
-		_count = _resultCount(newResultSets, pointerSize);
-		_dataSize = dataSize;
+		_resultType = resultType;
+		_dataType = dataType;
+		_stride = stride;
+		_count = _resultCount(newResultSets, stride);
 		_unalignedAccess = unalignedAccess;
 	}
 	return self;
@@ -76,7 +92,7 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	
 	NSMutableArray<NSData *> *newResultSets = [NSMutableArray array];
 
-	ZGMemorySize pointerSize = _pointerSize;
+	ZGMemorySize stride = _stride;
 	
 	NSUInteger resultsProcessed = 0;
 	
@@ -87,7 +103,7 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	{
 		const void *resultBytes = resultSet.bytes;
 		ZGMemoryAddress resultSetLength = resultSet.length;
-		for (ZGMemoryAddress offset = 0; offset < resultSetLength; offset += pointerSize)
+		for (ZGMemoryAddress offset = 0; offset < resultSetLength; offset += stride)
 		{
 			addressCallback((const void *)((const uint8_t *)resultBytes + offset), &shouldStopEnumerating);
 			resultsProcessed++;
@@ -95,9 +111,9 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 			if (resultsProcessed >= count || shouldStopEnumerating)
 			{
 				// Is there any left over data from current result set
-				if (offset + pointerSize < resultSetLength)
+				if (offset + stride < resultSetLength)
 				{
-					[newResultSets addObject:[resultSet subdataWithRange:NSMakeRange(offset + pointerSize, resultSetLength - offset - pointerSize)]];
+					[newResultSets addObject:[resultSet subdataWithRange:NSMakeRange(offset + stride, resultSetLength - offset - stride)]];
 				}
 				
 				// Grab the remaining result sets we haven't processed
@@ -118,7 +134,7 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	
 FINISH_ENUMERATING:
 	_resultSets = [newResultSets copy];
-	_count = _resultCount(newResultSets, pointerSize);
+	_count = _resultCount(newResultSets, stride);
 }
 
 @end

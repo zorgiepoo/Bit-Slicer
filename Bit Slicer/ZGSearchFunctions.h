@@ -51,4 +51,9 @@ extern "C"
 #endif
 ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> _Nullable delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults * _Nullable laterSearchResults);
 
+#ifdef __cplusplus
+extern "C"
+#endif
+ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType indirectDataType);
+
 NS_ASSUME_NONNULL_END

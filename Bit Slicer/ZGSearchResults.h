@@ -32,25 +32,33 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSInteger, ZGSearchResultType)
+{
+	ZGSearchResultTypeDirect = 0,
+	ZGSearchResultTypeIndirect
+};
 
 @interface ZGSearchResults : NSObject
 
 @property (nonatomic, readonly) ZGMemorySize count;
 
-@property (nonatomic, readonly) ZGMemorySize pointerSize;
-@property (nonatomic, readonly) ZGMemorySize dataSize;
+@property (nonatomic, readonly) ZGMemorySize stride;
 @property (nonatomic, readonly) BOOL unalignedAccess;
 @property (nonatomic, readonly) NSArray<NSData *> *resultSets;
+@property (nonatomic, readonly) ZGSearchResultType resultType;
 
-// User data fields
-@property (nonatomic) NSInteger dataType;
-@property (nonatomic) BOOL enabled;
+// Only used by clients
+@property (nonatomic, readonly) ZGVariableType dataType;
 
 typedef void (^zg_enumerate_search_results_t)(const void *data, BOOL *stop);
 
-- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize unalignedAccess:(BOOL)unalignedAccess;
++ (ZGMemorySize)indirectStrideWithMaxNumberOfLevels:(ZGMemorySize)maxNumberOfLevels pointerSize:(ZGMemorySize)pointerSize;
+
+- (id)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess;
 
 - (void)enumerateWithCount:(ZGMemorySize)count usingBlock:(zg_enumerate_search_results_t)addressCallback;
 
