@@ -1,4 +1,6 @@
-# Bit Slicer
+## Bu depo bir çataldır ve çocukluğumuzun favori uygulamalarından olan Cheat Engine'nin Mac üzerindeki en iyi alternatifidir.
+
+## Bit Slicer
 ![Bit Slicer icon](https://zgcoder.net/software/bitslicer/images/web_icon.png)
 
 [Download Bit Slicer](https://zgcoder.net/software/bitslicer/dist/stable/Bit%20Slicer.dmg)
