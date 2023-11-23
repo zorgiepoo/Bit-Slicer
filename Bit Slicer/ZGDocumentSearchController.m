@@ -362,18 +362,15 @@
 				uint16_t numberOfLevels = *(const uint16_t *)((const void *)((const uint8_t *)data) + pointerSize);
 				const uint16_t *offsets = (const uint16_t *)((const void *)((const uint8_t *)data + pointerSize + sizeof(numberOfLevels)));
 				
-				uint16_t firstOffset = offsets[0];
-				NSString *addressFormula =
-					firstOffset != 0x0 ?
-					[NSString stringWithFormat:@"[0x%llX] + 0x%X", baseAddress, firstOffset] :
-					[NSString stringWithFormat:@"[0x%llX]", baseAddress];
-				
-				for (ZGMemorySize level = 1; level < numberOfLevels; level++)
+				NSString *addressFormula = [NSString stringWithFormat:@"0x%llX", baseAddress];
+				for (uint16_t level = 0; level < numberOfLevels; level++)
 				{
-					uint16_t offset = offsets[level];
+					uint16_t offsetIndex = numberOfLevels - level - 1;
+					uint16_t offset = offsets[offsetIndex];
+					
 					addressFormula =
 						offset != 0x0 ?
-						[NSString stringWithFormat:@"[%@ + 0x%X]", addressFormula, offset] :
+						[NSString stringWithFormat:@"[%@] + 0x%X", addressFormula, offset] :
 						[NSString stringWithFormat:@"[%@]", addressFormula];
 				}
 				
@@ -795,7 +792,8 @@
 	}
 	
 	_searchData.indirectMaxOffset = 256;
-	_searchData.indirectMaxLevels = 5;
+	_searchData.indirectMaxLevels = 2;
+	_searchData.indirectStopAtStaticAddresses = YES;
 	
 	return YES;
 }
@@ -848,7 +846,15 @@
 			}
 			else
 			{
-				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, (ZGVariableType)[self->_indirectDataType integerValue]);
+				NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:currentProcess];
+				
+				NSArray<NSValue *> *totalStaticSegmentRanges = [machBinaries zgMapUsingBlock:^id _Nonnull(ZGMachBinary *__unsafe_unretained  _Nonnull machBinary) {
+					ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
+					
+					return [NSValue valueWithRange:machBinaryInfo.totalSegmentRange];
+				}];
+				
+				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, (ZGVariableType)[self->_indirectDataType integerValue], totalStaticSegmentRanges);
 			}
 		}
 		else

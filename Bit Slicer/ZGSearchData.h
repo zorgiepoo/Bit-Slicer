@@ -81,6 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) double epsilon;
 @property (nonatomic) uint16_t indirectMaxOffset;
 @property (nonatomic) uint16_t indirectMaxLevels;
+@property (nonatomic) BOOL indirectStopAtStaticAddresses;
 @property (nonatomic) BOOL shouldIgnoreStringCase;
 @property (nonatomic) BOOL shouldIncludeNullTerminator;
 @property (nonatomic) ZGMemoryAddress beginAddress;
