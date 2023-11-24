@@ -387,8 +387,10 @@
 				 enabled:YES
 				 byteOrder:byteOrder];
 				
+				// Set the address formula to use a dynamic address but do not set usesDynamicAddress to YES yet
+				// When we relativize variables we may mark them as dynamic addresses, or when annotations are
+				// finished below.
 				newVariable.addressFormula = addressFormula;
-				newVariable.usesDynamicAddress = YES;
 				
 				[newVariables addObject:newVariable];
 				//TODO: annotations below need to look at baseAddress, not finally evaulated address
@@ -411,6 +413,16 @@
 		dispatch_async(dispatch_get_main_queue(), ^{
 			// Waiting for completion would lead to a bad user experience and there is no need to
 			[ZGVariableController annotateVariables:newVariables annotationInfo:annotationInfo process:currentProcess symbols:YES async:YES completionHandler:^{
+				if (resultType == ZGSearchResultTypeIndirect)
+				{
+					// Make sure all our new indirect variables are dynamic if they haven't been marked dynamic
+					// when annotating/relativizing them.
+					for (ZGVariable *variable in newVariables)
+					{
+						variable.usesDynamicAddress = YES;
+					}
+				}
+				
 				[windowController.variablesTableView reloadData];
 			}];
 		});

@@ -1063,7 +1063,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				}
 				
 				variable.usesDynamicAddress = YES;
-				variable.finishedEvaluatingDynamicAddress = YES;
+				variable.finishedEvaluatingDynamicAddress = !isIndirectVariable;
 			}
 			
 			staticVariableDescription = [NSString stringWithFormat:@"%@ %@ (%@)", partialPath, segmentName, (isIndirectVariable ? @"static, indirect" : @"static")];
