@@ -271,6 +271,7 @@
 	}
 }
 
+// Note: this can be called multiple times if maxProgress is unknown the first time
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress
 {
 	_windowController.progressIndicator.maxValue = (double)searchProgress.maxProgress;
