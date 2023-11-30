@@ -143,7 +143,7 @@
 	ZGSearchResults *results = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
 	
 	__block BOOL foundAddress = NO;
-	[results enumerateWithCount:results.count usingBlock:^(const void *resultAddressData, BOOL *stop) {
+	[results enumerateWithCount:results.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
 		ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
 		if (resultAddress == address)
 		{
@@ -240,7 +240,7 @@
 	XCTAssertEqual(sizeof(ZGMemoryAddress), 8U);
 	
 	__block NSUInteger addressIndex = 0;
-	[equalExecuteNarrowResults enumerateWithCount:2 usingBlock:^(const void *resultAddressData, __unused BOOL *stop) {
+	[equalExecuteNarrowResults enumerateWithCount:2 removeResults:YES usingBlock:^(const void *resultAddressData, __unused BOOL *stop) {
 		ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
 		addressesRemoved[addressIndex] = resultAddress;
 		addressIndex++;

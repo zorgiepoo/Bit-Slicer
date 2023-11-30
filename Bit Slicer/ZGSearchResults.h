@@ -50,6 +50,7 @@ typedef NS_ENUM(NSInteger, ZGSearchResultType)
 @property (nonatomic, readonly) BOOL unalignedAccess;
 @property (nonatomic, readonly) NSArray<NSData *> *resultSets;
 @property (nonatomic, readonly) ZGSearchResultType resultType;
+@property (nonatomic) uint16_t indirectMaxLevels;
 
 // Only used by clients
 @property (nonatomic, readonly) ZGVariableType dataType;
@@ -60,7 +61,7 @@ typedef void (^zg_enumerate_search_results_t)(const void *data, BOOL *stop);
 
 - (id)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess;
 
-- (void)enumerateWithCount:(ZGMemorySize)count usingBlock:(zg_enumerate_search_results_t)addressCallback;
+- (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback;
 
 @end
 

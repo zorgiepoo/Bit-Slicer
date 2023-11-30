@@ -54,6 +54,11 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 #ifdef __cplusplus
 extern "C"
 #endif
-ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType indirectDataType, NSArray<NSValue *> *totalStaticSegmentRanges);
+ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, NSArray<NSValue *> *totalStaticSegmentRanges);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> _Nullable delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults * _Nullable laterSearchResults);
 
 NS_ASSUME_NONNULL_END

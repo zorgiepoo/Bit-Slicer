@@ -83,14 +83,14 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	return self;
 }
 
-- (void)enumerateWithCount:(ZGMemorySize)count usingBlock:(zg_enumerate_search_results_t)addressCallback
+- (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
 	if (count == 0)
 	{
 		return;
 	}
 	
-	NSMutableArray<NSData *> *newResultSets = [NSMutableArray array];
+	NSMutableArray<NSData *> *newResultSets = removeResults ? [NSMutableArray array] : nil;
 
 	ZGMemorySize stride = _stride;
 	
@@ -110,29 +110,36 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 			
 			if (resultsProcessed >= count || shouldStopEnumerating)
 			{
-				// Is there any left over data from current result set
-				if (offset + stride < resultSetLength)
+				if (!removeResults)
 				{
-					[newResultSets addObject:[resultSet subdataWithRange:NSMakeRange(offset + stride, resultSetLength - offset - stride)]];
+					return;
 				}
-				
-				// Grab the remaining result sets we haven't processed
-				NSUInteger resultSetsCount = resultSets.count;
-				if (resultSetIndex + 1 < resultSetsCount)
+				else
 				{
-					NSArray<NSData *> *remainingResultSets = [resultSets subarrayWithRange:NSMakeRange(resultSetIndex + 1, resultSetsCount - resultSetIndex - 1)];
+					// Is there any left over data from current result set
+					if (offset + stride < resultSetLength)
+					{
+						[newResultSets addObject:[resultSet subdataWithRange:NSMakeRange(offset + stride, resultSetLength - offset - stride)]];
+					}
 					
-					[newResultSets addObjectsFromArray:remainingResultSets];
+					// Grab the remaining result sets we haven't processed
+					NSUInteger resultSetsCount = resultSets.count;
+					if (resultSetIndex + 1 < resultSetsCount)
+					{
+						NSArray<NSData *> *remainingResultSets = [resultSets subarrayWithRange:NSMakeRange(resultSetIndex + 1, resultSetsCount - resultSetIndex - 1)];
+						
+						[newResultSets addObjectsFromArray:remainingResultSets];
+					}
+					
+					goto CREATE_NEW_RESULT_SETS;
 				}
-				
-				goto FINISH_ENUMERATING;
 			}
 		}
 		
 		resultSetIndex++;
 	}
 	
-FINISH_ENUMERATING:
+CREATE_NEW_RESULT_SETS:
 	_resultSets = [newResultSets copy];
 	_count = _resultCount(newResultSets, stride);
 }

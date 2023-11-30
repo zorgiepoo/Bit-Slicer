@@ -652,7 +652,7 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 		__block Py_ssize_t addressIndex = 0;
 		ZGMemorySize pointerSize = results.stride;
 		
-		[results enumerateWithCount:numberOfEntries usingBlock:^(const void *data, BOOL * __unused stop) {
+		[results enumerateWithCount:numberOfEntries removeResults:NO usingBlock:^(const void *data, BOOL * __unused stop) {
 			ZGMemoryAddress address;
 			switch (pointerSize)
 			{
