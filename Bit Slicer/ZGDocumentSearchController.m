@@ -468,6 +468,12 @@
 			[windowController.variablesTableView reloadData];
 			[windowController markDocumentChange];
 		}
+		else
+		{
+			// This is temporary I think..
+			_documentData.variables = oldVariables;
+			[windowController.variablesTableView reloadData];
+		}
 	}
 	else
 	{

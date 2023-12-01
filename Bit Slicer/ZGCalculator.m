@@ -522,10 +522,9 @@
 						assert(false);
 						return NO;
 					}
-					uint16_t levelIndex = numberOfLevels - 1 - levelsRecursed;
 					
 					uint16_t offset = (uint16_t)offsetExpression.number.unsignedShortValue;
-					memcpy((uint8_t *)buffer + pointerSize + sizeof(numberOfLevels) + levelIndex * sizeof(offset), &offset, sizeof(offset));
+					memcpy((uint8_t *)buffer + pointerSize + sizeof(numberOfLevels) + levelsRecursed * sizeof(offset), &offset, sizeof(offset));
 				}
 				else
 				{
