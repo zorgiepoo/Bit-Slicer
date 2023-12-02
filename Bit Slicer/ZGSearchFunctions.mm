@@ -2716,18 +2716,6 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 
 ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)
 {
-	// Simple(?) plan of attack:
-	// Enumerate through all first/later search results (combine them first..). Don't remove elements.
-	// Evaluate the memory addresses of every indirect blob (requires several ZGReadBytes(), etc).
-	// This will likely involve an optimization page/region table.
-	// Build new search results with direct type
-	// Dellocate page/region table stuff, no longer needed
-	// Do narrow search on all the new search results -- however we need to pass a flag to store 0 memory addresses for all misses.
-	// Likely progress reporting on number of variables found needs to ignore all zero addresses as well
-	// Now the narrowed search results AND the new indirect search results should have the same count!
-	// Enumerate through BOTH of these search results together in parallel fashion (for efficiency likely need to create new enumeration method on ZGSearchResults)
-	// For ANY narrow address != 0, this will be included in a new indirect search results that has the corresponding old indirect search result added
-	
 	NSMutableArray<NSData *> *indirectResultSets = [NSMutableArray arrayWithArray:firstSearchResults.resultSets];
 	if (laterSearchResults != nil)
 	{
