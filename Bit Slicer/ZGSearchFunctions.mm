@@ -127,6 +127,8 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	
+	ZGMemorySize pointerSize = searchData.pointerSize;
+	
 	NSArray<ZGRegion *> *regions;
 	if (!shouldCompareStoredValues)
 	{
@@ -197,7 +199,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 				dispatch_async(dispatch_get_main_queue(), ^{
 					searchProgress.numberOfVariablesFound += results.length / stride;
 					searchProgress.progress++;
-					[delegate progress:searchProgress advancedWithResultSet:results];
+					[delegate progress:searchProgress advancedWithResultSet:results resultType:ZGSearchResultTypeDirect dataType:resultDataType stride:pointerSize];
 				});
 			}
 		}
@@ -1636,7 +1638,7 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 				dispatch_async(dispatch_get_main_queue(), ^{
 					searchProgress.progress++;
 					searchProgress.numberOfVariablesFound += currentResultSet.length / stride;
-					//[delegate progress:searchProgress advancedWithResultSet:currentResultSet];
+					[delegate progress:searchProgress advancedWithResultSet:currentResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
 				});
 				
 				resultSetIndex++;
@@ -1787,7 +1789,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 						{
 							searchProgress.numberOfVariablesFound += results.length / pointerSize;
 							searchProgress.progress++;
-							[delegate progress:searchProgress advancedWithResultSet:results];
+							[delegate progress:searchProgress advancedWithResultSet:results resultType:ZGSearchResultTypeDirect dataType:dataType stride:pointerSize];
 						}
 						else
 						{

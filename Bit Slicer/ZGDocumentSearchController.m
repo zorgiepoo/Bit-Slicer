@@ -244,7 +244,7 @@
 	[windowController setStatusString:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	if (!_searchProgress.shouldCancelSearch && windowController != nil)
@@ -261,7 +261,7 @@
 		{
 			// These progress search results are thrown away,
 			// so doesn't matter if accesses are unaligned or not
-			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] resultType:ZGSearchResultTypeDirect dataType:_dataType stride:_searchData.pointerSize unalignedAccess:YES];
+			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] resultType:resultType dataType:dataType stride:stride unalignedAccess:YES];
 			
 			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch - currentVariableCount fromResults:searchResults];
 			[variablesTableView reloadData];

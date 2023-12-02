@@ -31,6 +31,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGSearchResults.h"
 
 @class ZGSearchProgress;
 
@@ -39,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ZGSearchProgressDelegate <NSObject>
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet;
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride;
 
 @end
 
