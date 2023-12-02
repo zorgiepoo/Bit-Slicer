@@ -61,6 +61,8 @@ typedef void (^zg_enumerate_search_results_t)(const void *data, BOOL *stop);
 
 - (id)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess;
 
+- (instancetype)searchResultsByAppendingSearchResults:(ZGSearchResults *)searchResults;
+
 - (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback;
 
 @end
