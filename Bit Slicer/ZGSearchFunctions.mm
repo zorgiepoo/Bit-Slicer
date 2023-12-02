@@ -1934,7 +1934,7 @@ bool ZGNarrowSearchWithFunctionStoredCompare(ZGRegion **lastUsedSavedRegionRefer
 }
 
 template <typename T, typename P, typename F, typename H>
-NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap processTask, T *searchValue, ZGSearchData * __unsafe_unretained searchData, void *extraStorage, P __unused pointerSize, ZGMemorySize dataSize, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSDictionary<NSNumber *, ZGRegion *> * __unsafe_unretained pageToRegionTable, NSDictionary<NSNumber *, ZGRegion *> * __unsafe_unretained savedPageToRegionTable, NSArray<ZGRegion *> * __unsafe_unretained savedRegions, ZGMemorySize pageSize, BOOL zeroNonMatchingResults, H compareHelperFunction)
+NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap processTask, T *searchValue, ZGSearchData * __unsafe_unretained searchData, void *extraStorage, P resultDataStride, ZGMemorySize dataSize, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSDictionary<NSNumber *, ZGRegion *> * __unsafe_unretained pageToRegionTable, NSDictionary<NSNumber *, ZGRegion *> * __unsafe_unretained savedPageToRegionTable, NSArray<ZGRegion *> * __unsafe_unretained savedRegions, ZGMemorySize pageSize, BOOL zeroNonMatchingResults, H compareHelperFunction)
 {
 	ZGRegion *lastUsedRegion = nil;
 	ZGRegion *lastUsedSavedRegion = nil;
@@ -1948,86 +1948,79 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 	ZGMemoryAddress beginAddress = searchData.beginAddress;
 	ZGMemoryAddress endAddress = searchData.endAddress;
 	
-	size_t addressCapacity = INITIAL_BUFFER_ADDRESSES_CAPACITY;
-	P *memoryAddresses = static_cast<P *>(malloc(addressCapacity * sizeof(*memoryAddresses)));
+	size_t capacity = MAX(INITIAL_BUFFER_ADDRESSES_CAPACITY, (oldDataLength / sizeof(P)));
+	uint8_t *narrowResultData = static_cast<uint8_t *>(malloc(capacity * resultDataStride));
 	ZGMemorySize numberOfVariablesFound = 0;
 
 	ZGMemoryAddress dataIndex = oldResultSetStartIndex;
 	while (dataIndex < oldDataLength)
 	{
-		if (numberOfVariablesFound == addressCapacity)
-		{
-			addressCapacity = static_cast<size_t>(addressCapacity * REALLOCATION_GROWTH_RATE);
-			memoryAddresses = static_cast<P *>(realloc(memoryAddresses, addressCapacity * sizeof(*memoryAddresses)));
-		}
+		P variableAddress = *(static_cast<P *>(const_cast<void *>(oldResultSetBytes)) + dataIndex / sizeof(P));
 		
-		ZGMemorySize numberOfStepsToTake = MIN(addressCapacity - numberOfVariablesFound, (oldDataLength - dataIndex) / sizeof(P));
-		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
+		if (lastUsedRegion == nil || (variableAddress < lastUsedRegion->_address || variableAddress + dataSize > lastUsedRegion->_address + lastUsedRegion->_size))
 		{
-			P variableAddress = *(static_cast<P *>(const_cast<void *>(oldResultSetBytes)) + dataIndex / sizeof(P));
-			
-			if (lastUsedRegion == nil || (variableAddress < lastUsedRegion->_address || variableAddress + dataSize > lastUsedRegion->_address + lastUsedRegion->_size))
+			if (lastUsedRegion != nil)
 			{
-				if (lastUsedRegion != nil)
-				{
-					ZGFreeBytes(lastUsedRegion->_bytes, lastUsedRegion->_size);
-				}
-				
-				ZGRegion *newRegion = nil;
+				ZGFreeBytes(lastUsedRegion->_bytes, lastUsedRegion->_size);
+			}
+			
+			ZGRegion *newRegion = nil;
 
-				if (pageToRegionTable == nil)
+			if (pageToRegionTable == nil)
+			{
+				ZGMemoryAddress regionAddress = variableAddress;
+				ZGMemorySize regionSize = dataSize;
+				ZGMemoryBasicInfo basicInfo;
+				if (ZGRegionInfo(processTask, &regionAddress, &regionSize, &basicInfo))
 				{
-					ZGMemoryAddress regionAddress = variableAddress;
-					ZGMemorySize regionSize = dataSize;
-					ZGMemoryBasicInfo basicInfo;
-					if (ZGRegionInfo(processTask, &regionAddress, &regionSize, &basicInfo))
-					{
-						newRegion = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize protection:basicInfo.protection userTag:0];
-						regionMatchesProtection = ZGMemoryProtectionMatchesProtectionMode(basicInfo.protection, protectionMode);
-					}
+					newRegion = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize protection:basicInfo.protection userTag:0];
+					regionMatchesProtection = ZGMemoryProtectionMatchesProtectionMode(basicInfo.protection, protectionMode);
 				}
-				else
-				{
-					newRegion = [pageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
-				}
+			}
+			else
+			{
+				newRegion = [pageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
+			}
+			
+			if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
+			{
+				// Read all the pages enclosing the start and end variable address
+				// Reading the entire region may be too expensive
+				ZGMemoryAddress startPageAddress = variableAddress - (variableAddress % pageSize);
+				ZGMemoryAddress endPageAddress = (variableAddress + dataSize) + (pageSize - ((variableAddress + dataSize) % pageSize));
+				ZGMemorySize totalRegionSize = (endPageAddress - startPageAddress);
 				
-				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
+				lastUsedRegion = [[ZGRegion alloc] initWithAddress:startPageAddress size:totalRegionSize];
+				
+				void *bytes = nullptr;
+				if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))
 				{
-					// Read all the pages enclosing the start and end variable address
-					// Reading the entire region may be too expensive
-					ZGMemoryAddress startPageAddress = variableAddress - (variableAddress % pageSize);
-					ZGMemoryAddress endPageAddress = (variableAddress + dataSize) + (pageSize - ((variableAddress + dataSize) % pageSize));
-					ZGMemorySize totalRegionSize = (endPageAddress - startPageAddress);
-					
-					lastUsedRegion = [[ZGRegion alloc] initWithAddress:startPageAddress size:totalRegionSize];
-					
-					void *bytes = nullptr;
-					if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))
-					{
-						lastUsedRegion->_bytes = bytes;
-					}
-					else
-					{
-						lastUsedRegion = nil;
-					}
+					lastUsedRegion->_bytes = bytes;
 				}
 				else
 				{
 					lastUsedRegion = nil;
 				}
 			}
-			
-			if (lastUsedRegion != nil && regionMatchesProtection && variableAddress >= beginAddress && variableAddress + dataSize <= endAddress && compareHelperFunction(&lastUsedSavedRegion, lastUsedRegion, variableAddress, dataSize, savedPageToRegionTable, savedRegions, pageSize, comparisonFunction, searchData, searchValue, extraStorage))
+			else
 			{
-				memoryAddresses[numberOfVariablesFound++] = variableAddress;
+				lastUsedRegion = nil;
 			}
-			else if (zeroNonMatchingResults)
-			{
-				memoryAddresses[numberOfVariablesFound++] = 0x0;
-			}
-			
-			dataIndex += sizeof(P);
 		}
+		
+		if (lastUsedRegion != nil && regionMatchesProtection && variableAddress >= beginAddress && variableAddress + dataSize <= endAddress && compareHelperFunction(&lastUsedSavedRegion, lastUsedRegion, variableAddress, dataSize, savedPageToRegionTable, savedRegions, pageSize, comparisonFunction, searchData, searchValue, extraStorage))
+		{
+			memcpy(narrowResultData + numberOfVariablesFound * sizeof(variableAddress), &variableAddress, sizeof(variableAddress));
+			numberOfVariablesFound++;
+		}
+		else if (zeroNonMatchingResults)
+		{
+			P zeroAddress = 0x0;
+			memcpy(narrowResultData + numberOfVariablesFound * sizeof(zeroAddress), &zeroAddress, sizeof(zeroAddress));
+			numberOfVariablesFound++;
+		}
+		
+		dataIndex += sizeof(P);
 	}
 	
 	if (lastUsedRegion != nil)
@@ -2035,7 +2028,7 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 		ZGFreeBytes(lastUsedRegion->_bytes, lastUsedRegion->_size);
 	}
 	
-	return [NSData dataWithBytesNoCopy:memoryAddresses length:numberOfVariablesFound * sizeof(*memoryAddresses) freeWhenDone:YES];
+	return [NSData dataWithBytesNoCopy:narrowResultData length:numberOfVariablesFound * resultDataStride freeWhenDone:YES];
 }
 
 template <typename T, typename F>
