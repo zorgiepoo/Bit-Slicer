@@ -263,7 +263,7 @@
 			// so doesn't matter if accesses are unaligned or not
 			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] resultType:resultType dataType:dataType stride:stride unalignedAccess:YES];
 			
-			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch - currentVariableCount fromResults:searchResults];
+			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch - currentVariableCount finishingSearch:NO fromResults:searchResults];
 			[variablesTableView reloadData];
 		}
 		
@@ -282,7 +282,7 @@
 
 #pragma mark Searching
 
-- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables fromResults:(ZGSearchResults *)searchResults
+- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables finishingSearch:(BOOL)finishingSearch fromResults:(ZGSearchResults *)searchResults
 {
 	if (searchResults.count == 0) return;
 	
@@ -304,7 +304,11 @@
 	ZGMemorySize dataSize = _searchData.dataSize;
 	ZGSearchResultType resultType = searchResults.resultType;
 	
+	ZGMemorySize searchResultsCount = searchResults.count;
+	
 	[searchResults enumerateWithCount:numberOfVariables removeResults:YES usingBlock:^(const void *data, BOOL * __unused stop) {
+		BOOL enabled = (!finishingSearch || searchResultsCount > 1);
+		
 		switch (resultType)
 		{
 			case ZGSearchResultTypeDirect:
@@ -331,7 +335,7 @@
 				 qualifier:qualifier
 				 pointerSize:pointerSize
 				 description:[[NSAttributedString alloc] initWithString:@""]
-				 enabled:YES
+				 enabled:enabled
 				 byteOrder:byteOrder];
 				
 				[newVariables addObject:newVariable];
@@ -384,7 +388,7 @@
 				 qualifier:qualifier
 				 pointerSize:pointerSize
 				 description:[[NSAttributedString alloc] initWithString:@""]
-				 enabled:YES
+				 enabled:enabled
 				 byteOrder:byteOrder];
 				
 				// Set the address formula to use a dynamic address but do not set usesDynamicAddress to YES yet
@@ -438,15 +442,25 @@
 
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables
 {
-	[self fetchNumberOfVariables:numberOfVariables fromResults:_searchResults];
+	[self fetchNumberOfVariables:numberOfVariables finishingSearch:NO fromResults:_searchResults];
+}
+
+- (void)_fetchVariablesFromResultsAndFinishedSearch:(BOOL)finishedSearch
+{
+	if (_documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+	{
+		[self fetchNumberOfVariables:(MAX_NUMBER_OF_VARIABLES_TO_FETCH - _documentData.variables.count) finishingSearch:finishedSearch fromResults:_searchResults];
+	}
 }
 
 - (void)fetchVariablesFromResults
 {
-	if (_documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH)
-	{
-		[self fetchNumberOfVariables:(MAX_NUMBER_OF_VARIABLES_TO_FETCH - _documentData.variables.count) fromResults:_searchResults];
-	}
+	[self _fetchVariablesFromResultsAndFinishedSearch:NO];
+}
+
+- (void)fetchVariablesFromResultsAndFinishedSearch
+{
+	[self _fetchVariablesFromResultsAndFinishedSearch:YES];
 }
 
 - (void)finalizeSearchWithOldVariables:(NSArray<ZGVariable *> *)oldVariables andNotSearchedVariables:(NSArray<ZGVariable *> *)notSearchedVariables
@@ -464,15 +478,9 @@
 			
 			_searchResults = _temporarySearchResults;
 			_documentData.variables = notSearchedVariables;
-			[self fetchVariablesFromResults];
+			[self fetchVariablesFromResultsAndFinishedSearch];
 			[windowController.variablesTableView reloadData];
 			[windowController markDocumentChange];
-		}
-		else
-		{
-			// This is temporary I think..
-			_documentData.variables = oldVariables;
-			[windowController.variablesTableView reloadData];
 		}
 	}
 	else
@@ -809,8 +817,8 @@
 		return NO;
 	}
 	
-	_searchData.indirectMaxOffset = 256;
-	_searchData.indirectMaxLevels = 2;
+	_searchData.indirectMaxOffset = 2048;
+	_searchData.indirectMaxLevels = 3;
 	_searchData.indirectStopAtStaticAddresses = YES;
 	
 	return YES;
