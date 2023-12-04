@@ -67,7 +67,6 @@
 	ZGSearchResults * _Nullable _temporarySearchResults;
 	BOOL _isBusy;
 	ZGVariableType _dataType;
-	NSNumber *_indirectDataType;
 	ZGFunctionType _functionType;
 	NSString *_searchValueString;
 	ZGSearchData * _Nonnull _searchData;
@@ -633,10 +632,9 @@
 	return success;
 }
 
-- (BOOL)retrieveSearchDataWithError:(NSError * __autoreleasing *)error
+- (BOOL)retrieveSearchDataWithDataType:(ZGVariableType)dataType error:(NSError * __autoreleasing *)error
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	ZGVariableType dataType = _dataType;
 	
 	_searchData.pointerSize = windowController.currentProcess.pointerSize;
 	
@@ -824,7 +822,7 @@
 	return YES;
 }
 
-- (void)searchVariables:(NSArray<ZGVariable *> *)variables byNarrowing:(BOOL)isNarrowing indirectMaxLevels:(uint16_t)indirectMaxLevels usingCompletionBlock:(dispatch_block_t)completeSearchBlock
+- (void)searchVariables:(NSArray<ZGVariable *> *)variables byNarrowing:(BOOL)isNarrowing pointerAddressSearch:(BOOL)pointerAddressSearch indirectMaxLevels:(uint16_t)indirectMaxLevels usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	ZGProcess *currentProcess = windowController.currentProcess;
@@ -899,7 +897,7 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			if (self->_indirectDataType == nil)
+			if (!pointerAddressSearch)
 			{
 				self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
 			}
@@ -913,7 +911,7 @@
 					return [NSValue valueWithRange:machBinaryInfo.totalSegmentRange];
 				}];
 				
-				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevels, (ZGVariableType)[self->_indirectDataType integerValue], totalStaticSegmentRanges);
+				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevels, self->_dataType, totalStaticSegmentRanges);
 			}
 		}
 		else
@@ -932,15 +930,14 @@
 	});
 }
 
-- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType indirectDataType:(NSNumber *)indirectDataType functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
+- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
 {
 	_dataType = dataType;
-	_indirectDataType = indirectDataType;
 	_functionType = functionType;
 	_searchValueString = [searchStringValue copy];
 	
 	NSError *error = nil;
-	if (![self retrieveSearchDataWithError:&error])
+	if (![self retrieveSearchDataWithDataType:(pointerAddressSearch ? ZGPointer : dataType) error:&error])
 	{
 		ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), ZGUnwrapNullableObject(error.userInfo[ZGRetrieveFlagsErrorDescriptionKey]));
 		return;
@@ -949,7 +946,7 @@
 	NSMutableArray<ZGVariable *> *notSearchedVariables = [[NSMutableArray alloc] init];
 	NSMutableArray<ZGVariable *> *searchedVariables = [[NSMutableArray alloc] init];
 	
-	BOOL isNarrowingSearch = (indirectDataType == nil) && [self isInNarrowSearchMode];
+	BOOL isNarrowingSearch = !pointerAddressSearch && [self isInNarrowSearchMode];
 	
 	// Add all variables whose value should not be searched for, first
 	ZGDocumentWindowController *windowController = _windowController;
@@ -1040,7 +1037,7 @@
 	_documentData.variables = notSearchedVariables;
 	[windowController.variablesTableView reloadData];
 	
-	[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch indirectMaxLevels:indirectMaxLevels usingCompletionBlock:^ {
+	[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch pointerAddressSearch:pointerAddressSearch indirectMaxLevels:indirectMaxLevels usingCompletionBlock:^ {
 		if (self->_windowController != nil)
 		{
 			self->_searchData.searchValue = NULL;

@@ -1506,11 +1506,11 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 			case sizeof(ZGMemoryAddress):
 				if (searchData.bytesSwapped)
 				{
-					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return ZGPointerSwappedEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchValue), searchData, indirectDataType, storeValueDifference, nil);
+					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return ZGPointerSwappedEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchValue), searchData, ZGPointer, storeValueDifference, nil);
 				}
 				else
 				{
-					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchValue), searchData, indirectDataType, storeValueDifference, nil);
+					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchValue), searchData, ZGPointer, storeValueDifference, nil);
 				}
 				
 				searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
@@ -1518,11 +1518,11 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 			case sizeof(ZG32BitMemoryAddress):
 				if (searchData.bytesSwapped)
 				{
-					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return ZGPointerSwappedEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchValue), searchData, indirectDataType, storeValueDifference, nil);
+					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return ZGPointerSwappedEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchValue), searchData, ZGPointer, storeValueDifference, nil);
 				}
 				else
 				{
-					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchValue), searchData, indirectDataType, storeValueDifference, nil);
+					searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchValue), searchData, ZGPointer, storeValueDifference, nil);
 				}
 				searchValueAddress = *(static_cast<ZG32BitMemoryAddress *>(searchValue));
 				break;
