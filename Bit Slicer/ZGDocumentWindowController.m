@@ -83,6 +83,10 @@
 #define ZGEndianLittle @"ZGEndianLittle"
 #define ZGEndianBig @"ZGEndianBig"
 
+#define ZGSearchKindGroup @"ZGSearchKindGroup"
+#define ZGSearchKindValueIdentifier @"ZGSearchKindValue"
+#define ZGSearchKindAddressIdentifier @"ZGSearchKindAddress"
+
 @implementation ZGDocumentWindowController
 {
 	ZGDebuggerController * _Nonnull _debuggerController;
@@ -103,6 +107,7 @@
 	AGScopeBarGroup * _Nullable _qualifierGroup;
 	AGScopeBarGroup * _Nullable _stringMatchingGroup;
 	AGScopeBarGroup * _Nullable _endianGroup;
+	AGScopeBarGroup * _Nullable _searchKindGroup;
 	
 	NSPopover * _Nullable _advancedOptionsPopover;
 	
@@ -190,6 +195,12 @@
 	[_endianGroup addItemWithIdentifier:ZGEndianBig title:ZGLocalizableSearchDocumentString(@"scopeBarEndianBigItem")];
 	_endianGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
+	_searchKindGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGSearchKindGroup];
+	_searchKindGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarKindGroup");
+	[_searchKindGroup addItemWithIdentifier:ZGSearchKindValueIdentifier title:ZGLocalizableSearchDocumentString(@"scopeBarKindValueItem")];
+	[_searchKindGroup addItemWithIdentifier:ZGSearchKindAddressIdentifier title:ZGLocalizableSearchDocumentString(@"scopeBarKindAddressItem")];
+	_searchKindGroup.selectionMode = AGScopeBarGroupSelectOne;
+	
 	// Set delegate after setting up scope bar so we won't receive initial selection events beforehand
 	_scopeBar.delegate = self;
 }
@@ -254,6 +265,17 @@
 			}
 			
 			[_variablesTableView reloadData];
+			[self markDocumentChange];
+		}
+	}
+	else if ([item.group.identifier isEqualToString:ZGSearchKindGroup])
+	{
+		ZGSearchKind newSearchKind = [item.identifier isEqualToString:ZGSearchKindAddressIdentifier] ? ZGSearchKindAddress : ZGSearchKindValue;
+		
+		if (newSearchKind != _documentData.searchKind)
+		{
+			_documentData.searchKind = newSearchKind;
+			
 			[self markDocumentChange];
 		}
 	}
@@ -477,6 +499,8 @@
 	}
 	
 	[_endianGroup setSelected:YES forItemWithIdentifier:_documentData.byteOrderTag == CFByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
+	
+	[_searchKindGroup setSelected:YES forItemWithIdentifier:_documentData.searchKind == ZGSearchKindAddress ? ZGSearchKindAddressIdentifier : ZGSearchKindValueIdentifier];
 	
 	if (_advancedOptionsPopover != nil)
 	{
@@ -735,6 +759,7 @@
 	[self changeScopeBarGroup:_qualifierGroup shouldExist:needsQualifier];
 	[self changeScopeBarGroup:_stringMatchingGroup shouldExist:needsStringMatching];
 	[self changeScopeBarGroup:_endianGroup shouldExist:needsEndianness];
+	[self changeScopeBarGroup:_searchKindGroup shouldExist:YES];
 	
 	_showsFlags = needsFlags;
 	_scopeBar.accessoryView = _showsFlags ? _scopeBarFlagsView : nil;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19158" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19158"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -198,7 +198,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="362" y="330" width="760" height="240"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="760" height="240"/>
             <view key="contentView" id="aTX-qN-msi">
                 <rect key="frame" x="0.0" y="0.0" width="760" height="240"/>
@@ -218,7 +218,7 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn identifier="description" width="264.12109375" minWidth="43" maxWidth="20000" id="7xt-Ka-k1E">
+                                        <tableColumn identifier="description" width="264" minWidth="43" maxWidth="20000" id="7xt-Ka-k1E">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Description">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -230,7 +230,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="address" width="114.9609375" minWidth="91" maxWidth="20000" id="i6q-5D-Acx">
+                                        <tableColumn identifier="address" width="115" minWidth="91" maxWidth="20000" id="i6q-5D-Acx">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Address">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -242,7 +242,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="value" width="169.109375" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
+                                        <tableColumn identifier="value" width="169" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Value">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -307,7 +307,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
-                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dLn-LQ-VPC">
+                    <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dLn-LQ-VPC">
                         <rect key="frame" x="52" y="0.0" width="4" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="right" id="Ukg-I3-8ZY">
@@ -316,7 +316,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dg-I8-jgu">
+                    <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dg-I8-jgu">
                         <rect key="frame" x="18" y="3" width="724" height="14"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="displaying_or_found_x_variables" id="6Kr-rx-QwW">
@@ -636,10 +636,6 @@
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
                             <rect key="frame" x="-3" y="-4" width="167" height="25"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="0SL-Gj-qtF"/>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="cvc-cY-mNk"/>
-                            </constraints>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -654,6 +650,10 @@
                                     <action selector="runningApplicationsPopUpButton:" target="-2" id="SGA-if-PXe"/>
                                 </connections>
                             </popUpButtonCell>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="0SL-Gj-qtF"/>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="cvc-cY-mNk"/>
+                            </constraints>
                         </popUpButton>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="41602B2F-FA2E-443A-88AC-9DAD73A95550" label="Data Type" paletteLabel="Data Type" sizingBehavior="auto" id="70m-RL-vim">
@@ -692,9 +692,6 @@
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Icp-Tb-DVJ">
                             <rect key="frame" x="-3" y="-4" width="127" height="25"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="Kiy-8R-fMo"/>
-                            </constraints>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -706,6 +703,9 @@
                                     </items>
                                 </menu>
                             </popUpButtonCell>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="Kiy-8R-fMo"/>
+                            </constraints>
                             <connections>
                                 <action selector="functionTypePopUpButtonRequest:" target="-2" id="TRH-OK-9d0"/>
                             </connections>
@@ -729,7 +729,7 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="52E16CE5-DDC6-4458-A993-F5F7CF90040C" label="Search" paletteLabel="Search" sizingBehavior="auto" id="x8t-Jw-Hi9" userLabel="Search">
                         <nil key="toolTip"/>
-                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WaT-8a-dxh">
+                        <searchField key="view" wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WaT-8a-dxh">
                             <rect key="frame" x="0.0" y="0.0" width="200" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Jey-Lt-NQ6"/>
@@ -761,7 +761,7 @@
             <rect key="frame" x="0.0" y="0.0" width="174" height="25"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hY6-jr-dYH">
+                <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hY6-jr-dYH">
                     <rect key="frame" x="94" y="3" width="80" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="fbi-ow-T4X">
@@ -773,7 +773,7 @@
                         <action selector="changeFlags:" target="-2" id="DMV-A6-D8D"/>
                     </connections>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3S-5O-0jn">
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3S-5O-0jn">
                     <rect key="frame" x="5" y="5" width="83" height="14"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Flags:" id="AOM-F4-uKc">
@@ -783,11 +783,11 @@
                     </textFieldCell>
                 </textField>
             </subviews>
-            <point key="canvasLocation" x="-4" y="292"/>
+            <point key="canvasLocation" x="10" y="78"/>
         </customView>
     </objects>
     <resources>
-        <image name="NSActionTemplate" width="15" height="15"/>
+        <image name="NSActionTemplate" width="20" height="20"/>
         <image name="container" width="38" height="38"/>
     </resources>
 </document>

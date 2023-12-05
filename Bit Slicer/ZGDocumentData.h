@@ -40,6 +40,7 @@
 #define ZGByteOrderTagKey @"ZGByteOrderTagKey"
 #define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
 #define ZGProtectionModeKey @"ZGProtectionModeKey"
+#define ZGSearchKindKey @"ZGSearchKindKey"
 #define ZGIgnoreDataAlignmentKey @"ZGIgnoreDataAlignmentKey"
 #define ZGExactStringLengthKey @"ZGExactStringLengthKey"
 #define ZGIgnoreStringCaseKey @"ZGIgnoreStringCaseKey"
@@ -56,12 +57,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ZGVariable;
 
+typedef NS_ENUM(NSInteger, ZGSearchKind)
+{
+	ZGSearchKindValue = 0,
+	ZGSearchKindAddress
+};
+
 @interface ZGDocumentData : NSObject
 
 @property (nonatomic) NSInteger selectedDatatypeTag;
 @property (nonatomic) NSInteger qualifierTag;
 @property (nonatomic) NSInteger byteOrderTag;
 @property (nonatomic) NSInteger functionTypeTag;
+@property (nonatomic) ZGSearchKind searchKind;
 @property (nonatomic) BOOL ignoreDataAlignment;
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;

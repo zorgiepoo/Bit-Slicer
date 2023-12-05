@@ -119,6 +119,10 @@
 	[keyedArchiver
 	 encodeInt32:(int32_t)_searchData.protectionMode
 	 forKey:ZGProtectionModeKey];
+	
+	[keyedArchiver
+	 encodeInteger:_data.searchKind
+	 forKey:ZGSearchKindKey];
     
 	[keyedArchiver
 	 encodeBool:_data.ignoreDataAlignment
@@ -213,6 +217,7 @@
 	_data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
 	_searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
 	_searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
+	_data.searchKind = [keyedUnarchiver decodeIntegerForKey:ZGSearchKindKey];
 	
 	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBeginningAddressKey]];
 	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEndingAddressKey]];
