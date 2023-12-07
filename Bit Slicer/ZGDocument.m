@@ -121,8 +121,16 @@
 	 forKey:ZGProtectionModeKey];
 	
 	[keyedArchiver
-	 encodeInteger:_data.searchKind
-	 forKey:ZGSearchKindKey];
+	 encodeInteger:_data.searchType
+	 forKey:ZGSearchTypeKey];
+	
+	[keyedArchiver
+	 encodeInteger:_data.searchAddressMaxLevels
+	 forKey:ZGSearchAddressMaxLevels];
+	
+	[keyedArchiver
+	 encodeInteger:_data.searchAddressMaxOffset
+	 forKey:ZGSearchAddressMaxOffset];
     
 	[keyedArchiver
 	 encodeBool:_data.ignoreDataAlignment
@@ -217,7 +225,10 @@
 	_data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
 	_searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
 	_searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
-	_data.searchKind = [keyedUnarchiver decodeIntegerForKey:ZGSearchKindKey];
+	_data.searchType = [keyedUnarchiver decodeIntegerForKey:ZGSearchTypeKey];
+	
+	_data.searchAddressMaxLevels = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxLevels];
+	_data.searchAddressMaxOffset = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxOffset];
 	
 	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBeginningAddressKey]];
 	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEndingAddressKey]];

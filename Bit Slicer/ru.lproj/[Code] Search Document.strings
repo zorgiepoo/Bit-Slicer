@@ -37,14 +37,14 @@
 /* Scope Bar Big Endian */
 "scopeBarEndianBigItem" = "Обратный";
 
-/* Scope Bar Kind Group */
-"scopeBarKindGroup" = "Kind";
+/* Scope Bar Search Type Group */
+"scopeBarSearchTypeGroup" = "Type:";
 
-/* Scope Bar Kind Value */
-"scopeBarKindValueItem" = "Значение";
+/* Scope Bar Search Type Value */
+"scopeBarSearchTypeValueItem" = "Значение";
 
-/* Scope Bar Kind Address */
-"scopeBarKindAddressItem" = "Адрес";
+/* Scope Bar Search Type Address */
+"scopeBarSearchTypeAddressItem" = "Адрес";
 
 /* Scope Bar accessory for Below label when doing > value search; also used for error reporting */
 "searchBelowLabel" = "но меньше";

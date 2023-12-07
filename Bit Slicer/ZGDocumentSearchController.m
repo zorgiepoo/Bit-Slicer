@@ -632,8 +632,10 @@
 	return success;
 }
 
-- (BOOL)retrieveSearchDataWithDataType:(ZGVariableType)dataType error:(NSError * __autoreleasing *)error
+- (BOOL)retrieveSearchDataWithDataType:(ZGVariableType)directDataType addressSearch:(BOOL)addressSearch error:(NSError * __autoreleasing *)error
 {
+	ZGVariableType dataType = addressSearch ? ZGPointer : directDataType;
+	
 	ZGDocumentWindowController *windowController = _windowController;
 	
 	_searchData.pointerSize = windowController.currentProcess.pointerSize;
@@ -741,7 +743,7 @@
 		}
 	}
 	
-	if (CFByteOrderGetCurrent() != _documentData.byteOrderTag && ZGSupportsEndianness(dataType))
+	if (!addressSearch && CFByteOrderGetCurrent() != _documentData.byteOrderTag && ZGSupportsEndianness(dataType))
 	{
 		_searchData.bytesSwapped = YES;
 		if (ZGSupportsSwappingBeforeSearch(functionType, dataType))
@@ -775,7 +777,7 @@
 		? sizeof(int8_t)
 		: ZGDataAlignment(processType, dataType, _searchData.dataSize);
 	
-	if (![self retrieveFlagsSearchDataWithDataType:dataType functionType:functionType error:error])
+	if (!addressSearch && ![self retrieveFlagsSearchDataWithDataType:dataType functionType:functionType error:error])
 	{
 		return NO;
 	}
@@ -815,8 +817,8 @@
 		return NO;
 	}
 	
-	_searchData.indirectMaxOffset = 2048;
-	_searchData.indirectMaxLevels = 3;
+	_searchData.indirectMaxOffset = (uint16_t)_documentData.searchAddressMaxOffset;
+	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
 	_searchData.indirectStopAtStaticAddresses = YES;
 	
 	return YES;
@@ -937,7 +939,7 @@
 	_searchValueString = [searchStringValue copy];
 	
 	NSError *error = nil;
-	if (![self retrieveSearchDataWithDataType:(pointerAddressSearch ? ZGPointer : dataType) error:&error])
+	if (![self retrieveSearchDataWithDataType:dataType addressSearch:pointerAddressSearch error:&error])
 	{
 		ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), ZGUnwrapNullableObject(error.userInfo[ZGRetrieveFlagsErrorDescriptionKey]));
 		return;

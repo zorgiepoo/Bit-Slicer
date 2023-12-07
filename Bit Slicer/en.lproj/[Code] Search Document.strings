@@ -38,14 +38,14 @@
 /* Scope Bar Big Endian */
 "scopeBarEndianBigItem" = "Big";
 
-/* Scope Bar Kind Group */
-"scopeBarKindGroup" = "Kind";
+/* Scope Bar Search Type Group */
+"scopeBarSearchTypeGroup" = "Type:";
 
-/* Scope Bar Kind Value */
-"scopeBarKindValueItem" = "Value";
+/* Scope Bar Search Type Value */
+"scopeBarSearchTypeValueItem" = "Value";
 
-/* Scope Bar Kind Address */
-"scopeBarKindAddressItem" = "Address";
+/* Scope Bar Search Type Address */
+"scopeBarSearchTypeAddressItem" = "Address";
 
 /* Scope Bar accessory for Below label when doing > value search; also used for error reporting */
 "searchBelowLabel" = "Below";
