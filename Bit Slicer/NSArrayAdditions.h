@@ -36,11 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSArray<ObjectType> (NSArrayAdditions)
 
+typedef ObjectType _Nullable (^zg_array_flatmap_t)(ObjectType object);
 typedef BOOL (^zg_array_filter_t)(ObjectType __unsafe_unretained object);
 
 typedef NSComparisonResult (^zg_binary_search_t)(ObjectType __unsafe_unretained currentObject);
 typedef id _Nonnull (^zg_map_t)(ObjectType __unsafe_unretained object);
 
+- (NSArray *)zgFlatMapUsingBlock:(zg_array_flatmap_t)block;
 - (NSArray<ObjectType> *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep;
 - (NSArray *)zgMapUsingBlock:(zg_map_t)map;
 

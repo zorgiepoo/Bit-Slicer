@@ -83,14 +83,6 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	return self;
 }
 
-- (instancetype)searchResultsByAppendingSearchResults:(ZGSearchResults *)newSearchResults
-{
-	NSMutableArray<NSData *> *newResultSets = [NSMutableArray arrayWithArray:_resultSets];
-	[newResultSets addObjectsFromArray:newSearchResults.resultSets];
-	
-	return [[ZGSearchResults alloc] initWithResultSets:newResultSets resultType:_resultType dataType:_dataType stride:_stride unalignedAccess:_unalignedAccess];
-}
-
 - (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
 	if (count == 0)

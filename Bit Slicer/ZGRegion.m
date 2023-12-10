@@ -33,6 +33,7 @@
 #import "ZGRegion.h"
 #import <mach/mach_vm.h>
 #import "NSArrayAdditions.h"
+#import "ZGVirtualMemoryUserTags.h"
 
 @implementation ZGRegion
 
@@ -167,11 +168,55 @@
 	return regions;
 }
 
-+ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory
++ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory filterHeapAndStackData:(BOOL)filterHeapAndStackData totalStaticSegmentRanges:(NSArray<NSValue *> * _Nullable)totalStaticSegmentRanges
 {
-	return [regions zgFilterUsingBlock:^(ZGRegion *region) {
-		// For shared memory / pmap, see https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/vm/vm.html
-		return (BOOL)(region.address < endAddress && region.address + region.size > beginAddress && ZGMemoryProtectionMatchesProtectionMode(region.protection, protectionMode) && (includeSharedMemory || region.userTag != VM_MEMORY_SHARED_PMAP));
+	return [regions zgFlatMapUsingBlock:^ZGRegion *(ZGRegion *region) {
+		if (endAddress <= region.address || beginAddress >= region.address + region.size)
+		{
+			return nil;
+		}
+		
+		if (!ZGMemoryProtectionMatchesProtectionMode(region.protection, protectionMode))
+		{
+			return nil;
+		}
+		
+		if (!includeSharedMemory && ZGUserTagIsSharedMemory(region.userTag))
+		{
+			return nil;
+		}
+		
+		if (filterHeapAndStackData && !ZGUserTagIsStackOrHeapData(region.userTag))
+		{
+			NSValue *matchingSegmentRangeValue = [totalStaticSegmentRanges zgBinarySearchUsingBlock:^NSComparisonResult(NSValue *__unsafe_unretained  _Nonnull currentValue) {
+				NSRange totalSegmentRange = currentValue.rangeValue;
+				if (region.address + region.size <= totalSegmentRange.location)
+				{
+					return NSOrderedDescending;
+				}
+				
+				if (region.address >= totalSegmentRange.location + totalSegmentRange.length)
+				{
+					return NSOrderedAscending;
+				}
+				
+				return NSOrderedSame;
+			}];
+			
+			if (matchingSegmentRangeValue == nil)
+			{
+				return nil;
+			}
+			
+			NSRange matchingSegmentRange = matchingSegmentRangeValue.rangeValue;
+			
+			ZGMemoryAddress maxStartingAddress = MAX(matchingSegmentRange.location, region.address);
+			ZGMemoryAddress minEndingAddress = MIN(matchingSegmentRange.location + matchingSegmentRange.length, region.address + region.size);
+			
+			return [[ZGRegion alloc] initWithAddress:maxStartingAddress size:(minEndingAddress - maxStartingAddress) protection:region.protection userTag:region.userTag];
+		}
+		
+		return region;
 	}];
 }
 

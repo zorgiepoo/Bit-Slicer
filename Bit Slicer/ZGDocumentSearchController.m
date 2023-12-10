@@ -143,17 +143,11 @@
 
 #pragma mark Report information
 
-- (BOOL)isVariableNarrowable:(ZGVariable *)variable withDataType:(ZGVariableType)dataType
+- (BOOL)isVariableNarrowable:(ZGVariable *)variable dataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch
 {
-	return (variable.enabled && variable.type == dataType && !variable.isFrozen);
-}
-
-- (BOOL)isInNarrowSearchMode
-{
-	ZGVariableType dataType = _dataType;
-	return [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
-		return [self isVariableNarrowable:variable withDataType:dataType];
-	}];
+	// If we are doing a pointer address search, the variable must have a dynamic pointer address
+	// If we are doing a regular value search, variable could be a normal address or dynamic pointer address
+	return (variable.enabled && variable.type == dataType && !variable.isFrozen) && (!pointerAddressSearch || variable.usesDynamicPointerAddress) && !variable.usesDynamicSymbolAddress;
 }
 
 - (BOOL)canStartTask
@@ -470,7 +464,7 @@
 	{
 		ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:_searchProgress], nil);
 		
-		if (notSearchedVariables.count + _temporarySearchResults.count != oldVariables.count)
+		if (notSearchedVariables.count + _temporarySearchResults.count != oldVariables.count + _searchResults.count)
 		{
 			windowController.undoManager.actionName = ZGLocalizableSearchDocumentString(@"undoSearchAction");
 			[(ZGDocumentWindowController *)[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:_searchResults];
@@ -480,6 +474,12 @@
 			[self fetchVariablesFromResultsAndFinishedSearch];
 			[windowController.variablesTableView reloadData];
 			[windowController markDocumentChange];
+		}
+		else
+		{
+			// New search didn't return any new results, so let's show old variables again
+			_documentData.variables = oldVariables;
+			[windowController.variablesTableView reloadData];
 		}
 	}
 	else
@@ -820,17 +820,158 @@
 	_searchData.indirectMaxOffset = (uint16_t)_documentData.searchAddressMaxOffset;
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
 	_searchData.indirectStopAtStaticAddresses = YES;
+	_searchData.filterHeapAndStackData = addressSearch;
 	
 	return YES;
 }
 
-- (void)searchVariables:(NSArray<ZGVariable *> *)variables byNarrowing:(BOOL)isNarrowing pointerAddressSearch:(BOOL)pointerAddressSearch indirectMaxLevels:(uint16_t)indirectMaxLevels usingCompletionBlock:(dispatch_block_t)completeSearchBlock
+- (void)searchVariablesWithString:(NSString *)searchStringValue dataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
 {
+	_dataType = dataType;
+	_functionType = functionType;
+	_searchValueString = [searchStringValue copy];
+	
+	NSError *error = nil;
+	if (![self retrieveSearchDataWithDataType:dataType addressSearch:pointerAddressSearch error:&error])
+	{
+		ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), ZGUnwrapNullableObject(error.userInfo[ZGRetrieveFlagsErrorDescriptionKey]));
+		return;
+	}
+	
+	NSMutableArray<ZGVariable *> *notSearchedVariables = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *searchedVariables = [[NSMutableArray alloc] init];
+	
+	BOOL isNarrowingSearch = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
+		return [self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch];
+	}];
+	
 	ZGDocumentWindowController *windowController = _windowController;
+	
+	NSArray<ZGVariable *> *variables = _documentData.variables;
+	uint16_t indirectMaxLevels;
+	
+	// Compute indirectMaxLevels (if relevant)
+	
+	if (pointerAddressSearch)
+	{
+		// Use requested max levels for initial and narrow pointer address searches
+		indirectMaxLevels = _searchData.indirectMaxLevels;
+	}
+	else if (!isNarrowingSearch)
+	{
+		// Regular initial value search. No indirect variable searching is supported here.
+		indirectMaxLevels = 0;
+	}
+	else /* if (!pointerAddressSearch && isNarrowingSearch) */
+	{
+		// This is a value narrow search but figure out if we are narrowing regular variables or indirect variables
+		// Figure out what max indirect level to use too if we're narrowing indirect variables
+		
+		uint16_t computedIndirectMaxLevels = 0;
+		uint16_t numberOfIndirectNarrowingVariables = 0;
+		uint16_t numberOfDirectNarrowingVariables = 0;
+		
+		for (ZGVariable *variable in variables)
+		{
+			if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch])
+			{
+				uint16_t numberOfDynamicPointersInAddress = (uint16_t)(variable.numberOfDynamicPointersInAddress);
+				if (numberOfDynamicPointersInAddress > computedIndirectMaxLevels)
+				{
+					computedIndirectMaxLevels = numberOfDynamicPointersInAddress;
+				}
+				
+				if (numberOfDynamicPointersInAddress > 0)
+				{
+					numberOfIndirectNarrowingVariables++;
+				}
+				else
+				{
+					numberOfDirectNarrowingVariables++;
+				}
+			}
+		}
+		
+		if (_searchResults.count > 0)
+		{
+			if (_searchResults.resultType == ZGSearchResultTypeIndirect)
+			{
+				// What to do if _searchResults.indirectMaxLevels < computedIndirectMaxLevels?
+				// That would be very bad..
+				indirectMaxLevels = (computedIndirectMaxLevels >= _searchResults.indirectMaxLevels) ? computedIndirectMaxLevels : _searchResults.indirectMaxLevels;
+			}
+			else
+			{
+				indirectMaxLevels = 0;
+			}
+		}
+		else
+		{
+			indirectMaxLevels = (numberOfIndirectNarrowingVariables > numberOfDirectNarrowingVariables) ? computedIndirectMaxLevels : 0;
+		}
+	}
+	
+	// Split not searched variables and searched variables
+		
+	for (ZGVariable *variable in variables)
+	{
+		if (!isNarrowingSearch)
+		{
+			// Nothing to narrow
+			[notSearchedVariables addObject:variable];
+		}
+		else if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch])
+		{
+			if (pointerAddressSearch)
+			{
+				// Variable must have dynamic pointer address
+				[searchedVariables addObject:variable];
+			}
+			else if (indirectMaxLevels > 0)
+			{
+				// Only narrow search variable if it has dynamic pointer address
+				if (variable.usesDynamicPointerAddress)
+				{
+					[searchedVariables addObject:variable];
+				}
+				else
+				{
+					[notSearchedVariables addObject:variable];
+				}
+			}
+			else
+			{
+				// Regular value narrow search, only narrow search variable if it does not have dynamic pointer address
+				if (!variable.usesDynamicPointerAddress)
+				{
+					[searchedVariables addObject:variable];
+				}
+				else
+				{
+					[notSearchedVariables addObject:variable];
+				}
+			}
+		}
+		else
+		{
+			// Narrowing search, but variable is not narrowable
+			[notSearchedVariables addObject:variable];
+		}
+	}
+	
+	[self prepareTask];
+	
+	id searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
+	
+	NSArray<ZGVariable *> *oldVariables = _documentData.variables;
+	
+	_documentData.variables = notSearchedVariables;
+	[windowController.variablesTableView reloadData];
+	
+	// Build first search results for narrow search
 	ZGProcess *currentProcess = windowController.currentProcess;
-	ZGVariableType dataType = _dataType;
 	ZGSearchResults *firstSearchResults = nil;
-	if (isNarrowing)
+	if (isNarrowingSearch)
 	{
 		ZGMemorySize hostAlignment = ZGDataAlignment(ZG_PROCESS_TYPE_HOST, dataType, _searchData.dataSize);
 		BOOL unalignedAddressAccess = NO;
@@ -851,14 +992,16 @@
 			indirectFailedImages = nil;
 		}
 		
+		ZGMemorySize pointerSize = _searchData.pointerSize;
+		
 		NSMutableData *firstResultSets = [NSMutableData data];
-		for (ZGVariable *variable in variables)
+		for (ZGVariable *variable in searchedVariables)
 		{
 			ZGMemoryAddress variableAddress = variable.address;
 			
 			if (indirectMaxLevels == 0)
 			{
-				if (_searchData.pointerSize == sizeof(ZGMemoryAddress))
+				if (pointerSize == sizeof(ZGMemoryAddress))
 				{
 					[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
 				}
@@ -876,6 +1019,7 @@
 				}
 				else
 				{
+					// TODO: what should we do here, ignore the variable?
 					assert(false);
 				}
 			}
@@ -888,176 +1032,84 @@
 		
 		if (indirectMaxLevels == 0)
 		{
+			// Regular narrow search involving no indirect variables
 			firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] resultType:ZGSearchResultTypeDirect dataType:dataType stride:_searchData.pointerSize unalignedAccess:unalignedAddressAccess];
 		}
 		else
 		{
-			firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] resultType:ZGSearchResultTypeIndirect dataType:dataType stride:indirectStride unalignedAccess:unalignedAddressAccess];
+			// Narrow search involving indirect variables
+			
+			// Check if previous search results should be combined with new search results from table
+			NSArray<NSData *> *narrowResultSets;
+			if (_searchResults.count > 0 && _searchResults.dataType == dataType && _searchResults.resultType == ZGSearchResultTypeIndirect)
+			{
+				NSMutableArray<NSData *> *newNarrowResultSets = [NSMutableArray arrayWithObject:firstResultSets];
+				[newNarrowResultSets addObjectsFromArray:(NSArray *_Nonnull)_searchResults.resultSets];
+				
+				narrowResultSets = newNarrowResultSets;
+			}
+			else
+			{
+				narrowResultSets = @[firstResultSets];
+			}
+			
+			firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:narrowResultSets resultType:ZGSearchResultTypeIndirect dataType:dataType stride:indirectStride unalignedAccess:unalignedAddressAccess];
 		}
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		if (!isNarrowing)
+		if (pointerAddressSearch)
 		{
-			if (!pointerAddressSearch)
-			{
-				self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
-			}
-			else
-			{
-				NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:currentProcess];
+			// Pointer address searches for initial and narrow searches
+			
+			NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:currentProcess];
+			
+			NSArray<NSValue *> *totalStaticSegmentRanges = [machBinaries zgMapUsingBlock:^id _Nonnull(ZGMachBinary *__unsafe_unretained  _Nonnull machBinary) {
+				ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
 				
-				NSArray<NSValue *> *totalStaticSegmentRanges = [machBinaries zgMapUsingBlock:^id _Nonnull(ZGMachBinary *__unsafe_unretained  _Nonnull machBinary) {
-					ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
-					
-					return [NSValue valueWithRange:machBinaryInfo.totalSegmentRange];
-				}];
-				
-				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevels, self->_dataType, totalStaticSegmentRanges);
-			}
+				return [NSValue valueWithRange:machBinaryInfo.totalSegmentRange];
+			}];
+			
+			self->_searchData.totalStaticSegmentRanges = totalStaticSegmentRanges;
+			
+			self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevels, self->_dataType, firstSearchResults);
+		}
+		else if (!isNarrowingSearch)
+		{
+			// Regular initial value search
+			self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
+		}
+		else if (indirectMaxLevels > 0)
+		{
+			// Narrow value search involving indirect variables
+			self->_temporarySearchResults = ZGNarrowIndirectSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults);
 		}
 		else
 		{
-			if (indirectMaxLevels == 0)
-			{
-				self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.stride) ? self->_searchResults : nil);
-			}
-			else
-			{
-				self->_temporarySearchResults = ZGNarrowIndirectSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType) ? self->_searchResults : nil);
-			}
+			// Regular Narrow value search
+			self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.stride) ? self->_searchResults : nil);
 		}
 		
-		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
-	});
-}
-
-- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
-{
-	_dataType = dataType;
-	_functionType = functionType;
-	_searchValueString = [searchStringValue copy];
-	
-	NSError *error = nil;
-	if (![self retrieveSearchDataWithDataType:dataType addressSearch:pointerAddressSearch error:&error])
-	{
-		ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), ZGUnwrapNullableObject(error.userInfo[ZGRetrieveFlagsErrorDescriptionKey]));
-		return;
-	}
-	
-	NSMutableArray<ZGVariable *> *notSearchedVariables = [[NSMutableArray alloc] init];
-	NSMutableArray<ZGVariable *> *searchedVariables = [[NSMutableArray alloc] init];
-	
-	BOOL isNarrowingSearch = !pointerAddressSearch && [self isInNarrowSearchMode];
-	
-	// Add all variables whose value should not be searched for, first
-	ZGDocumentWindowController *windowController = _windowController;
-	
-	NSArray<ZGVariable *> *variables = _documentData.variables;
-	uint16_t indirectMaxLevels;
-	if (!isNarrowingSearch)
-	{
-		indirectMaxLevels = _searchData.indirectMaxLevels;
-	}
-	else if (isNarrowingSearch && _searchResults.count > 0 && _searchResults.resultType == ZGSearchResultTypeIndirect && _searchResults.indirectMaxLevels > 0)
-	{
-		indirectMaxLevels = _searchResults.indirectMaxLevels;
-	}
-	else
-	{
-		if (isNarrowingSearch)
-		{
-			uint16_t computedIndirectMaxLevels = 0;
-			uint16_t numberOfIndirectNarrowingVariables = 0;
-			uint16_t numberOfDirectNarrowingVariables = 0;
-			
-			for (ZGVariable *variable in variables)
+		dispatch_async(dispatch_get_main_queue(), ^{
+			if (self->_windowController != nil)
 			{
-				if ([self isVariableNarrowable:variable withDataType:dataType])
+				self->_searchData.searchValue = NULL;
+				self->_searchData.swappedValue = NULL;
+				
+				if (searchDataActivity != nil)
 				{
-					uint16_t numberOfDynamicPointersInAddress = (uint16_t)(variable.numberOfDynamicPointersInAddress);
-					if (numberOfDynamicPointersInAddress > computedIndirectMaxLevels)
-					{
-						computedIndirectMaxLevels = numberOfDynamicPointersInAddress;
-					}
-					
-					if (numberOfDynamicPointersInAddress > 0)
-					{
-						numberOfIndirectNarrowingVariables++;
-					}
-					else
-					{
-						numberOfDirectNarrowingVariables++;
-					}
+					[[NSProcessInfo processInfo] endActivity:searchDataActivity];
+				}
+				
+				[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
+				
+				if (storeValuesAfterSearch && self->_searchData.savedData != nil)
+				{
+					[self storeAllValuesAndAfterSearches:YES];
 				}
 			}
-			
-			indirectMaxLevels = (numberOfIndirectNarrowingVariables > numberOfDirectNarrowingVariables) ? computedIndirectMaxLevels : 0;
-		}
-		else
-		{
-			indirectMaxLevels = 0;
-		}
-	}
-	
-	for (ZGVariable *variable in variables)
-	{
-		if (!isNarrowingSearch)
-		{
-			[notSearchedVariables addObject:variable];
-		}
-		else if (indirectMaxLevels == 0)
-		{
-			if (![self isVariableNarrowable:variable withDataType:dataType] || variable.usesDynamicPointerAddress)
-			{
-				[notSearchedVariables addObject:variable];
-			}
-			else
-			{
-				[searchedVariables addObject:variable];
-			}
-		}
-		else /* if (indirectMaxLevels != 0) */
-		{
-			if (![self isVariableNarrowable:variable withDataType:dataType] || !variable.usesDynamicPointerAddress)
-			{
-				[notSearchedVariables addObject:variable];
-			}
-			else
-			{
-				[searchedVariables addObject:variable];
-			}
-		}
-	}
-	
-	[self prepareTask];
-	
-	id searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
-	
-	NSArray<ZGVariable *> *oldVariables = _documentData.variables;
-	
-	_documentData.variables = notSearchedVariables;
-	[windowController.variablesTableView reloadData];
-	
-	[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch pointerAddressSearch:pointerAddressSearch indirectMaxLevels:indirectMaxLevels usingCompletionBlock:^ {
-		if (self->_windowController != nil)
-		{
-			self->_searchData.searchValue = NULL;
-			self->_searchData.swappedValue = NULL;
-			
-			if (searchDataActivity != nil)
-			{
-				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
-			}
-			
-			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
-			
-			if (storeValuesAfterSearch && self->_searchData.savedData != nil)
-			{
-				[self storeAllValuesAndAfterSearches:YES];
-			}
-		}
-	}];
+		});
+	});
 }
 
 - (void)cancelTask

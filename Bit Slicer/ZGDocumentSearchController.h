@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables;
 - (void)fetchVariablesFromResults;
 
-- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch;
+- (void)searchVariablesWithString:(NSString *)searchStringValue dataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch;
 - (void)storeAllValuesAndAfterSearches:(BOOL)storeValuesAfterSearches;
 
 - (void)updateStoreValuesButtonImageWithStoringValuesAfterSearches:(BOOL)storingValuesAfterSearches;

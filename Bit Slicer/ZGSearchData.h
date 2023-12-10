@@ -75,6 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) void *swappedValue;
 @property (nonatomic) BOOL bytesSwapped;
 
+@property (nonatomic) NSArray<NSValue *> *totalStaticSegmentRanges;
+
 @property (nonatomic, nullable) void *rangeValue;
 @property (nonatomic, nullable) ZGStoredData *savedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
@@ -82,6 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) uint16_t indirectMaxOffset;
 @property (nonatomic) uint16_t indirectMaxLevels;
 @property (nonatomic) BOOL indirectStopAtStaticAddresses;
+@property (nonatomic) BOOL filterHeapAndStackData;
 @property (nonatomic) BOOL shouldIgnoreStringCase;
 @property (nonatomic) BOOL shouldIncludeNullTerminator;
 @property (nonatomic) ZGMemoryAddress beginAddress;

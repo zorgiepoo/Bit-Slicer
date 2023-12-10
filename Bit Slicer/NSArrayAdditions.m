@@ -34,6 +34,22 @@
 
 @implementation NSArray (NSArrayAdditions)
 
+- (NSArray *)zgFlatMapUsingBlock:(zg_array_flatmap_t)block
+{
+	NSMutableArray *newResults = [[NSMutableArray alloc] init];
+	
+	for (id item in self)
+	{
+		id object = block(item);
+		if (object != nil)
+		{
+			[newResults addObject:item];
+		}
+	}
+	
+	return [NSArray arrayWithArray:newResults];
+}
+
 - (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep
 {
 	NSMutableArray *newResults = [[NSMutableArray alloc] init];

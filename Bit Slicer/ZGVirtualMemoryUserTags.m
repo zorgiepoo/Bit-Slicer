@@ -56,6 +56,37 @@ case value: \
 #pragma message("Need to update the user tag descriptions")
 #endif
 
+bool ZGUserTagIsSharedMemory(uint32_t userTag)
+{
+	// For shared memory / pmap, see https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/vm/vm.html
+	return userTag == VM_MEMORY_SHARED_PMAP;
+}
+
+bool ZGUserTagIsStackOrHeapData(uint32_t userTag)
+{
+	switch (userTag)
+	{
+		case VM_MEMORY_MALLOC:
+		case VM_MEMORY_MALLOC_SMALL:
+		case VM_MEMORY_MALLOC_LARGE:
+		case VM_MEMORY_MALLOC_HUGE:
+		case VM_MEMORY_REALLOC:
+		case VM_MEMORY_MALLOC_TINY:
+		case VM_MEMORY_MALLOC_LARGE_REUSABLE:
+		case VM_MEMORY_MALLOC_LARGE_REUSED:
+		case VM_MEMORY_MALLOC_NANO:
+		case VM_MEMORY_MALLOC_MEDIUM:
+		case VM_MEMORY_STACK:
+		case VM_MEMORY_DYLIB:
+		case VM_MEMORY_TCMALLOC:
+		case VM_MEMORY_DYLD:
+		case VM_MEMORY_DYLD_MALLOC:
+			return true;
+		default:
+			return false;
+	}
+}
+
 NSString *ZGUserTagDescription(uint32_t userTag)
 {
 	NSString *userTagDescription = nil;
@@ -73,6 +104,7 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_LARGE_REUSED)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ANALYSIS_TOOL)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_NANO)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_MEDIUM)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_MACH_MSG, @"Mach Message")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_IOKIT, @"IOKit")
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_STACK)
