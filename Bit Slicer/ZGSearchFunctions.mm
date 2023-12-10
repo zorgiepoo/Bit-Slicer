@@ -1456,18 +1456,13 @@ ZGSearchResults *ZGSearchForByteArrays(ZGMemoryMap processTask, ZGSearchData *se
 static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData *> *resultSets, NSUInteger initialResultSetIndex, uint16_t *currentOffsets, ZGMemoryAddress *currentBaseAddresses, NSMutableDictionary<NSNumber *, ZGSearchResults *> *visitedSearchResults, uint16_t levelIndex, void *tempBuffer, void *searchValue, ZGSearchData *searchData, ZGMemorySize pointerSize, ZGVariableType indirectDataType, ZGMemorySize stride, uint16_t maxLevels, BOOL stopAtStaticAddresses, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate, ZGSearchProgress *searchProgress)
 {
 	ZGMemoryAddress searchValueAddress;
+	if (pointerSize == sizeof(ZGMemoryAddress))
 	{
-		switch (pointerSize)
-		{
-			case sizeof(ZGMemoryAddress):
-				searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
-				break;
-			case sizeof(ZG32BitMemoryAddress):
-				searchValueAddress = *(static_cast<ZG32BitMemoryAddress *>(searchValue));
-				break;
-			default:
-				abort();
-		}
+		searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
+	}
+	else
+	{
+		searchValueAddress = *(static_cast<ZG32BitMemoryAddress *>(searchValue));
 	}
 	
 	if (levelIndex > 0 && stopAtStaticAddresses)
@@ -1497,20 +1492,17 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 	if (levelIndex == 0 || (searchResults = visitedSearchResults[@(searchValueAddress)]) == nil)
 	{
 		const BOOL storeValueDifference = YES;
-		switch (pointerSize)
+		if (pointerSize == sizeof(ZGMemoryAddress))
 		{
-			case sizeof(ZGMemoryAddress):
-				searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchValue), searchData, ZGInt64, ZGPointer, storeValueDifference, nil);
-				
-				searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
-				break;
-			case sizeof(ZG32BitMemoryAddress):
-				searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchValue), searchData, ZGInt32, ZGPointer, storeValueDifference, nil);
-				
-				searchValueAddress = *(static_cast<ZG32BitMemoryAddress *>(searchValue));
-				break;
-			default:
-				abort();
+			searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchValue), searchData, ZGInt64, ZGPointer, storeValueDifference, nil);
+			
+			searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
+		}
+		else
+		{
+			searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return ZGPointerEqualsWithMaxOffset(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchValue), searchData, ZGInt32, ZGPointer, storeValueDifference, nil);
+			
+			searchValueAddress = *(static_cast<ZG32BitMemoryAddress *>(searchValue));
 		}
 		
 		currentBaseAddresses[levelIndex] = searchValueAddress;
@@ -1529,10 +1521,13 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 	{
 		maxSearchResultsCountPerBucket = (searchResultsCount < maxItemsPerBucket) ? maxItemsPerBucket : (searchResultsCount / maxItemsPerBucket);
 		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			searchProgress.maxProgress = searchResultsCount;
-			[delegate progressWillBegin:searchProgress];
-		});
+		if (delegate != nil)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				searchProgress.maxProgress = searchResultsCount;
+				[delegate progressWillBegin:searchProgress];
+			});
+		}
 	}
 	else
 	{
@@ -1543,20 +1538,15 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 	[searchResults enumerateWithCount:searchResultsCount removeResults:NO usingBlock:^(const void * _Nonnull searchResultData, BOOL * __unused _Nonnull stop) {
 		// Extract base address for searching
 		ZGMemoryAddress baseAddress;
-		switch (pointerSize)
+		if (pointerSize == sizeof(ZGMemoryAddress))
 		{
-			case sizeof(ZGMemoryAddress):
-				memcpy(&baseAddress, searchResultData, pointerSize);
-				break;
-			case sizeof(ZG32BitMemoryAddress):
-			{
-				ZG32BitMemoryAddress tempBaseAddress;
-				memcpy(&tempBaseAddress, searchResultData, pointerSize);
-				baseAddress = tempBaseAddress;
-				break;
-			}
-			default:
-				abort();
+			memcpy(&baseAddress, searchResultData, pointerSize);
+		}
+		else
+		{
+			ZG32BitMemoryAddress tempBaseAddress;
+			memcpy(&tempBaseAddress, searchResultData, pointerSize);
+			baseAddress = tempBaseAddress;
 		}
 		
 		// Detect if we have any cycles and stop here
@@ -1618,11 +1608,14 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 			currentResultsAdded++;
 			if (currentResultsAdded >= maxSearchResultsCountPerBucket)
 			{
-				dispatch_async(dispatch_get_main_queue(), ^{
-					searchProgress.progress++;
-					searchProgress.numberOfVariablesFound += currentResultSet.length / stride;
-					[delegate progress:searchProgress advancedWithResultSet:currentResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
-				});
+				if (delegate != nil)
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+						searchProgress.progress++;
+						searchProgress.numberOfVariablesFound += currentResultSet.length / stride;
+						[delegate progress:searchProgress advancedWithResultSet:currentResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
+					});
+				}
 				
 				resultSetIndex++;
 				currentResultsAdded = 0;
@@ -1631,31 +1624,36 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 	}];
 }
 
-static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap processTask, const void *indirectResult, ZGMemorySize pointerSize)
+static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap processTask, const void *indirectResult, ZGMemorySize pointerSize, uint16_t *outNumberOfLevels, uint16_t *outOffsets, ZGMemoryAddress *outBaseAddresses)
 {
 	const uint8_t *resultBytes = static_cast<const uint8_t *>(indirectResult);
 	
 	ZGMemoryAddress baseAddress;
-	switch (pointerSize)
+	if (pointerSize == sizeof(ZGMemoryAddress))
 	{
-		case sizeof(ZGMemoryAddress):
-			memcpy(&baseAddress, resultBytes, pointerSize);
-			break;
-		case sizeof(ZG32BitMemoryAddress):
-		{
-			ZG32BitMemoryAddress halfAddress;
-			memcpy(&halfAddress, resultBytes, pointerSize);
-			baseAddress = halfAddress;
-			break;
-		}
-		default:
-			abort();
+		memcpy(&baseAddress, resultBytes, pointerSize);
+	}
+	else
+	{
+		ZG32BitMemoryAddress halfAddress;
+		memcpy(&halfAddress, resultBytes, pointerSize);
+		baseAddress = halfAddress;
 	}
 	
 	uint16_t numberOfLevels;
 	memcpy(&numberOfLevels, resultBytes + pointerSize, sizeof(numberOfLevels));
 	
+	if (outNumberOfLevels != nullptr)
+	{
+		*outNumberOfLevels = numberOfLevels;
+	}
+	
 	const uint8_t *offsets = resultBytes + pointerSize + sizeof(numberOfLevels);
+	
+	if (outOffsets != nullptr)
+	{
+		memcpy(outOffsets, offsets, sizeof(*offsets) * numberOfLevels);
+	}
 	
 	bool validAddress = true;
 	
@@ -1671,20 +1669,20 @@ static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap p
 			break;
 		}
 		
-		ZGMemoryAddress dereferencedAddressFromMemory;
-		switch (pointerSize)
+		if (outBaseAddresses != nullptr)
 		{
-			case sizeof(ZGMemoryAddress):
-				dereferencedAddressFromMemory = *(static_cast<ZGMemoryAddress *>(bytesFromMemory));
-				break;
-			case sizeof(ZG32BitMemoryAddress):
-			{
-				ZG32BitMemoryAddress halfDereferencedAddressFromMemory = *(static_cast<ZG32BitMemoryAddress *>(bytesFromMemory));
-				dereferencedAddressFromMemory = halfDereferencedAddressFromMemory;
-				break;
-			}
-			default:
-				abort();
+			outBaseAddresses[numberOfLevels - 1 - level] = currentAddress;
+		}
+		
+		ZGMemoryAddress dereferencedAddressFromMemory;
+		if (pointerSize == sizeof(ZGMemoryAddress))
+		{
+			dereferencedAddressFromMemory = *(static_cast<ZGMemoryAddress *>(bytesFromMemory));
+		}
+		else
+		{
+			ZG32BitMemoryAddress halfDereferencedAddressFromMemory = *(static_cast<ZG32BitMemoryAddress *>(bytesFromMemory));
+			dereferencedAddressFromMemory = halfDereferencedAddressFromMemory;
 		}
 		
 		ZGFreeBytes(bytesFromMemory, numberOfBytesRead);
@@ -1705,7 +1703,8 @@ static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap p
 
 ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, ZGSearchResults * _Nullable previousSearchResults)
 {
-	const uint16_t maxLevels = indirectMaxLevels;
+	const uint16_t previousIndirectMaxLevels = previousSearchResults.indirectMaxLevels;
+	const uint16_t maxLevels = (indirectMaxLevels >= previousIndirectMaxLevels) ? indirectMaxLevels : previousIndirectMaxLevels;
 	
 	ZGMemorySize pointerSize = searchData.pointerSize;
 	
@@ -1719,6 +1718,8 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	
 	NSMutableDictionary<NSNumber *, ZGSearchResults *> *visitedSearchResults = [NSMutableDictionary dictionary];
 	
+	BOOL indirectStopAtStaticAddresses = searchData.indirectStopAtStaticAddresses;
+	
 	if (previousSearchResults == nil)
 	{
 		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:(previousSearchResults == nil ? 1.0 : previousSearchResults.count)];
@@ -1727,51 +1728,52 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			[delegate progressWillBegin:searchProgress];
 		});
 		
-		_ZGSearchForIndirectPointerRecursively(resultSets, 0, currentOffsets, currentBaseAddresses, visitedSearchResults, 0, tempBuffer, searchData.searchValue, searchData, pointerSize, indirectDataType, stride, maxLevels, searchData.indirectStopAtStaticAddresses, processTask, delegate, searchProgress);
+		_ZGSearchForIndirectPointerRecursively(resultSets, 0, currentOffsets, currentBaseAddresses, visitedSearchResults, 0, tempBuffer, searchData.searchValue, searchData, pointerSize, indirectDataType, stride, maxLevels, indirectStopAtStaticAddresses, processTask, delegate, searchProgress);
 	}
 	else
 	{
 		ZGMemoryAddress searchAddress;
-		switch (pointerSize)
+		if (pointerSize == sizeof(ZGMemoryAddress))
 		{
-			case sizeof(ZGMemoryAddress):
-				searchAddress = *(static_cast<ZGMemoryAddress *>(searchData.searchValue));
-				break;
-			case sizeof(ZG32BitMemoryAddress):
-				searchAddress = *(static_cast<ZG32BitMemoryAddress *>(searchData.searchValue));
-				break;
-			default:
-				abort();
+			searchAddress = *(static_cast<ZGMemoryAddress *>(searchData.searchValue));
+		}
+		else
+		{
+			searchAddress = *(static_cast<ZG32BitMemoryAddress *>(searchData.searchValue));
 		}
 		
 		NSArray<NSData *> *previousIndirectResultSets = previousSearchResults.resultSets;
 		ZGMemorySize previousIndirectResultSetStride = previousSearchResults.stride;
 		
-		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousIndirectResultSets.count];
+		NSUInteger previousIndirectResultSetsCount = previousIndirectResultSets.count;
+		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousIndirectResultSetsCount];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[delegate progressWillBegin:searchProgress];
 		});
 		
+		for (NSUInteger previousIndirectResultSetIndex = 0; previousIndirectResultSetIndex < previousIndirectResultSetsCount; previousIndirectResultSetIndex++)
+		{
+			[resultSets addObject:[NSMutableData data]];
+		}
+		
+		NSUInteger resultSetIndex = 0;
 		for (NSData *previousIndirectResultSet in previousIndirectResultSets)
 		{
-			NSMutableData *newResultSet = [NSMutableData data];
+			NSMutableData *newResultSet = resultSets[resultSetIndex];
 			
 			const uint8_t *previousIndirectResultSetBytes = static_cast<const uint8_t *>(previousIndirectResultSet.bytes);
 			NSUInteger previousIndirectResultSetCount = previousIndirectResultSet.length / previousIndirectResultSetStride;
 			for (NSUInteger previousIndirectResultSetIndex = 0; previousIndirectResultSetIndex < previousIndirectResultSetCount; previousIndirectResultSetIndex++)
 			{
-				// For each previous search result, retrieve computed address, populate currentOffsets, baseAddresses, tempBuffer (easy)
-				// If maxLevels is the same (or <) as previousSearchResults.maxLevels just compare if addresses are equal
-				// If they are, store the indirect result, and call it a day. Easy-peasy.
-				// If maxLevels is > previousSearchResults.maxLevels, then for any indirect search result that
-				// has levels < previousSearchResults.maxLevels, just compare that address and store if it it's equal.
-				// For any that is levels >= previousSearchResults.maxLevels, we will search up to new maxLevels
-				
 				const uint8_t *previousIndirectResult = previousIndirectResultSetBytes + previousIndirectResultSetIndex * previousIndirectResultSetStride;
 				
+				uint16_t numberOfLevels;
 				ZGMemoryAddress currentAddress;
-				if (!ZGEvaluateIndirectAddress(&currentAddress, processTask, previousIndirectResult, pointerSize))
+				
+				memset(currentOffsets, 0, sizeof(*currentOffsets) * maxLevels);
+				memset(currentBaseAddresses, 0, sizeof(*currentBaseAddresses) * maxLevels);
+				if (!ZGEvaluateIndirectAddress(&currentAddress, processTask, previousIndirectResult, pointerSize, &numberOfLevels, currentOffsets, currentBaseAddresses))
 				{
 					continue;
 				}
@@ -1781,13 +1783,33 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 					continue;
 				}
 				
+				memset(tempBuffer, 0, stride);
 				memcpy(tempBuffer, previousIndirectResult, previousIndirectResultSetStride);
 				[newResultSet appendBytes:tempBuffer length:stride];
 				
-				memset(tempBuffer, 0, stride);
+				// Determine if for this indirect result if we should recurse deeper
+				// This will apply to results that have reached the maximum level from the previous indirect search
+				if (numberOfLevels != previousIndirectMaxLevels || indirectMaxLevels <= numberOfLevels)
+				{
+					continue;
+				}
+				
+				ZGMemoryAddress recurseSearchAddress = currentBaseAddresses[numberOfLevels - 1];
+				ZGMemoryAddress recurseHalfSearchAddress;
+				void *recurseSearchAddressValue;
+				if (pointerSize == sizeof(ZGMemoryAddress))
+				{
+					recurseSearchAddressValue = &recurseSearchAddress;
+					recurseHalfSearchAddress = 0;
+				}
+				else
+				{
+					recurseHalfSearchAddress = static_cast<ZG32BitMemoryAddress>(recurseSearchAddress);
+					recurseSearchAddressValue = &recurseHalfSearchAddress;
+				}
+				
+				_ZGSearchForIndirectPointerRecursively(resultSets, resultSetIndex, currentOffsets, currentBaseAddresses, visitedSearchResults, numberOfLevels, tempBuffer, recurseSearchAddressValue, searchData, pointerSize, indirectDataType, stride, maxLevels, indirectStopAtStaticAddresses, processTask, nil, nil);
 			}
-			
-			[resultSets addObject:newResultSet];
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				searchProgress.numberOfVariablesFound += newResultSet.length / stride;
@@ -1795,6 +1817,8 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 				
 				[delegate progress:searchProgress advancedWithResultSet:newResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
 			});
+			
+			resultSetIndex++;
 		}
 	}
 	
@@ -2835,7 +2859,7 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, ZGSearch
 			const uint8_t *resultBytes = resultSetBytes + resultIndex * indirectResultsStride;
 			
 			ZGMemoryAddress address;
-			if (!ZGEvaluateIndirectAddress(&address, processTask, resultBytes, pointerSize))
+			if (!ZGEvaluateIndirectAddress(&address, processTask, resultBytes, pointerSize, nullptr, nullptr, nullptr))
 			{
 				address = 0x0;
 			}

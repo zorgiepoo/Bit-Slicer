@@ -848,24 +848,21 @@
 	ZGDocumentWindowController *windowController = _windowController;
 	
 	NSArray<ZGVariable *> *variables = _documentData.variables;
-	uint16_t indirectMaxLevels;
 	
-	// Compute indirectMaxLevels (if relevant)
+	// Compute indirectMaxLevelsForCurrentSearchResults (if relevant)
+	uint16_t indirectMaxLevelsForCurrentSearchResults;
 	
-	if (pointerAddressSearch)
+	if (!isNarrowingSearch)
 	{
-		// Use requested max levels for initial and narrow pointer address searches
-		indirectMaxLevels = _searchData.indirectMaxLevels;
+		// Regular initial value search with indirect variable searching is not possible
+		// For initial address search, indirectMaxLevelsForCurrentSearchResults is not used
+		indirectMaxLevelsForCurrentSearchResults = 0;
 	}
-	else if (!isNarrowingSearch)
+	else /* if (isNarrowingSearch) */
 	{
-		// Regular initial value search. No indirect variable searching is supported here.
-		indirectMaxLevels = 0;
-	}
-	else /* if (!pointerAddressSearch && isNarrowingSearch) */
-	{
-		// This is a value narrow search but figure out if we are narrowing regular variables or indirect variables
+		// Figure out if we are narrowing regular variables or indirect variables
 		// Figure out what max indirect level to use too if we're narrowing indirect variables
+		// Note we may be narrowing indirect variables for a value search or an address search
 		
 		uint16_t computedIndirectMaxLevels = 0;
 		uint16_t numberOfIndirectNarrowingVariables = 0;
@@ -892,23 +889,34 @@
 			}
 		}
 		
+		// Rely on current indirect search results if available
 		if (_searchResults.count > 0)
 		{
 			if (_searchResults.resultType == ZGSearchResultTypeIndirect)
 			{
-				// What to do if _searchResults.indirectMaxLevels < computedIndirectMaxLevels?
-				// That would be very bad..
-				indirectMaxLevels = (computedIndirectMaxLevels >= _searchResults.indirectMaxLevels) ? computedIndirectMaxLevels : _searchResults.indirectMaxLevels;
+				indirectMaxLevelsForCurrentSearchResults = (computedIndirectMaxLevels >= _searchResults.indirectMaxLevels) ? computedIndirectMaxLevels : _searchResults.indirectMaxLevels;
 			}
 			else
 			{
-				indirectMaxLevels = 0;
+				indirectMaxLevelsForCurrentSearchResults = 0;
 			}
 		}
 		else
 		{
-			indirectMaxLevels = (numberOfIndirectNarrowingVariables > numberOfDirectNarrowingVariables) ? computedIndirectMaxLevels : 0;
+			indirectMaxLevelsForCurrentSearchResults = (numberOfIndirectNarrowingVariables > numberOfDirectNarrowingVariables) ? computedIndirectMaxLevels : 0;
 		}
+	}
+	
+	// Prefer requested max levels for initial and narrowing pointer address search for the next search,
+	// as long as it's >= indirectMaxLevelsForCurrentSearchResults
+	uint16_t indirectMaxLevelsForNextSearchResults;
+	if (pointerAddressSearch)
+	{
+		indirectMaxLevelsForNextSearchResults = (indirectMaxLevelsForCurrentSearchResults >= _searchData.indirectMaxLevels) ? indirectMaxLevelsForCurrentSearchResults : _searchData.indirectMaxLevels;
+	}
+	else
+	{
+		indirectMaxLevelsForNextSearchResults = 0;
 	}
 	
 	// Split not searched variables and searched variables
@@ -927,7 +935,7 @@
 				// Variable must have dynamic pointer address
 				[searchedVariables addObject:variable];
 			}
-			else if (indirectMaxLevels > 0)
+			else if (indirectMaxLevelsForCurrentSearchResults > 0)
 			{
 				// Only narrow search variable if it has dynamic pointer address
 				if (variable.usesDynamicPointerAddress)
@@ -976,13 +984,13 @@
 		ZGMemorySize hostAlignment = ZGDataAlignment(ZG_PROCESS_TYPE_HOST, dataType, _searchData.dataSize);
 		BOOL unalignedAddressAccess = NO;
 		
-		ZGMemorySize indirectStride = (indirectMaxLevels == 0) ? 0 : [ZGSearchResults indirectStrideWithMaxNumberOfLevels:indirectMaxLevels pointerSize:currentProcess.pointerSize];
+		ZGMemorySize currentIndirectStride = (indirectMaxLevelsForCurrentSearchResults == 0) ? 0 : [ZGSearchResults indirectStrideWithMaxNumberOfLevels:indirectMaxLevelsForCurrentSearchResults pointerSize:currentProcess.pointerSize];
 		
 		NSMutableArray<NSString *> *indirectFailedImages;
 		void *indirectBuffer;
-		if (indirectStride > 0)
+		if (currentIndirectStride > 0)
 		{
-			indirectBuffer = calloc(1, indirectStride);
+			indirectBuffer = calloc(1, currentIndirectStride);
 			assert(indirectBuffer != NULL);
 			indirectFailedImages = [NSMutableArray array];
 		}
@@ -999,7 +1007,7 @@
 		{
 			ZGMemoryAddress variableAddress = variable.address;
 			
-			if (indirectMaxLevels == 0)
+			if (indirectMaxLevelsForCurrentSearchResults == 0)
 			{
 				if (pointerSize == sizeof(ZGMemoryAddress))
 				{
@@ -1013,14 +1021,13 @@
 			}
 			else
 			{
-				if ([ZGCalculator extractIndirectAddressesAndOffsetsFromIntoBuffer:indirectBuffer expression:variable.addressFormula process:currentProcess failedImages:indirectFailedImages maxLevels:indirectMaxLevels stride:indirectStride])
+				if ([ZGCalculator extractIndirectAddressesAndOffsetsFromIntoBuffer:indirectBuffer expression:variable.addressFormula process:currentProcess failedImages:indirectFailedImages maxLevels:indirectMaxLevelsForCurrentSearchResults stride:currentIndirectStride])
 				{
-					[firstResultSets appendBytes:indirectBuffer length:indirectStride];
+					[firstResultSets appendBytes:indirectBuffer length:currentIndirectStride];
 				}
 				else
 				{
-					// TODO: what should we do here, ignore the variable?
-					assert(false);
+					NSLog(@"Error: failed to parse indirect variable expression: %@", variable.addressFormula);
 				}
 			}
 			
@@ -1030,7 +1037,7 @@
 			}
 		}
 		
-		if (indirectMaxLevels == 0)
+		if (indirectMaxLevelsForCurrentSearchResults == 0)
 		{
 			// Regular narrow search involving no indirect variables
 			firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] resultType:ZGSearchResultTypeDirect dataType:dataType stride:_searchData.pointerSize unalignedAccess:unalignedAddressAccess];
@@ -1039,21 +1046,21 @@
 		{
 			// Narrow search involving indirect variables
 			
-			// Check if previous search results should be combined with new search results from table
-			NSArray<NSData *> *narrowResultSets;
+			// Check if previous search results should be combined with new search results from the table
+			ZGSearchResults *newSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] resultType:ZGSearchResultTypeIndirect dataType:dataType stride:currentIndirectStride unalignedAccess:unalignedAddressAccess];
+			newSearchResults.indirectMaxLevels = indirectMaxLevelsForCurrentSearchResults;
+			
 			if (_searchResults.count > 0 && _searchResults.dataType == dataType && _searchResults.resultType == ZGSearchResultTypeIndirect)
 			{
-				NSMutableArray<NSData *> *newNarrowResultSets = [NSMutableArray arrayWithObject:firstResultSets];
-				[newNarrowResultSets addObjectsFromArray:(NSArray *_Nonnull)_searchResults.resultSets];
-				
-				narrowResultSets = newNarrowResultSets;
+				// This will also make the strides of the search results match if necessary
+				// This should be rare and should only happen if the user manually adds indirect variables
+				// to the table whose level exceeds the current search result's max level
+				firstSearchResults = [newSearchResults indirectSearchResultsByAppendingIndirectSearchResults:(ZGSearchResults * _Nonnull)_searchResults];
 			}
 			else
 			{
-				narrowResultSets = @[firstResultSets];
+				firstSearchResults = newSearchResults;
 			}
-			
-			firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:narrowResultSets resultType:ZGSearchResultTypeIndirect dataType:dataType stride:indirectStride unalignedAccess:unalignedAddressAccess];
 		}
 	}
 	
@@ -1072,14 +1079,14 @@
 			
 			self->_searchData.totalStaticSegmentRanges = totalStaticSegmentRanges;
 			
-			self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevels, self->_dataType, firstSearchResults);
+			self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevelsForNextSearchResults, self->_dataType, firstSearchResults);
 		}
 		else if (!isNarrowingSearch)
 		{
 			// Regular initial value search
 			self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
 		}
-		else if (indirectMaxLevels > 0)
+		else if (indirectMaxLevelsForCurrentSearchResults > 0)
 		{
 			// Narrow value search involving indirect variables
 			self->_temporarySearchResults = ZGNarrowIndirectSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults);

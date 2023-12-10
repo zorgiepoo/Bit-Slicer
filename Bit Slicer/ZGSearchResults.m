@@ -83,6 +83,52 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	return self;
 }
 
+static void ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(NSMutableArray<NSData *> *newResultSets, NSArray<NSData *> *resultSets, ZGMemorySize currentStride, ZGMemorySize newStride)
+{
+	if (currentStride == newStride)
+	{
+		[newResultSets addObjectsFromArray:resultSets];
+		return;
+	}
+	
+	assert(currentStride < newStride);
+	
+	for (NSData *resultSet in resultSets)
+	{
+		const uint8_t *resultSetBytes = (const uint8_t *)(resultSet.bytes);
+		ZGMemorySize resultSetCount = resultSet.length / currentStride;
+		
+		uint8_t *newResultSetBytes = calloc(resultSetCount, newStride);
+		assert(newResultSetBytes != NULL);
+		
+		for (ZGMemorySize resultSetIndex = 0; resultSetIndex < resultSetCount; resultSetIndex++)
+		{
+			memcpy(newResultSetBytes + resultSetIndex * newStride, resultSetBytes + resultSetIndex * currentStride, currentStride);
+		}
+		
+		NSData *newResultSet = [[NSData alloc] initWithBytesNoCopy:newResultSetBytes length:resultSetCount * newStride];
+		[newResultSets addObject:newResultSet];
+	}
+}
+
+- (instancetype)indirectSearchResultsByAppendingIndirectSearchResults:(ZGSearchResults *)theirSearchResults
+{
+	assert(theirSearchResults.resultType == _resultType && theirSearchResults.dataType == _dataType && _resultType == ZGSearchResultTypeIndirect);
+	
+	ZGMemorySize newStride = (_stride > theirSearchResults.stride ? _stride : theirSearchResults.stride);
+	uint16_t newIndirectMaxLevels = (_indirectMaxLevels > theirSearchResults.indirectMaxLevels ? _indirectMaxLevels : theirSearchResults.indirectMaxLevels);
+	
+	NSMutableArray<NSData *> *newResultSets = [NSMutableArray array];
+	ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(newResultSets, _resultSets, _stride, newStride);
+	ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(newResultSets, theirSearchResults.resultSets, theirSearchResults.stride, newStride);
+	
+	ZGSearchResults *newSearchResults = [[ZGSearchResults alloc] initWithResultSets:newResultSets resultType:_resultType dataType:_dataType stride:newStride unalignedAccess:_unalignedAccess || theirSearchResults.unalignedAccess];
+	
+	newSearchResults.indirectMaxLevels = newIndirectMaxLevels;
+	
+	return newSearchResults;
+}
+
 - (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
 	if (count == 0)

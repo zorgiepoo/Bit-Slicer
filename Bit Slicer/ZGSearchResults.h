@@ -59,7 +59,9 @@ typedef void (^zg_enumerate_search_results_t)(const void *data, BOOL *stop);
 
 + (ZGMemorySize)indirectStrideWithMaxNumberOfLevels:(ZGMemorySize)maxNumberOfLevels pointerSize:(ZGMemorySize)pointerSize;
 
-- (id)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess;
+- (instancetype)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess;
+
+- (instancetype)indirectSearchResultsByAppendingIndirectSearchResults:(ZGSearchResults *)newSearchResults;
 
 - (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback;
 
