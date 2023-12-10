@@ -41,8 +41,10 @@
 #define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
 #define ZGProtectionModeKey @"ZGProtectionModeKey"
 #define ZGSearchTypeKey @"ZGSearchTypeKey"
-#define ZGSearchAddressMaxLevels @"ZGSearchAddressMaxLevelsKey"
-#define ZGSearchAddressMaxOffset @"ZGSearchAddressMaxOffset"
+#define ZGSearchAddressMaxLevelsKey @"ZGSearchAddressMaxLevelsKey"
+#define ZGSearchAddressMaxOffsetKey @"ZGSearchAddressMaxOffset"
+#define ZGSearchAddressSameOffsetKey @"ZGSearchAddressSameOffset"
+#define ZGSearchAddressOffsetComparisonKey @"ZGSearchAddressOffsetComparison"
 #define ZGIgnoreDataAlignmentKey @"ZGIgnoreDataAlignmentKey"
 #define ZGExactStringLengthKey @"ZGExactStringLengthKey"
 #define ZGIgnoreStringCaseKey @"ZGIgnoreStringCaseKey"
@@ -65,6 +67,12 @@ typedef NS_ENUM(NSInteger, ZGSearchType)
 	ZGSearchTypeAddress
 };
 
+typedef NS_ENUM(NSInteger, ZGSearchAddressOffsetComparison)
+{
+	ZGSearchAddressOffsetComparisonMax = 0,
+	ZGSearchAddressOffsetComparisonSame = 1
+};
+
 @interface ZGDocumentData : NSObject
 
 @property (nonatomic) NSInteger selectedDatatypeTag;
@@ -74,6 +82,8 @@ typedef NS_ENUM(NSInteger, ZGSearchType)
 @property (nonatomic) ZGSearchType searchType;
 @property (nonatomic) NSInteger searchAddressMaxLevels;
 @property (nonatomic) NSInteger searchAddressMaxOffset;
+@property (nonatomic) NSInteger searchAddressSameOffset;
+@property (nonatomic) ZGSearchAddressOffsetComparison searchAddressOffsetComparison;
 @property (nonatomic) BOOL ignoreDataAlignment;
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;

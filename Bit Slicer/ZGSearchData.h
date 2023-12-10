@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 	ZGMemorySize _pointerSize;
 	void * _Nullable _rangeValue;
 	double _epsilon;
-	uint16_t _indirectMaxOffset;
+	uint16_t _indirectOffset;
 	BOOL _shouldIgnoreStringCase;
 	BOOL _shouldIncludeNullTerminator;
 	
@@ -81,7 +81,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) ZGStoredData *savedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
 @property (nonatomic) double epsilon;
-@property (nonatomic) uint16_t indirectMaxOffset;
+@property (nonatomic) BOOL indirectOffsetMaxComparison;
+@property (nonatomic) uint16_t indirectOffset;
 @property (nonatomic) uint16_t indirectMaxLevels;
 @property (nonatomic) BOOL indirectStopAtStaticAddresses;
 @property (nonatomic) BOOL filterHeapAndStackData;

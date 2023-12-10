@@ -817,7 +817,17 @@
 		return NO;
 	}
 	
-	_searchData.indirectMaxOffset = (uint16_t)_documentData.searchAddressMaxOffset;
+	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)
+	{
+		_searchData.indirectOffsetMaxComparison = NO;
+		_searchData.indirectOffset = (uint16_t)_documentData.searchAddressSameOffset;
+	}
+	else
+	{
+		_searchData.indirectOffsetMaxComparison = YES;
+		_searchData.indirectOffset = (uint16_t)_documentData.searchAddressMaxOffset;
+	}
+	
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
 	_searchData.indirectStopAtStaticAddresses = YES;
 	_searchData.filterHeapAndStackData = addressSearch;

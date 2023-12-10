@@ -126,12 +126,20 @@
 	
 	[keyedArchiver
 	 encodeInteger:_data.searchAddressMaxLevels
-	 forKey:ZGSearchAddressMaxLevels];
+	 forKey:ZGSearchAddressMaxLevelsKey];
 	
 	[keyedArchiver
 	 encodeInteger:_data.searchAddressMaxOffset
-	 forKey:ZGSearchAddressMaxOffset];
+	 forKey:ZGSearchAddressMaxOffsetKey];
     
+	[keyedArchiver
+	 encodeInteger:_data.searchAddressSameOffset
+	 forKey:ZGSearchAddressSameOffsetKey];
+	
+	[keyedArchiver
+	 encodeInteger:_data.searchAddressOffsetComparison
+	 forKey:ZGSearchAddressOffsetComparisonKey];
+	
 	[keyedArchiver
 	 encodeBool:_data.ignoreDataAlignment
 	 forKey:ZGIgnoreDataAlignmentKey];
@@ -227,8 +235,21 @@
 	_searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
 	_data.searchType = [keyedUnarchiver decodeIntegerForKey:ZGSearchTypeKey];
 	
-	_data.searchAddressMaxLevels = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxLevels];
-	_data.searchAddressMaxOffset = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxOffset];
+	NSInteger decodedMaxLevels = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxLevelsKey];
+	_data.searchAddressMaxLevels = (decodedMaxLevels > 0 ? decodedMaxLevels : 1);
+	_data.searchAddressMaxOffset = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxOffsetKey];
+	_data.searchAddressSameOffset = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressSameOffsetKey];
+	
+	NSInteger decodedOffsetComparison = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressOffsetComparisonKey];
+	NSInteger offsetComparison = ZGSearchAddressOffsetComparisonMax;
+	switch ((ZGSearchAddressOffsetComparison)decodedOffsetComparison)
+	{
+		case ZGSearchAddressOffsetComparisonMax:
+		case ZGSearchAddressOffsetComparisonSame:
+			offsetComparison = decodedOffsetComparison;
+			break;
+	}
+	_data.searchAddressOffsetComparison = offsetComparison;
 	
 	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBeginningAddressKey]];
 	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEndingAddressKey]];

@@ -17,8 +17,9 @@
                 <outlet property="_scopeBarFlagsView" destination="053-lf-ydX" id="bS5-vp-dPP"/>
                 <outlet property="_searchAddressMaxLevelsStepper" destination="QsO-dZ-JLm" id="n7V-al-Wdf"/>
                 <outlet property="_searchAddressMaxLevelsTextField" destination="krU-4S-mNx" id="bJz-Ed-Kib"/>
-                <outlet property="_searchAddressMaxOffsetStepper" destination="Tl4-KO-zSW" id="xOP-kP-IZy"/>
-                <outlet property="_searchAddressMaxOffsetTextField" destination="6Ui-5n-d5k" id="PH9-Gl-Qna"/>
+                <outlet property="_searchAddressOffsetComparisonPopUpButton" destination="igZ-EE-KLe" id="gpH-91-lOU"/>
+                <outlet property="_searchAddressOffsetStepper" destination="Tl4-KO-zSW" id="3Iv-sm-RhT"/>
+                <outlet property="_searchAddressOffsetTextField" destination="6Ui-5n-d5k" id="2fb-hj-q3c"/>
                 <outlet property="_toolbar" destination="UZg-mb-r8g" id="9bW-ar-bQK"/>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
                 <outlet property="functionPopUpButton" destination="Icp-Tb-DVJ" id="Bbf-kY-5xD"/>
@@ -830,16 +831,19 @@
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="igZ-EE-KLe">
                     <rect key="frame" x="171" y="0.0" width="46" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <popUpButtonCell key="cell" type="push" title="≤" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="BrH-0b-bdg" id="WBP-2a-ZOR">
+                    <popUpButtonCell key="cell" type="push" title="≤" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="BrH-0b-bdg" id="WBP-2a-ZOR">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
                         <menu key="menu" id="PyO-3S-6cM">
                             <items>
                                 <menuItem title="≤" id="BrH-0b-bdg"/>
-                                <menuItem title="=" id="RUR-Zy-RpG"/>
+                                <menuItem title="=" tag="1" id="RUR-Zy-RpG"/>
                             </items>
                         </menu>
                     </popUpButtonCell>
+                    <connections>
+                        <action selector="searchAddressOffsetComparisonDidChange:" target="-2" id="4As-cG-UXd"/>
+                    </connections>
                 </popUpButton>
                 <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Ui-5n-d5k">
                     <rect key="frame" x="221" y="3" width="46" height="19"/>
@@ -854,7 +858,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
-                        <action selector="searchAddressMaxOffsetDidChange:" target="-2" id="VPq-4V-OaX"/>
+                        <action selector="searchAddressOffsetDidChange:" target="-2" id="k6b-wa-kXX"/>
                     </connections>
                 </textField>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tl4-KO-zSW">
@@ -862,7 +866,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" id="raN-rX-28X"/>
                     <connections>
-                        <action selector="searchAddressMaxOffsetDidChange:" target="-2" id="NbT-TC-qG3"/>
+                        <action selector="searchAddressOffsetDidChange:" target="-2" id="pAz-SA-TAb"/>
                     </connections>
                 </stepper>
                 <box horizontalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="hE3-Lr-YU6">

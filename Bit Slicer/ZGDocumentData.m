@@ -52,8 +52,10 @@
 		_lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
 		_byteOrderTag = CFByteOrderGetCurrent();
 		_searchType = ZGSearchTypeValue;
-		_searchAddressMaxLevels = 3;
+		_searchAddressMaxLevels = 1;
 		_searchAddressMaxOffset = 2048;
+		_searchAddressSameOffset = 2048;
+		_searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
 	}
 	return self;
 }

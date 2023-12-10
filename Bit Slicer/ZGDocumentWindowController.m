@@ -117,8 +117,9 @@
 	IBOutlet NSTextField *_flagsLabel;
 	IBOutlet NSTextField *_searchAddressMaxLevelsTextField;
 	IBOutlet NSStepper *_searchAddressMaxLevelsStepper;
-	IBOutlet NSTextField *_searchAddressMaxOffsetTextField;
-	IBOutlet NSStepper *_searchAddressMaxOffsetStepper;
+	IBOutlet NSTextField *_searchAddressOffsetTextField;
+	IBOutlet NSStepper *_searchAddressOffsetStepper;
+	IBOutlet NSPopUpButton *_searchAddressOffsetComparisonPopUpButton;
 	IBOutlet AGScopeBar *_scopeBar;
 	IBOutlet NSView *_scopeBarFlagsView;
 	IBOutlet NSView *_scopeBarAddressSearchOptionsView;
@@ -508,20 +509,32 @@
 	
 	[_searchTypeGroup setSelected:YES forItemWithIdentifier:_documentData.searchType == ZGSearchTypeAddress ? ZGSearchTypeAddressIdentifier : ZGSearchTypeValueIdentifier];
 	
-	NSNumberFormatter *searchAddressMaxOffsetFormatter = (NSNumberFormatter *)(_searchAddressMaxOffsetTextField.formatter);
+	NSNumberFormatter *searchAddressOffsetFormatter = (NSNumberFormatter *)(_searchAddressOffsetTextField.formatter);
+	searchAddressOffsetFormatter.numberStyle = NSNumberFormatterNoStyle;
 	
-	_searchAddressMaxOffsetStepper.maxValue = searchAddressMaxOffsetFormatter.maximum.doubleValue;
-	_searchAddressMaxOffsetStepper.minValue = searchAddressMaxOffsetFormatter.minimum.doubleValue;
+	_searchAddressOffsetStepper.maxValue = searchAddressOffsetFormatter.maximum.doubleValue;
+	_searchAddressOffsetStepper.minValue = searchAddressOffsetFormatter.minimum.doubleValue;
+	
+	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
+	{
+		_searchAddressOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
+	}
+	else
+	{
+		_searchAddressOffsetTextField.integerValue = _documentData.searchAddressSameOffset;
+	}
+	
+	[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:(NSInteger)_documentData.searchAddressOffsetComparison];
+	
+	_searchAddressOffsetStepper.integerValue = _searchAddressOffsetTextField.integerValue;
 	
 	NSNumberFormatter *searchAddressMaxLevelsFormatter = (NSNumberFormatter *)(_searchAddressMaxLevelsTextField.formatter);
+	searchAddressMaxLevelsFormatter.numberStyle = NSNumberFormatterNoStyle;
 	
 	_searchAddressMaxLevelsStepper.minValue = searchAddressMaxLevelsFormatter.minimum.doubleValue;
 	_searchAddressMaxLevelsStepper.maxValue = searchAddressMaxLevelsFormatter.maximum.doubleValue;
 	
-	_searchAddressMaxOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
 	_searchAddressMaxLevelsTextField.integerValue = _documentData.searchAddressMaxLevels;
-	
-	_searchAddressMaxOffsetStepper.integerValue = _searchAddressMaxOffsetTextField.integerValue;
 	_searchAddressMaxLevelsStepper.integerValue = _searchAddressMaxLevelsTextField.integerValue;
 	
 	if (_advancedOptionsPopover != nil)
@@ -938,18 +951,61 @@
 	[self markDocumentChange];
 }
 
-- (IBAction)searchAddressMaxOffsetDidChange:(id)sender
+- (IBAction)searchAddressOffsetDidChange:(id)sender
 {
-	if (sender == _searchAddressMaxOffsetTextField)
+	if (sender == _searchAddressOffsetTextField)
 	{
-		_documentData.searchAddressMaxOffset = _searchAddressMaxOffsetTextField.integerValue;
-		_searchAddressMaxOffsetStepper.integerValue = _documentData.searchAddressMaxOffset;
+		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
+		{
+			_documentData.searchAddressMaxOffset = _searchAddressOffsetTextField.integerValue;
+			_searchAddressOffsetStepper.integerValue = _documentData.searchAddressMaxOffset;
+		}
+		else
+		{
+			_documentData.searchAddressSameOffset = _searchAddressOffsetTextField.integerValue;
+			_searchAddressOffsetStepper.integerValue = _documentData.searchAddressSameOffset;
+		}
 	}
 	else /* if (sender == _searchAddressMaxOffsetStepper) */
 	{
-		_documentData.searchAddressMaxOffset = _searchAddressMaxOffsetStepper.integerValue;
-		_searchAddressMaxOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
+		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
+		{
+			_documentData.searchAddressMaxOffset = _searchAddressOffsetStepper.integerValue;
+			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
+		}
+		else
+		{
+			_documentData.searchAddressSameOffset = _searchAddressOffsetStepper.integerValue;
+			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressSameOffset;
+		}
 	}
+	
+	[self markDocumentChange];
+}
+
+- (void)_updateSearchAddressOffsetTextField
+{
+	ZGSearchAddressOffsetComparison offsetComparison = _documentData.searchAddressOffsetComparison;
+	switch (offsetComparison)
+	{
+		case ZGSearchAddressOffsetComparisonMax:
+			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
+			_searchAddressOffsetStepper.integerValue = _searchAddressOffsetTextField.integerValue;
+			break;
+		case ZGSearchAddressOffsetComparisonSame:
+			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressSameOffset;
+			_searchAddressOffsetStepper.integerValue = _searchAddressOffsetTextField.integerValue;
+			break;
+	}
+}
+
+- (IBAction)searchAddressOffsetComparisonDidChange:(id)sender
+{
+	ZGSearchAddressOffsetComparison offsetComparison = (ZGSearchAddressOffsetComparison)(_searchAddressOffsetComparisonPopUpButton.selectedTag);
+	
+	_documentData.searchAddressOffsetComparison = offsetComparison;
+	
+	[self _updateSearchAddressOffsetTextField];
 	
 	[self markDocumentChange];
 }
