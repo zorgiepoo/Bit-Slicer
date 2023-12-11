@@ -821,6 +821,15 @@
 		return NO;
 	}
 	
+	if (_documentData.searchType == ZGSearchTypeValue)
+	{
+		_searchData.protectionMode = _documentData.valueProtectionMode;
+	}
+	else
+	{
+		_searchData.protectionMode = _documentData.addressProtectionMode;
+	}
+	
 	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)
 	{
 		_searchData.indirectOffsetMaxComparison = NO;
@@ -1183,7 +1192,7 @@
 	
 	ZGMemoryAddress beginAddress = _searchData.beginAddress;
 	ZGMemoryAddress endAddress = _searchData.endAddress;
-	ZGProtectionMode protectionMode = _searchData.protectionMode;
+	ZGProtectionMode protectionMode = (_documentData.searchType == ZGSearchTypeValue) ? _documentData.valueProtectionMode : _documentData.addressProtectionMode;
 	BOOL includeSharedMemory = _searchData.includeSharedMemory;
 	
 	ZGMemoryMap processTask = windowController.currentProcess.processTask;

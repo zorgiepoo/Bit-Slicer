@@ -56,6 +56,8 @@
 		_searchAddressMaxOffset = 2048;
 		_searchAddressSameOffset = 2048;
 		_searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+		_valueProtectionMode = ZGProtectionAll;
+		_addressProtectionMode = ZGProtectionWrite;
 	}
 	return self;
 }

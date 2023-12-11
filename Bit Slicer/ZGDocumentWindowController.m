@@ -217,17 +217,33 @@
 	{
 		if (selected)
 		{
+			ZGProtectionMode newProtectionMode;
 			if ([item.identifier isEqualToString:ZGProtectionItemAll])
 			{
-				_searchData.protectionMode = ZGProtectionAll;
+				newProtectionMode = ZGProtectionAll;
 			}
 			else if ([item.identifier isEqualToString:ZGProtectionItemWrite])
 			{
-				_searchData.protectionMode = ZGProtectionWrite;
+				newProtectionMode = ZGProtectionWrite;
 			}
 			else if ([item.identifier isEqualToString:ZGProtectionItemExecute])
 			{
-				_searchData.protectionMode = ZGProtectionExecute;
+				newProtectionMode = ZGProtectionExecute;
+			}
+			else
+			{
+				// Shouldn't be possible
+				assert(false);
+				newProtectionMode = ZGProtectionAll;
+			}
+			
+			if (_documentData.searchType == ZGSearchTypeValue)
+			{
+				_documentData.valueProtectionMode = newProtectionMode;
+			}
+			else
+			{
+				_documentData.addressProtectionMode = newProtectionMode;
 			}
 			
 			[self markDocumentChange];
@@ -472,19 +488,6 @@
 	
 	[_variableController disableHarmfulVariables:_documentData.variables];
 	[self updateVariables:_documentData.variables searchResults:nil];
-	
-	switch (_searchData.protectionMode)
-	{
-		case ZGProtectionAll:
-			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemAll];
-			break;
-		case ZGProtectionWrite:
-			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemWrite];
-			break;
-		case ZGProtectionExecute:
-			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
-			break;
-	}
 	
 	if (_documentData.qualifierTag == ZGSigned)
 	{
@@ -834,6 +837,20 @@
 	{
 		_showsFlags = needsFlags;
 		_scopeBar.accessoryView = _showsFlags ? _scopeBarFlagsView : nil;
+	}
+	
+	ZGProtectionMode protectionMode = (_documentData.searchType == ZGSearchTypeValue) ? _documentData.valueProtectionMode : _documentData.addressProtectionMode;
+	switch (protectionMode)
+	{
+		case ZGProtectionAll:
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemAll];
+			break;
+		case ZGProtectionWrite:
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemWrite];
+			break;
+		case ZGProtectionExecute:
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
+			break;
 	}
 }
 

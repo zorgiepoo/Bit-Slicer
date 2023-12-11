@@ -117,8 +117,12 @@
 	 forKey:ZGFunctionTypeTagKey];
 	
 	[keyedArchiver
-	 encodeInt32:(int32_t)_searchData.protectionMode
-	 forKey:ZGProtectionModeKey];
+	 encodeInt32:(int32_t)_data.valueProtectionMode
+	 forKey:ZGValueProtectionModeKey];
+	
+	[keyedArchiver
+	 encodeInt32:(int32_t)_data.addressProtectionMode
+	 forKey:ZGAddressProtectionModeKey];
 	
 	[keyedArchiver
 	 encodeInteger:_data.searchType
@@ -229,7 +233,8 @@
 	_data.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
 	_data.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
 	_data.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
-	_searchData.protectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGProtectionModeKey];
+	_data.valueProtectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGValueProtectionModeKey];
+	_data.addressProtectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGAddressProtectionModeKey];
 	_data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
 	_searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
 	_searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];

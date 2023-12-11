@@ -31,6 +31,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGSearchProtectionMode.h"
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
 #define ZGProcessInternalNameKey @"ZGProcessNameKey"
@@ -39,7 +40,8 @@
 #define ZGQualifierTagKey @"ZGQualifierKey"
 #define ZGByteOrderTagKey @"ZGByteOrderTagKey"
 #define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
-#define ZGProtectionModeKey @"ZGProtectionModeKey"
+#define ZGValueProtectionModeKey @"ZGProtectionModeKey"
+#define ZGAddressProtectionModeKey @"ZGAddressProtectionMode"
 #define ZGSearchTypeKey @"ZGSearchTypeKey"
 #define ZGSearchAddressMaxLevelsKey @"ZGSearchAddressMaxLevelsKey"
 #define ZGSearchAddressMaxOffsetKey @"ZGSearchAddressMaxOffset"
@@ -93,6 +95,8 @@ typedef NS_ENUM(NSInteger, ZGSearchAddressOffsetComparison)
 @property (copy, nonatomic) NSString *lastEpsilonValue;
 @property (copy, nonatomic, nullable) NSString *lastAboveRangeValue;
 @property (copy, nonatomic, nullable) NSString *lastBelowRangeValue;
+@property (nonatomic) ZGProtectionMode valueProtectionMode;
+@property (nonatomic) ZGProtectionMode addressProtectionMode;
 
 @end
 
