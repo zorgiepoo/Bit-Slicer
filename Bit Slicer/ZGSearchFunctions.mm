@@ -1511,8 +1511,6 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 			{
 				searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return ZGPointerEqualsWithSameOffset(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchValue), searchData, ZGInt64, ZGPointer, storeValueDifference, nil);
 			}
-			
-			searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
 		}
 		else
 		{
@@ -1524,8 +1522,6 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 			{
 				searchResults = ZGSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return ZGPointerEqualsWithSameOffset(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchValue), searchData, ZGInt32, ZGPointer, storeValueDifference, nil);
 			}
-			
-			searchValueAddress = *(static_cast<ZG32BitMemoryAddress *>(searchValue));
 		}
 		
 		currentBaseAddresses[levelIndex] = searchValueAddress;
@@ -1683,7 +1679,7 @@ static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap p
 	
 	if (outOffsets != nullptr)
 	{
-		memcpy(outOffsets, offsets, sizeof(*offsets) * numberOfLevels);
+		memcpy(outOffsets, offsets, sizeof(uint16_t) * numberOfLevels);
 	}
 	
 	bool validAddress = true;
