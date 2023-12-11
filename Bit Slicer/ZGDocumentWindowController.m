@@ -1541,7 +1541,13 @@
 - (IBAction)searchPointerToSelectedVariable:(id)__unused sender
 {
 	ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
-	//[_searchController searchVariablesWithString:variable.addressStringValue dataType:variable.type pointerAddressSearch:YES functionType:ZGEquals storeValuesAfterSearch:_storeValuesAfterSearch];
+	
+	[_searchTypeGroup setSelected:YES forItemWithIdentifier:ZGSearchTypeAddressIdentifier];
+	
+	_documentData.searchValue = [NSString stringWithFormat:@"0x%llX", variable.address];
+	_searchValueTextField.stringValue = _documentData.searchValue;
+	
+	[self.window makeFirstResponder:_searchValueTextField];
 }
 
 - (void)_storeAllValues
