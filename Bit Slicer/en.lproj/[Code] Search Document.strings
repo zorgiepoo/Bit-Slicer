@@ -1,3 +1,26 @@
+/* Value data types */
+"dataType_value_0" = "8-bit Integer";
+"dataType_value_1" = "16-bit Integer";
+"dataType_value_2" = "32-bit Integer";
+"dataType_value_3" = "64-bit Integer";
+"dataType_value_4" = "Float";
+"dataType_value_5" = "Double";
+"dataType_value_6" = "8-bit String";
+"dataType_value_7" = "16-bit String";
+"dataType_value_8" = "Pointer";
+"dataType_value_9" = "Byte Array";
+
+/* Address data types */
+"dataType_address_0" = "Address of 8-bit Integer";
+"dataType_address_1" = "Address of 16-bit Integer";
+"dataType_address_2" = "Address of 32-bit Integer";
+"dataType_address_3" = "Address of 64-bit Integer";
+"dataType_address_4" = "Address of Float";
+"dataType_address_5" = "Address of Double";
+"dataType_address_6" = "Address of 8-bit String";
+"dataType_address_7" = "Address of 16-bit String";
+"dataType_address_8" = "Address of Pointer";
+"dataType_address_9" = "Address of Byte Array";
 
 /* Scope Bar Protection Group */
 "scopeBarProtectionGroup" = "Protection:";

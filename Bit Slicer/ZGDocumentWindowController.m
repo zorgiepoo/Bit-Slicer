@@ -819,6 +819,16 @@
 		_documentData.functionTypeTag = _functionPopUpButton.selectedTag;
 	}
 	
+	NSString *dataTypeSearchType = (_documentData.searchType == ZGSearchTypeValue) ? @"value" : @"address";
+	for (NSMenuItem *dataTypeMenuItem in _dataTypesPopUpButton.itemArray)
+	{
+		ZGVariableType dataTypeForMenuItem = dataTypeMenuItem.tag;
+		NSString *localizedKey = [NSString stringWithFormat:@"dataType_%@_%ld", dataTypeSearchType, dataTypeForMenuItem];
+		NSString *localizedTitle = ZGLocalizableSearchDocumentString(localizedKey);
+		
+		dataTypeMenuItem.title = localizedTitle;
+	}
+	
 	BOOL needsEndianness = (_documentData.searchType == ZGSearchTypeValue && ZGSupportsEndianness(dataType));
 	
 	[self changeScopeBarGroup:_qualifierGroup shouldExist:needsQualifier];
