@@ -300,8 +300,6 @@
 	ZGMemorySize searchResultsCount = searchResults.count;
 	
 	[searchResults enumerateWithCount:numberOfVariables removeResults:YES usingBlock:^(const void *data, BOOL * __unused stop) {
-		BOOL enabled = (!finishingSearch || searchResultsCount > 1);
-		
 		switch (resultType)
 		{
 			case ZGSearchResultTypeDirect:
@@ -318,6 +316,8 @@
 					default:
 						abort();
 				}
+				
+				BOOL enabled = (!finishingSearch || searchResultsCount > 1);
 				
 				ZGVariable *newVariable =
 				[[ZGVariable alloc]
@@ -371,6 +371,10 @@
 						[NSString stringWithFormat:@"[%@] + 0x%X", addressFormula, offset] :
 						[NSString stringWithFormat:@"[%@]", addressFormula];
 				}
+				
+				// Even if only one variable comes back, we leave indirect results enabled
+				// because the user may still want to do another search that recurses with a deeper level
+				BOOL enabled = YES;
 				
 				ZGVariable *newVariable =
 				[[ZGVariable alloc]
