@@ -72,6 +72,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)updateStoreValuesButtonImageWithStoringValuesAfterSearches:(BOOL)storingValuesAfterSearches;
 
+- (NSUInteger)currentSearchAddressNumberOfIndirectLevelsWithDataType:(ZGVariableType)dataType;
+
 - (void)cleanUp;
 
 @end

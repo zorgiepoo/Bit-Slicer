@@ -119,6 +119,8 @@
 	IBOutlet NSStepper *_searchAddressMaxLevelsStepper;
 	IBOutlet NSTextField *_searchAddressOffsetTextField;
 	IBOutlet NSStepper *_searchAddressOffsetStepper;
+	IBOutlet NSTextField *_searchAddressOffsetLabel;
+	IBOutlet NSBox *_searchAddressVerticalDivider;
 	IBOutlet NSPopUpButton *_searchAddressOffsetComparisonPopUpButton;
 	IBOutlet AGScopeBar *_scopeBar;
 	IBOutlet NSView *_scopeBarFlagsView;
@@ -822,6 +824,11 @@
 	NSString *dataTypeSearchType = (_documentData.searchType == ZGSearchTypeValue) ? @"value" : @"address";
 	for (NSMenuItem *dataTypeMenuItem in _dataTypesPopUpButton.itemArray)
 	{
+		if (dataTypeMenuItem.separatorItem)
+		{
+			continue;
+		}
+		
 		ZGVariableType dataTypeForMenuItem = dataTypeMenuItem.tag;
 		NSString *localizedKey = [NSString stringWithFormat:@"dataType_%@_%ld", dataTypeSearchType, dataTypeForMenuItem];
 		NSString *localizedTitle = ZGLocalizableSearchDocumentString(localizedKey);
@@ -862,6 +869,67 @@
 			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
 			break;
 	}
+	
+	[self updateSearchAddressOptions];
+}
+
+- (void)updateSearchAddressOptions
+{
+	if (_documentData.searchType == ZGSearchTypeValue)
+	{
+		return;
+	}
+	
+	NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:_documentData.selectedDatatypeTag];
+	
+	NSUInteger nextNumberOfIndirectLevels = (NSUInteger)_documentData.searchAddressMaxLevels;
+	if (nextNumberOfIndirectLevels == currentNumberOfIndirectLevelsInTable + 1)
+	{
+		BOOL searchAddressOffsetComparisonWasHidden = _searchAddressOffsetComparisonPopUpButton.hidden;
+		
+		_searchAddressOffsetTextField.hidden = NO;
+		_searchAddressOffsetStepper.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.enabled = YES;
+		
+		// If the search offset comparison was previously same and was not usable, we should
+		// update the default offset comparison to max
+		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame && searchAddressOffsetComparisonWasHidden)
+		{
+			_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+			[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:ZGSearchAddressOffsetComparisonMax];
+			
+			[self _updateSearchAddressOffsetTextField];
+			
+			[self markDocumentChange];
+		}
+	}
+	else if (nextNumberOfIndirectLevels <= currentNumberOfIndirectLevelsInTable)
+	{
+		_searchAddressOffsetTextField.hidden = YES;
+		_searchAddressOffsetStepper.hidden = YES;
+		_searchAddressOffsetComparisonPopUpButton.hidden = YES;
+	}
+	else /* if (nextNumberOfIndirectLevels > currentNumberOfIndirectLevelsInTable + 1) */
+	{
+		_searchAddressOffsetTextField.hidden = NO;
+		_searchAddressOffsetStepper.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.enabled = NO;
+		
+		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)
+		{
+			_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+			[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:ZGSearchAddressOffsetComparisonMax];
+			
+			[self _updateSearchAddressOffsetTextField];
+			
+			[self markDocumentChange];
+		}
+	}
+	
+	_searchAddressOffsetLabel.hidden = _searchAddressOffsetTextField.hidden;
+	_searchAddressVerticalDivider.hidden = _searchAddressOffsetTextField.hidden;
 }
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
@@ -975,6 +1043,7 @@
 		_searchAddressMaxLevelsTextField.integerValue = _documentData.searchAddressMaxLevels;
 	}
 	
+	[self updateSearchAddressOptions];
 	[self markDocumentChange];
 }
 
@@ -1053,6 +1122,7 @@
 	[_variablesTableView reloadData];
 	
 	[self updateNumberOfValuesDisplayedStatus];
+	[self updateSearchAddressOptions];
 }
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier

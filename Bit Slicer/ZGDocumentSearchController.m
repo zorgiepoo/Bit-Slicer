@@ -440,6 +440,8 @@
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables
 {
 	[self fetchNumberOfVariables:numberOfVariables finishingSearch:NO fromResults:_searchResults];
+	
+	[_windowController updateSearchAddressOptions];
 }
 
 - (void)_fetchVariablesFromResultsAndFinishedSearch:(BOOL)finishedSearch
@@ -468,7 +470,8 @@
 	{
 		ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:_searchProgress], nil);
 		
-		if (notSearchedVariables.count + _temporarySearchResults.count != oldVariables.count + _searchResults.count)
+		// Update the search results and variables only if they have changed in any way
+		if ((notSearchedVariables.count + _temporarySearchResults.count != oldVariables.count + _searchResults.count) || (_temporarySearchResults.indirectMaxLevels != _searchResults.indirectMaxLevels))
 		{
 			windowController.undoManager.actionName = ZGLocalizableSearchDocumentString(@"undoSearchAction");
 			[(ZGDocumentWindowController *)[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:_searchResults];
@@ -477,6 +480,9 @@
 			_documentData.variables = notSearchedVariables;
 			[self fetchVariablesFromResultsAndFinishedSearch];
 			[windowController.variablesTableView reloadData];
+			
+			[windowController updateSearchAddressOptions];
+			
 			[windowController markDocumentChange];
 		}
 		else
@@ -505,8 +511,9 @@
 	
 	BOOL shouldMakeSearchFieldFirstResponder = YES;
 	
-	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
-	if (!_searchProgress.shouldCancelSearch && _documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what they were looking for.
+	// But don't do this if the user is searching for addresses
+	if (!_searchProgress.shouldCancelSearch && _documentData.searchType == ZGSearchTypeValue && _documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
 	{
 		NSArray<ZGVariable *> *filteredVariables = [_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
 			return variable.enabled;
@@ -848,6 +855,51 @@
 	return YES;
 }
 
+- (BOOL)isNarrowingSearchWithDataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch
+{
+	return [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
+		return [self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch];
+	}];
+}
+
+- (NSUInteger)currentSearchAddressNumberOfIndirectLevelsWithDataType:(ZGVariableType)dataType
+{
+	BOOL isNarrowingSearch = [self isNarrowingSearchWithDataType:dataType pointerAddressSearch:YES];
+	if (!isNarrowingSearch)
+	{
+		return 0;
+	}
+	
+	uint16_t computedIndirectMaxLevelsFromTable = 0;
+	for (ZGVariable *variable in _documentData.variables)
+	{
+		if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:YES])
+		{
+			uint16_t numberOfDynamicPointersInAddress = (uint16_t)(variable.numberOfDynamicPointersInAddress);
+			if (numberOfDynamicPointersInAddress > computedIndirectMaxLevelsFromTable)
+			{
+				computedIndirectMaxLevelsFromTable = numberOfDynamicPointersInAddress;
+			}
+		}
+	}
+	
+	uint16_t currentIndirectMaxLevels;
+	if (_searchResults.count == 0)
+	{
+		currentIndirectMaxLevels = computedIndirectMaxLevelsFromTable;
+	}
+	else if (_searchResults.indirectMaxLevels > computedIndirectMaxLevelsFromTable)
+	{
+		currentIndirectMaxLevels = _searchResults.indirectMaxLevels;
+	}
+	else
+	{
+		currentIndirectMaxLevels = computedIndirectMaxLevelsFromTable;
+	}
+	
+	return currentIndirectMaxLevels;
+}
+
 - (void)searchVariablesWithString:(NSString *)searchStringValue dataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch functionType:(ZGFunctionType)functionType storeValuesAfterSearch:(BOOL)storeValuesAfterSearch
 {
 	_dataType = dataType;
@@ -864,9 +916,7 @@
 	NSMutableArray<ZGVariable *> *notSearchedVariables = [[NSMutableArray alloc] init];
 	NSMutableArray<ZGVariable *> *searchedVariables = [[NSMutableArray alloc] init];
 	
-	BOOL isNarrowingSearch = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
-		return [self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch];
-	}];
+	BOOL isNarrowingSearch = [self isNarrowingSearchWithDataType:dataType pointerAddressSearch:pointerAddressSearch];
 	
 	ZGDocumentWindowController *windowController = _windowController;
 	

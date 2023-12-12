@@ -53,8 +53,8 @@
 		_byteOrderTag = CFByteOrderGetCurrent();
 		_searchType = ZGSearchTypeValue;
 		_searchAddressMaxLevels = 1;
-		_searchAddressMaxOffset = 2048;
-		_searchAddressSameOffset = 2048;
+		_searchAddressMaxOffset = 1024;
+		_searchAddressSameOffset = 1024;
 		_searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
 		_valueProtectionMode = ZGProtectionAll;
 		_addressProtectionMode = ZGProtectionWrite;

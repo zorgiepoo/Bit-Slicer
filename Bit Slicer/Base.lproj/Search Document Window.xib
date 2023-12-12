@@ -18,8 +18,10 @@
                 <outlet property="_searchAddressMaxLevelsStepper" destination="QsO-dZ-JLm" id="n7V-al-Wdf"/>
                 <outlet property="_searchAddressMaxLevelsTextField" destination="krU-4S-mNx" id="bJz-Ed-Kib"/>
                 <outlet property="_searchAddressOffsetComparisonPopUpButton" destination="igZ-EE-KLe" id="gpH-91-lOU"/>
+                <outlet property="_searchAddressOffsetLabel" destination="Fax-W0-upK" id="ZKz-FH-6MZ"/>
                 <outlet property="_searchAddressOffsetStepper" destination="Tl4-KO-zSW" id="3Iv-sm-RhT"/>
                 <outlet property="_searchAddressOffsetTextField" destination="6Ui-5n-d5k" id="2fb-hj-q3c"/>
+                <outlet property="_searchAddressVerticalDivider" destination="hE3-Lr-YU6" id="qv5-Fp-AmF"/>
                 <outlet property="_toolbar" destination="UZg-mb-r8g" id="9bW-ar-bQK"/>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
                 <outlet property="functionPopUpButton" destination="Icp-Tb-DVJ" id="Bbf-kY-5xD"/>

@@ -348,6 +348,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self updateFrozenActivity];
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
+	
+	[windowController updateSearchAddressOptions];
 }
 
 - (void)disableHarmfulVariables:(NSArray<ZGVariable *> *)variables
@@ -392,6 +394,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
 	
 	[windowController updateNumberOfValuesDisplayedStatus];
+	[windowController updateSearchAddressOptions];
 }
 
 - (void)removeSelectedSearchValues
@@ -560,6 +563,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
+	
+	[windowController updateSearchAddressOptions];
 }
 
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
@@ -901,6 +906,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	// the table view always needs to be reloaded because of being able to select multiple indexes
 	[windowController.variablesTableView reloadData];
 	
+	[windowController updateSearchAddressOptions];
+	
 	if (undoableRowIndexes.count > 0)
 	{
 		NSString *activeChangeAction = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoMultipleActiveChange") : ZGLocalizedStringFromVariableActionsTable(@"undoSingleActiveChange");
@@ -964,6 +971,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	variable.finishedEvaluatingDynamicAddress = NO;
 	
 	[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+	
+	[windowController updateSearchAddressOptions];
 }
 
 #pragma mark Relativizing Variable Addresses
