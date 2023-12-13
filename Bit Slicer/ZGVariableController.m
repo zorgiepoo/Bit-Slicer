@@ -1021,7 +1021,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			BOOL isIndirectVariable = NO;
 			NSString *partialPath = [machFilePath lastPathComponent];
-			if (machBinaryInfo.slide > 0 && !variable.usesDynamicAddress)
+			if (!variable.usesDynamicAddress)
 			{
 				NSString *pathToUse = nil;
 				NSString *baseArgument = @"";
