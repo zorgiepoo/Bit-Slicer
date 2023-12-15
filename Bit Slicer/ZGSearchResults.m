@@ -50,10 +50,11 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	//		uintptr_t baseAddress;
 	//		uint16_t numLevels;
 	//		uint16_t offsets[MAX_NUM_LEVELS];
+	//		uint8_t sortRank;
 	//		uint8_t padding[N];
 	//	}
 	
-	ZGMemorySize minimumSize = pointerSize + sizeof(uint16_t) + numberOfLevels * sizeof(uint16_t);
+	ZGMemorySize minimumSize = pointerSize + sizeof(uint16_t) + numberOfLevels * sizeof(uint16_t) + sizeof(uint8_t);
 	ZGMemorySize remainder = minimumSize % pointerSize;
 	ZGMemorySize padding = (remainder == 0) ? 0 : (pointerSize - remainder);
 	return minimumSize + padding;
