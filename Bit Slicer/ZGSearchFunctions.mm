@@ -1732,7 +1732,7 @@ static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap p
 	return validAddress;
 }
 
-ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, ZGSearchResults * _Nullable previousSearchResults)
+ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, ZGSearchResults * _Nullable previousSearchResults, ZGMemorySize * _Nullable numberOfStaticResults)
 {
 	const uint16_t previousIndirectMaxLevels = previousSearchResults.indirectMaxLevels;
 	const uint16_t maxLevels = (indirectMaxLevels >= previousIndirectMaxLevels) ? indirectMaxLevels : previousIndirectMaxLevels;
@@ -1917,6 +1917,11 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	// Assume unaligned access for now(?)
 	BOOL unalignedAccess = NO;
 	ZGSearchResults *indirectSearchResults = [[ZGSearchResults alloc] initWithResultSets:[resultSets copy] resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride unalignedAccess:unalignedAccess];
+	
+	if (numberOfStaticResults != nullptr)
+	{
+		*numberOfStaticResults = (staticMainExecutableResultSet.length + staticOtherLibrariesResultSet.length) / stride;
+	}
 	
 	indirectSearchResults.indirectMaxLevels = maxLevels;
 	

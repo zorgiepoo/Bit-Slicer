@@ -444,89 +444,33 @@
 	[_windowController updateSearchAddressOptions];
 }
 
-- (void)_fetchVariablesFromResultsAndFinishedSearch:(BOOL)finishedSearch
+- (void)fetchVariablesFromResultsAndFinishedSearch:(BOOL)finishedSearch minimumNumberOfResults:(NSUInteger)minimumNumberOfResults
 {
-	if (_documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+	NSUInteger numberOfVariables;
+	if (minimumNumberOfResults < MAX_NUMBER_OF_VARIABLES_TO_FETCH)
 	{
-		[self fetchNumberOfVariables:(MAX_NUMBER_OF_VARIABLES_TO_FETCH - _documentData.variables.count) finishingSearch:finishedSearch fromResults:_searchResults];
-	}
-}
-
-- (void)fetchVariablesFromResults
-{
-	[self _fetchVariablesFromResultsAndFinishedSearch:NO];
-}
-
-- (void)fetchVariablesFromResultsAndFinishedSearch
-{
-	[self _fetchVariablesFromResultsAndFinishedSearch:YES];
-}
-
-- (void)finalizeSearchWithOldVariables:(NSArray<ZGVariable *> *)oldVariables andNotSearchedVariables:(NSArray<ZGVariable *> *)notSearchedVariables
-{
-	ZGDocumentWindowController *windowController = _windowController;
-	
-	if (!_searchProgress.shouldCancelSearch)
-	{
-		ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:_searchProgress], nil);
-		
-		// Update the search results and variables only if they have changed in any way
-		if ((notSearchedVariables.count + _temporarySearchResults.count != oldVariables.count + _searchResults.count) || (_temporarySearchResults.indirectMaxLevels != _searchResults.indirectMaxLevels))
+		NSUInteger maxNumberOfResultsLeft = (MAX_NUMBER_OF_VARIABLES_TO_FETCH - minimumNumberOfResults);
+		NSUInteger variableTableCount = _documentData.variables.count;
+		if (variableTableCount < maxNumberOfResultsLeft)
 		{
-			windowController.undoManager.actionName = ZGLocalizableSearchDocumentString(@"undoSearchAction");
-			[(ZGDocumentWindowController *)[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:_searchResults];
-			
-			_searchResults = _temporarySearchResults;
-			_documentData.variables = notSearchedVariables;
-			[self fetchVariablesFromResultsAndFinishedSearch];
-			[windowController.variablesTableView reloadData];
-			
-			[windowController updateSearchAddressOptions];
-			
-			[windowController markDocumentChange];
+			numberOfVariables = (maxNumberOfResultsLeft - variableTableCount);
 		}
 		else
 		{
-			// New search didn't return any new results, so let's show old variables again
-			_documentData.variables = oldVariables;
-			[windowController.variablesTableView reloadData];
+			numberOfVariables = minimumNumberOfResults;
 		}
 	}
 	else
 	{
-		_documentData.variables = oldVariables;
-		[windowController.variablesTableView reloadData];
+		numberOfVariables = minimumNumberOfResults;
 	}
 	
-	dispatch_async(_machBinaryAnnotationInfoQueue, ^{
-		self->_machBinaryAnnotationInfo.machBinaries = nil;
-		self->_machBinaryAnnotationInfo.machFilePathDictionary = nil;
-	});
-	
-	[windowController updateOcclusionActivity];
-	
-	_temporarySearchResults = nil;
-	
-	[windowController updateNumberOfValuesDisplayedStatus];
-	
-	BOOL shouldMakeSearchFieldFirstResponder = YES;
-	
-	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what they were looking for.
-	// But don't do this if the user is searching for addresses
-	if (!_searchProgress.shouldCancelSearch && _documentData.searchType == ZGSearchTypeValue && _documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
-	{
-		NSArray<ZGVariable *> *filteredVariables = [_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
-			return variable.enabled;
-		}];
-		
-		if (filteredVariables.count == 1)
-		{
-			[windowController.window makeFirstResponder:windowController.variablesTableView];
-			shouldMakeSearchFieldFirstResponder = NO;
-		}
-	}
-	
-	[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
+	[self fetchNumberOfVariables:numberOfVariables finishingSearch:finishedSearch fromResults:_searchResults];
+}
+
+- (void)fetchVariablesFromResults
+{
+	[self fetchVariablesFromResultsAndFinishedSearch:NO minimumNumberOfResults:0];
 }
 
 #define ZGRetrieveFlagsErrorDomain @"ZGRetrieveFlagsErrorDomain"
@@ -1052,6 +996,7 @@
 	// Build first search results for narrow search
 	ZGProcess *currentProcess = windowController.currentProcess;
 	ZGSearchResults *firstSearchResults = nil;
+	NSUInteger numberOfIndirectBaseAddressesFromCurrentNarrowSearchResults = 0;
 	if (isNarrowingSearch)
 	{
 		ZGMemorySize hostAlignment = ZGDataAlignment(ZG_PROCESS_TYPE_HOST, dataType, _searchData.dataSize);
@@ -1076,6 +1021,7 @@
 		ZGMemorySize pointerSize = _searchData.pointerSize;
 		
 		NSMutableData *firstResultSets = [NSMutableData data];
+		NSUInteger varibleIndex = 0;
 		for (ZGVariable *variable in searchedVariables)
 		{
 			ZGMemoryAddress variableAddress = variable.address;
@@ -1097,6 +1043,11 @@
 				if ([ZGCalculator extractIndirectAddressesAndOffsetsFromIntoBuffer:indirectBuffer expression:variable.addressFormula process:currentProcess failedImages:indirectFailedImages maxLevels:indirectMaxLevelsForCurrentSearchResults stride:currentIndirectStride])
 				{
 					[firstResultSets appendBytes:indirectBuffer length:currentIndirectStride];
+					
+					if (variable.usesDynamicBaseAddress)
+					{
+						numberOfIndirectBaseAddressesFromCurrentNarrowSearchResults = (varibleIndex + 1);
+					}
 				}
 				else
 				{
@@ -1108,6 +1059,8 @@
 			{
 				unalignedAddressAccess = YES;
 			}
+			
+			varibleIndex++;
 		}
 		
 		if (indirectMaxLevelsForCurrentSearchResults == 0)
@@ -1138,6 +1091,7 @@
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		NSUInteger numberOfImportantResults;
 		if (pointerAddressSearch)
 		{
 			// Pointer address searches for initial and narrow searches
@@ -1152,22 +1106,31 @@
 			
 			self->_searchData.totalStaticSegmentRanges = totalStaticSegmentRanges;
 			
-			self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevelsForNextSearchResults, self->_dataType, firstSearchResults);
+			ZGMemorySize numberOfStaticResults = 0;
+			self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevelsForNextSearchResults, self->_dataType, firstSearchResults, &numberOfStaticResults);
+			
+			numberOfImportantResults = (NSUInteger)numberOfStaticResults;
 		}
 		else if (!isNarrowingSearch)
 		{
 			// Regular initial value search
 			self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
+			
+			numberOfImportantResults = 0;
 		}
 		else if (indirectMaxLevelsForCurrentSearchResults > 0)
 		{
 			// Narrow value search involving indirect variables
 			self->_temporarySearchResults = ZGNarrowIndirectSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults);
+			
+			numberOfImportantResults = numberOfIndirectBaseAddressesFromCurrentNarrowSearchResults;
 		}
 		else
 		{
 			// Regular Narrow value search
 			self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.stride) ? self->_searchResults : nil);
+			
+			numberOfImportantResults = 0;
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
@@ -1181,9 +1144,70 @@
 					[[NSProcessInfo processInfo] endActivity:searchDataActivity];
 				}
 				
-				[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
+				if (!self->_searchProgress.shouldCancelSearch)
+				{
+					ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self->_searchProgress], nil);
+					
+					// Update the search results and variables only if they have changed in any way
+					if ((notSearchedVariables.count + self->_temporarySearchResults.count != oldVariables.count + self->_searchResults.count) || (self->_temporarySearchResults.indirectMaxLevels != self->_searchResults.indirectMaxLevels))
+					{
+						windowController.undoManager.actionName = ZGLocalizableSearchDocumentString(@"undoSearchAction");
+						[(ZGDocumentWindowController *)[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:self->_searchResults];
+						
+						self->_searchResults = self->_temporarySearchResults;
+						self->_documentData.variables = notSearchedVariables;
+						[self fetchVariablesFromResultsAndFinishedSearch:YES minimumNumberOfResults:numberOfImportantResults];
+						[windowController.variablesTableView reloadData];
+						
+						[windowController updateSearchAddressOptions];
+						
+						[windowController markDocumentChange];
+					}
+					else
+					{
+						// New search didn't return any new results, so let's show old variables again
+						self->_documentData.variables = oldVariables;
+						[windowController.variablesTableView reloadData];
+					}
+				}
+				else
+				{
+					self->_documentData.variables = oldVariables;
+					[windowController.variablesTableView reloadData];
+				}
 				
-				if (storeValuesAfterSearch && self->_searchData.savedData != nil)
+				dispatch_async(self->_machBinaryAnnotationInfoQueue, ^{
+					self->_machBinaryAnnotationInfo.machBinaries = nil;
+					self->_machBinaryAnnotationInfo.machFilePathDictionary = nil;
+				});
+				
+				[windowController updateOcclusionActivity];
+				
+				self->_temporarySearchResults = nil;
+				
+				[windowController updateNumberOfValuesDisplayedStatus];
+				
+				BOOL shouldMakeSearchFieldFirstResponder = YES;
+				
+				// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what they were looking for.
+				// But don't do this if the user is searching for indirect variables
+				if (!pointerAddressSearch && !self->_searchProgress.shouldCancelSearch && self->_documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+				{
+					NSArray<ZGVariable *> *filteredVariables = [self->_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
+						return variable.enabled;
+					}];
+					
+					// Make sure single variable is not indirect variable from a value search
+					if (filteredVariables.count == 1 && !filteredVariables[0].usesDynamicPointerAddress)
+					{
+						[windowController.window makeFirstResponder:windowController.variablesTableView];
+						shouldMakeSearchFieldFirstResponder = NO;
+					}
+				}
+				
+				[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
+				
+				if (!pointerAddressSearch && storeValuesAfterSearch && self->_searchData.savedData != nil)
 				{
 					[self storeAllValuesAndAfterSearches:YES];
 				}
