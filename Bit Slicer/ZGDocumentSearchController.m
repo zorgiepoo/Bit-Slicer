@@ -341,7 +341,6 @@
 				//		uintptr_t baseAddress;
 				//		uint16_t numLevels;
 				//		uint16_t offsets[MAX_NUM_LEVELS];
-				//		uint8_t sortRank;
 				//		uint8_t padding[N];
 				//	}
 				
