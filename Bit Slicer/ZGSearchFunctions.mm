@@ -1774,13 +1774,13 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 				[staticResultSet appendData:tempData];
 				
 				// Static variables should be shown to the user with more immediately
-				if (delegate != nil)
-				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						searchProgress.numberOfVariablesFound++;
-						[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
-					});
-				}
+//				if (delegate != nil)
+//				{
+//					dispatch_async(dispatch_get_main_queue(), ^{
+//						searchProgress.numberOfVariablesFound++;
+//						[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
+//					});
+//				}
 			}
 			memset(static_cast<uint8_t *>(tempBuffer), 0, stride);
 			
@@ -1908,7 +1908,7 @@ static int _sortPointerMapTable(const void *entry1, const void *entry2)
 	}
 }
 
-ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, ZGSearchResults * _Nullable previousSearchResults, ZGMemorySize * _Nullable numberOfStaticResults)
+ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, ZGSearchResults * _Nullable previousSearchResults)
 {
 	const uint16_t previousIndirectMaxLevels = previousSearchResults.indirectMaxLevels;
 	const uint16_t maxLevels = (indirectMaxLevels >= previousIndirectMaxLevels) ? indirectMaxLevels : previousIndirectMaxLevels;
@@ -2088,13 +2088,13 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 						[staticResultSet appendData:tempData];
 						
 						// Static variables should be shown to the user with more immediately
-						if (delegate != nil)
-						{
-							dispatch_async(dispatch_get_main_queue(), ^{
-								searchProgress.numberOfVariablesFound++;
-								[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
-							});
-						}
+//						if (delegate != nil)
+//						{
+//							dispatch_async(dispatch_get_main_queue(), ^{
+//								searchProgress.numberOfVariablesFound++;
+//								[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
+//							});
+//						}
 					}
 					
 					if (!isStatic || !indirectStopAtStaticAddresses)
@@ -2160,11 +2160,6 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	// Assume unaligned access for now(?)
 	BOOL unalignedAccess = NO;
 	ZGSearchResults *indirectSearchResults = [[ZGSearchResults alloc] initWithResultSets:[resultSets copy] resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride unalignedAccess:unalignedAccess];
-	
-	if (numberOfStaticResults != nullptr)
-	{
-		*numberOfStaticResults = (staticMainExecutableResultSet.length + staticOtherLibrariesResultSet.length) / stride;
-	}
 	
 	indirectSearchResults.indirectMaxLevels = maxLevels;
 	

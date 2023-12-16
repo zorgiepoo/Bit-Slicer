@@ -73,6 +73,7 @@
 	ZGMachBinaryAnnotationInfo _machBinaryAnnotationInfo;
 	dispatch_queue_t _machBinaryAnnotationInfoQueue;
 	
+	NSUInteger _searchResultStaticBinaryInitialInsertionIndex;
 	NSUInteger _searchResultStaticMainExecutableInsertionIndex;
 	NSUInteger _searchResultStaticOtherLibraryInsertionIndex;
 }
@@ -249,16 +250,16 @@
 		
 		NSTableView *variablesTableView = windowController.variablesTableView;
 		
+		// Limit the number of intermediate search results to show to be relatively small, per addressType
+		// (a little bit larger than what can be displayed on screen without scrolling)
+		// This is so we don't spend to much time annotating/relativizing variables before the search is finished
+		NSUInteger maxNumberOfVariablesToFetchScreenLimit = MIN((NSUInteger)(variablesTableView.visibleRect.size.height / variablesTableView.rowHeight * 1.5), MAX_NUMBER_OF_VARIABLES_TO_FETCH);
+		
 		NSUInteger maxNumberOfVariablesToFetch;
 		NSUInteger insertionIndex;
 		if (addressType == ZGSearchResultAddressTypeRegular)
 		{
-			// Limit the number of intermediate search results to show to be relatively small
-			// (a little bit larger than what can be displayed on screen without scrolling)
-			// This is so we don't spend to much time annotating/relativizing variables before the search is finished
-			
-			NSUInteger maxNumberOfVariablesToFetchLimit = MIN((NSUInteger)(variablesTableView.visibleRect.size.height / variablesTableView.rowHeight * 1.5), MAX_NUMBER_OF_VARIABLES_TO_FETCH);
-			maxNumberOfVariablesToFetch = (currentVariableCount < maxNumberOfVariablesToFetchLimit && resultSet.length > 0) ? (maxNumberOfVariablesToFetchLimit - currentVariableCount) : 0;
+			maxNumberOfVariablesToFetch = (currentVariableCount < maxNumberOfVariablesToFetchScreenLimit && resultSet.length > 0) ? (maxNumberOfVariablesToFetchScreenLimit - currentVariableCount) : 0;
 			insertionIndex = NSUIntegerMax;
 		}
 		else
@@ -266,18 +267,44 @@
 			NSUInteger newResultSetCount = resultSet.length / stride;
 			if (newResultSetCount > 0)
 			{
-				maxNumberOfVariablesToFetch = newResultSetCount;
-				
 				if (addressType == ZGSearchResultAddressTypeStaticMainExecutable)
 				{
-					insertionIndex = _searchResultStaticMainExecutableInsertionIndex;
-					_searchResultStaticMainExecutableInsertionIndex += newResultSetCount;
-					_searchResultStaticOtherLibraryInsertionIndex += newResultSetCount;
+					NSUInteger numberOfStaticMainExecutableAddressesInserted = (_searchResultStaticMainExecutableInsertionIndex - _searchResultStaticBinaryInitialInsertionIndex);
+					
+					if (numberOfStaticMainExecutableAddressesInserted < maxNumberOfVariablesToFetchScreenLimit)
+					{
+						NSUInteger numberOfVariablesToFetch = MIN((maxNumberOfVariablesToFetchScreenLimit - numberOfStaticMainExecutableAddressesInserted), newResultSetCount);
+						
+						insertionIndex = _searchResultStaticMainExecutableInsertionIndex;
+						_searchResultStaticMainExecutableInsertionIndex += numberOfVariablesToFetch;
+						_searchResultStaticOtherLibraryInsertionIndex += numberOfVariablesToFetch;
+						
+						maxNumberOfVariablesToFetch = numberOfVariablesToFetch;
+					}
+					else
+					{
+						maxNumberOfVariablesToFetch = 0;
+						insertionIndex = NSUIntegerMax;
+					}
 				}
 				else
 				{
-					insertionIndex = _searchResultStaticOtherLibraryInsertionIndex;
-					_searchResultStaticOtherLibraryInsertionIndex += newResultSetCount;
+					NSUInteger numberOfStaticOtherLibraryAddressesInserted = (_searchResultStaticOtherLibraryInsertionIndex - _searchResultStaticBinaryInitialInsertionIndex);
+					
+					if (numberOfStaticOtherLibraryAddressesInserted < maxNumberOfVariablesToFetchScreenLimit)
+					{
+						NSUInteger numberOfVariablesToFetch = MIN((maxNumberOfVariablesToFetchScreenLimit - numberOfStaticOtherLibraryAddressesInserted), newResultSetCount);
+						
+						insertionIndex = _searchResultStaticOtherLibraryInsertionIndex;
+						_searchResultStaticOtherLibraryInsertionIndex += numberOfVariablesToFetch;
+						
+						maxNumberOfVariablesToFetch = numberOfVariablesToFetch;
+					}
+					else
+					{
+						maxNumberOfVariablesToFetch = 0;
+						insertionIndex = NSUIntegerMax;
+					}
 				}
 			}
 			else
@@ -492,25 +519,17 @@
 	[_windowController updateSearchAddressOptions];
 }
 
-- (void)fetchVariablesFromResultsAndFinishedSearch:(BOOL)finishedSearch minimumNumberOfResults:(NSUInteger)minimumNumberOfResults
+- (void)fetchVariablesFromResultsAndFinishedSearch:(BOOL)finishedSearch
 {
 	NSUInteger numberOfVariables;
-	if (minimumNumberOfResults < MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+	NSUInteger variableTableCount = _documentData.variables.count;
+	if (variableTableCount < MAX_NUMBER_OF_VARIABLES_TO_FETCH)
 	{
-		NSUInteger maxNumberOfResultsLeft = (MAX_NUMBER_OF_VARIABLES_TO_FETCH - minimumNumberOfResults);
-		NSUInteger variableTableCount = _documentData.variables.count;
-		if (variableTableCount < maxNumberOfResultsLeft)
-		{
-			numberOfVariables = (maxNumberOfResultsLeft - variableTableCount);
-		}
-		else
-		{
-			numberOfVariables = minimumNumberOfResults;
-		}
+		numberOfVariables = (MAX_NUMBER_OF_VARIABLES_TO_FETCH - variableTableCount);
 	}
 	else
 	{
-		numberOfVariables = minimumNumberOfResults;
+		numberOfVariables = 0;
 	}
 	
 	[self fetchNumberOfVariables:numberOfVariables insertionIndex:NSUIntegerMax finishingSearch:finishedSearch fromResults:_searchResults];
@@ -518,7 +537,7 @@
 
 - (void)fetchVariablesFromResults
 {
-	[self fetchVariablesFromResultsAndFinishedSearch:NO minimumNumberOfResults:0];
+	[self fetchVariablesFromResultsAndFinishedSearch:NO];
 }
 
 #define ZGRetrieveFlagsErrorDomain @"ZGRetrieveFlagsErrorDomain"
@@ -1044,7 +1063,6 @@
 	// Build first search results for narrow search
 	ZGProcess *currentProcess = windowController.currentProcess;
 	ZGSearchResults *firstSearchResults = nil;
-	NSUInteger numberOfIndirectBaseAddressesFromCurrentNarrowSearchResults = 0;
 	if (isNarrowingSearch)
 	{
 		ZGMemorySize hostAlignment = ZGDataAlignment(ZG_PROCESS_TYPE_HOST, dataType, _searchData.dataSize);
@@ -1091,11 +1109,6 @@
 				if ([ZGCalculator extractIndirectAddressesAndOffsetsFromIntoBuffer:indirectBuffer expression:variable.addressFormula process:currentProcess failedImages:indirectFailedImages maxLevels:indirectMaxLevelsForCurrentSearchResults stride:currentIndirectStride])
 				{
 					[firstResultSets appendBytes:indirectBuffer length:currentIndirectStride];
-					
-					if (variable.usesDynamicBaseAddress)
-					{
-						numberOfIndirectBaseAddressesFromCurrentNarrowSearchResults = (varibleIndex + 1);
-					}
 				}
 				else
 				{
@@ -1138,11 +1151,11 @@
 		}
 	}
 	
-	_searchResultStaticMainExecutableInsertionIndex = notSearchedVariables.count;
-	_searchResultStaticOtherLibraryInsertionIndex = notSearchedVariables.count;
+	_searchResultStaticBinaryInitialInsertionIndex = notSearchedVariables.count;
+	_searchResultStaticMainExecutableInsertionIndex = _searchResultStaticBinaryInitialInsertionIndex;
+	_searchResultStaticOtherLibraryInsertionIndex = _searchResultStaticBinaryInitialInsertionIndex;
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		NSUInteger numberOfImportantResults;
 		if (pointerAddressSearch)
 		{
 			// Pointer address searches for initial and narrow searches
@@ -1157,31 +1170,22 @@
 			
 			self->_searchData.totalStaticSegmentRanges = totalStaticSegmentRanges;
 			
-			ZGMemorySize numberOfStaticResults = 0;
-			self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevelsForNextSearchResults, self->_dataType, firstSearchResults, &numberOfStaticResults);
-			
-			numberOfImportantResults = (NSUInteger)numberOfStaticResults;
+			self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevelsForNextSearchResults, self->_dataType, firstSearchResults);
 		}
 		else if (!isNarrowingSearch)
 		{
 			// Regular initial value search
 			self->_temporarySearchResults = ZGSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType);
-			
-			numberOfImportantResults = 0;
 		}
 		else if (indirectMaxLevelsForCurrentSearchResults > 0)
 		{
 			// Narrow value search involving indirect variables
 			self->_temporarySearchResults = ZGNarrowIndirectSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults);
-			
-			numberOfImportantResults = numberOfIndirectBaseAddressesFromCurrentNarrowSearchResults;
 		}
 		else
 		{
 			// Regular Narrow value search
 			self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.stride) ? self->_searchResults : nil);
-			
-			numberOfImportantResults = 0;
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
@@ -1207,7 +1211,7 @@
 						
 						self->_searchResults = self->_temporarySearchResults;
 						self->_documentData.variables = notSearchedVariables;
-						[self fetchVariablesFromResultsAndFinishedSearch:YES minimumNumberOfResults:numberOfImportantResults];
+						[self fetchVariablesFromResultsAndFinishedSearch:YES];
 						[windowController.variablesTableView reloadData];
 						
 						[windowController updateSearchAddressOptions];
