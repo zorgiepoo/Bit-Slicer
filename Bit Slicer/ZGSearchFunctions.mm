@@ -54,6 +54,7 @@
 	ZGSearchProgress *_searchProgress;
 	ZGVariableType _dataType;
 	ZGMemorySize _stride;
+	ZGSearchResultType _resultType;
 	
 	NSMutableArray<NSData *> *_resultSets;
 	NSMutableArray<NSData *> *_staticMainExecutableResultSets;
@@ -62,6 +63,8 @@
 	os_unfair_lock _lock;
 	dispatch_source_t _notifyTimer;
 	id<ZGSearchProgressDelegate> _delegate;
+	
+	BOOL _notifiesStaticResults;
 }
 
 static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
@@ -74,7 +77,7 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 	return length;
 }
 
-- (instancetype)initWithSearchProgress:(ZGSearchProgress *)searchProgress dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride delegate:(id<ZGSearchProgressDelegate>)delegate
+- (instancetype)initWithSearchProgress:(ZGSearchProgress *)searchProgress resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride notifiesStaticResults:(BOOL)notifiesStaticResults delegate:(id<ZGSearchProgressDelegate>)delegate
 {
 	self = [super init];
 	if (self != nil)
@@ -82,10 +85,12 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 		_searchProgress = searchProgress;
 		_dataType = dataType;
 		_stride = stride;
+		_resultType = resultType;
+		_notifiesStaticResults = notifiesStaticResults;
 		
 		_resultSets = [NSMutableArray array];
-		_staticMainExecutableResultSets = [NSMutableArray array];
-		_staticOtherLibraryResultSets = [NSMutableArray array];
+		_staticMainExecutableResultSets = _notifiesStaticResults ? [NSMutableArray array] : nil;
+		_staticOtherLibraryResultSets = _notifiesStaticResults ? [NSMutableArray array] : nil;
 		_lock = OS_UNFAIR_LOCK_INIT;
 		
 		_delegate = delegate;
@@ -104,6 +109,11 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 
 - (void)start
 {
+	if (_delegate == nil)
+	{
+		return;
+	}
+	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self->_delegate progressWillBegin:self->_searchProgress];
 	});
@@ -113,6 +123,11 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 
 - (void)stop
 {
+	if (_delegate == nil)
+	{
+		return;
+	}
+	
 	dispatch_source_cancel(_notifyTimer);
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -129,12 +144,20 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 	os_unfair_lock_lock(&self->_lock);
 	
 	resultSets = [self->_resultSets copy];
-	staticMainExecutableResultSets = [self->_staticMainExecutableResultSets copy];
-	staticOtherLibraryResultSets = [self->_staticOtherLibraryResultSets copy];
+	
+	if (_notifiesStaticResults)
+	{
+		staticMainExecutableResultSets = [self->_staticMainExecutableResultSets copy];
+		staticOtherLibraryResultSets = [self->_staticOtherLibraryResultSets copy];
+	}
 	
 	[_resultSets removeAllObjects];
-	[_staticMainExecutableResultSets removeAllObjects];
-	[_staticOtherLibraryResultSets removeAllObjects];
+	
+	if (_notifiesStaticResults)
+	{
+		[_staticMainExecutableResultSets removeAllObjects];
+		[_staticOtherLibraryResultSets removeAllObjects];
+	}
 	
 	os_unfair_lock_unlock(&self->_lock);
 	
@@ -142,42 +165,51 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 	if (resultSetsCount > 0)
 	{
 		NSUInteger resultSetsLength = ZGLengthForResultSets(resultSets);
-		NSUInteger staticMainExecutableResultSetsLength = ZGLengthForResultSets(staticMainExecutableResultSets);
-		NSUInteger staticOtherLibraryResultSetsLength = ZGLengthForResultSets(staticOtherLibraryResultSets);
+		NSUInteger staticMainExecutableResultSetsLength = _notifiesStaticResults ? ZGLengthForResultSets(staticMainExecutableResultSets) : 0;
+		NSUInteger staticOtherLibraryResultSetsLength = _notifiesStaticResults ? ZGLengthForResultSets(staticOtherLibraryResultSets) : 0;
 		
 		_searchProgress.numberOfVariablesFound += (resultSetsLength + staticMainExecutableResultSetsLength + staticOtherLibraryResultSetsLength) / self->_stride;
 		
 		_searchProgress.progress += resultSets.count;
 		
+		BOOL reportedProgress = NO;
 		if (staticMainExecutableResultSetsLength > 0)
 		{
-			[self->_delegate progress:_searchProgress advancedWithResultSets:staticMainExecutableResultSets totalResultSetLength:staticMainExecutableResultSetsLength resultType:ZGSearchResultTypeIndirect dataType:_dataType addressType:ZGSearchResultAddressTypeStaticMainExecutable stride:_stride];
+			[self->_delegate progress:_searchProgress advancedWithResultSets:staticMainExecutableResultSets totalResultSetLength:staticMainExecutableResultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeStaticMainExecutable stride:_stride];
+			reportedProgress = YES;
 		}
 		
 		if (staticOtherLibraryResultSetsLength > 0)
 		{
-			[self->_delegate progress:_searchProgress advancedWithResultSets:staticOtherLibraryResultSets totalResultSetLength:staticOtherLibraryResultSetsLength resultType:ZGSearchResultTypeIndirect dataType:_dataType addressType:ZGSearchResultAddressTypeStaticOtherLibrary stride:_stride];
+			[self->_delegate progress:_searchProgress advancedWithResultSets:staticOtherLibraryResultSets totalResultSetLength:staticOtherLibraryResultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeStaticOtherLibrary stride:_stride];
+			reportedProgress = YES;
 		}
 		
-		if (resultSetsLength > 0 && staticMainExecutableResultSetsLength == 0 && staticOtherLibraryResultSetsLength == 0)
+		if (resultSetsLength > 0 || !reportedProgress)
 		{
-			[self->_delegate progress:_searchProgress advancedWithResultSets:resultSets totalResultSetLength:resultSetsLength resultType:ZGSearchResultTypeIndirect dataType:_dataType addressType:ZGSearchResultAddressTypeRegular stride:_stride];
+			[self->_delegate progress:_searchProgress advancedWithResultSets:resultSets totalResultSetLength:resultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeRegular stride:_stride];
 		}
 	}
 }
 
 - (void)addResultSet:(NSData *)resultSet staticMainExecutableResultSet:(NSData *)staticMainExecutableResultSet staticOtherLibraryResultSet:(NSData *)staticOtherLibraryResultSet
 {
-	if (_delegate != nil)
+	if (_delegate == nil)
 	{
-		os_unfair_lock_lock(&_lock);
-		
-		[_resultSets addObject:resultSet];
+		return;
+	}
+	
+	os_unfair_lock_lock(&_lock);
+	
+	[_resultSets addObject:resultSet];
+	
+	if (_notifiesStaticResults)
+	{
 		[_staticMainExecutableResultSets addObject:staticMainExecutableResultSet];
 		[_staticOtherLibraryResultSets addObject:staticOtherLibraryResultSet];
-		
-		os_unfair_lock_unlock(&_lock);
 	}
+	
+	os_unfair_lock_unlock(&_lock);
 }
 
 @end
@@ -303,12 +335,9 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:regions.count];
 	
-	if (delegate != nil)
-	{
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[delegate progressWillBegin:searchProgress];
-		});
-	}
+	ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeDirect dataType:resultDataType stride:stride notifiesStaticResults:NO delegate:delegate];
+	
+	[progressNotifier start];
 	
 	const void **allResultSets = static_cast<const void **>(calloc(regions.count, sizeof(*allResultSets)));
 	assert(allResultSets != NULL);
@@ -352,16 +381,11 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 				}
 			}
 			
-			if (delegate != nil)
-			{
-				dispatch_async(dispatch_get_main_queue(), ^{
-					searchProgress.numberOfVariablesFound += results.length / stride;
-					searchProgress.progress++;
-					[delegate progress:searchProgress advancedWithResultSets:(results != nil) ? @[results] : @[] totalResultSetLength:results.length resultType:ZGSearchResultTypeDirect dataType:resultDataType addressType:ZGSearchResultAddressTypeRegular stride:pointerSize];
-				});
-			}
+			[progressNotifier addResultSet:results != nil ? results : NSData.data staticMainExecutableResultSet:nil staticOtherLibraryResultSet:nil];
 		}
 	});
+	
+	[progressNotifier stop];
 	
 	NSArray<NSData *> *resultSets;
 	
@@ -2167,7 +2191,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			});
 		}
 		
-		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress dataType:indirectDataType stride:stride delegate:delegate];
+		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES delegate:delegate];
 		
 		_ZGSearchForIndirectPointerRecursively(pointerValueEntries, pointerValueEntriesCount, resultSets, 0, staticMainExecutableResultSet, staticOtherLibrariesResultSet, currentOffsets, currentBaseAddresses, visitedSearchResults, 0, tempBuffer, searchData.searchValue, searchData, pointerSize, indirectDataType, stride, maxLevels, indirectOffsetMaxComparison, indirectStopAtStaticAddresses, processTask, delegate, progressNotifier);
 		
@@ -2190,10 +2214,10 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 		
 		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousSearchResults.count];
 		
-		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress dataType:indirectDataType stride:stride delegate:delegate];
+		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES delegate:delegate];
 		
 		if (delegate != nil)
-		{	
+		{
 			[progressNotifier start];
 		}
 		
@@ -2395,11 +2419,11 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:newResultSetCount];
 	
+	ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:resultType dataType:resultDataType stride:newResultStride notifiesStaticResults:NO delegate:delegate];
+	
 	if (delegate != nil)
 	{
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[delegate progressWillBegin:searchProgress];
-		});
+		[progressNotifier start];
 	}
 	
 	const void **newResultSets = static_cast<const void **>(calloc(newResultSetCount, sizeof(*newResultSets)));
@@ -2425,17 +2449,12 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 					free(extraStorage);
 				}
 				
-				if (delegate != nil)
-				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						searchProgress.numberOfVariablesFound += results.length / newResultStride;
-						searchProgress.progress++;
-						[delegate progress:searchProgress advancedWithResultSets:results != nil ? @[results] : @[] totalResultSetLength:results.length resultType:resultType dataType:resultDataType addressType:ZGSearchResultAddressTypeRegular stride:newResultStride];
-					});
-				}
+				[progressNotifier addResultSet:(results != nil ? results : NSData.data) staticMainExecutableResultSet:nil staticOtherLibraryResultSet:nil];
 			}
 		}
 	});
+	
+	[progressNotifier stop];
 	
 	NSArray<NSData *> *resultSets;
 	
