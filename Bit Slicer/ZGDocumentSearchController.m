@@ -72,6 +72,9 @@
 	ZGSearchData * _Nonnull _searchData;
 	ZGMachBinaryAnnotationInfo _machBinaryAnnotationInfo;
 	dispatch_queue_t _machBinaryAnnotationInfoQueue;
+	
+	NSUInteger _searchResultStaticMainExecutableInsertionIndex;
+	NSUInteger _searchResultStaticOtherLibraryInsertionIndex;
 }
 
 #pragma mark Class Utilities
@@ -237,7 +240,7 @@
 	[windowController setStatusString:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	if (!_searchProgress.shouldCancelSearch && windowController != nil)
@@ -246,17 +249,51 @@
 		
 		NSTableView *variablesTableView = windowController.variablesTableView;
 		
-		// Limit the number of intermediate search results to show to be relatively small
-		// (a little bit larger than what can be displayed on screen without scrolling)
-		// This is so we don't spend to much time annotating/relativizing variables before the search is finished
-		NSUInteger maxNumberOfVariablesToFetch = MIN((NSUInteger)(variablesTableView.visibleRect.size.height / variablesTableView.rowHeight * 1.5), MAX_NUMBER_OF_VARIABLES_TO_FETCH);
-		if (currentVariableCount < maxNumberOfVariablesToFetch && resultSet.length > 0)
+		NSUInteger maxNumberOfVariablesToFetch;
+		NSUInteger insertionIndex;
+		if (addressType == ZGSearchResultAddressTypeRegular)
+		{
+			// Limit the number of intermediate search results to show to be relatively small
+			// (a little bit larger than what can be displayed on screen without scrolling)
+			// This is so we don't spend to much time annotating/relativizing variables before the search is finished
+			
+			NSUInteger maxNumberOfVariablesToFetchLimit = MIN((NSUInteger)(variablesTableView.visibleRect.size.height / variablesTableView.rowHeight * 1.5), MAX_NUMBER_OF_VARIABLES_TO_FETCH);
+			maxNumberOfVariablesToFetch = (currentVariableCount < maxNumberOfVariablesToFetchLimit && resultSet.length > 0) ? (maxNumberOfVariablesToFetchLimit - currentVariableCount) : 0;
+			insertionIndex = NSUIntegerMax;
+		}
+		else
+		{
+			NSUInteger newResultSetCount = resultSet.length / stride;
+			if (newResultSetCount > 0)
+			{
+				maxNumberOfVariablesToFetch = newResultSetCount;
+				
+				if (addressType == ZGSearchResultAddressTypeStaticMainExecutable)
+				{
+					insertionIndex = _searchResultStaticMainExecutableInsertionIndex;
+					_searchResultStaticMainExecutableInsertionIndex += newResultSetCount;
+					_searchResultStaticOtherLibraryInsertionIndex += newResultSetCount;
+				}
+				else
+				{
+					insertionIndex = _searchResultStaticOtherLibraryInsertionIndex;
+					_searchResultStaticOtherLibraryInsertionIndex += newResultSetCount;
+				}
+			}
+			else
+			{
+				maxNumberOfVariablesToFetch = 0;
+				insertionIndex = NSUIntegerMax;
+			}
+		}
+		
+		if (maxNumberOfVariablesToFetch > 0)
 		{
 			// These progress search results are thrown away,
 			// so doesn't matter if accesses are unaligned or not
 			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] resultType:resultType dataType:dataType stride:stride unalignedAccess:YES];
 			
-			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch - currentVariableCount finishingSearch:NO fromResults:searchResults];
+			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch insertionIndex:insertionIndex finishingSearch:NO fromResults:searchResults];
 			[variablesTableView reloadData];
 		}
 		
@@ -275,7 +312,7 @@
 
 #pragma mark Searching
 
-- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables finishingSearch:(BOOL)finishingSearch fromResults:(ZGSearchResults *)searchResults
+- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables insertionIndex:(NSUInteger)insertionIndex finishingSearch:(BOOL)finishingSearch fromResults:(ZGSearchResults *)searchResults
 {
 	if (searchResults.count == 0) return;
 	
@@ -428,18 +465,29 @@
 		});
 	});
 	
-	[allVariables addObjectsFromArray:newVariables];
+	NSRange rangeToUpdateVariables;
+	if (insertionIndex == NSUIntegerMax)
+	{
+		rangeToUpdateVariables = NSMakeRange(allVariables.count, newVariables.count);
+		[allVariables addObjectsFromArray:newVariables];
+	}
+	else
+	{
+		rangeToUpdateVariables = NSMakeRange(insertionIndex, newVariables.count);
+		[allVariables insertObjects:newVariables atIndexes:[NSIndexSet indexSetWithIndexesInRange:rangeToUpdateVariables]];
+	}
+	 
 	_documentData.variables = [NSArray arrayWithArray:allVariables];
 	
 	if (_documentData.variables.count > 0)
 	{
-		[windowController.tableController updateVariableValuesInRange:NSMakeRange(allVariables.count - newVariables.count, newVariables.count)];
+		[windowController.tableController updateVariableValuesInRange:rangeToUpdateVariables];
 	}
 }
 
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables
 {
-	[self fetchNumberOfVariables:numberOfVariables finishingSearch:NO fromResults:_searchResults];
+	[self fetchNumberOfVariables:numberOfVariables insertionIndex:NSUIntegerMax finishingSearch:NO fromResults:_searchResults];
 	
 	[_windowController updateSearchAddressOptions];
 }
@@ -465,7 +513,7 @@
 		numberOfVariables = minimumNumberOfResults;
 	}
 	
-	[self fetchNumberOfVariables:numberOfVariables finishingSearch:finishedSearch fromResults:_searchResults];
+	[self fetchNumberOfVariables:numberOfVariables insertionIndex:NSUIntegerMax finishingSearch:finishedSearch fromResults:_searchResults];
 }
 
 - (void)fetchVariablesFromResults
@@ -1089,6 +1137,9 @@
 			}
 		}
 	}
+	
+	_searchResultStaticMainExecutableInsertionIndex = notSearchedVariables.count;
+	_searchResultStaticOtherLibraryInsertionIndex = notSearchedVariables.count;
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		NSUInteger numberOfImportantResults;

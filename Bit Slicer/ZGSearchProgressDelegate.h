@@ -37,10 +37,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, ZGSearchResultAddressType)
+{
+	ZGSearchResultAddressTypeRegular = 0,
+	ZGSearchResultAddressTypeStaticMainExecutable,
+	ZGSearchResultAddressTypeStaticOtherLibrary
+};
+
 @protocol ZGSearchProgressDelegate <NSObject>
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride;
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride;
 
 @end
 

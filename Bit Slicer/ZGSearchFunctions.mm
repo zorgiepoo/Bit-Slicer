@@ -203,7 +203,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 				dispatch_async(dispatch_get_main_queue(), ^{
 					searchProgress.numberOfVariablesFound += results.length / stride;
 					searchProgress.progress++;
-					[delegate progress:searchProgress advancedWithResultSet:results resultType:ZGSearchResultTypeDirect dataType:resultDataType stride:pointerSize];
+					[delegate progress:searchProgress advancedWithResultSet:results resultType:ZGSearchResultTypeDirect dataType:resultDataType addressType:ZGSearchResultAddressTypeRegular stride:pointerSize];
 				});
 			}
 		}
@@ -1610,7 +1610,18 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 			}
 			else
 			{
-				NSMutableData *staticResultSet = (matchingSegmentRange != firstTotalStaticSegmentRangeValue) ? staticOtherLibrariesResultSet : staticMainExecutableResultSet;
+				ZGSearchResultAddressType addressType;
+				NSMutableData *staticResultSet;
+				if (matchingSegmentRange == firstTotalStaticSegmentRangeValue)
+				{
+					addressType = ZGSearchResultAddressTypeStaticMainExecutable;
+					staticResultSet = staticMainExecutableResultSet;
+				}
+				else
+				{
+					addressType = ZGSearchResultAddressTypeStaticOtherLibrary;
+					staticResultSet =  staticOtherLibrariesResultSet;
+				}
 				
 				NSData *tempData = [NSData dataWithBytes:tempBuffer length:stride];
 				
@@ -1621,7 +1632,7 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 				{
 					dispatch_async(dispatch_get_main_queue(), ^{
 						searchProgress.numberOfVariablesFound++;
-						[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
+						[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
 					});
 				}
 			}
@@ -1641,7 +1652,7 @@ static void _ZGSearchForIndirectPointerRecursively(NSMutableArray<NSMutableData 
 				dispatch_async(dispatch_get_main_queue(), ^{
 					searchProgress.progress++;
 					searchProgress.numberOfVariablesFound += currentResultSet.length / stride;
-					[delegate progress:searchProgress advancedWithResultSet:currentResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
+					[delegate progress:searchProgress advancedWithResultSet:currentResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeRegular stride:stride];
 				});
 			}
 			
@@ -1838,7 +1849,18 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 					BOOL isStatic = (matchingSegmentRange != nil);
 					if (isStatic)
 					{
-						NSMutableData *staticResultSet = (matchingSegmentRange != firstTotalStaticSegmentRangeValue) ? staticOtherLibrariesResultSet : staticMainExecutableResultSet;
+						ZGSearchResultAddressType addressType;
+						NSMutableData *staticResultSet;
+						if (matchingSegmentRange == firstTotalStaticSegmentRangeValue)
+						{
+							addressType = ZGSearchResultAddressTypeStaticMainExecutable;
+							staticResultSet = staticMainExecutableResultSet;
+						}
+						else
+						{
+							addressType = ZGSearchResultAddressTypeStaticOtherLibrary;
+							staticResultSet =  staticOtherLibrariesResultSet;
+						}
 						
 						NSData *tempData = [NSData dataWithBytes:tempBuffer length:stride];
 						
@@ -1849,7 +1871,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 						{
 							dispatch_async(dispatch_get_main_queue(), ^{
 								searchProgress.numberOfVariablesFound++;
-								[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
+								[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
 							});
 						}
 					}
@@ -1880,7 +1902,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 								recurseSearchAddressValue = &nextRecurseHalfSearchAddress;
 							}
 							
-							_ZGSearchForIndirectPointerRecursively(resultSets, resultSetIndex, staticMainExecutableResultSet, staticOtherLibrariesResultSet, currentOffsets, currentBaseAddresses, visitedSearchResults, numberOfLevels, tempBuffer, recurseSearchAddressValue, searchData, pointerSize, indirectDataType, stride, maxLevels, indirectOffsetMaxComparison, indirectStopAtStaticAddresses, processTask, nil, nil);
+							_ZGSearchForIndirectPointerRecursively(resultSets, resultSetIndex, staticMainExecutableResultSet, staticOtherLibrariesResultSet, currentOffsets, currentBaseAddresses, visitedSearchResults, numberOfLevels, tempBuffer, recurseSearchAddressValue, searchData, pointerSize, indirectDataType, stride, maxLevels, indirectOffsetMaxComparison, indirectStopAtStaticAddresses, processTask, delegate, searchProgress);
 						}
 						
 						resultSetIndex++;
@@ -1893,7 +1915,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 						searchProgress.numberOfVariablesFound += newResultSet.length / stride;
 						searchProgress.progress++;
 						
-						[delegate progress:searchProgress advancedWithResultSet:newResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride];
+						[delegate progress:searchProgress advancedWithResultSet:newResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeRegular stride:stride];
 					});
 				}
 			}
@@ -2032,7 +2054,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 					dispatch_async(dispatch_get_main_queue(), ^{
 						searchProgress.numberOfVariablesFound += results.length / newResultStride;
 						searchProgress.progress++;
-						[delegate progress:searchProgress advancedWithResultSet:results resultType:resultType dataType:resultDataType stride:newResultStride];
+						[delegate progress:searchProgress advancedWithResultSet:results resultType:resultType dataType:resultDataType addressType:ZGSearchResultAddressTypeRegular stride:newResultStride];
 					});
 				}
 			}
