@@ -202,10 +202,10 @@ NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddre
 	NSString *userTagDescription = nil;
 	ZGMemoryAddress regionAddress = address;
 	ZGMemorySize regionSize = size;
-	ZGMemorySubmapInfo submapInfo;
-	if (ZGRegionSubmapInfo(processTask, &regionAddress, &regionSize, &submapInfo) && regionAddress <= address && address + size <= regionAddress + regionSize)
+	ZGMemoryExtendedInfo extendedInfo;
+	if (ZGRegionExtendedInfo(processTask, &regionAddress, &regionSize, &extendedInfo) && regionAddress <= address && address + size <= regionAddress + regionSize)
 	{
-		userTagDescription = ZGUserTagDescription(submapInfo.user_tag);
+		userTagDescription = ZGUserTagDescription(extendedInfo.user_tag);
 	}
 	return userTagDescription;
 }

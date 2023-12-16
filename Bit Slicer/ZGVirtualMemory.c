@@ -202,6 +202,14 @@ bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySiz
 	return mach_vm_region(processTask, address, size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS;
 }
 
+bool ZGRegionExtendedInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryExtendedInfo *regionInfo)
+{
+	mach_port_t objectName = MACH_PORT_NULL;
+	mach_msg_type_number_t regionInfoSize = VM_REGION_EXTENDED_INFO_COUNT;
+	
+	return mach_vm_region(processTask, address, size, VM_REGION_EXTENDED_INFO, (vm_region_info_t)regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS;
+}
+
 bool ZGRegionSubmapInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemorySubmapInfo *regionInfo)
 {
 	bool success = true;

@@ -1161,9 +1161,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	};
 	
 	void (^finishAnnotations)(NSArray *, NSArray *) = ^(NSArray * _Nullable symbols, NSArray *staticDescriptions) {
-		__block ZGMemoryAddress cachedSubmapRegionAddress = 0;
-		__block ZGMemorySize cachedSubmapRegionSize = 0;
-		__block ZGMemorySubmapInfo cachedSubmapInfo;
+		__block ZGMemoryAddress cachedRegionAddress = 0;
+		__block ZGMemorySize cachedRegionSize = 0;
+		__block ZGMemoryExtendedInfo cachedInfo;
 		
 		[variables enumerateObjectsUsingBlock:^(ZGVariable * _Nonnull variable, NSUInteger index, BOOL * _Nonnull __unused stop) {
 			id staticDescriptionObject = staticDescriptions[index];
@@ -1180,23 +1180,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				symbol = nil;
 			}
 			
-			if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
+			if (cachedRegionAddress >= variable.address + variable.size || cachedRegionAddress + cachedRegionSize <= variable.address)
 			{
-				cachedSubmapRegionAddress = variable.address;
-				if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
+				cachedRegionAddress = variable.address;
+				if (!ZGRegionExtendedInfo(processTask, &cachedRegionAddress, &cachedRegionSize, &cachedInfo))
 				{
-					cachedSubmapRegionAddress = 0;
-					cachedSubmapRegionSize = 0;
+					cachedRegionAddress = 0;
+					cachedRegionSize = 0;
 				}
 			}
 			
 			NSString *userTagDescription = nil;
 			NSString *protectionDescription = nil;
 			
-			if (cachedSubmapRegionAddress <= variable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= variable.address + variable.size)
+			if (cachedRegionAddress <= variable.address && cachedRegionAddress + cachedRegionSize >= variable.address + variable.size)
 			{
-				userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
-				protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
+				userTagDescription = ZGUserTagDescription(cachedInfo.user_tag);
+				protectionDescription = ZGProtectionDescription(cachedInfo.protection);
 			}
 			
 			NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];
