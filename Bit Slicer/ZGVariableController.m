@@ -1086,7 +1086,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				[newDescription appendString:@" "];
 			}
-			[newDescription appendString:(isIndirectVariable ? @"static, indirect" : @"static")];
+			[newDescription appendString:(isIndirectVariable ? @"(static, indirect)" : @"(static)")];
 			
 			staticVariableDescription = [newDescription copy];
 		}
