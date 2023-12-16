@@ -1677,6 +1677,9 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 	
 	uint16_t searchIndirectOffset = searchData->_indirectOffset;
 	
+	NSUInteger initialStaticMainResultSetLength = (levelIndex == 0) ? staticMainExecutableResultSet.length : 0;
+	NSUInteger initialStaticOtherLibraryResultSetLength = (levelIndex == 0) ? staticOtherLibrariesResultSet.length : 0;
+	
 	__block NSUInteger resultSetIndex = initialResultSetIndex;
 	[searchResults enumerateWithCount:searchResultsCount removeResults:NO usingBlock:^(const void * _Nonnull searchResultData, BOOL * __unused _Nonnull stop) {
 		NSMutableData *currentResultSet = resultSets[resultSetIndex];
@@ -1756,31 +1759,9 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 			}
 			else
 			{
-				ZGSearchResultAddressType addressType;
-				NSMutableData *staticResultSet;
-				if (matchingSegmentRange == firstTotalStaticSegmentRangeValue)
-				{
-					addressType = ZGSearchResultAddressTypeStaticMainExecutable;
-					staticResultSet = staticMainExecutableResultSet;
-				}
-				else
-				{
-					addressType = ZGSearchResultAddressTypeStaticOtherLibrary;
-					staticResultSet =  staticOtherLibrariesResultSet;
-				}
+				NSMutableData *staticResultSet = (matchingSegmentRange == firstTotalStaticSegmentRangeValue) ? staticMainExecutableResultSet : staticOtherLibrariesResultSet;
 				
-				NSData *tempData = [NSData dataWithBytes:tempBuffer length:stride];
-				
-				[staticResultSet appendData:tempData];
-				
-				// Static variables should be shown to the user with more immediately
-//				if (delegate != nil)
-//				{
-//					dispatch_async(dispatch_get_main_queue(), ^{
-//						searchProgress.numberOfVariablesFound++;
-//						[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
-//					});
-//				}
+				[staticResultSet appendBytes:tempBuffer length:stride];
 			}
 			memset(static_cast<uint8_t *>(tempBuffer), 0, stride);
 			
@@ -1795,9 +1776,24 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 		{
 			if (delegate != nil)
 			{
+				NSData *staticMainResultSetSubset = [[staticMainExecutableResultSet subdataWithRange:NSMakeRange(initialStaticMainResultSetLength, staticMainExecutableResultSet.length - initialStaticMainResultSetLength)] copy];
+				
+				NSData *staticOtherLibraryResultSetSubset = [[staticOtherLibrariesResultSet subdataWithRange:NSMakeRange(initialStaticOtherLibraryResultSetLength, staticOtherLibrariesResultSet.length - initialStaticOtherLibraryResultSetLength)] copy];
+				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					searchProgress.progress++;
-					searchProgress.numberOfVariablesFound += currentResultSet.length / stride;
+					searchProgress.numberOfVariablesFound += (currentResultSet.length + staticMainResultSetSubset.length + staticOtherLibraryResultSetSubset.length) / stride;
+					
+					if (staticMainResultSetSubset.length > 0)
+					{
+						[delegate progress:searchProgress advancedWithResultSet:staticMainResultSetSubset resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeStaticMainExecutable stride:stride];
+					}
+					
+					if (staticOtherLibraryResultSetSubset.length > 0)
+					{
+						[delegate progress:searchProgress advancedWithResultSet:staticOtherLibraryResultSetSubset resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeStaticOtherLibrary stride:stride];
+					}
+					
 					[delegate progress:searchProgress advancedWithResultSet:currentResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeRegular stride:stride];
 				});
 			}
@@ -2036,6 +2032,9 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			{
 				NSMutableData *newResultSet = [NSMutableData data];
 				
+				NSUInteger initialStaticMainResultSetLength = staticMainExecutableResultSet.length;
+				NSUInteger initialStaticOtherLibraryResultSetLength = staticOtherLibrariesResultSet.length;
+				
 				const uint8_t *previousIndirectResult = previousIndirectResultSetBytes + previousIndirectResultSetIndex * previousIndirectResultSetStride;
 				
 				uint16_t numberOfLevels;
@@ -2070,31 +2069,9 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 					BOOL isStatic = (matchingSegmentRange != nil);
 					if (isStatic)
 					{
-						ZGSearchResultAddressType addressType;
-						NSMutableData *staticResultSet;
-						if (matchingSegmentRange == firstTotalStaticSegmentRangeValue)
-						{
-							addressType = ZGSearchResultAddressTypeStaticMainExecutable;
-							staticResultSet = staticMainExecutableResultSet;
-						}
-						else
-						{
-							addressType = ZGSearchResultAddressTypeStaticOtherLibrary;
-							staticResultSet =  staticOtherLibrariesResultSet;
-						}
+						NSMutableData *staticResultSet = (matchingSegmentRange == firstTotalStaticSegmentRangeValue) ? staticMainExecutableResultSet : staticOtherLibrariesResultSet;
 						
-						NSData *tempData = [NSData dataWithBytes:tempBuffer length:stride];
-						
-						[staticResultSet appendData:tempData];
-						
-						// Static variables should be shown to the user with more immediately
-//						if (delegate != nil)
-//						{
-//							dispatch_async(dispatch_get_main_queue(), ^{
-//								searchProgress.numberOfVariablesFound++;
-//								[delegate progress:searchProgress advancedWithResultSet:tempData resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:addressType stride:stride];
-//							});
-//						}
+						[staticResultSet appendBytes:tempBuffer length:stride];
 					}
 					
 					if (!isStatic || !indirectStopAtStaticAddresses)
@@ -2132,9 +2109,24 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 				
 				if (delegate != nil)
 				{
+					NSData *staticMainResultSetSubset = [[staticMainExecutableResultSet subdataWithRange:NSMakeRange(initialStaticMainResultSetLength, staticMainExecutableResultSet.length - initialStaticMainResultSetLength)] copy];
+					
+					NSData *staticOtherLibraryResultSetSubset = [[staticOtherLibrariesResultSet subdataWithRange:NSMakeRange(initialStaticOtherLibraryResultSetLength, staticOtherLibrariesResultSet.length - initialStaticOtherLibraryResultSetLength)] copy];
+					
 					dispatch_async(dispatch_get_main_queue(), ^{
-						searchProgress.numberOfVariablesFound += newResultSet.length / stride;
+						searchProgress.numberOfVariablesFound += (newResultSet.length + staticMainResultSetSubset.length + staticOtherLibraryResultSetSubset.length) / stride;
+						
 						searchProgress.progress++;
+						
+						if (staticMainResultSetSubset.length > 0)
+						{
+							[delegate progress:searchProgress advancedWithResultSet:staticMainResultSetSubset resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeStaticMainExecutable stride:stride];
+						}
+						
+						if (staticOtherLibraryResultSetSubset.length > 0)
+						{
+							[delegate progress:searchProgress advancedWithResultSet:staticOtherLibraryResultSetSubset resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeStaticOtherLibrary stride:stride];
+						}
 						
 						[delegate progress:searchProgress advancedWithResultSet:newResultSet resultType:ZGSearchResultTypeIndirect dataType:indirectDataType addressType:ZGSearchResultAddressTypeRegular stride:stride];
 					});
