@@ -1015,9 +1015,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (machFilePath != nil)
 	{
 		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:process];
-		NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
+		NSRange totalSegmentRange = machBinaryInfo.totalSegmentRange;
 		
-		if (segmentName != nil)
+		if (variable.address >= totalSegmentRange.location && variable.address < totalSegmentRange.location + totalSegmentRange.length)
 		{
 			BOOL isIndirectVariable = NO;
 			NSString *partialPath = [machFilePath lastPathComponent];
@@ -1075,7 +1075,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				variable.finishedEvaluatingDynamicAddress = !isIndirectVariable;
 			}
 			
-			staticVariableDescription = [NSString stringWithFormat:@"%@ %@ (%@)", partialPath, segmentName, (isIndirectVariable ? @"static, indirect" : @"static")];
+			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
+			
+			NSMutableString *newDescription = [[NSMutableString alloc] initWithString:partialPath];
+			if (segmentName != nil)
+			{
+				[newDescription appendFormat:@" %@ ", segmentName];
+			}
+			else
+			{
+				[newDescription appendString:@" "];
+			}
+			[newDescription appendString:(isIndirectVariable ? @"static, indirect" : @"static")];
+			
+			staticVariableDescription = [newDescription copy];
 		}
 	}
 	
