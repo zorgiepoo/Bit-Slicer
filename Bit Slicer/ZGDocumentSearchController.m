@@ -241,7 +241,7 @@
 	[windowController setStatusString:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSets:(NSArray<NSData *> *)resultSets totalResultSetLength:(NSUInteger)totalResultSetLength resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	if (!_searchProgress.shouldCancelSearch && windowController != nil)
@@ -259,12 +259,12 @@
 		NSUInteger insertionIndex;
 		if (addressType == ZGSearchResultAddressTypeRegular)
 		{
-			maxNumberOfVariablesToFetch = (currentVariableCount < maxNumberOfVariablesToFetchScreenLimit && resultSet.length > 0) ? (maxNumberOfVariablesToFetchScreenLimit - currentVariableCount) : 0;
+			maxNumberOfVariablesToFetch = (currentVariableCount < maxNumberOfVariablesToFetchScreenLimit && totalResultSetLength > 0) ? (maxNumberOfVariablesToFetchScreenLimit - currentVariableCount) : 0;
 			insertionIndex = NSUIntegerMax;
 		}
 		else
 		{
-			NSUInteger newResultSetCount = resultSet.length / stride;
+			NSUInteger newResultSetCount = totalResultSetLength / stride;
 			if (newResultSetCount > 0)
 			{
 				if (addressType == ZGSearchResultAddressTypeStaticMainExecutable)
@@ -318,7 +318,7 @@
 		{
 			// These progress search results are thrown away,
 			// so doesn't matter if accesses are unaligned or not
-			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] resultType:resultType dataType:dataType stride:stride unalignedAccess:YES];
+			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:resultSets resultType:resultType dataType:dataType stride:stride unalignedAccess:YES];
 			
 			[self fetchNumberOfVariables:maxNumberOfVariablesToFetch insertionIndex:insertionIndex finishingSearch:NO fromResults:searchResults];
 			[variablesTableView reloadData];

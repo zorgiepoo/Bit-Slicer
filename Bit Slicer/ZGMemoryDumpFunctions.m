@@ -89,7 +89,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSea
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			searchProgress.progress++;
-			[delegate progress:searchProgress advancedWithResultSet:[NSData data] resultType:ZGSearchResultTypeDirect dataType:0 addressType:ZGSearchResultAddressTypeRegular stride:0];
+			[delegate progress:searchProgress advancedWithResultSets:@[] totalResultSetLength:0 resultType:ZGSearchResultTypeDirect dataType:0 addressType:ZGSearchResultAddressTypeRegular stride:0];
 		});
 		
 		if (searchProgress.shouldCancelSearch)

@@ -145,7 +145,7 @@
 	_progressIndicator.maxValue = _searchProgress.maxProgress;
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)__unused resultSet resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSets:(NSArray<NSData *> *)__unused resultSets totalResultSetLength:(NSUInteger)__unused totalResultSetLength resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride
 {
 	_progressIndicator.doubleValue = searchProgress.progress;
 }
