@@ -313,8 +313,6 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	
-	ZGMemorySize pointerSize = searchData.pointerSize;
-	
 	NSArray<ZGRegion *> *regions;
 	if (!shouldCompareStoredValues)
 	{

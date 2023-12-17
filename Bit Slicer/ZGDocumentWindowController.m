@@ -1509,6 +1509,7 @@
 - (IBAction)clear:(id)__unused sender
 {
 	[_variableController clear];
+	[self updateSearchAddressOptions];
 }
 
 - (IBAction)clearSearchValues:(id)__unused sender
