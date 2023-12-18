@@ -51,6 +51,7 @@ typedef id _Nonnull (^zg_map_t)(ObjectType __unsafe_unretained object);
 - (BOOL)zgAllObjectsMatchingCondition:(zg_array_filter_t)matchingCondition;
 
 - (nullable ObjectType)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator;
+- (nullable ObjectType)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator getIndex:(NSUInteger *)outIndex;
 
 @end
 

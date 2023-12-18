@@ -48,12 +48,13 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 {
 	//	Struct {
 	//		uintptr_t baseAddress;
+	//		uint16_t baseImageIndex;
 	//		uint16_t numLevels;
 	//		uint16_t offsets[MAX_NUM_LEVELS];
 	//		uint8_t padding[N];
 	//	}
 	
-	ZGMemorySize minimumSize = pointerSize + sizeof(uint16_t) + numberOfLevels * sizeof(uint16_t);
+	ZGMemorySize minimumSize = pointerSize + sizeof(uint16_t) + numberOfLevels * sizeof(uint16_t) + sizeof(uint16_t);
 	ZGMemorySize remainder = minimumSize % pointerSize;
 	ZGMemorySize padding = (remainder == 0) ? 0 : (pointerSize - remainder);
 	return minimumSize + padding;
@@ -125,8 +126,49 @@ static void ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(NSMutableArray<N
 	ZGSearchResults *newSearchResults = [[ZGSearchResults alloc] initWithResultSets:newResultSets resultType:_resultType dataType:_dataType stride:newStride unalignedAccess:_unalignedAccess || theirSearchResults.unalignedAccess];
 	
 	newSearchResults.indirectMaxLevels = newIndirectMaxLevels;
+	newSearchResults.headerAddresses = theirSearchResults.headerAddresses;
+	newSearchResults.totalStaticSegmentRanges = theirSearchResults.totalStaticSegmentRanges;
+	newSearchResults.filePaths = theirSearchResults.filePaths;
 	
 	return newSearchResults;
+}
+
+- (void)updateHeaderAddresses:(NSArray<NSNumber *> *)headerAddresses totalStaticSegmentRanges:(NSArray<NSValue *> *)totalStaticSegmentRanges usingFilePaths:(NSArray<NSString *> *)filePaths
+{
+	assert(_filePaths != nil);
+	
+	// We want to keep filePaths at same indexes but update headerAddresses and totalStaticSegmentRanges
+	NSMutableDictionary<NSString *, NSNumber *> *newFilePathsTable = [[NSMutableDictionary alloc] initWithCapacity:filePaths.count];
+	
+	{
+		NSUInteger filePathIndex = 0;
+		for (NSString *filePath in filePaths)
+		{
+			newFilePathsTable[filePath] = @(filePathIndex);
+			filePathIndex++;
+		}
+	}
+	
+	NSMutableArray<NSNumber *> *newHeaderAddresses = [[NSMutableArray alloc] init];
+	NSMutableArray<NSValue *> *newTotalStaticSegmentRanges = [[NSMutableArray alloc] init];
+	for (NSString *filePath in _filePaths)
+	{
+		NSNumber *filePathIndexNumber = newFilePathsTable[filePath];
+		if (filePathIndexNumber != nil)
+		{
+			NSUInteger filePathIndex = filePathIndexNumber.unsignedIntegerValue;
+			[newHeaderAddresses addObject:headerAddresses[filePathIndex]];
+			[newTotalStaticSegmentRanges addObject:totalStaticSegmentRanges[filePathIndex]];
+		}
+		else
+		{
+			[newHeaderAddresses addObject:@(0)];
+			[newTotalStaticSegmentRanges addObject:[NSValue valueWithRange:NSMakeRange(0, 0)]];
+		}
+	}
+	
+	_headerAddresses = [newHeaderAddresses copy];
+	_totalStaticSegmentRanges = [newTotalStaticSegmentRanges copy];
 }
 
 - (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback

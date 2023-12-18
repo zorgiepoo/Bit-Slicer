@@ -47,7 +47,7 @@ typedef NS_ENUM(NSUInteger, ZGSearchResultAddressType)
 @protocol ZGSearchProgressDelegate <NSObject>
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSets:(NSArray<NSData *> *)resultSets totalResultSetLength:(NSUInteger)totalResultSetLength resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride;
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSets:(NSArray<NSData *> *)resultSets totalResultSetLength:(NSUInteger)totalResultSetLength resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride headerAddresses:(NSArray<NSNumber *> * _Nullable)headerAddresses;
 
 @end
 

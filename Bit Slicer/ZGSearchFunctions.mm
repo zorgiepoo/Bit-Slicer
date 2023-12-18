@@ -56,6 +56,8 @@
 	ZGMemorySize _stride;
 	ZGSearchResultType _resultType;
 	
+	NSArray<NSNumber *> *_headerAddresses;
+	
 	NSMutableArray<NSData *> *_resultSets;
 	NSMutableArray<NSData *> *_staticMainExecutableResultSets;
 	NSMutableArray<NSData *> *_staticOtherLibraryResultSets;
@@ -77,7 +79,29 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 	return length;
 }
 
-- (instancetype)initWithSearchProgress:(ZGSearchProgress *)searchProgress resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride notifiesStaticResults:(BOOL)notifiesStaticResults delegate:(id<ZGSearchProgressDelegate>)delegate
+static ZGMemorySize ZGPageSizeForRegionAlignment(ZGMemoryMap processTask, BOOL translated)
+{
+	ZGMemorySize computedPageSize = NSPageSize(); // sane default
+	ZGPageSize(processTask, &computedPageSize);
+	
+	ZGMemorySize pageSize;
+	if (translated)
+	{
+		// ZGPageSize() can get us the wrong page size for VM region alignment for Rosetta processes
+		// Hardcode a safe minimum x86 constant in this case
+		// Note this does not need to be accurate, since this returned page size is used for optimization purposes
+		// The page size needs to meet the "minimum" boundary however
+		const ZGMemorySize x86PageSize = 4096;
+		pageSize = (computedPageSize < x86PageSize) ? computedPageSize : x86PageSize;
+	}
+	else
+	{
+		pageSize = computedPageSize;
+	}
+	return pageSize;
+}
+
+- (instancetype)initWithSearchProgress:(ZGSearchProgress *)searchProgress resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride notifiesStaticResults:(BOOL)notifiesStaticResults headerAddresses:(NSArray<NSNumber *> *)headerAddresses delegate:(id<ZGSearchProgressDelegate>)delegate
 {
 	self = [super init];
 	if (self != nil)
@@ -87,6 +111,8 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 		_stride = stride;
 		_resultType = resultType;
 		_notifiesStaticResults = notifiesStaticResults;
+		
+		_headerAddresses = headerAddresses;
 		
 		_resultSets = [NSMutableArray array];
 		_staticMainExecutableResultSets = _notifiesStaticResults ? [NSMutableArray array] : nil;
@@ -175,19 +201,19 @@ static NSUInteger ZGLengthForResultSets(NSArray<NSData *> *resultSets)
 		BOOL reportedProgress = NO;
 		if (staticMainExecutableResultSetsLength > 0)
 		{
-			[self->_delegate progress:_searchProgress advancedWithResultSets:staticMainExecutableResultSets totalResultSetLength:staticMainExecutableResultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeStaticMainExecutable stride:_stride];
+			[self->_delegate progress:_searchProgress advancedWithResultSets:staticMainExecutableResultSets totalResultSetLength:staticMainExecutableResultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeStaticMainExecutable stride:_stride headerAddresses:_headerAddresses];
 			reportedProgress = YES;
 		}
 		
 		if (staticOtherLibraryResultSetsLength > 0)
 		{
-			[self->_delegate progress:_searchProgress advancedWithResultSets:staticOtherLibraryResultSets totalResultSetLength:staticOtherLibraryResultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeStaticOtherLibrary stride:_stride];
+			[self->_delegate progress:_searchProgress advancedWithResultSets:staticOtherLibraryResultSets totalResultSetLength:staticOtherLibraryResultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeStaticOtherLibrary stride:_stride headerAddresses:_headerAddresses];
 			reportedProgress = YES;
 		}
 		
 		if (resultSetsLength > 0 || !reportedProgress)
 		{
-			[self->_delegate progress:_searchProgress advancedWithResultSets:resultSets totalResultSetLength:resultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeRegular stride:_stride];
+			[self->_delegate progress:_searchProgress advancedWithResultSets:resultSets totalResultSetLength:resultSetsLength resultType:_resultType dataType:_dataType addressType:ZGSearchResultAddressTypeRegular stride:_stride headerAddresses:_headerAddresses];
 		}
 	}
 }
@@ -333,7 +359,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:regions.count];
 	
-	ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeDirect dataType:resultDataType stride:stride notifiesStaticResults:NO delegate:delegate];
+	ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeDirect dataType:resultDataType stride:stride notifiesStaticResults:NO headerAddresses:nil delegate:delegate];
 	
 	[progressNotifier start];
 	
@@ -1835,6 +1861,7 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 		}
 	}
 	
+	NSArray<NSNumber *> *headerAddresses = searchData.headerAddresses;
 	NSArray<NSValue *> *totalStaticSegmentRanges = searchData.totalStaticSegmentRanges;
 	NSValue *firstTotalStaticSegmentRangeValue = totalStaticSegmentRanges.firstObject;
 	
@@ -1875,32 +1902,14 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 		{
 			//	Struct {
 			//		uintptr_t baseAddress;
+			//		uint16_t baseImageIndex;
 			//		uint16_t numLevels;
 			//		uint16_t offsets[MAX_NUM_LEVELS];
 			//		uint8_t padding[N];
 			//	}
 			
-			// Copy result address
-			memcpy(tempBuffer, &baseAddress, pointerSize);
-			
-			// Write number of levels
-			uint16_t numberOfLevels = levelIndex + 1;
-			memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize, &numberOfLevels, sizeof(numberOfLevels));
-			
-			// Write offset to currentOffsets
-			if (offsetMaxComparison)
-			{
-				memcpy(currentOffsets + levelIndex, static_cast<const uint8_t *>(searchResultData) + pointerSize, sizeof(uint16_t));
-			}
-			else
-			{
-				memcpy(currentOffsets + levelIndex, &searchIndirectOffset, sizeof(searchIndirectOffset));
-			}
-			
-			// Populate tempBuffer with offsets
-			memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize + sizeof(uint16_t), currentOffsets, sizeof(*currentOffsets) * numberOfLevels);
-			
 			// Determine if variable is static
+			NSUInteger matchingSegmentIndex;
 			NSValue *matchingSegmentRange = [totalStaticSegmentRanges zgBinarySearchUsingBlock:^NSComparisonResult(NSValue *__unsafe_unretained  _Nonnull currentValue) {
 				NSRange totalSegmentRange = currentValue.rangeValue;
 				if (baseAddress >= totalSegmentRange.location + totalSegmentRange.length)
@@ -1914,7 +1923,44 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 				}
 				
 				return NSOrderedSame;
-			}];
+			} getIndex:&matchingSegmentIndex];
+			
+			// Write result address and base image index
+			uint16_t baseImageIndex;
+			if (matchingSegmentRange == nil)
+			{
+				memcpy(tempBuffer, &baseAddress, pointerSize);
+				
+				baseImageIndex = UINT16_MAX;
+				memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
+			}
+			else
+			{
+				ZGMemoryAddress headerAddress = [headerAddresses[matchingSegmentIndex] unsignedLongLongValue];
+				ZGMemoryAddress offsetAddress = (baseAddress - headerAddress);
+				
+				memcpy(tempBuffer, &offsetAddress, pointerSize);
+				
+				baseImageIndex = static_cast<uint16_t>(matchingSegmentIndex);
+				memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
+			}
+			
+			// Write number of levels
+			uint16_t numberOfLevels = levelIndex + 1;
+			memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize + sizeof(baseImageIndex), &numberOfLevels, sizeof(numberOfLevels));
+			
+			// Write offset to currentOffsets
+			if (offsetMaxComparison)
+			{
+				memcpy(currentOffsets + levelIndex, static_cast<const uint8_t *>(searchResultData) + pointerSize, sizeof(uint16_t));
+			}
+			else
+			{
+				memcpy(currentOffsets + levelIndex, &searchIndirectOffset, sizeof(searchIndirectOffset));
+			}
+			
+			// Populate tempBuffer with offsets
+			memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize + sizeof(baseImageIndex) + sizeof(numberOfLevels), currentOffsets, sizeof(*currentOffsets) * numberOfLevels);
 			
 			if (matchingSegmentRange == nil)
 			{
@@ -1926,6 +1972,7 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 				
 				[staticResultSet appendBytes:tempBuffer length:stride];
 			}
+			
 			memset(static_cast<uint8_t *>(tempBuffer), 0, stride);
 			
 			uint16_t nextLevelIndex = levelIndex + 1;
@@ -1951,20 +1998,42 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 	}];
 }
 
-static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap processTask, const void *indirectResult, ZGMemorySize pointerSize, std::unordered_map<ZGMemoryAddress, ZGRegion *> &pageToRegionTable, ZGMemorySize pageSize, uint16_t *outNumberOfLevels, uint16_t *outOffsets, ZGMemoryAddress *outBaseAddresses, ZGMemoryAddress *outNextRecurseSearchAddress)
+static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap processTask, const void *indirectResult, ZGMemorySize pointerSize, NSArray<NSNumber *> *headerAddresses, std::unordered_map<ZGMemoryAddress, ZGRegion *> &pageToRegionTable, ZGMemorySize pageSize, uint16_t *outNumberOfLevels, uint16_t *outOffsets, ZGMemoryAddress *outBaseAddresses, ZGMemoryAddress *outNextRecurseSearchAddress)
 {
+	
+	//	Struct {
+	//		uintptr_t baseAddress;
+	//		uint16_t baseImageIndex;
+	//		uint16_t numLevels;
+	//		uint16_t offsets[MAX_NUM_LEVELS];
+	//		uint8_t padding[N];
+	//	}
+	
 	const uint8_t *resultBytes = static_cast<const uint8_t *>(indirectResult);
 	
-	ZGMemoryAddress baseAddress;
+	ZGMemoryAddress initialBaseAddress;
 	if (pointerSize == sizeof(ZGMemoryAddress))
 	{
-		memcpy(&baseAddress, resultBytes, pointerSize);
+		memcpy(&initialBaseAddress, resultBytes, pointerSize);
 	}
 	else
 	{
 		ZG32BitMemoryAddress halfAddress;
 		memcpy(&halfAddress, resultBytes, pointerSize);
-		baseAddress = halfAddress;
+		initialBaseAddress = halfAddress;
+	}
+	
+	uint16_t baseImageIndex;
+	memcpy(&baseImageIndex, resultBytes + pointerSize, sizeof(baseImageIndex));
+	
+	ZGMemoryAddress baseAddress;
+	if (baseImageIndex == UINT16_MAX)
+	{
+		baseAddress = initialBaseAddress;
+	}
+	else
+	{
+		baseAddress = initialBaseAddress + headerAddresses[baseImageIndex].unsignedLongLongValue;
 	}
 	
 	if (outNextRecurseSearchAddress != nullptr)
@@ -1973,14 +2042,14 @@ static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap p
 	}
 	
 	uint16_t numberOfLevels;
-	memcpy(&numberOfLevels, resultBytes + pointerSize, sizeof(numberOfLevels));
+	memcpy(&numberOfLevels, resultBytes + pointerSize + sizeof(baseImageIndex), sizeof(numberOfLevels));
 	
 	if (outNumberOfLevels != nullptr)
 	{
 		*outNumberOfLevels = numberOfLevels;
 	}
 	
-	const uint8_t *offsets = resultBytes + pointerSize + sizeof(numberOfLevels);
+	const uint8_t *offsets = resultBytes + pointerSize + sizeof(baseImageIndex) + sizeof(numberOfLevels);
 	
 	if (outOffsets != nullptr)
 	{
@@ -1992,7 +2061,6 @@ static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap p
 	ZGMemoryAddress currentAddress = baseAddress;
 	for (uint16_t level = 0; level < numberOfLevels; level++)
 	{
-		//ZGRegion *region = [pageToRegionTable objectForKey:@(currentAddress - (currentAddress % pageSize))];
 		ZGRegion *region = pageToRegionTable[currentAddress - (currentAddress % pageSize)];
 		if (region == nil)
 		{
@@ -2002,6 +2070,7 @@ static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap p
 		
 		if (region->_bytes == nullptr && !ZGReadBytes(processTask, region->_address, &region->_bytes, &region->_size))
 		{
+			region->_bytes = nullptr;
 			validAddress = false;
 			break;
 		}
@@ -2075,6 +2144,7 @@ static NSArray<ZGRegion *> *ZGBuildPageToRegionTable(ZGMemoryMap processTask, st
 	{
 		ZGMemoryAddress regionAddress = region.address;
 		ZGMemorySize regionSize = region.size;
+		assert(regionAddress % pageSize == 0);
 		for (NSUInteger dataIndex = 0; dataIndex < regionSize; dataIndex += pageSize)
 		{
 			pageToRegionTable[(dataIndex + regionAddress)] = region;
@@ -2096,13 +2166,16 @@ static void ZGFreeRegionBytes(NSArray<ZGRegion *> *regions)
 	}
 }
 
-ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, ZGSearchResults * _Nullable previousSearchResults)
+ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, BOOL translated, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, uint16_t indirectMaxLevels, ZGVariableType indirectDataType, ZGSearchResults * _Nullable previousSearchResults)
 {
 	const uint16_t previousIndirectMaxLevels = previousSearchResults.indirectMaxLevels;
 	const uint16_t maxLevels = (indirectMaxLevels >= previousIndirectMaxLevels) ? indirectMaxLevels : previousIndirectMaxLevels;
 	
 	NSArray<NSValue *> *totalStaticSegmentRanges = searchData.totalStaticSegmentRanges;
 	NSValue *firstTotalStaticSegmentRangeValue = totalStaticSegmentRanges.firstObject;
+	
+	NSArray<NSNumber *> *headerAddresses = searchData.headerAddresses;
+	NSArray<NSString *> *filePaths = searchData.filePaths;
 	
 	// Build pointer table across all regions of interest when we are going to do an expensive search
 	NSMutableData *pointerTableData;
@@ -2189,7 +2262,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			});
 		}
 		
-		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES delegate:delegate];
+		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES headerAddresses:headerAddresses delegate:delegate];
 		
 		_ZGSearchForIndirectPointerRecursively(pointerValueEntries, pointerValueEntriesCount, resultSets, 0, staticMainExecutableResultSet, staticOtherLibrariesResultSet, currentOffsets, currentBaseAddresses, visitedSearchResults, 0, tempBuffer, searchData.searchValue, searchData, pointerSize, indirectDataType, stride, maxLevels, indirectOffsetMaxComparison, indirectStopAtStaticAddresses, processTask, delegate, progressNotifier);
 		
@@ -2212,15 +2285,14 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 		
 		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousSearchResults.count];
 		
-		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES delegate:delegate];
+		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES headerAddresses:headerAddresses delegate:delegate];
 		
 		if (delegate != nil)
 		{
 			[progressNotifier start];
 		}
 		
-		ZGMemorySize pageSize = NSPageSize(); // sane default
-		ZGPageSize(processTask, &pageSize);
+		ZGMemorySize pageSize = ZGPageSizeForRegionAlignment(processTask, translated);
 		
 		std::unordered_map<ZGMemoryAddress, ZGRegion *> pageToRegionTable;
 		NSArray<ZGRegion *> *regions = ZGBuildPageToRegionTable(processTask, pageToRegionTable, searchData, pageSize);
@@ -2246,7 +2318,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 				memset(currentOffsets, 0, sizeof(*currentOffsets) * maxLevels);
 				memset(currentBaseAddresses, 0, sizeof(*currentBaseAddresses) * maxLevels);
 				
-				if (ZGEvaluateIndirectAddress(&currentAddress, processTask, previousIndirectResult, pointerSize, pageToRegionTable, pageSize, &numberOfLevels, currentOffsets, currentBaseAddresses, &nextRecurseSearchAddress) &&
+				if (ZGEvaluateIndirectAddress(&currentAddress, processTask, previousIndirectResult, pointerSize, headerAddresses, pageToRegionTable, pageSize, &numberOfLevels, currentOffsets, currentBaseAddresses, &nextRecurseSearchAddress) &&
 					currentAddress == searchAddress)
 				{
 					memset(tempBuffer, 0, stride);
@@ -2345,6 +2417,10 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	
 	indirectSearchResults.indirectMaxLevels = maxLevels;
 	
+	indirectSearchResults.headerAddresses = headerAddresses;
+	indirectSearchResults.totalStaticSegmentRanges = totalStaticSegmentRanges;
+	indirectSearchResults.filePaths = filePaths;
+	
 	return indirectSearchResults;
 }
 
@@ -2417,7 +2493,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:newResultSetCount];
 	
-	ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:resultType dataType:resultDataType stride:newResultStride notifiesStaticResults:NO delegate:delegate];
+	ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:resultType dataType:resultDataType stride:newResultStride notifiesStaticResults:NO headerAddresses:searchData.headerAddresses delegate:delegate];
 	
 	if (delegate != nil)
 	{
@@ -2661,15 +2737,14 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 }
 
 template <typename T, typename F>
-ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap processTask, T *searchValue, ZGSearchData * __unsafe_unretained searchData, ZGVariableType rawDataType, ZGVariableType resultDataType, id <ZGSearchProgressDelegate> delegate, ZGSearchResults * __unsafe_unretained firstSearchResults, ZGSearchResults * __unsafe_unretained laterSearchResults, ZGSearchResults * __unsafe_unretained indirectSearchResults)
+ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap processTask, BOOL translated, T *searchValue, ZGSearchData * __unsafe_unretained searchData, ZGVariableType rawDataType, ZGVariableType resultDataType, id <ZGSearchProgressDelegate> delegate, ZGSearchResults * __unsafe_unretained firstSearchResults, ZGSearchResults * __unsafe_unretained laterSearchResults, ZGSearchResults * __unsafe_unretained indirectSearchResults)
 {
 	ZGMemorySize pointerSize = searchData.pointerSize;
 	ZGMemorySize resultDataStride = (indirectSearchResults == nil) ? firstSearchResults.stride : indirectSearchResults.stride;
 	ZGMemorySize dataSize = searchData.dataSize;
 	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
 	
-	ZGMemorySize pageSize = NSPageSize(); // sane default
-	ZGPageSize(processTask, &pageSize);
+	ZGMemorySize pageSize = ZGPageSizeForRegionAlignment(processTask, translated);
 	
 	BOOL includeSharedMemory = searchData.includeSharedMemory;
 	
@@ -2843,31 +2918,31 @@ ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap pr
 
 #pragma mark Narrowing Integers
 
-#define ZGHandleNarrowIntegerType(functionType, type, integerQualifier, dataType, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults) \
+#define ZGHandleNarrowIntegerType(functionType, type, integerQualifier, dataType, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults) \
 case dataType: \
 if (integerQualifier == ZGSigned) \
-	retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, type * a, type *b, type *c) -> bool { return functionType(sd, a, b, c); }, processTask, static_cast<type *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
+	retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, type * a, type *b, type *c) -> bool { return functionType(sd, a, b, c); }, processTask, translated, static_cast<type *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
 else \
-	retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, u##type *a, u##type *b, u##type *c) -> bool { return functionType(sd, a, b, c); }, processTask, static_cast<u##type *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
+	retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, u##type *a, u##type *b, u##type *c) -> bool { return functionType(sd, a, b, c); }, processTask, translated, static_cast<u##type *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
 break
 
 #define ZGHandleNarrowIntegerCase(dataType, function) \
 if (dataType == ZGPointer) {\
 	switch (searchData.dataSize) {\
 		case sizeof(ZGMemoryAddress):\
-			retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return function(sd, a, b, c); }, processTask, static_cast<uint64_t *>(searchData.searchValue), searchData, ZGInt64, ZGPointer, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
+			retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint64_t *a, uint64_t *b, uint64_t *c) -> bool { return function(sd, a, b, c); }, processTask, translated, static_cast<uint64_t *>(searchData.searchValue), searchData, ZGInt64, ZGPointer, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
 			break;\
 		case sizeof(ZG32BitMemoryAddress):\
-			retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return function(sd, a, b, c); }, processTask, static_cast<uint32_t *>(searchData.searchValue), searchData, ZGInt32, ZGPointer, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
+			retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint32_t *a, uint32_t *b, uint32_t *c) -> bool { return function(sd, a, b, c); }, processTask, translated, static_cast<uint32_t *>(searchData.searchValue), searchData, ZGInt32, ZGPointer, delegate, firstSearchResults, laterSearchResults, indirectSearchResults); \
 			break;\
 	}\
 }\
 else {\
 	switch (dataType) {\
-		ZGHandleNarrowIntegerType(function, int8_t, integerQualifier, ZGInt8, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
-		ZGHandleNarrowIntegerType(function, int16_t, integerQualifier, ZGInt16, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
-		ZGHandleNarrowIntegerType(function, int32_t, integerQualifier, ZGInt32, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
-		ZGHandleNarrowIntegerType(function, int64_t, integerQualifier, ZGInt64, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+		ZGHandleNarrowIntegerType(function, int8_t, integerQualifier, ZGInt8, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+		ZGHandleNarrowIntegerType(function, int16_t, integerQualifier, ZGInt16, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+		ZGHandleNarrowIntegerType(function, int32_t, integerQualifier, ZGInt32, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+		ZGHandleNarrowIntegerType(function, int64_t, integerQualifier, ZGInt64, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
 		case ZGFloat:\
 		case ZGDouble:\
 		case ZGPointer:\
@@ -2879,7 +2954,7 @@ else {\
 	}\
 }\
 
-ZGSearchResults *ZGNarrowSearchForIntegers(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults * __unsafe_unretained firstSearchResults, ZGSearchResults * __unsafe_unretained laterSearchResults, ZGSearchResults *__unsafe_unretained indirectSearchResults)
+ZGSearchResults *ZGNarrowSearchForIntegers(ZGMemoryMap processTask, BOOL translated, ZGSearchData * __unsafe_unretained searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults * __unsafe_unretained firstSearchResults, ZGSearchResults * __unsafe_unretained laterSearchResults, ZGSearchResults *__unsafe_unretained indirectSearchResults)
 {
 	id retValue = nil;
 	switch (functionType)
@@ -2994,15 +3069,15 @@ ZGSearchResults *ZGNarrowSearchForIntegers(ZGMemoryMap processTask, ZGSearchData
 	return retValue;
 }
 
-#define ZGHandleNarrowType(functionType, type, dataType, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults) \
+#define ZGHandleNarrowType(functionType, type, dataType, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults) \
 	case dataType: \
-		retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, type *a, type *b, type *c) -> bool { return functionType(sd, a, b, c); }, processTask, static_cast<type *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+		retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, type *a, type *b, type *c) -> bool { return functionType(sd, a, b, c); }, processTask, translated, static_cast<type *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
 		break
 
 #define ZGHandleNarrowFloatingPointCase(theCase, function) \
 switch (theCase) {\
-	ZGHandleNarrowType(function, float, ZGFloat, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
-	ZGHandleNarrowType(function, double, ZGDouble, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+	ZGHandleNarrowType(function, float, ZGFloat, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+	ZGHandleNarrowType(function, double, ZGDouble, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
 	case ZGInt8:\
 	case ZGInt16:\
 	case ZGInt32:\
@@ -3017,7 +3092,7 @@ switch (theCase) {\
 
 #pragma mark Narrowing Floating Points
 
-ZGSearchResults *ZGNarrowSearchForFloatingPoints(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGFunctionType functionType, ZGSearchResults * __unsafe_unretained firstSearchResults, ZGSearchResults * __unsafe_unretained laterSearchResults, ZGSearchResults * __unsafe_unretained indirectSearchResults)
+ZGSearchResults *ZGNarrowSearchForFloatingPoints(ZGMemoryMap processTask, BOOL translated, ZGSearchData * __unsafe_unretained searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGFunctionType functionType, ZGSearchResults * __unsafe_unretained firstSearchResults, ZGSearchResults * __unsafe_unretained laterSearchResults, ZGSearchResults * __unsafe_unretained indirectSearchResults)
 {
 	id retValue = nil;
 	switch (functionType)
@@ -3160,7 +3235,7 @@ bool ZGByteArrayNotEquals(ZGSearchData *__unsafe_unretained searchData, T * __re
 	return !ZGByteArrayEquals(searchData, variableValue, compareValue, extraStorage);
 }
 
-ZGSearchResults *ZGNarrowSearchForByteArrays(ZGMemoryMap processTask, ZGSearchData *searchData, ZGVariableType dataType, id <ZGSearchProgressDelegate> delegate, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults, ZGSearchResults *indirectSearchResults)
+ZGSearchResults *ZGNarrowSearchForByteArrays(ZGMemoryMap processTask, BOOL translated, ZGSearchData *searchData, ZGVariableType dataType, id <ZGSearchProgressDelegate> delegate, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults, ZGSearchResults *indirectSearchResults)
 {
 	id retValue = nil;
 	
@@ -3169,21 +3244,21 @@ ZGSearchResults *ZGNarrowSearchForByteArrays(ZGMemoryMap processTask, ZGSearchDa
 		case ZGEquals:
 			if (searchData.byteArrayFlags != nullptr)
 			{
-				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayWithWildcardsEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayWithWildcardsEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 			}
 			else
 			{
-				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 			}
 			break;
 		case ZGNotEquals:
 			if (searchData.byteArrayFlags != nullptr)
 			{
-				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayWithWildcardsNotEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayWithWildcardsNotEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 			}
 			else
 			{
-				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayNotEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+				retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayNotEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 			}
 			break;
 		case ZGEqualsStored:
@@ -3206,8 +3281,8 @@ ZGSearchResults *ZGNarrowSearchForByteArrays(ZGMemoryMap processTask, ZGSearchDa
 
 #define ZGHandleNarrowStringCase(theCase, function1, function2) \
 switch (theCase) {\
-	ZGHandleNarrowType(function1, char, ZGString8, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
-	ZGHandleNarrowType(function2, unichar, ZGString16, processTask, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+	ZGHandleNarrowType(function1, char, ZGString8, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
+	ZGHandleNarrowType(function2, unichar, ZGString16, processTask, translated, searchData, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);\
 	case ZGInt8:\
 	case ZGInt16:\
 	case ZGInt32:\
@@ -3220,7 +3295,7 @@ switch (theCase) {\
 	break;\
 }\
 
-ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults, ZGSearchResults *indirectSearchResults)
+ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, BOOL translated, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults, ZGSearchResults *indirectSearchResults)
 {
 	id retValue = nil;
 	
@@ -3231,21 +3306,21 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 			case ZGEquals:
 				if (dataType == ZGString16 && searchData.bytesSwapped)
 				{
-					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGString16FastSwappedEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGString16FastSwappedEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 				}
 				else
 				{
-					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 				}
 				break;
 			case ZGNotEquals:
 				if (dataType == ZGString16 && searchData.bytesSwapped)
 				{
-					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGString16FastSwappedNotEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGString16FastSwappedNotEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 				}
 				else
 				{
-					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayNotEquals(sd, a, b, c); }, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
+					retValue = ZGNarrowSearchWithFunction([](ZGSearchData * __unsafe_unretained sd, uint8_t *a, uint8_t *b, uint8_t *c) -> bool { return ZGByteArrayNotEquals(sd, a, b, c); }, processTask, translated, static_cast<uint8_t *>(searchData.searchValue), searchData, dataType, dataType, delegate, firstSearchResults, laterSearchResults, indirectSearchResults);
 				}
 				break;
 			case ZGEqualsStored:
@@ -3304,7 +3379,7 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 
 #pragma mark Narrow Search for Data
 
-static ZGSearchResults *_ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults, ZGSearchResults *indirectSearchResults)
+static ZGSearchResults *_ZGNarrowSearchForData(ZGMemoryMap processTask, BOOL translated, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults, ZGSearchResults *indirectSearchResults)
 {
 	id retValue = nil;
 	
@@ -3315,18 +3390,18 @@ static ZGSearchResults *_ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearch
 		case ZGInt32:
 		case ZGInt64:
 		case ZGPointer:
-			retValue = ZGNarrowSearchForIntegers(processTask, searchData, delegate, dataType, integerQualifier, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
+			retValue = ZGNarrowSearchForIntegers(processTask, translated, searchData, delegate, dataType, integerQualifier, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
 			break;
 		case ZGFloat:
 		case ZGDouble:
-			retValue = ZGNarrowSearchForFloatingPoints(processTask, searchData, delegate, dataType, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
+			retValue = ZGNarrowSearchForFloatingPoints(processTask, translated, searchData, delegate, dataType, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
 			break;
 		case ZGString8:
 		case ZGString16:
-			retValue = ZGNarrowSearchForStrings(processTask, searchData, delegate, dataType, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
+			retValue = ZGNarrowSearchForStrings(processTask, translated, searchData, delegate, dataType, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
 			break;
 		case ZGByteArray:
-			retValue = ZGNarrowSearchForByteArrays(processTask, searchData, dataType, delegate, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
+			retValue = ZGNarrowSearchForByteArrays(processTask, translated, searchData, dataType, delegate, functionType, firstSearchResults, laterSearchResults, indirectSearchResults);
 			break;
 		case ZGScript:
 			break;
@@ -3335,29 +3410,23 @@ static ZGSearchResults *_ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearch
 	return retValue;
 }
 
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, BOOL translated, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)
 {
-	return _ZGNarrowSearchForData(processTask, searchData, delegate, dataType, integerQualifier, functionType, firstSearchResults, laterSearchResults, nil);
+	return _ZGNarrowSearchForData(processTask, translated, searchData, delegate, dataType, integerQualifier, functionType, firstSearchResults, laterSearchResults, nil);
 }
 
-ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *indirectSearchResults)
+ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL translated, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *indirectSearchResults)
 {
 	NSArray<NSData *> *indirectResultSets = indirectSearchResults.resultSets;
 	
-	//	Struct {
-	//		uintptr_t baseAddress;
-	//		uint16_t numLevels;
-	//		uint16_t offsets[MAX_NUM_LEVELS];
-	//		uint8_t padding[N];
-	//	}
-	
-	ZGMemorySize pageSize = NSPageSize(); // sane default
-	ZGPageSize(processTask, &pageSize);
+	ZGMemorySize pageSize = ZGPageSizeForRegionAlignment(processTask, translated);
 	
 	std::unordered_map<ZGMemoryAddress, ZGRegion *> pageToRegionTable;
 	NSArray<ZGRegion *> *regions = ZGBuildPageToRegionTable(processTask, pageToRegionTable, searchData, pageSize);
 	
 	NSMutableArray<NSData *> *directResultSets = [NSMutableArray array];
+	
+	NSArray<NSNumber *> *headerAddresses = indirectSearchResults.headerAddresses;
 	
 	ZGMemorySize pointerSize = searchData.pointerSize;
 	ZGMemorySize indirectResultsStride = indirectSearchResults.stride;
@@ -3373,7 +3442,7 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, ZGSearch
 			const uint8_t *resultBytes = resultSetBytes + resultIndex * indirectResultsStride;
 			
 			ZGMemoryAddress address;
-			if (!ZGEvaluateIndirectAddress(&address, processTask, resultBytes, pointerSize, pageToRegionTable, pageSize, nullptr, nullptr, nullptr, nullptr))
+			if (!ZGEvaluateIndirectAddress(&address, processTask, resultBytes, pointerSize, headerAddresses, pageToRegionTable, pageSize, nullptr, nullptr, nullptr, nullptr))
 			{
 				address = 0x0;
 			}
@@ -3399,7 +3468,12 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, ZGSearch
 	
 	ZGSearchResults *directSearchResults = [[ZGSearchResults alloc] initWithResultSets:directResultSets resultType:ZGSearchResultTypeDirect dataType:dataType stride:pointerSize unalignedAccess:indirectSearchResults.unalignedAccess];
 	
-	ZGSearchResults *narrowSearchResults = _ZGNarrowSearchForData(processTask, searchData, delegate, dataType, integerQualifier, functionType, directSearchResults, nullptr, indirectSearchResults);
+	ZGSearchResults *narrowSearchResults = _ZGNarrowSearchForData(processTask, translated, searchData, delegate, dataType, integerQualifier, functionType, directSearchResults, nullptr, indirectSearchResults);
+	
+	narrowSearchResults.indirectMaxLevels = indirectSearchResults.indirectMaxLevels;
+	narrowSearchResults.headerAddresses = headerAddresses;
+	narrowSearchResults.totalStaticSegmentRanges = indirectSearchResults.totalStaticSegmentRanges;
+	narrowSearchResults.filePaths = indirectSearchResults.filePaths;
 	
 	return narrowSearchResults;
 }

@@ -378,6 +378,8 @@
 	[[self undoManager] removeAllActions];
 
 	[_tableController clearCache];
+	
+	[_searchController invalidateStaticSearchResultMapping];
 
 	for (ZGVariable *variable in _documentData.variables)
 	{

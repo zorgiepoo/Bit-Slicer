@@ -633,7 +633,7 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject * __unused 
 	_searchProgress = searchProgress;
 }
 
-- (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSets:(NSArray<NSData *> *)__unused resultSets totalResultSetLength:(NSUInteger)__unused totalResultSetLength resultType:(ZGSearchResultType)__unused resultType dataType:(ZGVariableType)__unused dataType addressType:(ZGSearchResultAddressType)__unused addressType stride:(ZGMemorySize)__unused stride
+- (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSets:(NSArray<NSData *> *)__unused resultSets totalResultSetLength:(NSUInteger)__unused totalResultSetLength resultType:(ZGSearchResultType)__unused resultType dataType:(ZGVariableType)__unused dataType addressType:(ZGSearchResultAddressType)__unused addressType stride:(ZGMemorySize)__unused stride headerAddresses:(NSArray<NSNumber *> * _Nullable)__unused headerAddresses
 {
 }
 

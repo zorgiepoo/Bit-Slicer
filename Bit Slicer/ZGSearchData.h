@@ -75,7 +75,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) void *swappedValue;
 @property (nonatomic) BOOL bytesSwapped;
 
-@property (nonatomic) NSArray<NSValue *> *totalStaticSegmentRanges;
+@property (nonatomic, nullable) NSArray<NSValue *> *totalStaticSegmentRanges;
+@property (nonatomic, nullable) NSArray<NSNumber *> *headerAddresses;
+@property (nonatomic, nullable) NSArray<NSString *> *filePaths;
 
 @property (nonatomic, nullable) void *rangeValue;
 @property (nonatomic, nullable) ZGStoredData *savedData;

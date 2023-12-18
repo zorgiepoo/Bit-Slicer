@@ -207,13 +207,6 @@
 			{
 				return nil;
 			}
-			
-			NSRange matchingSegmentRange = matchingSegmentRangeValue.rangeValue;
-			
-			ZGMemoryAddress maxStartingAddress = MAX(matchingSegmentRange.location, region.address);
-			ZGMemoryAddress minEndingAddress = MIN(matchingSegmentRange.location + matchingSegmentRange.length, region.address + region.size);
-			
-			return [[ZGRegion alloc] initWithAddress:maxStartingAddress size:(minEndingAddress - maxStartingAddress) protection:region.protection userTag:region.userTag];
 		}
 		
 		return region;

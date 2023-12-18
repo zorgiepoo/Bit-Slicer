@@ -52,6 +52,10 @@ typedef NS_ENUM(NSInteger, ZGSearchResultType)
 @property (nonatomic, readonly) ZGSearchResultType resultType;
 @property (nonatomic) uint16_t indirectMaxLevels;
 
+@property (nonatomic, nullable) NSArray<NSValue *> *totalStaticSegmentRanges;
+@property (nonatomic, nullable) NSArray<NSNumber *> *headerAddresses;
+@property (nonatomic, nullable) NSArray<NSString *> *filePaths;
+
 // Only used by clients
 @property (nonatomic, readonly) ZGVariableType dataType;
 
@@ -64,6 +68,8 @@ typedef void (^zg_enumerate_search_results_t)(const void *data, BOOL *stop);
 - (instancetype)indirectSearchResultsByAppendingIndirectSearchResults:(ZGSearchResults *)newSearchResults;
 
 - (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback;
+
+- (void)updateHeaderAddresses:(NSArray<NSNumber *> *)headerAddresses totalStaticSegmentRanges:(NSArray<NSValue *> *)totalStaticSegmentRanges usingFilePaths:(NSArray<NSString *> *)filePaths;
 
 @end
 
