@@ -685,7 +685,8 @@
 	
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	_searchData.pointerSize = windowController.currentProcess.pointerSize;
+	ZGProcess *process = windowController.currentProcess;
+	_searchData.pointerSize = process.pointerSize;
 	
 	// Set default search arguments
 	_searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
@@ -871,6 +872,16 @@
 	else
 	{
 		_searchData.protectionMode = _documentData.addressProtectionMode;
+		
+		if (!ZG_PROCESS_TYPE_IS_64_BIT(process.type))
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"addressTypeNotSupportedFor32Bit")}];
+			}
+			
+			return NO;
+		}
 	}
 	
 	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)

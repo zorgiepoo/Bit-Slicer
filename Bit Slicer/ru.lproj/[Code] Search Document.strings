@@ -175,6 +175,9 @@
 /* Error Message for when Beginning Address >= Ending Address */
 "endingAddressIsNotGreaterThanBeginningAddressErrorMessage" = "Значение Начального адреса должно быть меньше, чем значение в Конечном адресе, либо одно или оба поля можгут оставаться пустыми.";
 
+/* Error Message for when trying address type search for 32-bit targets */
+"addressTypeNotSupportedFor32Bit" = "Searching memory addresses for 32-bit targets is not supported.";
+
 /* Error message for when the selected data type to seach is a numerical one, and the expression cannot be parsed */
 "invalidNumericalSearchExpressionErrorMessage" = "Поисковое значение должно быть числовым.";
 

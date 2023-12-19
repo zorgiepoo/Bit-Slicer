@@ -175,6 +175,9 @@
 /* Error Message for when Beginning Address >= Ending Address */
 "endingAddressIsNotGreaterThanBeginningAddressErrorMessage" = "The value in the Beginning Address field must be less than the value in the Ending Address field, or one or both of the fields can be omitted.";
 
+/* Error Message for when trying address type search for 32-bit targets */
+"addressTypeNotSupportedFor32Bit" = "Searching memory addresses for 32-bit targets is not supported.";
+
 /* Error message for when the selected data type to seach is a numerical one, and the expression cannot be parsed */
 "invalidNumericalSearchExpressionErrorMessage" = "The search value is not a valid numerical expression.";
 
