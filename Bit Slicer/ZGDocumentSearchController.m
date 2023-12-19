@@ -1379,9 +1379,9 @@
 				
 				[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
 				
-				if (!pointerAddressSearch && storeValuesAfterSearch && self->_searchData.savedData != nil)
+				if (storeValuesAfterSearch && self->_searchData.savedData != nil)
 				{
-					[self storeAllValuesAndAfterSearches:YES];
+					[self storeAllValuesAndAfterSearches:YES insertValueToken:NO];
 				}
 			}
 		});
@@ -1428,7 +1428,7 @@
 	}
 }
 
-- (void)storeAllValuesAndAfterSearches:(BOOL)storeValuesAfterSearches
+- (void)storeAllValuesAndAfterSearches:(BOOL)storeValuesAfterSearches insertValueToken:(BOOL)insertValueToken
 {
 	[self prepareTask];
 	
@@ -1438,7 +1438,7 @@
 	
 	ZGMemoryAddress beginAddress = _searchData.beginAddress;
 	ZGMemoryAddress endAddress = _searchData.endAddress;
-	ZGProtectionMode protectionMode = (_documentData.searchType == ZGSearchTypeValue) ? _documentData.valueProtectionMode : _documentData.addressProtectionMode;
+	ZGProtectionMode protectionMode = _documentData.valueProtectionMode;
 	BOOL includeSharedMemory = _searchData.includeSharedMemory;
 	
 	ZGMemoryMap processTask = windowController.currentProcess.processTask;
@@ -1453,7 +1453,7 @@
 				tempSavedData = nil;
 				[self updateStoreValuesButtonImageWithStoringValuesAfterSearches:storeValuesAfterSearches];
 				
-				if (![[self class] hasStoredValueTokenFromExpression:self->_documentData.searchValue])
+				if (insertValueToken && ![[self class] hasStoredValueTokenFromExpression:self->_documentData.searchValue])
 				{
 					[windowController insertStoredValueToken];
 				}

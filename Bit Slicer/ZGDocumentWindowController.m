@@ -1621,7 +1621,7 @@
 - (void)_storeAllValues
 {
 	_documentData.searchValue = _searchValueTextField.stringValue;
-	[_searchController storeAllValuesAndAfterSearches:_storeValuesAfterSearch];
+	[_searchController storeAllValuesAndAfterSearches:_storeValuesAfterSearch insertValueToken:(_documentData.searchType == ZGSearchTypeValue)];
 }
 
 - (IBAction)storeAllValues:(id)__unused sender
