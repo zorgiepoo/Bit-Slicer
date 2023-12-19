@@ -317,7 +317,7 @@
 					{
 						for (ZGVariable *variable in _documentData.variables)
 						{
-							if ((!variable.usesDynamicPointerAddress || variable.enabled) && variable.type == selectedDataType && !variable.usesDynamicSymbolAddress)
+							if ((!variable.usesDynamicPointerAddress || variable.enabled) && variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
 							{
 								_documentData.searchAddress = variable.addressStringValue;
 								break;
