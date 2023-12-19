@@ -47,6 +47,7 @@
 		_beginningAddressStringValue = @"";
 		_endingAddressStringValue = @"";
 		_searchValue = @"";
+		_searchAddress = @"";
 		_functionTypeTag = ZGEquals;
 		_selectedDatatypeTag = ZGInt32;
 		_lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];

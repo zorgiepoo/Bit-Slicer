@@ -298,6 +298,17 @@
 		if (newSearchType != _documentData.searchType)
 		{
 			_documentData.searchType = newSearchType;
+			switch (newSearchType)
+			{
+				case ZGSearchTypeValue:
+					_documentData.searchAddress = _searchValueTextField.stringValue;
+					_searchValueTextField.stringValue = _documentData.searchValue;
+					break;
+				case ZGSearchTypeAddress:
+					_documentData.searchValue = _searchValueTextField.stringValue;
+					_searchValueTextField.stringValue = _documentData.searchAddress;
+					break;
+			}
 			
 			[self updateOptions];
 			[self markDocumentChange];
@@ -541,7 +552,14 @@
 		[optionsViewController reloadInterface];
 	}
 	
-	_searchValueTextField.stringValue = _documentData.searchValue;
+	if (_documentData.searchType == ZGSearchTypeAddress)
+	{
+		_searchValueTextField.stringValue = _documentData.searchAddress;
+	}
+	else
+	{
+		_searchValueTextField.stringValue = _documentData.searchValue;
+	}
 	
 	[self.window makeFirstResponder:_searchValueTextField];
 	
@@ -954,9 +972,17 @@
 
 - (ZGFunctionType)selectedFunctionType
 {
-	_documentData.searchValue = _searchValueTextField.stringValue;
-	
 	BOOL isSearchAddressType = (_documentData.searchType == ZGSearchTypeAddress);
+	
+	if (isSearchAddressType)
+	{
+		_documentData.searchAddress = _searchValueTextField.stringValue;
+	}
+	else
+	{
+		_documentData.searchValue = _searchValueTextField.stringValue;
+	}
+	
 	BOOL isLinearlyExpressedStoredValue = NO;
 	BOOL isStoringValues = !isSearchAddressType && [[_searchController class] hasStoredValueTokenFromExpression:_documentData.searchValue isLinearlyExpressed:&isLinearlyExpressedStoredValue];
 
@@ -1496,15 +1522,31 @@
 		}
 		
 		_searchValueTextField.stringValue = @"";
-		_documentData.searchValue = _searchValueTextField.stringValue;
+		
+		if (_documentData.searchType == ZGSearchTypeAddress)
+		{
+			_documentData.searchAddress = _searchValueTextField.stringValue;
+		}
+		else
+		{
+			_documentData.searchValue = _searchValueTextField.stringValue;
+		}
 	}
 }
 
 - (IBAction)searchValue:(id)__unused sender
 {
-	_documentData.searchValue = _searchValueTextField.stringValue;
+	NSString *newSearchValue = _searchValueTextField.stringValue;
+	if (_documentData.searchType == ZGSearchTypeValue)
+	{
+		_documentData.searchValue = newSearchValue;
+	}
+	else
+	{
+		_documentData.searchAddress = newSearchValue;
+	}
 	
-	BOOL hasEmptyExpression = (_documentData.searchValue.length == 0);
+	BOOL hasEmptyExpression = (newSearchValue.length == 0);
 	if (!hasEmptyExpression && _searchController.canStartTask && self.currentProcess.valid)
 	{
 		if (self.currentProcess.hasGrantedAccess)
@@ -1521,7 +1563,7 @@
 					[[self undoManager] removeAllActions];
 				}
 				
-				[_searchController searchVariablesWithString:_documentData.searchValue dataType:[self selectedDataType] pointerAddressSearch:(_documentData.searchType == ZGSearchTypeAddress) functionType:functionType storeValuesAfterSearch:_storeValuesAfterSearch];
+				[_searchController searchVariablesWithString:newSearchValue dataType:[self selectedDataType] pointerAddressSearch:(_documentData.searchType == ZGSearchTypeAddress) functionType:functionType storeValuesAfterSearch:_storeValuesAfterSearch];
 			}
 		}
 		else
@@ -1612,16 +1654,12 @@
 	
 	[_searchTypeGroup setSelected:YES forItemWithIdentifier:ZGSearchTypeAddressIdentifier];
 	
-	_documentData.searchValue = [NSString stringWithFormat:@"0x%llX", variable.address];
-	_searchValueTextField.stringValue = _documentData.searchValue;
+	_documentData.searchAddress = [NSString stringWithFormat:@"0x%llX", variable.address];
+	_searchValueTextField.stringValue = _documentData.searchAddress;
 	
 	[self.window makeFirstResponder:_searchValueTextField];
-}
-
-- (void)_storeAllValues
-{
-	_documentData.searchValue = _searchValueTextField.stringValue;
-	[_searchController storeAllValuesAndAfterSearches:_storeValuesAfterSearch insertValueToken:(_documentData.searchType == ZGSearchTypeValue)];
+	
+	[self markDocumentChange];
 }
 
 - (IBAction)storeAllValues:(id)__unused sender
@@ -1632,7 +1670,11 @@
 		[self _storeAllValuesAfterSearchesAndUpdateStoreValuesButton:NO];
 	}
 	
-	[self _storeAllValues];
+	if (_documentData.searchType == ZGSearchTypeValue)
+	{
+		_documentData.searchValue = _searchValueTextField.stringValue;
+	}
+	[_searchController storeAllValuesAndAfterSearches:_storeValuesAfterSearch insertValueToken:(_documentData.searchType == ZGSearchTypeValue)];
 }
 
 - (void)_storeAllValuesAfterSearchesAndUpdateStoreValuesButton:(BOOL)updateStoreValuesButton

@@ -184,6 +184,10 @@
 	 encodeObject:_data.searchValue
 	 forKey:ZGSearchStringValueKeyNew];
 	
+	[keyedArchiver
+	 encodeObject:_data.searchAddress
+	 forKey:ZGSearchStringAddressKey];
+	
 	[keyedArchiver finishEncoding];
 	
 	return [[NSFileWrapper alloc] initRegularFileWithContents:keyedArchiver.encodedData];
@@ -286,6 +290,10 @@
 	}
 	
 	_data.searchValue = (searchValue != nil) ? searchValue : @"";
+	
+	NSString *searchAddress = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchStringAddressKey];
+	
+	_data.searchAddress = (searchAddress != nil) ? searchAddress : @"";
 	
 	NSString *lastEpsilonValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEpsilonKey];
 	_data.lastEpsilonValue = lastEpsilonValue != nil ? lastEpsilonValue : @"";

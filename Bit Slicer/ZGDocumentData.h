@@ -57,6 +57,7 @@
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchStringValueKeyNew @"ZGSearchStringValueNewKey"
 #define ZGSearchStringValueKeyOld @"ZGSearchStringValueKey" // legacy
+#define ZGSearchStringAddressKey @"ZGSearchStringAddressKey"
 #define ZGIncludeSharedMemoryKey @"ZGIncludeSharedMemoryKey"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -90,6 +91,7 @@ typedef NS_ENUM(NSInteger, ZGSearchAddressOffsetComparison)
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;
 @property (copy, nonatomic) NSString *searchValue;
+@property (copy, nonatomic) NSString *searchAddress;
 @property (nonatomic) NSArray<ZGVariable *> *variables;
 @property (copy, nonatomic, nullable) NSString *desiredProcessInternalName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;
