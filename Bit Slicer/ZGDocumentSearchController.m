@@ -51,6 +51,7 @@
 #import "ZGVariableDataInfo.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGNullability.h"
+#import "NSStringAdditions.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-umbrella"
@@ -884,15 +885,38 @@
 		}
 	}
 	
+	NSString *indirectOffsetStringValue;
 	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)
 	{
 		_searchData.indirectOffsetMaxComparison = NO;
-		_searchData.indirectOffset = (uint16_t)_documentData.searchAddressSameOffset;
+		indirectOffsetStringValue = _documentData.searchAddressSameOffset;
 	}
 	else
 	{
 		_searchData.indirectOffsetMaxComparison = YES;
-		_searchData.indirectOffset = (uint16_t)_documentData.searchAddressMaxOffset;
+		indirectOffsetStringValue = _documentData.searchAddressMaxOffset;
+	}
+	
+	if ([indirectOffsetStringValue zgIsHexRepresentation])
+	{
+		unsigned int decodedOffset = 0;
+		if ([[NSScanner scannerWithString:indirectOffsetStringValue] scanHexInt:&decodedOffset])
+		{
+			_searchData.indirectOffset = (uint16_t)decodedOffset;
+		}
+		else
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"addressTypeIndirectOffsetParseError")}];
+			}
+			
+			return NO;
+		}
+	}
+	else
+	{
+		_searchData.indirectOffset = (uint16_t)indirectOffsetStringValue.zgUnsignedIntValue;
 	}
 	
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;

@@ -133,11 +133,11 @@
 	 forKey:ZGSearchAddressMaxLevelsKey];
 	
 	[keyedArchiver
-	 encodeInteger:_data.searchAddressMaxOffset
+	 encodeObject:_data.searchAddressMaxOffset
 	 forKey:ZGSearchAddressMaxOffsetKey];
     
 	[keyedArchiver
-	 encodeInteger:_data.searchAddressSameOffset
+	 encodeObject:_data.searchAddressSameOffset
 	 forKey:ZGSearchAddressSameOffsetKey];
 	
 	[keyedArchiver
@@ -242,8 +242,14 @@
 	
 	NSInteger decodedMaxLevels = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxLevelsKey];
 	_data.searchAddressMaxLevels = (decodedMaxLevels > 0 ? decodedMaxLevels : 1);
-	_data.searchAddressMaxOffset = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxOffsetKey];
-	_data.searchAddressSameOffset = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressSameOffsetKey];
+	
+	NSString *decodedSearchAddressMaxOffset = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchAddressMaxOffsetKey];
+	
+	_data.searchAddressMaxOffset = (decodedSearchAddressMaxOffset != nil ? decodedSearchAddressMaxOffset : @"");
+	
+	NSString *decodedSearchAddressSameOffset = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchAddressSameOffsetKey];
+	
+	_data.searchAddressSameOffset = (decodedSearchAddressSameOffset != nil ? decodedSearchAddressSameOffset : @"");
 	
 	NSInteger decodedOffsetComparison = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressOffsetComparisonKey];
 	NSInteger offsetComparison = ZGSearchAddressOffsetComparisonMax;

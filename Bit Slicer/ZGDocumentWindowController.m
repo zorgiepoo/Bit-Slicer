@@ -118,7 +118,6 @@
 	IBOutlet NSTextField *_searchAddressMaxLevelsTextField;
 	IBOutlet NSStepper *_searchAddressMaxLevelsStepper;
 	IBOutlet NSTextField *_searchAddressOffsetTextField;
-	IBOutlet NSStepper *_searchAddressOffsetStepper;
 	IBOutlet NSTextField *_searchAddressOffsetLabel;
 	IBOutlet NSBox *_searchAddressVerticalDivider;
 	IBOutlet NSPopUpButton *_searchAddressOffsetComparisonPopUpButton;
@@ -516,24 +515,16 @@
 	
 	[_searchTypeGroup setSelected:YES forItemWithIdentifier:_documentData.searchType == ZGSearchTypeAddress ? ZGSearchTypeAddressIdentifier : ZGSearchTypeValueIdentifier];
 	
-	NSNumberFormatter *searchAddressOffsetFormatter = (NSNumberFormatter *)(_searchAddressOffsetTextField.formatter);
-	searchAddressOffsetFormatter.numberStyle = NSNumberFormatterNoStyle;
-	
-	_searchAddressOffsetStepper.maxValue = searchAddressOffsetFormatter.maximum.doubleValue;
-	_searchAddressOffsetStepper.minValue = searchAddressOffsetFormatter.minimum.doubleValue;
-	
 	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
 	{
-		_searchAddressOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
+		_searchAddressOffsetTextField.stringValue = _documentData.searchAddressMaxOffset;
 	}
 	else
 	{
-		_searchAddressOffsetTextField.integerValue = _documentData.searchAddressSameOffset;
+		_searchAddressOffsetTextField.stringValue = _documentData.searchAddressSameOffset;
 	}
 	
 	[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:(NSInteger)_documentData.searchAddressOffsetComparison];
-	
-	_searchAddressOffsetStepper.integerValue = _searchAddressOffsetTextField.integerValue;
 	
 	NSNumberFormatter *searchAddressMaxLevelsFormatter = (NSNumberFormatter *)(_searchAddressMaxLevelsTextField.formatter);
 	searchAddressMaxLevelsFormatter.numberStyle = NSNumberFormatterNoStyle;
@@ -890,7 +881,6 @@
 		BOOL searchAddressOffsetComparisonWasHidden = _searchAddressOffsetComparisonPopUpButton.hidden;
 		
 		_searchAddressOffsetTextField.hidden = NO;
-		_searchAddressOffsetStepper.hidden = NO;
 		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
 		_searchAddressOffsetComparisonPopUpButton.enabled = YES;
 		
@@ -909,13 +899,11 @@
 	else if (nextNumberOfIndirectLevels <= currentNumberOfIndirectLevelsInTable)
 	{
 		_searchAddressOffsetTextField.hidden = YES;
-		_searchAddressOffsetStepper.hidden = YES;
 		_searchAddressOffsetComparisonPopUpButton.hidden = YES;
 	}
 	else /* if (nextNumberOfIndirectLevels > currentNumberOfIndirectLevelsInTable + 1) */
 	{
 		_searchAddressOffsetTextField.hidden = NO;
-		_searchAddressOffsetStepper.hidden = NO;
 		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
 		_searchAddressOffsetComparisonPopUpButton.enabled = NO;
 		
@@ -1051,31 +1039,13 @@
 
 - (IBAction)searchAddressOffsetDidChange:(id)sender
 {
-	if (sender == _searchAddressOffsetTextField)
+	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
 	{
-		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
-		{
-			_documentData.searchAddressMaxOffset = _searchAddressOffsetTextField.integerValue;
-			_searchAddressOffsetStepper.integerValue = _documentData.searchAddressMaxOffset;
-		}
-		else
-		{
-			_documentData.searchAddressSameOffset = _searchAddressOffsetTextField.integerValue;
-			_searchAddressOffsetStepper.integerValue = _documentData.searchAddressSameOffset;
-		}
+		_documentData.searchAddressMaxOffset = _searchAddressOffsetTextField.stringValue;
 	}
-	else /* if (sender == _searchAddressMaxOffsetStepper) */
+	else
 	{
-		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
-		{
-			_documentData.searchAddressMaxOffset = _searchAddressOffsetStepper.integerValue;
-			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
-		}
-		else
-		{
-			_documentData.searchAddressSameOffset = _searchAddressOffsetStepper.integerValue;
-			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressSameOffset;
-		}
+		_documentData.searchAddressSameOffset = _searchAddressOffsetTextField.stringValue;
 	}
 	
 	[self markDocumentChange];
@@ -1087,12 +1057,10 @@
 	switch (offsetComparison)
 	{
 		case ZGSearchAddressOffsetComparisonMax:
-			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressMaxOffset;
-			_searchAddressOffsetStepper.integerValue = _searchAddressOffsetTextField.integerValue;
+			_searchAddressOffsetTextField.stringValue = _documentData.searchAddressMaxOffset;
 			break;
 		case ZGSearchAddressOffsetComparisonSame:
-			_searchAddressOffsetTextField.integerValue = _documentData.searchAddressSameOffset;
-			_searchAddressOffsetStepper.integerValue = _searchAddressOffsetTextField.integerValue;
+			_searchAddressOffsetTextField.stringValue = _documentData.searchAddressSameOffset;
 			break;
 	}
 }

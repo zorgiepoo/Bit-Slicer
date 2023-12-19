@@ -178,6 +178,9 @@
 /* Error Message for when trying address type search for 32-bit targets */
 "addressTypeNotSupportedFor32Bit" = "Searching memory addresses for 32-bit targets is not supported.";
 
+/* Error Message for when the offset value cannot be parsed */
+"addressTypeIndirectOffsetParseError" = "The offset value could not be parsed.";
+
 /* Error message for when the selected data type to seach is a numerical one, and the expression cannot be parsed */
 "invalidNumericalSearchExpressionErrorMessage" = "Поисковое значение должно быть числовым.";
 
