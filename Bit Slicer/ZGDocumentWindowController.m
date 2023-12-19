@@ -62,6 +62,7 @@
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
 #import "ZGNullability.h"
+#import "ZGCalculator.h"
 #import <libproc.h>
 
 #import <TargetConditionals.h>
@@ -305,9 +306,38 @@
 					_searchValueTextField.stringValue = _documentData.searchValue;
 					break;
 				case ZGSearchTypeAddress:
+				{
 					_documentData.searchValue = _searchValueTextField.stringValue;
+					
+					ZGVariableType selectedDataType = _documentData.selectedDatatypeTag;
+					NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:selectedDataType];
+					
+					// Try to find an active variable the user may want to search its address for
+					if (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0)
+					{
+						for (ZGVariable *variable in _documentData.variables)
+						{
+							if ((!variable.usesDynamicPointerAddress || variable.enabled) && variable.type == selectedDataType && !variable.usesDynamicSymbolAddress)
+							{
+								_documentData.searchAddress = variable.addressStringValue;
+								break;
+							}
+						}
+					}
+					
 					_searchValueTextField.stringValue = _documentData.searchAddress;
+					
+					if (currentNumberOfIndirectLevelsInTable == 0)
+					{
+						// Reset levels state because this will be a new address search
+						_documentData.searchAddressMaxLevels = 1;
+						[self _updateSearchAddressMaxLevelsTextField];
+						
+						_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+						[self _updateSearchAddressOffsetTextField];
+					}
 					break;
+				}
 			}
 			
 			[self updateOptions];
@@ -543,8 +573,7 @@
 	_searchAddressMaxLevelsStepper.minValue = searchAddressMaxLevelsFormatter.minimum.doubleValue;
 	_searchAddressMaxLevelsStepper.maxValue = searchAddressMaxLevelsFormatter.maximum.doubleValue;
 	
-	_searchAddressMaxLevelsTextField.integerValue = _documentData.searchAddressMaxLevels;
-	_searchAddressMaxLevelsStepper.integerValue = _searchAddressMaxLevelsTextField.integerValue;
+	[self _updateSearchAddressMaxLevelsTextField];
 	
 	if (_advancedOptionsPopover != nil)
 	{
@@ -1061,6 +1090,12 @@
 	
 	[self updateSearchAddressOptions];
 	[self markDocumentChange];
+}
+
+- (void)_updateSearchAddressMaxLevelsTextField
+{
+	_searchAddressMaxLevelsTextField.integerValue = _documentData.searchAddressMaxLevels;
+	_searchAddressMaxLevelsStepper.integerValue = _searchAddressMaxLevelsTextField.integerValue;
 }
 
 - (IBAction)searchAddressOffsetDidChange:(id)sender
