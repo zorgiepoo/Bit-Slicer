@@ -458,6 +458,17 @@
 		
 		[_scriptManager triggerCurrentProcessChanged];
 		[_watchVariableWindowController triggerCurrentProcessChanged];
+		
+		if (_documentData.searchType == ZGSearchTypeValue && _documentData.searchAddress.length > 0)
+		{
+			// If a process died and is being restarted, the dynamic address searched is
+			// likely no longer valid (unless the expression uses some dynamic expression)
+			if (![_documentData.searchAddress containsString:ZGBaseAddressFunction] && ![_documentData.searchAddress containsString:ZGFindSymbolFunction])
+			{
+				_documentData.searchAddress = @"";
+				[self markDocumentChange];
+			}
+		}
 	}
 }
 
