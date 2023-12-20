@@ -95,6 +95,7 @@
 	
 	BOOL _preferringNewTab;
 	BOOL _storeValuesAfterSearch;
+	BOOL _performedRecentValueSearch;
 	
 	ZGEditValueWindowController * _Nullable _editValueWindowController;
 	ZGEditAddressWindowController * _Nullable _editAddressWindowController;
@@ -313,17 +314,50 @@
 					NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:selectedDataType];
 					
 					// Try to find an active variable the user may want to search its address for
-					if (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0)
+					if (self.currentProcess.valid && (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0 || _performedRecentValueSearch))
 					{
+						ZGVariable *foundEnabledIndirectVariable = nil;
+						ZGVariable *foundDirectVariable = nil;
 						for (ZGVariable *variable in _documentData.variables)
 						{
-							if ((!variable.usesDynamicPointerAddress || variable.enabled) && variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
+							if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
 							{
-								_documentData.searchAddress = variable.addressStringValue;
-								break;
+								if (variable.usesDynamicPointerAddress)
+								{
+									if (foundEnabledIndirectVariable == nil && variable.enabled)
+									{
+										foundEnabledIndirectVariable = variable;
+										if (foundDirectVariable != nil)
+										{
+											break;
+										}
+									}
+								}
+								else
+								{
+									if (foundDirectVariable == nil)
+									{
+										foundDirectVariable = variable;
+										if (foundEnabledIndirectVariable != nil)
+										{
+											break;
+										}
+									}
+								}
 							}
 						}
+						
+						if (foundEnabledIndirectVariable != nil)
+						{
+							_documentData.searchAddress = foundEnabledIndirectVariable.addressStringValue;
+						}
+						else if (foundDirectVariable != nil)
+						{
+							_documentData.searchAddress = foundDirectVariable.addressStringValue;
+						}
 					}
+					
+					_performedRecentValueSearch = NO;
 					
 					_searchValueTextField.stringValue = _documentData.searchAddress;
 					
@@ -1610,6 +1644,8 @@
 				}
 				
 				[_searchController searchVariablesWithString:newSearchValue dataType:[self selectedDataType] pointerAddressSearch:(_documentData.searchType == ZGSearchTypeAddress) functionType:functionType storeValuesAfterSearch:_storeValuesAfterSearch];
+				
+				_performedRecentValueSearch = YES;
 			}
 		}
 		else
