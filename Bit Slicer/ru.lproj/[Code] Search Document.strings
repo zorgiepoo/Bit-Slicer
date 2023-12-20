@@ -62,7 +62,7 @@
 "scopeBarEndianBigItem" = "Обратный";
 
 /* Scope Bar Search Type Group */
-"scopeBarSearchTypeGroup" = "Type:";
+"scopeBarSearchTypeGroup" = "Search Type:";
 
 /* Scope Bar Search Type Value */
 "scopeBarSearchTypeValueItem" = "Значение";
