@@ -47,10 +47,18 @@
 		_beginningAddressStringValue = @"";
 		_endingAddressStringValue = @"";
 		_searchValue = @"";
+		_searchAddress = @"";
 		_functionTypeTag = ZGEquals;
 		_selectedDatatypeTag = ZGInt32;
 		_lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
 		_byteOrderTag = CFByteOrderGetCurrent();
+		_searchType = ZGSearchTypeValue;
+		_searchAddressMaxLevels = 1;
+		_searchAddressMaxOffset = @"2048";
+		_searchAddressSameOffset = @"2048";
+		_searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+		_valueProtectionMode = ZGProtectionAll;
+		_addressProtectionMode = ZGProtectionWrite;
 	}
 	return self;
 }

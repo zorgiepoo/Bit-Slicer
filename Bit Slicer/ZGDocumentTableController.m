@@ -242,7 +242,7 @@
 	{
 		visibleRowsRange = [_variablesTableView rowsInRect:_variablesTableView.visibleRect];
 		
-		if (windowController.searchController.canStartTask && windowController.searchController.searchResults.addressCount > 0 && visibleRowsRange.location + visibleRowsRange.length >= _documentData.variables.count)
+		if (windowController.searchController.canStartTask && windowController.searchController.searchResults.count > 0 && visibleRowsRange.location + visibleRowsRange.length >= _documentData.variables.count)
 		{
 			[windowController.searchController fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH];
 			needsToReloadTable = YES;

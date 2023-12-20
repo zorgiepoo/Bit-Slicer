@@ -31,6 +31,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGSearchProtectionMode.h"
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
 #define ZGProcessInternalNameKey @"ZGProcessNameKey"
@@ -39,7 +40,13 @@
 #define ZGQualifierTagKey @"ZGQualifierKey"
 #define ZGByteOrderTagKey @"ZGByteOrderTagKey"
 #define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
-#define ZGProtectionModeKey @"ZGProtectionModeKey"
+#define ZGValueProtectionModeKey @"ZGProtectionModeKey"
+#define ZGAddressProtectionModeKey @"ZGAddressProtectionMode"
+#define ZGSearchTypeKey @"ZGSearchTypeKey"
+#define ZGSearchAddressMaxLevelsKey @"ZGSearchAddressMaxLevelsKey"
+#define ZGSearchAddressMaxOffsetKey @"ZGSearchAddressMaxOffsetKey"
+#define ZGSearchAddressSameOffsetKey @"ZGSearchAddressSameOffsetKey"
+#define ZGSearchAddressOffsetComparisonKey @"ZGSearchAddressOffsetComparison"
 #define ZGIgnoreDataAlignmentKey @"ZGIgnoreDataAlignmentKey"
 #define ZGExactStringLengthKey @"ZGExactStringLengthKey"
 #define ZGIgnoreStringCaseKey @"ZGIgnoreStringCaseKey"
@@ -50,11 +57,24 @@
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchStringValueKeyNew @"ZGSearchStringValueNewKey"
 #define ZGSearchStringValueKeyOld @"ZGSearchStringValueKey" // legacy
+#define ZGSearchStringAddressKey @"ZGSearchStringAddressKey"
 #define ZGIncludeSharedMemoryKey @"ZGIncludeSharedMemoryKey"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class ZGVariable;
+
+typedef NS_ENUM(NSInteger, ZGSearchType)
+{
+	ZGSearchTypeValue = 0,
+	ZGSearchTypeAddress
+};
+
+typedef NS_ENUM(NSInteger, ZGSearchAddressOffsetComparison)
+{
+	ZGSearchAddressOffsetComparisonMax = 0,
+	ZGSearchAddressOffsetComparisonSame = 1
+};
 
 @interface ZGDocumentData : NSObject
 
@@ -62,15 +82,23 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSInteger qualifierTag;
 @property (nonatomic) NSInteger byteOrderTag;
 @property (nonatomic) NSInteger functionTypeTag;
+@property (nonatomic) ZGSearchType searchType;
+@property (nonatomic) NSInteger searchAddressMaxLevels;
+@property (nonatomic, copy) NSString *searchAddressMaxOffset;
+@property (nonatomic, copy) NSString *searchAddressSameOffset;
+@property (nonatomic) ZGSearchAddressOffsetComparison searchAddressOffsetComparison;
 @property (nonatomic) BOOL ignoreDataAlignment;
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;
 @property (copy, nonatomic) NSString *searchValue;
+@property (copy, nonatomic) NSString *searchAddress;
 @property (nonatomic) NSArray<ZGVariable *> *variables;
 @property (copy, nonatomic, nullable) NSString *desiredProcessInternalName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;
 @property (copy, nonatomic, nullable) NSString *lastAboveRangeValue;
 @property (copy, nonatomic, nullable) NSString *lastBelowRangeValue;
+@property (nonatomic) ZGProtectionMode valueProtectionMode;
+@property (nonatomic) ZGProtectionMode addressProtectionMode;
 
 @end
 

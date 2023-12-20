@@ -44,12 +44,12 @@ typedef NS_ENUM(NSInteger, ZGSearchProgressType)
 	ZGSearchProgressMemoryDumping
 };
 
-- (id)initWithProgressType:(ZGSearchProgressType)progressType maxProgress:(ZGMemorySize)maxProgress;
+- (instancetype)initWithProgressType:(ZGSearchProgressType)progressType maxProgress:(ZGMemorySize)maxProgress;
 
 @property (nonatomic, readonly) ZGSearchProgressType progressType;
 
 @property (nonatomic) ZGMemorySize progress;
-@property (nonatomic, readonly) ZGMemorySize maxProgress;
+@property (nonatomic) ZGMemorySize maxProgress;
 @property (nonatomic) NSUInteger numberOfVariablesFound;
 
 @property (atomic) BOOL shouldCancelSearch;

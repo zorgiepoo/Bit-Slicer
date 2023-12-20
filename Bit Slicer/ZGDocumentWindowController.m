@@ -62,6 +62,7 @@
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
 #import "ZGNullability.h"
+#import "ZGCalculator.h"
 #import <libproc.h>
 
 #import <TargetConditionals.h>
@@ -83,6 +84,10 @@
 #define ZGEndianLittle @"ZGEndianLittle"
 #define ZGEndianBig @"ZGEndianBig"
 
+#define ZGSearchTypeGroup @"ZGSearchTypeGroup"
+#define ZGSearchTypeValueIdentifier @"ZGSearchTypeValue"
+#define ZGSearchTypeAddressIdentifier @"ZGSearchTypeAddress"
+
 @implementation ZGDocumentWindowController
 {
 	ZGDebuggerController * _Nonnull _debuggerController;
@@ -90,6 +95,7 @@
 	
 	BOOL _preferringNewTab;
 	BOOL _storeValuesAfterSearch;
+	BOOL _performedRecentValueSearch;
 	
 	ZGEditValueWindowController * _Nullable _editValueWindowController;
 	ZGEditAddressWindowController * _Nullable _editAddressWindowController;
@@ -103,6 +109,7 @@
 	AGScopeBarGroup * _Nullable _qualifierGroup;
 	AGScopeBarGroup * _Nullable _stringMatchingGroup;
 	AGScopeBarGroup * _Nullable _endianGroup;
+	AGScopeBarGroup * _Nullable _searchTypeGroup;
 	
 	NSPopover * _Nullable _advancedOptionsPopover;
 	
@@ -110,8 +117,15 @@
 	IBOutlet NSTextField *_generalStatusTextField;
 	IBOutlet NSTextField *_flagsTextField;
 	IBOutlet NSTextField *_flagsLabel;
+	IBOutlet NSTextField *_searchAddressMaxLevelsTextField;
+	IBOutlet NSStepper *_searchAddressMaxLevelsStepper;
+	IBOutlet NSTextField *_searchAddressOffsetTextField;
+	IBOutlet NSTextField *_searchAddressOffsetLabel;
+	IBOutlet NSBox *_searchAddressVerticalDivider;
+	IBOutlet NSPopUpButton *_searchAddressOffsetComparisonPopUpButton;
 	IBOutlet AGScopeBar *_scopeBar;
 	IBOutlet NSView *_scopeBarFlagsView;
+	IBOutlet NSView *_scopeBarAddressSearchOptionsView;
 	IBOutlet NSToolbar *_toolbar;
 }
 
@@ -190,6 +204,12 @@
 	[_endianGroup addItemWithIdentifier:ZGEndianBig title:ZGLocalizableSearchDocumentString(@"scopeBarEndianBigItem")];
 	_endianGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
+	_searchTypeGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGSearchTypeGroup];
+	_searchTypeGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarSearchTypeGroup");
+	[_searchTypeGroup addItemWithIdentifier:ZGSearchTypeValueIdentifier title:ZGLocalizableSearchDocumentString(@"scopeBarSearchTypeValueItem")];
+	[_searchTypeGroup addItemWithIdentifier:ZGSearchTypeAddressIdentifier title:ZGLocalizableSearchDocumentString(@"scopeBarSearchTypeAddressItem")];
+	_searchTypeGroup.selectionMode = AGScopeBarGroupSelectOne;
+	
 	// Set delegate after setting up scope bar so we won't receive initial selection events beforehand
 	_scopeBar.delegate = self;
 }
@@ -200,17 +220,33 @@
 	{
 		if (selected)
 		{
+			ZGProtectionMode newProtectionMode;
 			if ([item.identifier isEqualToString:ZGProtectionItemAll])
 			{
-				_searchData.protectionMode = ZGProtectionAll;
+				newProtectionMode = ZGProtectionAll;
 			}
 			else if ([item.identifier isEqualToString:ZGProtectionItemWrite])
 			{
-				_searchData.protectionMode = ZGProtectionWrite;
+				newProtectionMode = ZGProtectionWrite;
 			}
 			else if ([item.identifier isEqualToString:ZGProtectionItemExecute])
 			{
-				_searchData.protectionMode = ZGProtectionExecute;
+				newProtectionMode = ZGProtectionExecute;
+			}
+			else
+			{
+				// Shouldn't be possible
+				assert(false);
+				newProtectionMode = ZGProtectionAll;
+			}
+			
+			if (_documentData.searchType == ZGSearchTypeValue)
+			{
+				_documentData.valueProtectionMode = newProtectionMode;
+			}
+			else
+			{
+				_documentData.addressProtectionMode = newProtectionMode;
 			}
 			
 			[self markDocumentChange];
@@ -254,6 +290,91 @@
 			}
 			
 			[_variablesTableView reloadData];
+			[self markDocumentChange];
+		}
+	}
+	else if ([item.group.identifier isEqualToString:ZGSearchTypeGroup])
+	{
+		ZGSearchType newSearchType = [item.identifier isEqualToString:ZGSearchTypeAddressIdentifier] ? ZGSearchTypeAddress : ZGSearchTypeValue;
+		
+		if (newSearchType != _documentData.searchType)
+		{
+			_documentData.searchType = newSearchType;
+			switch (newSearchType)
+			{
+				case ZGSearchTypeValue:
+					_documentData.searchAddress = _searchValueTextField.stringValue;
+					_searchValueTextField.stringValue = _documentData.searchValue;
+					break;
+				case ZGSearchTypeAddress:
+				{
+					_documentData.searchValue = _searchValueTextField.stringValue;
+					
+					ZGVariableType selectedDataType = _documentData.selectedDatatypeTag;
+					NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:selectedDataType];
+					
+					// Try to find an active variable the user may want to search its address for
+					if (self.currentProcess.valid && (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0 || _performedRecentValueSearch))
+					{
+						ZGVariable *foundEnabledIndirectVariable = nil;
+						ZGVariable *foundDirectVariable = nil;
+						for (ZGVariable *variable in _documentData.variables)
+						{
+							if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
+							{
+								if (variable.usesDynamicPointerAddress)
+								{
+									if (foundEnabledIndirectVariable == nil && variable.enabled)
+									{
+										foundEnabledIndirectVariable = variable;
+										if (foundDirectVariable != nil)
+										{
+											break;
+										}
+									}
+								}
+								else
+								{
+									if (foundDirectVariable == nil)
+									{
+										foundDirectVariable = variable;
+										if (foundEnabledIndirectVariable != nil)
+										{
+											break;
+										}
+									}
+								}
+							}
+						}
+						
+						if (foundEnabledIndirectVariable != nil)
+						{
+							_documentData.searchAddress = foundEnabledIndirectVariable.addressStringValue;
+						}
+						else if (foundDirectVariable != nil)
+						{
+							_documentData.searchAddress = foundDirectVariable.addressStringValue;
+						}
+					}
+					
+					_performedRecentValueSearch = NO;
+					
+					_searchValueTextField.stringValue = _documentData.searchAddress;
+					
+					if (currentNumberOfIndirectLevelsInTable == 0)
+					{
+						// Reset levels state because this will be a new address search
+						_documentData.searchAddressMaxLevels = 1;
+						[self _updateSearchAddressMaxLevelsTextField];
+						
+						_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+						[self _updateSearchAddressOffsetTextField];
+					}
+					break;
+				}
+			}
+			
+			[self updateOptions];
 			[self markDocumentChange];
 		}
 	}
@@ -331,6 +452,8 @@
 	[[self undoManager] removeAllActions];
 
 	[_tableController clearCache];
+	
+	[_searchController invalidateStaticSearchResultMapping];
 
 	for (ZGVariable *variable in _documentData.variables)
 	{
@@ -369,6 +492,17 @@
 		
 		[_scriptManager triggerCurrentProcessChanged];
 		[_watchVariableWindowController triggerCurrentProcessChanged];
+		
+		if (_documentData.searchType == ZGSearchTypeValue && _documentData.searchAddress.length > 0)
+		{
+			// If a process died and is being restarted, the dynamic address searched is
+			// likely no longer valid (unless the expression uses some dynamic expression)
+			if (![_documentData.searchAddress containsString:ZGBaseAddressFunction] && ![_documentData.searchAddress containsString:ZGFindSymbolFunction])
+			{
+				_documentData.searchAddress = @"";
+				[self markDocumentChange];
+			}
+		}
 	}
 }
 
@@ -406,7 +540,7 @@
 
 - (void)updateNumberOfValuesDisplayedStatus
 {
-	NSUInteger variableCount = _documentData.variables.count + _searchController.searchResults.addressCount;
+	NSUInteger variableCount = _documentData.variables.count + _searchController.searchResults.count;
 	
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 	[numberOfVariablesFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
@@ -444,19 +578,6 @@
 	[_variableController disableHarmfulVariables:_documentData.variables];
 	[self updateVariables:_documentData.variables searchResults:nil];
 	
-	switch (_searchData.protectionMode)
-	{
-		case ZGProtectionAll:
-			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemAll];
-			break;
-		case ZGProtectionWrite:
-			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemWrite];
-			break;
-		case ZGProtectionExecute:
-			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
-			break;
-	}
-	
 	if (_documentData.qualifierTag == ZGSigned)
 	{
 		[_qualifierGroup setSelected:YES forItemWithIdentifier:ZGQualifierSigned];
@@ -478,13 +599,41 @@
 	
 	[_endianGroup setSelected:YES forItemWithIdentifier:_documentData.byteOrderTag == CFByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
 	
+	[_searchTypeGroup setSelected:YES forItemWithIdentifier:_documentData.searchType == ZGSearchTypeAddress ? ZGSearchTypeAddressIdentifier : ZGSearchTypeValueIdentifier];
+	
+	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
+	{
+		_searchAddressOffsetTextField.stringValue = _documentData.searchAddressMaxOffset;
+	}
+	else
+	{
+		_searchAddressOffsetTextField.stringValue = _documentData.searchAddressSameOffset;
+	}
+	
+	[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:(NSInteger)_documentData.searchAddressOffsetComparison];
+	
+	NSNumberFormatter *searchAddressMaxLevelsFormatter = (NSNumberFormatter *)(_searchAddressMaxLevelsTextField.formatter);
+	searchAddressMaxLevelsFormatter.numberStyle = NSNumberFormatterNoStyle;
+	
+	_searchAddressMaxLevelsStepper.minValue = searchAddressMaxLevelsFormatter.minimum.doubleValue;
+	_searchAddressMaxLevelsStepper.maxValue = searchAddressMaxLevelsFormatter.maximum.doubleValue;
+	
+	[self _updateSearchAddressMaxLevelsTextField];
+	
 	if (_advancedOptionsPopover != nil)
 	{
 		ZGDocumentOptionsViewController *optionsViewController = (id)_advancedOptionsPopover.contentViewController;
 		[optionsViewController reloadInterface];
 	}
 	
-	_searchValueTextField.stringValue = _documentData.searchValue;
+	if (_documentData.searchType == ZGSearchTypeAddress)
+	{
+		_searchValueTextField.stringValue = _documentData.searchAddress;
+	}
+	else
+	{
+		_searchValueTextField.stringValue = _documentData.searchValue;
+	}
 	
 	[self.window makeFirstResponder:_searchValueTextField];
 	
@@ -665,46 +814,70 @@
 	BOOL needsQualifier = NO;
 	BOOL needsStringMatching = NO;
 	
-	if (dataType == ZGFloat || dataType == ZGDouble)
+	if (_documentData.searchType == ZGSearchTypeValue)
 	{
-		if (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
+		if (dataType == ZGFloat || dataType == ZGDouble)
 		{
-			// epsilon
-			[self setFlagsLabelStringValue:[ZGLocalizableSearchDocumentString(@"searchRoundErrorLabel") stringByAppendingString:@":"]];
-			if (_documentData.lastEpsilonValue != nil)
+			if (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
 			{
-				[self setFlagsStringValue:_documentData.lastEpsilonValue];
+				// epsilon
+				[self setFlagsLabelStringValue:[ZGLocalizableSearchDocumentString(@"searchRoundErrorLabel") stringByAppendingString:@":"]];
+				if (_documentData.lastEpsilonValue != nil)
+				{
+					[self setFlagsStringValue:_documentData.lastEpsilonValue];
+				}
+				else
+				{
+					[self setFlagsStringValue:@""];
+				}
 			}
 			else
 			{
-				[self setFlagsStringValue:@""];
+				// range
+				[self updateFlagsRangeTextField];
 			}
-		}
-		else
-		{
-			// range
-			[self updateFlagsRangeTextField];
-		}
-		
-		needsFlags = YES;
-	}
-	else if (dataType == ZGString8 || dataType == ZGString16)
-	{
-		needsStringMatching = YES;
-	}
-	else if (dataType != ZGByteArray)
-	{
-		if (!ZGIsFunctionTypeEquals(functionType) && !ZGIsFunctionTypeNotEquals(functionType))
-		{
-			// range
-			[self updateFlagsRangeTextField];
 			
 			needsFlags = YES;
 		}
-		
-		if (dataType != ZGPointer)
+		else if (dataType == ZGString8 || dataType == ZGString16)
 		{
-			needsQualifier = YES;
+			needsStringMatching = YES;
+		}
+		else if (dataType != ZGByteArray)
+		{
+			if (!ZGIsFunctionTypeEquals(functionType) && !ZGIsFunctionTypeNotEquals(functionType))
+			{
+				// range
+				[self updateFlagsRangeTextField];
+				
+				needsFlags = YES;
+			}
+			
+			if (dataType != ZGPointer)
+			{
+				needsQualifier = YES;
+			}
+		}
+	}
+	else
+	{
+		switch (dataType)
+		{
+			case ZGInt8:
+			case ZGInt16:
+			case ZGInt32:
+			case ZGInt64:
+				needsQualifier = YES;
+				break;
+			case ZGPointer:
+			case ZGByteArray:
+			case ZGScript:
+			case ZGFloat:
+			case ZGDouble:
+			case ZGString8:
+			case ZGString16:
+				needsQualifier = NO;
+				break;
 		}
 	}
 	
@@ -713,16 +886,19 @@
 	[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"equalsOperatorTitle") atIndex:0];
 	[[_functionPopUpButton itemAtIndex:0] setTag:ZGEquals];
 	
-	[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") atIndex:1];
-	[[_functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
-	
-	if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
+	if (_documentData.searchType == ZGSearchTypeValue)
 	{
-		[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:2];
-		[[_functionPopUpButton itemAtIndex:2] setTag:ZGGreaterThan];
+		[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") atIndex:1];
+		[[_functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
 		
-		[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:3];
-		[[_functionPopUpButton itemAtIndex:3] setTag:ZGLessThan];
+		if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
+		{
+			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:2];
+			[[_functionPopUpButton itemAtIndex:2] setTag:ZGGreaterThan];
+			
+			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:3];
+			[[_functionPopUpButton itemAtIndex:3] setTag:ZGLessThan];
+		}
 	}
 	
 	if (![_functionPopUpButton selectItemWithTag:_documentData.functionTypeTag])
@@ -730,14 +906,112 @@
 		_documentData.functionTypeTag = _functionPopUpButton.selectedTag;
 	}
 	
-	BOOL needsEndianness = ZGSupportsEndianness(dataType);
+	NSString *dataTypeSearchType = (_documentData.searchType == ZGSearchTypeValue) ? @"value" : @"address";
+	for (NSMenuItem *dataTypeMenuItem in _dataTypesPopUpButton.itemArray)
+	{
+		if (dataTypeMenuItem.separatorItem)
+		{
+			continue;
+		}
+		
+		ZGVariableType dataTypeForMenuItem = dataTypeMenuItem.tag;
+		NSString *localizedKey = [NSString stringWithFormat:@"dataType_%@_%ld", dataTypeSearchType, dataTypeForMenuItem];
+		NSString *localizedTitle = ZGLocalizableSearchDocumentString(localizedKey);
+		
+		dataTypeMenuItem.title = localizedTitle;
+	}
+	
+	BOOL needsEndianness = (_documentData.searchType == ZGSearchTypeValue && ZGSupportsEndianness(dataType));
 	
 	[self changeScopeBarGroup:_qualifierGroup shouldExist:needsQualifier];
 	[self changeScopeBarGroup:_stringMatchingGroup shouldExist:needsStringMatching];
 	[self changeScopeBarGroup:_endianGroup shouldExist:needsEndianness];
 	
-	_showsFlags = needsFlags;
-	_scopeBar.accessoryView = _showsFlags ? _scopeBarFlagsView : nil;
+	BOOL needsSearchType = (_documentData.functionTypeTag == ZGEquals);
+	[self changeScopeBarGroup:_searchTypeGroup shouldExist:needsSearchType];
+	
+	if (_documentData.searchType == ZGSearchTypeAddress)
+	{
+		_scopeBar.accessoryView = _scopeBarAddressSearchOptionsView;
+		_showsFlags = NO;
+	}
+	else
+	{
+		_showsFlags = needsFlags;
+		_scopeBar.accessoryView = _showsFlags ? _scopeBarFlagsView : nil;
+	}
+	
+	ZGProtectionMode protectionMode = (_documentData.searchType == ZGSearchTypeValue) ? _documentData.valueProtectionMode : _documentData.addressProtectionMode;
+	switch (protectionMode)
+	{
+		case ZGProtectionAll:
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemAll];
+			break;
+		case ZGProtectionWrite:
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemWrite];
+			break;
+		case ZGProtectionExecute:
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
+			break;
+	}
+	
+	[self updateSearchAddressOptions];
+}
+
+- (void)updateSearchAddressOptions
+{
+	if (_documentData.searchType == ZGSearchTypeValue)
+	{
+		return;
+	}
+	
+	NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:_documentData.selectedDatatypeTag];
+	
+	NSUInteger nextNumberOfIndirectLevels = (NSUInteger)_documentData.searchAddressMaxLevels;
+	if (nextNumberOfIndirectLevels == currentNumberOfIndirectLevelsInTable + 1)
+	{
+		BOOL searchAddressOffsetComparisonWasHidden = _searchAddressOffsetComparisonPopUpButton.hidden;
+		
+		_searchAddressOffsetTextField.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.enabled = YES;
+		
+		// If the search offset comparison was previously same and was not usable, we should
+		// update the default offset comparison to max
+		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame && searchAddressOffsetComparisonWasHidden)
+		{
+			_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+			[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:ZGSearchAddressOffsetComparisonMax];
+			
+			[self _updateSearchAddressOffsetTextField];
+			
+			[self markDocumentChange];
+		}
+	}
+	else if (nextNumberOfIndirectLevels <= currentNumberOfIndirectLevelsInTable)
+	{
+		_searchAddressOffsetTextField.hidden = YES;
+		_searchAddressOffsetComparisonPopUpButton.hidden = YES;
+	}
+	else /* if (nextNumberOfIndirectLevels > currentNumberOfIndirectLevelsInTable + 1) */
+	{
+		_searchAddressOffsetTextField.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
+		_searchAddressOffsetComparisonPopUpButton.enabled = NO;
+		
+		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)
+		{
+			_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+			[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:ZGSearchAddressOffsetComparisonMax];
+			
+			[self _updateSearchAddressOffsetTextField];
+			
+			[self markDocumentChange];
+		}
+	}
+	
+	_searchAddressOffsetLabel.hidden = _searchAddressOffsetTextField.hidden;
+	_searchAddressVerticalDivider.hidden = _searchAddressOffsetTextField.hidden;
 }
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
@@ -772,10 +1046,19 @@
 
 - (ZGFunctionType)selectedFunctionType
 {
-	_documentData.searchValue = _searchValueTextField.stringValue;
+	BOOL isSearchAddressType = (_documentData.searchType == ZGSearchTypeAddress);
+	
+	if (isSearchAddressType)
+	{
+		_documentData.searchAddress = _searchValueTextField.stringValue;
+	}
+	else
+	{
+		_documentData.searchValue = _searchValueTextField.stringValue;
+	}
 	
 	BOOL isLinearlyExpressedStoredValue = NO;
-	BOOL isStoringValues = [[_searchController class] hasStoredValueTokenFromExpression:_documentData.searchValue isLinearlyExpressed:&isLinearlyExpressedStoredValue];
+	BOOL isStoringValues = !isSearchAddressType && [[_searchController class] hasStoredValueTokenFromExpression:_documentData.searchValue isLinearlyExpressed:&isLinearlyExpressedStoredValue];
 
 	ZGFunctionType functionType = (ZGFunctionType)_documentData.functionTypeTag;
 	if (isStoringValues)
@@ -837,6 +1120,68 @@
 	[self selectNewFunctionTypeAtIndex:newIndex];
 }
 
+- (IBAction)searchAddressMaxLevelsDidChange:(id)sender
+{
+	if (sender == _searchAddressMaxLevelsTextField)
+	{
+		_documentData.searchAddressMaxLevels = _searchAddressMaxLevelsTextField.integerValue;
+		_searchAddressMaxLevelsStepper.integerValue = _documentData.searchAddressMaxLevels;
+	}
+	else /* if (sender == _searchAddressMaxLevelsStepper) */
+	{
+		_documentData.searchAddressMaxLevels = _searchAddressMaxLevelsStepper.integerValue;
+		_searchAddressMaxLevelsTextField.integerValue = _documentData.searchAddressMaxLevels;
+	}
+	
+	[self updateSearchAddressOptions];
+	[self markDocumentChange];
+}
+
+- (void)_updateSearchAddressMaxLevelsTextField
+{
+	_searchAddressMaxLevelsTextField.integerValue = _documentData.searchAddressMaxLevels;
+	_searchAddressMaxLevelsStepper.integerValue = _searchAddressMaxLevelsTextField.integerValue;
+}
+
+- (IBAction)searchAddressOffsetDidChange:(id)sender
+{
+	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
+	{
+		_documentData.searchAddressMaxOffset = _searchAddressOffsetTextField.stringValue;
+	}
+	else
+	{
+		_documentData.searchAddressSameOffset = _searchAddressOffsetTextField.stringValue;
+	}
+	
+	[self markDocumentChange];
+}
+
+- (void)_updateSearchAddressOffsetTextField
+{
+	ZGSearchAddressOffsetComparison offsetComparison = _documentData.searchAddressOffsetComparison;
+	switch (offsetComparison)
+	{
+		case ZGSearchAddressOffsetComparisonMax:
+			_searchAddressOffsetTextField.stringValue = _documentData.searchAddressMaxOffset;
+			break;
+		case ZGSearchAddressOffsetComparisonSame:
+			_searchAddressOffsetTextField.stringValue = _documentData.searchAddressSameOffset;
+			break;
+	}
+}
+
+- (IBAction)searchAddressOffsetComparisonDidChange:(id)sender
+{
+	ZGSearchAddressOffsetComparison offsetComparison = (ZGSearchAddressOffsetComparison)(_searchAddressOffsetComparisonPopUpButton.selectedTag);
+	
+	_documentData.searchAddressOffsetComparison = offsetComparison;
+	
+	[self _updateSearchAddressOffsetTextField];
+	
+	[self markDocumentChange];
+}
+
 #pragma mark Useful Methods
 
 - (void)updateVariables:(NSArray<ZGVariable *> *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults
@@ -853,6 +1198,7 @@
 	[_variablesTableView reloadData];
 	
 	[self updateNumberOfValuesDisplayedStatus];
+	[self updateSearchAddressOptions];
 }
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
@@ -1239,6 +1585,7 @@
 - (IBAction)clear:(id)__unused sender
 {
 	[_variableController clear];
+	[self updateSearchAddressOptions];
 }
 
 - (IBAction)clearSearchValues:(id)__unused sender
@@ -1255,15 +1602,31 @@
 		}
 		
 		_searchValueTextField.stringValue = @"";
-		_documentData.searchValue = _searchValueTextField.stringValue;
+		
+		if (_documentData.searchType == ZGSearchTypeAddress)
+		{
+			_documentData.searchAddress = _searchValueTextField.stringValue;
+		}
+		else
+		{
+			_documentData.searchValue = _searchValueTextField.stringValue;
+		}
 	}
 }
 
 - (IBAction)searchValue:(id)__unused sender
 {
-	_documentData.searchValue = _searchValueTextField.stringValue;
+	NSString *newSearchValue = _searchValueTextField.stringValue;
+	if (_documentData.searchType == ZGSearchTypeValue)
+	{
+		_documentData.searchValue = newSearchValue;
+	}
+	else
+	{
+		_documentData.searchAddress = newSearchValue;
+	}
 	
-	BOOL hasEmptyExpression = (_documentData.searchValue.length == 0);
+	BOOL hasEmptyExpression = (newSearchValue.length == 0);
 	if (!hasEmptyExpression && _searchController.canStartTask && self.currentProcess.valid)
 	{
 		if (self.currentProcess.hasGrantedAccess)
@@ -1280,7 +1643,9 @@
 					[[self undoManager] removeAllActions];
 				}
 				
-				[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES storeValuesAfterSearch:_storeValuesAfterSearch];
+				[_searchController searchVariablesWithString:newSearchValue dataType:[self selectedDataType] pointerAddressSearch:(_documentData.searchType == ZGSearchTypeAddress) functionType:functionType storeValuesAfterSearch:_storeValuesAfterSearch];
+				
+				_performedRecentValueSearch = YES;
 			}
 		}
 		else
@@ -1368,13 +1733,15 @@
 - (IBAction)searchPointerToSelectedVariable:(id)__unused sender
 {
 	ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
-	[_searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO storeValuesAfterSearch:_storeValuesAfterSearch];
-}
-
-- (void)_storeAllValues
-{
-	_documentData.searchValue = _searchValueTextField.stringValue;
-	[_searchController storeAllValuesAndAfterSearches:_storeValuesAfterSearch];
+	
+	[_searchTypeGroup setSelected:YES forItemWithIdentifier:ZGSearchTypeAddressIdentifier];
+	
+	_documentData.searchAddress = [NSString stringWithFormat:@"0x%llX", variable.address];
+	_searchValueTextField.stringValue = _documentData.searchAddress;
+	
+	[self.window makeFirstResponder:_searchValueTextField];
+	
+	[self markDocumentChange];
 }
 
 - (IBAction)storeAllValues:(id)__unused sender
@@ -1385,7 +1752,11 @@
 		[self _storeAllValuesAfterSearchesAndUpdateStoreValuesButton:NO];
 	}
 	
-	[self _storeAllValues];
+	if (_documentData.searchType == ZGSearchTypeValue)
+	{
+		_documentData.searchValue = _searchValueTextField.stringValue;
+	}
+	[_searchController storeAllValuesAndAfterSearches:_storeValuesAfterSearch insertValueToken:(_documentData.searchType == ZGSearchTypeValue)];
 }
 
 - (void)_storeAllValuesAfterSearchesAndUpdateStoreValuesButton:(BOOL)updateStoreValuesButton

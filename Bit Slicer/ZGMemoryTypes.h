@@ -43,8 +43,13 @@ typedef mach_vm_size_t ZGMemorySize;
 typedef vm_prot_t ZGMemoryProtection;
 typedef vm_map_t ZGMemoryMap;
 typedef vm_region_basic_info_data_64_t ZGMemoryBasicInfo;
+typedef vm_region_extended_info_data_t ZGMemoryExtendedInfo;
 typedef vm_region_submap_info_data_64_t ZGMemorySubmapInfo;
 
+#ifdef __cplusplus
+#define MAX_MEMORY_ADDRESS (static_cast<ZGMemoryAddress>(MACH_VM_MAX_ADDRESS))
+#else
 #define MAX_MEMORY_ADDRESS ((ZGMemoryAddress)MACH_VM_MAX_ADDRESS)
+#endif
 
 #endif

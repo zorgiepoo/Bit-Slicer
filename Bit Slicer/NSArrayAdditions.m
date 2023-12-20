@@ -34,6 +34,22 @@
 
 @implementation NSArray (NSArrayAdditions)
 
+- (NSArray *)zgFlatMapUsingBlock:(zg_array_flatmap_t)block
+{
+	NSMutableArray *newResults = [[NSMutableArray alloc] init];
+	
+	for (id item in self)
+	{
+		id object = block(item);
+		if (object != nil)
+		{
+			[newResults addObject:item];
+		}
+	}
+	
+	return [NSArray arrayWithArray:newResults];
+}
+
 - (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep
 {
 	NSMutableArray *newResults = [[NSMutableArray alloc] init];
@@ -109,6 +125,36 @@
 				end = middleIndex;
 				break;
 			case NSOrderedSame:
+				return object;
+		}
+	}
+	
+	return nil;
+}
+
+// our's first, their's later
+- (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator getIndex:(nonnull NSUInteger *)outIndex
+{
+	NSUInteger end = self.count;
+	NSUInteger start = 0;
+	while (end > start)
+	{
+		NSUInteger middleIndex = start + (end - start) / 2; // writing this as (start + end) / 2 can fail for large values of start & end
+		id __unsafe_unretained object = [self objectAtIndex:middleIndex];
+		
+		switch (comparator(object))
+		{
+			case NSOrderedAscending:
+				start = middleIndex + 1;
+				break;
+			case NSOrderedDescending:
+				end = middleIndex;
+				break;
+			case NSOrderedSame:
+				if (outIndex != NULL)
+				{
+					*outIndex = middleIndex;
+				}
 				return object;
 		}
 	}

@@ -348,6 +348,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self updateFrozenActivity];
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
+	
+	[windowController updateSearchAddressOptions];
 }
 
 - (void)disableHarmfulVariables:(NSArray<ZGVariable *> *)variables
@@ -392,6 +394,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
 	
 	[windowController updateNumberOfValuesDisplayedStatus];
+	[windowController updateSearchAddressOptions];
 }
 
 - (void)removeSelectedSearchValues
@@ -560,6 +563,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
+	
+	[windowController updateSearchAddressOptions];
 }
 
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
@@ -901,6 +906,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	// the table view always needs to be reloaded because of being able to select multiple indexes
 	[windowController.variablesTableView reloadData];
 	
+	[windowController updateSearchAddressOptions];
+	
 	if (undoableRowIndexes.count > 0)
 	{
 		NSString *activeChangeAction = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoMultipleActiveChange") : ZGLocalizedStringFromVariableActionsTable(@"undoSingleActiveChange");
@@ -964,6 +971,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	variable.finishedEvaluatingDynamicAddress = NO;
 	
 	[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+	
+	[windowController updateSearchAddressOptions];
 }
 
 #pragma mark Relativizing Variable Addresses
@@ -1006,12 +1015,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (machFilePath != nil)
 	{
 		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:process];
-		NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
+		NSRange totalSegmentRange = machBinaryInfo.totalSegmentRange;
 		
-		if (segmentName != nil)
+		if (variable.address >= totalSegmentRange.location && variable.address < totalSegmentRange.location + totalSegmentRange.length)
 		{
+			BOOL isIndirectVariable = NO;
 			NSString *partialPath = [machFilePath lastPathComponent];
-			if (machBinaryInfo.slide > 0 && !variable.usesDynamicAddress)
+			if (!variable.usesDynamicAddress)
 			{
 				NSString *pathToUse = nil;
 				NSString *baseArgument = @"";
@@ -1038,12 +1048,47 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
 				}
 				
-				variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machBinary.headerAddress];
+				NSString *baseFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machBinary.headerAddress];
+				
+				// Test if this is a variable that uses a pointer address
+				// but has not been evaluated to use a dynamic address yet
+				if (variable.usesDynamicPointerAddress)
+				{
+					NSString *pointerReference = [NSString stringWithFormat:@"[0x%llX]", variable.address];
+					if ([variable.addressFormula containsString:pointerReference])
+					{
+						variable.addressFormula = [variable.addressFormula stringByReplacingOccurrencesOfString:pointerReference withString:[NSString stringWithFormat:@"[%@]", baseFormula]];
+						
+						isIndirectVariable = YES;
+					}
+					else
+					{
+						variable.addressFormula = baseFormula;
+					}
+				}
+				else
+				{
+					variable.addressFormula = baseFormula;
+				}
+				
 				variable.usesDynamicAddress = YES;
-				variable.finishedEvaluatingDynamicAddress = YES;
+				variable.finishedEvaluatingDynamicAddress = !isIndirectVariable;
 			}
 			
-			staticVariableDescription = [NSString stringWithFormat:@"%@ %@ (static)", partialPath, segmentName];
+			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
+			
+			NSMutableString *newDescription = [[NSMutableString alloc] initWithString:partialPath];
+			if (segmentName != nil)
+			{
+				[newDescription appendFormat:@" %@ ", segmentName];
+			}
+			else
+			{
+				[newDescription appendString:@" "];
+			}
+			[newDescription appendString:(isIndirectVariable ? @"(static, indirect)" : @"(static)")];
+			
+			staticVariableDescription = [newDescription copy];
 		}
 	}
 	
@@ -1106,10 +1151,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		for (ZGVariable *variable in variables)
 		{
+			[variableAddresses addObject:@(variable.address)];
+			
 			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
 			
 			[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
-			[variableAddresses addObject:@(variable.address)];
 		}
 		
 		*staticDescriptionsRef = staticDescriptions;
@@ -1128,9 +1174,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	};
 	
 	void (^finishAnnotations)(NSArray *, NSArray *) = ^(NSArray * _Nullable symbols, NSArray *staticDescriptions) {
-		__block ZGMemoryAddress cachedSubmapRegionAddress = 0;
-		__block ZGMemorySize cachedSubmapRegionSize = 0;
-		__block ZGMemorySubmapInfo cachedSubmapInfo;
+		__block ZGMemoryAddress cachedRegionAddress = 0;
+		__block ZGMemorySize cachedRegionSize = 0;
+		__block ZGMemoryExtendedInfo cachedInfo;
 		
 		[variables enumerateObjectsUsingBlock:^(ZGVariable * _Nonnull variable, NSUInteger index, BOOL * _Nonnull __unused stop) {
 			id staticDescriptionObject = staticDescriptions[index];
@@ -1147,23 +1193,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				symbol = nil;
 			}
 			
-			if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
+			if (cachedRegionAddress >= variable.address + variable.size || cachedRegionAddress + cachedRegionSize <= variable.address)
 			{
-				cachedSubmapRegionAddress = variable.address;
-				if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
+				cachedRegionAddress = variable.address;
+				if (!ZGRegionExtendedInfo(processTask, &cachedRegionAddress, &cachedRegionSize, &cachedInfo))
 				{
-					cachedSubmapRegionAddress = 0;
-					cachedSubmapRegionSize = 0;
+					cachedRegionAddress = 0;
+					cachedRegionSize = 0;
 				}
 			}
 			
 			NSString *userTagDescription = nil;
 			NSString *protectionDescription = nil;
 			
-			if (cachedSubmapRegionAddress <= variable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= variable.address + variable.size)
+			if (cachedRegionAddress <= variable.address && cachedRegionAddress + cachedRegionSize >= variable.address + variable.size)
 			{
-				userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
-				protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
+				userTagDescription = ZGUserTagDescription(cachedInfo.user_tag);
+				protectionDescription = ZGProtectionDescription(cachedInfo.protection);
 			}
 			
 			NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];

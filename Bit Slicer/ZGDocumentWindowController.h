@@ -94,6 +94,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateNumberOfValuesDisplayedStatus;
 - (void)setStatusString:(NSString *)statusString;
 
+- (void)updateSearchAddressOptions;
+
 - (IBAction)requestEditingVariableDescription:(nullable id)sender;
 - (IBAction)requestEditingVariableAddress:(nullable id)sender;
 

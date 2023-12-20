@@ -116,8 +116,8 @@
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "GzQ-9Y-rMY"; */
 "GzQ-9Y-rMY.title" = "Указатель";
 
-/* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "JI2-jh-sbh"; */
-"JI2-jh-sbh.title" = "Искать указатель на переменную";
+/* Class = "NSMenuItem"; title = "Search Pointers to Variable"; ObjectID = "JI2-jh-sbh"; */
+"JI2-jh-sbh.title" = "Искать указатеи на переменную";
 
 /* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "JKq-De-dsT"; */
 "JKq-De-dsT.title" = "16-разрядное число";

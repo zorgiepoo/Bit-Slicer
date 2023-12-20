@@ -62,6 +62,34 @@
 	return _addressFormula != nil && [_addressFormula rangeOfString:@"["].location != NSNotFound && [_addressFormula rangeOfString:@"]"].location != NSNotFound;
 }
 
+- (NSUInteger)numberOfDynamicPointersInAddress
+{
+	if (_addressFormula == nil)
+	{
+		return 0;
+	}
+	
+	NSString *remainingAddressFormula = _addressFormula;
+	NSUInteger length = remainingAddressFormula.length;
+	NSUInteger pivotLocation = 0;
+	NSUInteger numberOfDynamicPointers = 0;
+	while (pivotLocation < length)
+	{
+		NSRange range = [remainingAddressFormula rangeOfString:@"[" options:(NSCaseInsensitiveSearch | NSLiteralSearch) range:NSMakeRange(pivotLocation, length - pivotLocation)];
+		
+		if (range.location == NSNotFound)
+		{
+			break;
+		}
+		
+		numberOfDynamicPointers++;
+		
+		pivotLocation = range.location + 1;
+	}
+	
+	return numberOfDynamicPointers;
+}
+
 - (BOOL)usesDynamicBaseAddress
 {
 	return _addressFormula != nil && [_addressFormula rangeOfString:[ZGBaseAddressFunction stringByAppendingString:@"("]].location != NSNotFound;
@@ -418,6 +446,238 @@
 	return (*additiveConstantString != nil && *multiplicativeConstantString != nil);
 }
 
+// Note: this method assumes buffer is zero-initialized
++ (BOOL)_extractBaseAddressAndOffsetsFromExpression:(DDExpression *)expression intoBuffer:(void *)buffer levelsRecursed:(uint16_t)levelsRecursed maxLevels:(uint16_t)maxLevels filePaths:(NSArray<NSString *> *)filePaths filePathSuffixIndexCache:(NSMutableDictionary<NSString *, id> *)filePathSuffixIndexCache
+{
+	//	Struct {
+	//		uintptr_t baseAddress;
+	//		uint16_t baseImageIndex;
+	//		uint16_t numLevels;
+	//		uint16_t offsets[MAX_NUM_LEVELS];
+	//		uint8_t padding[N];
+	//	}
+	
+	if (levelsRecursed > maxLevels)
+	{
+		return NO;
+	}
+	
+	ZGMemorySize pointerSize = sizeof(ZGMemoryAddress);
+	
+	switch (expression.expressionType)
+	{
+		case DDExpressionTypeFunction:
+			if ([expression.function isEqualToString:@"add"] && expression.arguments.count == 2)
+			{
+				DDExpression *argumentExpression1 = expression.arguments[0];
+				DDExpression *argumentExpression2 = expression.arguments[1];
+				
+				DDExpression *pointerSubExpression;
+				DDExpression *offsetExpression;
+				if (argumentExpression1.expressionType == DDExpressionTypeFunction && [argumentExpression1.function isEqualToString:ZGCalculatePointerFunction])
+				{
+					pointerSubExpression = argumentExpression1;
+					offsetExpression = argumentExpression2;
+				}
+				else if (argumentExpression2.expressionType == DDExpressionTypeFunction && [argumentExpression2.function isEqualToString:ZGCalculatePointerFunction])
+				{
+					pointerSubExpression = argumentExpression2;
+					offsetExpression = argumentExpression1;
+				}
+				else
+				{
+					pointerSubExpression = nil;
+					offsetExpression = nil;
+				}
+				
+				if (pointerSubExpression != nil)
+				{
+					if (offsetExpression != nil && offsetExpression.expressionType != DDExpressionTypeNumber)
+					{
+						return NO;
+					}
+					
+					if (pointerSubExpression.arguments.count != 1)
+					{
+						return NO;
+					}
+					
+					if (![self _extractBaseAddressAndOffsetsFromExpression:pointerSubExpression.arguments[0] intoBuffer:buffer levelsRecursed:levelsRecursed + 1 maxLevels:maxLevels filePaths:filePaths filePathSuffixIndexCache:filePathSuffixIndexCache])
+					{
+						return NO;
+					}
+					
+					// Fetch and store offset
+					if (offsetExpression.expressionType != DDExpressionTypeNumber)
+					{
+						return NO;
+					}
+					
+					// Number of levels is set when we recurse into base expression
+					uint16_t numberOfLevels = 0;
+					memcpy(&numberOfLevels, (uint8_t *)buffer + pointerSize + sizeof(uint16_t), sizeof(numberOfLevels));
+					
+					if (numberOfLevels == 0 || numberOfLevels - 1 < levelsRecursed)
+					{
+						// Shouldn't be possible
+						assert(false);
+						return NO;
+					}
+					
+					uint16_t offset = (uint16_t)offsetExpression.number.unsignedShortValue;
+					memcpy((uint8_t *)buffer + pointerSize + sizeof(uint16_t) + sizeof(numberOfLevels) + levelsRecursed * sizeof(offset), &offset, sizeof(offset));
+				}
+				else
+				{	
+					// Found the static base expression
+					
+					DDExpression *baseAddressArgumentExpression1 = expression.arguments[0];
+					DDExpression *baseAddressArgumentExpression2 = expression.arguments[1];
+					
+					DDExpression *baseFunctionExpression;
+					DDExpression *baseImageOffsetExpression;
+					
+					if (baseAddressArgumentExpression1.expressionType == DDExpressionTypeFunction && [baseAddressArgumentExpression1.function isEqualToString:ZGBaseAddressFunction])
+					{
+						baseFunctionExpression = baseAddressArgumentExpression1;
+						baseImageOffsetExpression = baseAddressArgumentExpression2;
+					}
+					else if (baseAddressArgumentExpression2.expressionType == DDExpressionTypeFunction && [baseAddressArgumentExpression2.function isEqualToString:ZGBaseAddressFunction])
+					{
+						baseFunctionExpression = baseAddressArgumentExpression2;
+						baseImageOffsetExpression = baseAddressArgumentExpression1;
+					}
+					else
+					{
+						return NO;
+					}
+					
+					if (baseImageOffsetExpression.expressionType != DDExpressionTypeNumber)
+					{
+						return NO;
+					}
+					
+					ZGMemoryAddress baseImageOffset = baseImageOffsetExpression.number.unsignedLongLongValue;
+					memcpy((uint8_t *)buffer, &baseImageOffset, sizeof(baseImageOffset));
+					
+					if (baseFunctionExpression.arguments.count == 0)
+					{
+						uint16_t baseImageIndex = 0;
+						memcpy((uint8_t *)buffer + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
+					}
+					else
+					{
+						DDExpression *baseImageSuffixExpression = baseFunctionExpression.arguments[0];
+						if (baseImageSuffixExpression.expressionType != DDExpressionTypeVariable)
+						{
+							return NO;
+						}
+						
+						NSString *baseImageSuffix = baseImageSuffixExpression.variable;
+						
+						id cachedBaseImageIndexNumber = filePathSuffixIndexCache[baseImageSuffix];
+						if (cachedBaseImageIndexNumber == nil)
+						{
+							BOOL foundBaseImage = NO;
+							uint16_t baseImageIndex = 0;
+							for (NSString *filePath in filePaths)
+							{
+								if ([filePath hasSuffix:baseImageSuffix])
+								{
+									memcpy((uint8_t *)buffer + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
+									foundBaseImage = YES;
+									break;
+								}
+								baseImageIndex++;
+							}
+							
+							if (!foundBaseImage)
+							{
+								filePathSuffixIndexCache[baseImageSuffix] = NSNull.null;
+								return NO;
+							}
+							
+							filePathSuffixIndexCache[baseImageSuffix] = @(baseImageIndex);
+						}
+						else
+						{
+							if (cachedBaseImageIndexNumber == NSNull.null)
+							{
+								return NO;
+							}
+							
+							uint16_t baseImageIndex = ((NSNumber *)cachedBaseImageIndexNumber).unsignedShortValue;
+							memcpy((uint8_t *)buffer + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
+						}
+					}
+					
+					memcpy((uint8_t *)buffer + pointerSize + sizeof(uint16_t), &levelsRecursed, sizeof(levelsRecursed));
+				}
+			}
+			else if ([expression.function isEqualToString:ZGCalculatePointerFunction] && expression.arguments.count == 1)
+			{
+				if (![self _extractBaseAddressAndOffsetsFromExpression:expression.arguments[0] intoBuffer:buffer levelsRecursed:levelsRecursed + 1 maxLevels:maxLevels filePaths:filePaths filePathSuffixIndexCache:filePathSuffixIndexCache])
+				{
+					return NO;
+				}
+			}
+			else
+			{
+				// While there can be a base() function in the base expression, we shouldn't encounter it here
+				return NO;
+			}
+			break;
+		case DDExpressionTypeNumber:
+		{
+			// Found base address without any base()
+			ZGMemoryAddress baseAddress = (ZGMemoryAddress)expression.number.unsignedLongLongValue;
+			switch (pointerSize)
+			{
+				case sizeof(ZGMemoryAddress):
+					memcpy(buffer, &baseAddress, sizeof(baseAddress));
+					break;
+				case sizeof(ZG32BitMemoryAddress):
+				{
+					ZG32BitMemoryAddress tempMemoryAddress = (ZG32BitMemoryAddress)baseAddress;
+					memcpy(buffer, &tempMemoryAddress, sizeof(tempMemoryAddress));
+					break;
+				}
+			}
+			
+			uint16_t baseIndex = UINT16_MAX;
+			memcpy((uint8_t *)buffer + pointerSize, &baseIndex, sizeof(baseIndex));
+			
+			memcpy((uint8_t *)buffer + pointerSize + sizeof(uint16_t), &levelsRecursed, sizeof(levelsRecursed));
+			
+			break;
+		}
+		case DDExpressionTypeVariable:
+			return NO;
+	}
+	
+	return YES;
+}
+
++ (BOOL)extractIndirectAddressesAndOffsetsFromIntoBuffer:(void *)buffer expression:(NSString *)initialExpression filePaths:(NSArray<NSString *> *)filePaths filePathSuffixIndexCache:(NSMutableDictionary<NSString *, id> *)filePathSuffixIndexCache maxLevels:(uint16_t)maxLevels stride:(ZGMemorySize)stride
+{
+	NSString *substitutedExpression = [ZGCalculator expressionBySubstitutingCalculatePointerFunctionInExpression:initialExpression];
+	
+	NSError *expressionError = NULL;
+	DDExpression *expression = [DDExpression expressionFromString:substitutedExpression error:&expressionError];
+	if (expression == nil)
+	{
+		return NO;
+	}
+
+	memset(buffer, 0, stride);
+	if (![self _extractBaseAddressAndOffsetsFromExpression:expression intoBuffer:buffer levelsRecursed:0 maxLevels:maxLevels filePaths:filePaths filePathSuffixIndexCache:filePathSuffixIndexCache])
+	{
+		return NO;
+	}
+
+	return YES;
+}
+
 + (BOOL)isValidExpression:(NSString *)expression
 {
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;
@@ -485,16 +745,23 @@
 	return [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates symbolicationRequiresExactMatch:(BOOL)symbolicationRequiresExactMatch foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
++ (NSDictionary<NSString *, id> *)_evaluatorSubstitutionsForProcess:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates symbolicationRequiresExactMatch:(BOOL)symbolicationRequiresExactMatch currentAddress:(ZGMemoryAddress)currentAddress
 {
-	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
-	
 	NSMutableDictionary<NSString *, id> *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process, ZGSymbolicatesVariable : @(symbolicates), ZGSymbolicationRequiresExactMatch : @(symbolicationRequiresExactMatch), ZGLastSearchInfoVariable : @(currentAddress), ZGDidFindSymbol : @(NO)}];
 
 	if (failedImages != nil)
 	{
 		[substitutions setObject:failedImages forKey:ZGFailedImagesVariable];
 	}
+	
+	return substitutions;
+}
+
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates symbolicationRequiresExactMatch:(BOOL)symbolicationRequiresExactMatch foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
+{
+	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
+	
+	NSDictionary<NSString *, id> *substitutions = [self _evaluatorSubstitutionsForProcess:process failedImages:failedImages symbolicates:symbolicates symbolicationRequiresExactMatch:symbolicationRequiresExactMatch currentAddress:currentAddress];
 
 	NSString *evaluatedExpression = [self evaluateExpression:newExpression substitutions:substitutions error:error];
 	if (foundSymbol != NULL)

@@ -46,9 +46,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL usesDynamicBaseAddress;
 @property (nonatomic, readonly) BOOL usesDynamicSymbolAddress;
 
+- (NSUInteger)numberOfDynamicPointersInAddress;
+
 @end
 
 @interface ZGCalculator : NSObject
+
++ (BOOL)extractIndirectAddressesAndOffsetsFromIntoBuffer:(void *)buffer expression:(NSString *)initialExpression filePaths:(NSArray<NSString *> *)filePaths filePathSuffixIndexCache:(NSMutableDictionary<NSString *, id> *)filePathSuffixIndexCache maxLevels:(uint16_t)maxLevels stride:(ZGMemorySize)stride;
 
 + (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString * _Nullable * _Nonnull)additiveConstantString multiplicateConstant:(NSString *_Nullable * _Nonnull)multiplicativeConstantString;
 

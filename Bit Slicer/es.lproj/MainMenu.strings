@@ -404,8 +404,8 @@
 /* Class = "NSMenuItem"; title = "Font"; ObjectID = "cy3-aR-hDp"; */
 "cy3-aR-hDp.title" = "Fuente";
 
-/* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "dr1-2H-Uqa"; */
-"dr1-2H-Uqa.title" = "Buscar Pointer a variable";
+/* Class = "NSMenuItem"; title = "Search Pointers to Variable"; ObjectID = "dr1-2H-Uqa"; */
+"dr1-2H-Uqa.title" = "Buscar Pointers a variable";
 
 /* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "e4N-vH-vLR"; */
 "e4N-vH-vLR.title" = "Use Default";
