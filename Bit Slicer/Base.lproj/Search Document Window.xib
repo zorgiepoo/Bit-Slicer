@@ -793,7 +793,7 @@
             <point key="canvasLocation" x="56" y="11"/>
         </customView>
         <customView id="8P1-IQ-4zh" userLabel="Address Seach Accessory">
-            <rect key="frame" x="0.0" y="0.0" width="266" height="25"/>
+            <rect key="frame" x="0.0" y="0.0" width="261" height="25"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fax-W0-upK">
@@ -835,7 +835,7 @@
                     </connections>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gI5-SN-blY">
-                    <rect key="frame" x="151" y="6" width="66" height="14"/>
+                    <rect key="frame" x="146" y="6" width="66" height="14"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Max Levels:" id="UOD-vt-IHJ">
                         <font key="font" metaFont="smallSystem"/>
@@ -843,16 +843,8 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QsO-dZ-JLm">
-                    <rect key="frame" x="252" y="0.0" width="15" height="22"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" id="J4Z-oA-HpQ"/>
-                    <connections>
-                        <action selector="searchAddressMaxLevelsDidChange:" target="-2" id="Sm4-FS-ohR"/>
-                    </connections>
-                </stepper>
                 <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="krU-4S-mNx">
-                    <rect key="frame" x="223" y="3" width="23" height="19"/>
+                    <rect key="frame" x="218" y="3" width="23" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="3" drawsBackground="YES" id="tOy-0X-UA3">
                         <numberFormatter key="formatter" formatterBehavior="default10_4" localizesFormat="NO" numberStyle="decimal" formatWidth="-1" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="SJ3-gE-EBM">
@@ -871,8 +863,16 @@
                     <rect key="frame" x="142" y="3" width="5" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                 </box>
+                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QsO-dZ-JLm">
+                    <rect key="frame" x="247" y="0.0" width="15" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" id="J4Z-oA-HpQ"/>
+                    <connections>
+                        <action selector="searchAddressMaxLevelsDidChange:" target="-2" id="Sm4-FS-ohR"/>
+                    </connections>
+                </stepper>
             </subviews>
-            <point key="canvasLocation" x="81" y="100.5"/>
+            <point key="canvasLocation" x="78.5" y="100.5"/>
         </customView>
     </objects>
     <resources>
