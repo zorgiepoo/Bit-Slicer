@@ -21,6 +21,7 @@
                 <outlet property="_searchAddressOffsetLabel" destination="Fax-W0-upK" id="ZKz-FH-6MZ"/>
                 <outlet property="_searchAddressOffsetTextField" destination="so8-Ni-dAC" id="B5d-st-t4K"/>
                 <outlet property="_searchAddressVerticalDivider" destination="hE3-Lr-YU6" id="qv5-Fp-AmF"/>
+                <outlet property="_searchTypePopUpButton" destination="t3M-9G-Seh" id="xlv-r6-s8l"/>
                 <outlet property="_toolbar" destination="UZg-mb-r8g" id="9bW-ar-bQK"/>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
                 <outlet property="functionPopUpButton" destination="Icp-Tb-DVJ" id="Bbf-kY-5xD"/>
@@ -216,7 +217,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
                             <rect key="frame" x="0.0" y="0.0" width="762" height="194"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf" customClass="ZGTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="762" height="177"/>
@@ -642,7 +643,7 @@
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
-                            <rect key="frame" x="-3" y="-4" width="167" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="74" height="25"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -695,10 +696,30 @@
                             </connections>
                         </popUpButton>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="1A10734E-5A5A-4CAD-905D-2618BA437CBC" label="Search Type" paletteLabel="Search Type" bordered="YES" title="value" sizingBehavior="auto" id="D2T-dX-W9r" userLabel="Search Type">
+                        <nil key="toolTip"/>
+                        <popUpButton key="view" verticalHuggingPriority="750" id="t3M-9G-Seh" userLabel="Textured Rounded Button">
+                            <rect key="frame" x="0.0" y="14" width="84" height="25"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <popUpButtonCell key="cell" type="roundTextured" title="value" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="NpW-LA-vBl" id="dsV-bj-atW">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="menu"/>
+                                <menu key="menu" title="OtherViews" id="R5h-SD-hix">
+                                    <items>
+                                        <menuItem title="value" id="NpW-LA-vBl"/>
+                                        <menuItem title="address" tag="1" id="v88-2O-5zY"/>
+                                    </items>
+                                </menu>
+                            </popUpButtonCell>
+                            <connections>
+                                <action selector="changeSearchType:" target="-2" id="GKe-5T-VsU"/>
+                            </connections>
+                        </popUpButton>
+                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="8E5DA537-8055-458D-9CED-FB55D84CC763" label="Operator" paletteLabel="Operator" title="Item_1" sizingBehavior="auto" id="moB-Wu-fvx">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Icp-Tb-DVJ">
-                            <rect key="frame" x="-3" y="-4" width="127" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="74" height="25"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -737,7 +758,7 @@
                     <toolbarItem implicitItemIdentifier="52E16CE5-DDC6-4458-A993-F5F7CF90040C" label="Search" paletteLabel="Search" sizingBehavior="auto" id="x8t-Jw-Hi9" userLabel="Search">
                         <nil key="toolTip"/>
                         <searchField key="view" wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WaT-8a-dxh">
-                            <rect key="frame" x="0.0" y="0.0" width="200" height="22"/>
+                            <rect key="frame" x="0.0" y="14" width="200" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Jey-Lt-NQ6"/>
                             </constraints>
@@ -752,6 +773,7 @@
                 <defaultToolbarItems>
                     <toolbarItem reference="jO3-Z2-Pv7"/>
                     <toolbarItem reference="70m-RL-vim"/>
+                    <toolbarItem reference="D2T-dX-W9r"/>
                     <toolbarItem reference="moB-Wu-fvx"/>
                     <toolbarItem reference="q4V-IG-gxK"/>
                     <toolbarItem reference="cbr-z0-cak"/>

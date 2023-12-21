@@ -84,10 +84,6 @@
 #define ZGEndianLittle @"ZGEndianLittle"
 #define ZGEndianBig @"ZGEndianBig"
 
-#define ZGSearchTypeGroup @"ZGSearchTypeGroup"
-#define ZGSearchTypeValueIdentifier @"ZGSearchTypeValue"
-#define ZGSearchTypeAddressIdentifier @"ZGSearchTypeAddress"
-
 @implementation ZGDocumentWindowController
 {
 	ZGDebuggerController * _Nonnull _debuggerController;
@@ -109,7 +105,6 @@
 	AGScopeBarGroup * _Nullable _qualifierGroup;
 	AGScopeBarGroup * _Nullable _stringMatchingGroup;
 	AGScopeBarGroup * _Nullable _endianGroup;
-	AGScopeBarGroup * _Nullable _searchTypeGroup;
 	
 	NSPopover * _Nullable _advancedOptionsPopover;
 	
@@ -117,6 +112,7 @@
 	IBOutlet NSTextField *_generalStatusTextField;
 	IBOutlet NSTextField *_flagsTextField;
 	IBOutlet NSTextField *_flagsLabel;
+	IBOutlet NSPopUpButton *_searchTypePopUpButton;
 	IBOutlet NSTextField *_searchAddressMaxLevelsTextField;
 	IBOutlet NSStepper *_searchAddressMaxLevelsStepper;
 	IBOutlet NSTextField *_searchAddressOffsetTextField;
@@ -204,12 +200,6 @@
 	[_endianGroup addItemWithIdentifier:ZGEndianBig title:ZGLocalizableSearchDocumentString(@"scopeBarEndianBigItem")];
 	_endianGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
-	_searchTypeGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGSearchTypeGroup];
-	_searchTypeGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarSearchTypeGroup");
-	[_searchTypeGroup addItemWithIdentifier:ZGSearchTypeValueIdentifier title:ZGLocalizableSearchDocumentString(@"scopeBarSearchTypeValueItem")];
-	[_searchTypeGroup addItemWithIdentifier:ZGSearchTypeAddressIdentifier title:ZGLocalizableSearchDocumentString(@"scopeBarSearchTypeAddressItem")];
-	_searchTypeGroup.selectionMode = AGScopeBarGroupSelectOne;
-	
 	// Set delegate after setting up scope bar so we won't receive initial selection events beforehand
 	_scopeBar.delegate = self;
 }
@@ -290,91 +280,6 @@
 			}
 			
 			[_variablesTableView reloadData];
-			[self markDocumentChange];
-		}
-	}
-	else if ([item.group.identifier isEqualToString:ZGSearchTypeGroup])
-	{
-		ZGSearchType newSearchType = [item.identifier isEqualToString:ZGSearchTypeAddressIdentifier] ? ZGSearchTypeAddress : ZGSearchTypeValue;
-		
-		if (newSearchType != _documentData.searchType)
-		{
-			_documentData.searchType = newSearchType;
-			switch (newSearchType)
-			{
-				case ZGSearchTypeValue:
-					_documentData.searchAddress = _searchValueTextField.stringValue;
-					_searchValueTextField.stringValue = _documentData.searchValue;
-					break;
-				case ZGSearchTypeAddress:
-				{
-					_documentData.searchValue = _searchValueTextField.stringValue;
-					
-					ZGVariableType selectedDataType = _documentData.selectedDatatypeTag;
-					NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:selectedDataType];
-					
-					// Try to find an active variable the user may want to search its address for
-					if (self.currentProcess.valid && (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0 || _performedRecentValueSearch))
-					{
-						ZGVariable *foundEnabledIndirectVariable = nil;
-						ZGVariable *foundDirectVariable = nil;
-						for (ZGVariable *variable in _documentData.variables)
-						{
-							if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
-							{
-								if (variable.usesDynamicPointerAddress)
-								{
-									if (foundEnabledIndirectVariable == nil && variable.enabled)
-									{
-										foundEnabledIndirectVariable = variable;
-										if (foundDirectVariable != nil)
-										{
-											break;
-										}
-									}
-								}
-								else
-								{
-									if (foundDirectVariable == nil)
-									{
-										foundDirectVariable = variable;
-										if (foundEnabledIndirectVariable != nil)
-										{
-											break;
-										}
-									}
-								}
-							}
-						}
-						
-						if (foundEnabledIndirectVariable != nil)
-						{
-							_documentData.searchAddress = foundEnabledIndirectVariable.addressStringValue;
-						}
-						else if (foundDirectVariable != nil)
-						{
-							_documentData.searchAddress = foundDirectVariable.addressStringValue;
-						}
-					}
-					
-					_performedRecentValueSearch = NO;
-					
-					_searchValueTextField.stringValue = _documentData.searchAddress;
-					
-					if (currentNumberOfIndirectLevelsInTable == 0)
-					{
-						// Reset levels state because this will be a new address search
-						_documentData.searchAddressMaxLevels = 1;
-						[self _updateSearchAddressMaxLevelsTextField];
-						
-						_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
-						[self _updateSearchAddressOffsetTextField];
-					}
-					break;
-				}
-			}
-			
-			[self updateOptions];
 			[self markDocumentChange];
 		}
 	}
@@ -599,7 +504,7 @@
 	
 	[_endianGroup setSelected:YES forItemWithIdentifier:_documentData.byteOrderTag == CFByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
 	
-	[_searchTypeGroup setSelected:YES forItemWithIdentifier:_documentData.searchType == ZGSearchTypeAddress ? ZGSearchTypeAddressIdentifier : ZGSearchTypeValueIdentifier];
+	[_searchTypePopUpButton selectItemWithTag:(NSInteger)_documentData.searchType];
 	
 	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
 	{
@@ -906,29 +811,11 @@
 		_documentData.functionTypeTag = _functionPopUpButton.selectedTag;
 	}
 	
-	NSString *dataTypeSearchType = (_documentData.searchType == ZGSearchTypeValue) ? @"value" : @"address";
-	for (NSMenuItem *dataTypeMenuItem in _dataTypesPopUpButton.itemArray)
-	{
-		if (dataTypeMenuItem.separatorItem)
-		{
-			continue;
-		}
-		
-		ZGVariableType dataTypeForMenuItem = dataTypeMenuItem.tag;
-		NSString *localizedKey = [NSString stringWithFormat:@"dataType_%@_%ld", dataTypeSearchType, dataTypeForMenuItem];
-		NSString *localizedTitle = ZGLocalizableSearchDocumentString(localizedKey);
-		
-		dataTypeMenuItem.title = localizedTitle;
-	}
-	
 	BOOL needsEndianness = (_documentData.searchType == ZGSearchTypeValue && ZGSupportsEndianness(dataType));
 	
 	[self changeScopeBarGroup:_qualifierGroup shouldExist:needsQualifier];
 	[self changeScopeBarGroup:_stringMatchingGroup shouldExist:needsStringMatching];
 	[self changeScopeBarGroup:_endianGroup shouldExist:needsEndianness];
-	
-	BOOL needsSearchType = (_documentData.functionTypeTag == ZGEquals);
-	[self changeScopeBarGroup:_searchTypeGroup shouldExist:needsSearchType];
 	
 	if (_documentData.searchType == ZGSearchTypeAddress)
 	{
@@ -1042,6 +929,97 @@
 - (ZGVariableType)selectedDataType
 {
 	return (ZGVariableType)_documentData.selectedDatatypeTag;
+}
+
+- (void)_changeSearchType:(ZGSearchType)newSearchType
+{
+	if (newSearchType != _documentData.searchType)
+	{
+		_documentData.searchType = newSearchType;
+		
+		switch (newSearchType)
+		{
+			case ZGSearchTypeValue:
+				_documentData.searchAddress = _searchValueTextField.stringValue;
+				_searchValueTextField.stringValue = _documentData.searchValue;
+				break;
+			case ZGSearchTypeAddress:
+			{
+				_documentData.searchValue = _searchValueTextField.stringValue;
+				
+				ZGVariableType selectedDataType = _documentData.selectedDatatypeTag;
+				NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:selectedDataType];
+				
+				// Try to find an active variable the user may want to search its address for
+				if (self.currentProcess.valid && (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0 || _performedRecentValueSearch))
+				{
+					ZGVariable *foundEnabledIndirectVariable = nil;
+					ZGVariable *foundDirectVariable = nil;
+					for (ZGVariable *variable in _documentData.variables)
+					{
+						if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
+						{
+							if (variable.usesDynamicPointerAddress)
+							{
+								if (foundEnabledIndirectVariable == nil && variable.enabled)
+								{
+									foundEnabledIndirectVariable = variable;
+									if (foundDirectVariable != nil)
+									{
+										break;
+									}
+								}
+							}
+							else
+							{
+								if (foundDirectVariable == nil)
+								{
+									foundDirectVariable = variable;
+									if (foundEnabledIndirectVariable != nil)
+									{
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					if (foundEnabledIndirectVariable != nil)
+					{
+						_documentData.searchAddress = foundEnabledIndirectVariable.addressStringValue;
+					}
+					else if (foundDirectVariable != nil)
+					{
+						_documentData.searchAddress = foundDirectVariable.addressStringValue;
+					}
+				}
+				
+				_performedRecentValueSearch = NO;
+				
+				_searchValueTextField.stringValue = _documentData.searchAddress;
+				
+				if (currentNumberOfIndirectLevelsInTable == 0)
+				{
+					// Reset levels state because this will be a new address search
+					_documentData.searchAddressMaxLevels = 1;
+					[self _updateSearchAddressMaxLevelsTextField];
+					
+					_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+					[self _updateSearchAddressOffsetTextField];
+				}
+				break;
+			}
+		}
+		
+		[self updateOptions];
+		[self markDocumentChange];
+	}
+}
+
+- (IBAction)changeSearchType:(id)sender
+{
+	ZGSearchType newSearchType = (ZGSearchType)[(NSPopUpButton *)sender selectedTag];
+	[self _changeSearchType:newSearchType];
 }
 
 - (ZGFunctionType)selectedFunctionType
@@ -1734,7 +1712,7 @@
 {
 	ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
 	
-	[_searchTypeGroup setSelected:YES forItemWithIdentifier:ZGSearchTypeAddressIdentifier];
+	[self _changeSearchType:ZGSearchTypeAddress];
 	
 	_documentData.searchAddress = [NSString stringWithFormat:@"0x%llX", variable.address];
 	_searchValueTextField.stringValue = _documentData.searchAddress;
