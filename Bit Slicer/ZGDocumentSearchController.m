@@ -920,8 +920,9 @@
 	}
 	
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
-	_searchData.indirectStopAtStaticAddresses = YES;
+	_searchData.indirectStopAtStaticAddresses = addressSearch;
 	_searchData.filterHeapAndStackData = addressSearch;
+	_searchData.excludeStaticDataFromSystemLibraries = addressSearch;
 	
 	_searchData.headerAddresses = nil;
 	_searchData.totalStaticSegmentRanges = nil;

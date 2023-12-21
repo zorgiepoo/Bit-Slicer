@@ -168,7 +168,7 @@
 	return regions;
 }
 
-+ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory filterHeapAndStackData:(BOOL)filterHeapAndStackData totalStaticSegmentRanges:(NSArray<NSValue *> * _Nullable)totalStaticSegmentRanges
++ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory filterHeapAndStackData:(BOOL)filterHeapAndStackData totalStaticSegmentRanges:(NSArray<NSValue *> * _Nullable)totalStaticSegmentRanges excludeStaticDataFromSystemLibraries:(BOOL)excludeStaticDataFromSystemLibraries filePaths:(NSArray<NSString *> * _Nullable)filePaths
 {
 	return [regions zgFlatMapUsingBlock:^ZGRegion *(ZGRegion *region) {
 		if (endAddress <= region.address || beginAddress >= region.address + region.size)
@@ -188,6 +188,7 @@
 		
 		if (filterHeapAndStackData && !ZGUserTagIsStackOrHeapData(region.userTag))
 		{
+			NSUInteger binaryIndex = 0;
 			NSValue *matchingSegmentRangeValue = [totalStaticSegmentRanges zgBinarySearchUsingBlock:^NSComparisonResult(NSValue *__unsafe_unretained  _Nonnull currentValue) {
 				NSRange totalSegmentRange = currentValue.rangeValue;
 				if (region.address + region.size <= totalSegmentRange.location)
@@ -201,11 +202,22 @@
 				}
 				
 				return NSOrderedSame;
-			}];
+			} getIndex:&binaryIndex];
 			
 			if (matchingSegmentRangeValue == nil)
 			{
 				return nil;
+			}
+			
+			if (excludeStaticDataFromSystemLibraries && binaryIndex > 0 && filePaths != nil)
+			{
+				NSString *filePath = filePaths[binaryIndex];
+				if ([filePath hasPrefix:@"/System/"] ||
+					[filePath hasPrefix:@"/usr/"] ||
+					[filePath hasPrefix:@"/Library/Apple/"])
+				{
+					return nil;
+				}
 			}
 		}
 		

@@ -347,10 +347,12 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		NSArray<ZGRegion *> *nonFilteredRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] :  [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 		
 		BOOL filterHeapAndStackData = searchData.filterHeapAndStackData;
-		
 		NSArray<NSValue *> *totalStaticSegmentRanges = searchData.totalStaticSegmentRanges;
 		
-		regions = [ZGRegion regionsFilteredFromRegions:nonFilteredRegions beginAddress:dataBeginAddress endAddress:dataEndAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory filterHeapAndStackData:filterHeapAndStackData totalStaticSegmentRanges:totalStaticSegmentRanges];
+		BOOL excludeStaticDataFromSystemLibraries = searchData.excludeStaticDataFromSystemLibraries;
+		NSArray<NSString *> *filePaths = searchData.filePaths;
+		
+		regions = [ZGRegion regionsFilteredFromRegions:nonFilteredRegions beginAddress:dataBeginAddress endAddress:dataEndAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory filterHeapAndStackData:filterHeapAndStackData totalStaticSegmentRanges:totalStaticSegmentRanges excludeStaticDataFromSystemLibraries:excludeStaticDataFromSystemLibraries filePaths:filePaths];
 	}
 	else
 	{
@@ -2143,7 +2145,7 @@ static NSArray<ZGRegion *> *ZGBuildPageToRegionTable(ZGMemoryMap processTask, st
 {
 	NSArray<ZGRegion *> *allRegions = [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 	
-	NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:searchData.beginAddress endAddress:searchData.endAddress protectionMode:searchData.protectionMode includeSharedMemory:searchData.includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil];
+	NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:searchData.beginAddress endAddress:searchData.endAddress protectionMode:searchData.protectionMode includeSharedMemory:searchData.includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil excludeStaticDataFromSystemLibraries:NO filePaths:nil];
 	
 	for (ZGRegion *region in regions)
 	{
@@ -2192,7 +2194,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, BOOL transl
 			
 		NSArray<ZGRegion *> *allRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] : [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 
-		NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:searchData.beginAddress endAddress:searchData.endAddress protectionMode:searchData.protectionMode includeSharedMemory:searchData.includeSharedMemory filterHeapAndStackData:searchData.filterHeapAndStackData totalStaticSegmentRanges:totalStaticSegmentRanges];
+		NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:searchData.beginAddress endAddress:searchData.endAddress protectionMode:searchData.protectionMode includeSharedMemory:searchData.includeSharedMemory filterHeapAndStackData:searchData.filterHeapAndStackData totalStaticSegmentRanges:totalStaticSegmentRanges excludeStaticDataFromSystemLibraries:searchData.excludeStaticDataFromSystemLibraries filePaths:filePaths];
 		
 		ZGMemorySize dataAlignment = searchData.dataAlignment;
 		ZGMemoryAddress maxPointerValue = searchData.endAddress;
@@ -2775,7 +2777,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap pr
 				lastAddress = searchData.endAddress;
 			}
 
-			NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:firstAddress endAddress:lastAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil];
+			NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:firstAddress endAddress:lastAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil excludeStaticDataFromSystemLibraries:NO filePaths:nil];
 			
 			for (ZGRegion *region in regions)
 			{
@@ -2845,7 +2847,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap pr
 			{
 				pageToSavedRegionTable = [[NSMutableDictionary alloc] init];
 				
-				NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:savedData beginAddress:firstAddress endAddress:lastAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil];
+				NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:savedData beginAddress:firstAddress endAddress:lastAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil excludeStaticDataFromSystemLibraries:NO filePaths:nil];
 				
 				for (ZGRegion *region in regions)
 				{

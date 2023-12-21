@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
 
-+ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory filterHeapAndStackData:(BOOL)filterHeapAndStackData totalStaticSegmentRanges:(NSArray<NSValue *> * _Nullable)totalStaticSegmentRanges;
++ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory filterHeapAndStackData:(BOOL)filterHeapAndStackData totalStaticSegmentRanges:(NSArray<NSValue *> * _Nullable)totalStaticSegmentRanges excludeStaticDataFromSystemLibraries:(BOOL)excludeStaticDataFromSystemLibraries filePaths:(NSArray<NSString *> * _Nullable)filePaths;
 
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection userTag:(uint32_t)userTag;
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;

@@ -88,6 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) uint16_t indirectMaxLevels;
 @property (nonatomic) BOOL indirectStopAtStaticAddresses;
 @property (nonatomic) BOOL filterHeapAndStackData;
+@property (nonatomic) BOOL excludeStaticDataFromSystemLibraries;
 @property (nonatomic) BOOL shouldIgnoreStringCase;
 @property (nonatomic) BOOL shouldIncludeNullTerminator;
 @property (nonatomic) ZGMemoryAddress beginAddress;
