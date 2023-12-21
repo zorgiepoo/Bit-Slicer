@@ -2007,7 +2007,7 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 	}];
 }
 
-static bool ZGEvaluateIndirectAddress2(ZGMemoryAddress *outAddress, ZGMemoryMap processTask, const void *indirectResult, ZGMemorySize pointerSize, NSArray<NSNumber *> *headerAddresses, ZGMemoryAddress minPointerAddress, ZGMemoryAddress maxPointerAddress, const ZGRegionValue *regionValuesTable, ZGMemorySize regionValuesTableCount, uint16_t *outNumberOfLevels, uint16_t *outBaseImageIndex, uint16_t *outOffsets, ZGMemoryAddress *outBaseAddresses, ZGMemoryAddress *outNextRecurseSearchAddress)
+static bool ZGEvaluateIndirectAddress(ZGMemoryAddress *outAddress, ZGMemoryMap processTask, const void *indirectResult, ZGMemorySize pointerSize, NSArray<NSNumber *> * __unsafe_unretained headerAddresses, ZGMemoryAddress minPointerAddress, ZGMemoryAddress maxPointerAddress, ZGRegionValue *regionValuesTable, ZGMemorySize regionValuesTableCount, uint16_t *outNumberOfLevels, uint16_t *outBaseImageIndex, uint16_t *outOffsets, ZGMemoryAddress *outBaseAddresses, ZGMemoryAddress *outNextRecurseSearchAddress)
 {
 	
 	//	Struct {
@@ -2082,7 +2082,7 @@ static bool ZGEvaluateIndirectAddress2(ZGMemoryAddress *outAddress, ZGMemoryMap 
 		}
 		
 		NSUInteger targetIndex = 0;
-		ZGRegionValue regionValueEntry;
+		ZGRegionValue *regionValueEntry;
 		{
 			NSUInteger end = regionValuesTableCount;
 			NSUInteger start = 0;
@@ -2090,13 +2090,13 @@ static bool ZGEvaluateIndirectAddress2(ZGMemoryAddress *outAddress, ZGMemoryMap 
 			while (end > start)
 			{
 				targetIndex = start + (end - start) / 2;
-				regionValueEntry = regionValuesTable[targetIndex];
+				regionValueEntry = &regionValuesTable[targetIndex];
 				
-				if (regionValueEntry.address + regionValueEntry.size <= currentAddress)
+				if (regionValueEntry->address + regionValueEntry->size <= currentAddress)
 				{
 					start = targetIndex + 1;
 				}
-				else if (regionValueEntry.address >= currentAddress + pointerSize)
+				else if (regionValueEntry->address >= currentAddress + pointerSize)
 				{
 					end = targetIndex;
 				}
@@ -2112,23 +2112,23 @@ static bool ZGEvaluateIndirectAddress2(ZGMemoryAddress *outAddress, ZGMemoryMap 
 		break;
 		
 EVALUATE_INDIRECT_ADDRESS_FOUND_MATCH:
-		if (regionValueEntry.bytes == nullptr)
+		if (regionValueEntry->bytes == nullptr)
 		{
-			ZGMemorySize newSize = regionValueEntry.size;
+			ZGMemorySize newSize = regionValueEntry->size;
 			void *newBytes = nullptr;
-			if (!ZGReadBytes(processTask, regionValueEntry.address, &newBytes, &newSize))
+			if (!ZGReadBytes(processTask, regionValueEntry->address, &newBytes, &newSize))
 			{
 				validAddress = false;
 				break;
 			}
 			else
 			{
-				regionValueEntry.size = newSize;
-				regionValueEntry.bytes = newBytes;
+				regionValueEntry->size = newSize;
+				regionValueEntry->bytes = newBytes;
 			}
 		}
 		
-		const void *bytesFromMemory = static_cast<const void *>(static_cast<const uint8_t *>(regionValueEntry.bytes) + currentAddress - regionValueEntry.address);
+		const void *bytesFromMemory = static_cast<const void *>(static_cast<const uint8_t *>(regionValueEntry->bytes) + currentAddress - regionValueEntry->address);
 		
 		ZGMemoryAddress dereferencedAddressFromMemory;
 		if (pointerSize == sizeof(ZGMemoryAddress))
@@ -2300,38 +2300,6 @@ static int _sortPointerMapTable(const void *entry1, const void *entry2)
 	else
 	{
 		return 0;
-	}
-}
-
-static NSArray<ZGRegion *> *ZGBuildPageToRegionTable(ZGMemoryMap processTask, std::unordered_map<ZGMemoryAddress, ZGRegion *> &pageToRegionTable, ZGSearchData *searchData, ZGMemorySize pageSize)
-{
-	NSArray<ZGRegion *> *allRegions = [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
-	
-	NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:searchData.beginAddress endAddress:searchData.endAddress protectionMode:searchData.protectionMode includeSharedMemory:searchData.includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil excludeStaticDataFromSystemLibraries:NO filePaths:nil];
-	
-	for (ZGRegion *region in regions)
-	{
-		ZGMemoryAddress regionAddress = region.address;
-		ZGMemorySize regionSize = region.size;
-		assert(regionAddress % pageSize == 0);
-		for (NSUInteger dataIndex = 0; dataIndex < regionSize; dataIndex += pageSize)
-		{
-			pageToRegionTable[(dataIndex + regionAddress)] = region;
-		}
-	}
-	
-	return regions;
-}
-
-static void ZGFreeRegionBytes(NSArray<ZGRegion *> *regions)
-{
-	for (ZGRegion *region in regions)
-	{
-		if (region->_bytes != nullptr)
-		{
-			ZGFreeBytes(region->_bytes, region->_size);
-			region->_bytes = nullptr;
-		}
 	}
 }
 
@@ -2530,7 +2498,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 				uint16_t baseImageIndex;
 				
 				NSData *newResultSet;
-				if (ZGEvaluateIndirectAddress2(&currentAddress, processTask, previousIndirectResult, pointerSize, headerAddresses, minPointerValue, maxPointerValue, narrowRegionsTable, narrowRegionsTableCount, &numberOfLevels, &baseImageIndex, currentOffsets, currentBaseAddresses, &nextRecurseSearchAddress) && currentAddress == searchAddress)
+				if (ZGEvaluateIndirectAddress(&currentAddress, processTask, previousIndirectResult, pointerSize, headerAddresses, minPointerValue, maxPointerValue, narrowRegionsTable, narrowRegionsTableCount, &numberOfLevels, &baseImageIndex, currentOffsets, currentBaseAddresses, &nextRecurseSearchAddress) && currentAddress == searchAddress)
 				{
 					memset(tempBuffer, 0, stride);
 					memcpy(tempBuffer, previousIndirectResult, previousIndirectResultSetStride);
@@ -2609,7 +2577,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			if (regionValue.bytes != nullptr)
 			{
 				ZGFreeBytes(regionValue.bytes, regionValue.size);
-				regionValue.bytes = nullptr;
+				narrowRegionsTable[regionIndex].bytes = nullptr;
 			}
 		}
 	}
@@ -2879,6 +2847,11 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 	for (ZGMemorySize oldVariableIndex = 0; oldVariableIndex < oldVariableCount; oldVariableIndex++)
 	{
 		P variableAddress = *(static_cast<P *>(const_cast<void *>(oldResultSetBytes)) + oldVariableIndex);
+		
+		if (variableAddress == 0x0)
+		{
+			continue;
+		}
 		
 		if (lastUsedRegion == nil || (variableAddress < lastUsedRegion->_address || variableAddress + dataSize > lastUsedRegion->_address + lastUsedRegion->_size))
 		{
@@ -3636,14 +3609,31 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 {
 	NSArray<NSData *> *indirectResultSets = indirectSearchResults.resultSets;
 	
-	ZGMemorySize pageSize = ZGPageSizeForRegionAlignment(processTask, translated);
+	NSArray<ZGRegion *> *allRegions = [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 	
-	std::unordered_map<ZGMemoryAddress, ZGRegion *> pageToRegionTable;
-	NSArray<ZGRegion *> *regions = ZGBuildPageToRegionTable(processTask, pageToRegionTable, searchData, pageSize);
+	NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:searchData.beginAddress endAddress:searchData.endAddress protectionMode:searchData.protectionMode includeSharedMemory:searchData.includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil excludeStaticDataFromSystemLibraries:NO filePaths:nil];
+	
+	ZGMemorySize regionValuesCount = regions.count;
+	ZGRegionValue *regionValues = static_cast<ZGRegionValue *>(calloc(regionValuesCount, sizeof(*regionValues)));
+	
+	{
+		NSUInteger regionIndex = 0;
+		for (ZGRegion *region in regions)
+		{
+			ZGRegionValue regionValue;
+			regionValue.address = region.address;
+			regionValue.size = region.size;
+			regionValue.bytes = nullptr;
+			regionValues[regionIndex++] = regionValue;
+		}
+	}
 	
 	NSMutableArray<NSData *> *directResultSets = [NSMutableArray array];
 	
 	NSArray<NSNumber *> *headerAddresses = indirectSearchResults.headerAddresses;
+	
+	ZGMemoryAddress minPointerAddress = searchData.beginAddress;
+	ZGMemoryAddress maxPointerAddress = searchData.endAddress;
 	
 	ZGMemorySize pointerSize = searchData.pointerSize;
 	ZGMemorySize indirectResultsStride = indirectSearchResults.stride;
@@ -3659,7 +3649,7 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 			const uint8_t *resultBytes = resultSetBytes + resultIndex * indirectResultsStride;
 			
 			ZGMemoryAddress address;
-			if (!ZGEvaluateIndirectAddress(&address, processTask, resultBytes, pointerSize, headerAddresses, pageToRegionTable, pageSize, nullptr, nullptr, nullptr, nullptr, nullptr))
+			if (!ZGEvaluateIndirectAddress(&address, processTask, resultBytes, pointerSize, headerAddresses, minPointerAddress, maxPointerAddress, regionValues, regionValuesCount, nullptr, nullptr, nullptr, nullptr, nullptr))
 			{
 				address = 0x0;
 			}
@@ -3681,7 +3671,15 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 		[directResultSets addObject:newResultSet];
 	}
 	
-	ZGFreeRegionBytes(regions);
+	for (ZGMemorySize regionIndex = 0; regionIndex < regionValuesCount; regionIndex++)
+	{
+		ZGRegionValue regionValue = regionValues[regionIndex];
+		if (regionValue.bytes != nullptr)
+		{
+			ZGFreeBytes(regionValue.bytes, regionValue.size);
+			regionValues[regionIndex].bytes = nullptr;
+		}
+	}
 	
 	ZGSearchResults *directSearchResults = [[ZGSearchResults alloc] initWithResultSets:directResultSets resultType:ZGSearchResultTypeDirect dataType:dataType stride:pointerSize unalignedAccess:indirectSearchResults.unalignedAccess];
 	
