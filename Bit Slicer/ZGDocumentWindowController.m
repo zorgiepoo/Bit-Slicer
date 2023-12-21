@@ -931,7 +931,7 @@
 	return (ZGVariableType)_documentData.selectedDatatypeTag;
 }
 
-- (void)_changeSearchType:(ZGSearchType)newSearchType
+- (void)_changeSearchType:(ZGSearchType)newSearchType prepopulateAddress:(BOOL)prepopulateAddress
 {
 	if (newSearchType != _documentData.searchType)
 	{
@@ -951,7 +951,7 @@
 				NSUInteger currentNumberOfIndirectLevelsInTable = [_searchController currentSearchAddressNumberOfIndirectLevelsWithDataType:selectedDataType];
 				
 				// Try to find an active variable the user may want to search its address for
-				if (self.currentProcess.valid && (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0 || _performedRecentValueSearch))
+				if (prepopulateAddress && self.currentProcess.valid && (currentNumberOfIndirectLevelsInTable == 0 || _documentData.searchAddress.length == 0 || _performedRecentValueSearch))
 				{
 					ZGVariable *foundEnabledIndirectVariable = nil;
 					ZGVariable *foundDirectVariable = nil;
@@ -1021,7 +1021,7 @@
 - (IBAction)changeSearchType:(id)sender
 {
 	ZGSearchType newSearchType = (ZGSearchType)[(NSPopUpButton *)sender selectedTag];
-	[self _changeSearchType:newSearchType];
+	[self _changeSearchType:newSearchType prepopulateAddress:YES];
 }
 
 - (ZGFunctionType)selectedFunctionType
@@ -1723,7 +1723,8 @@
 {
 	ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
 	
-	[self _changeSearchType:ZGSearchTypeAddress];
+	[_searchTypePopUpButton selectItemWithTag:ZGSearchTypeAddress];
+	[self _changeSearchType:ZGSearchTypeAddress prepopulateAddress:NO];
 	
 	_documentData.searchAddress = [NSString stringWithFormat:@"0x%llX", variable.address];
 	_searchValueTextField.stringValue = _documentData.searchAddress;
