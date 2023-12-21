@@ -174,6 +174,25 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[[self class] copyVariableAddress:windowController.selectedVariables[0]];
 }
 
++ (void)copyVariableRawAddress:(ZGVariable *)variable
+{
+	[NSPasteboard.generalPasteboard
+	 declareTypes:@[NSPasteboardTypeString]
+	 owner:self];
+	
+	[NSPasteboard.generalPasteboard
+	 setString:variable.addressStringValue
+	 forType:NSPasteboardTypeString];
+}
+
+- (void)copyRawAddress
+{
+	ZGDocumentWindowController *windowController = _windowController;
+	ZGVariable *variable = windowController.selectedVariables[0];
+	
+	[[self class] copyVariableRawAddress:variable];
+}
+
 + (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables
 {
 	[NSPasteboard.generalPasteboard

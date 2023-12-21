@@ -168,6 +168,12 @@
                                     <action selector="copyAddress:" target="-1" id="1089"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Copy Raw Address" keyEquivalent="c" id="Y5k-Nh-cGe">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="copyRawAddress:" target="-1" id="Mak-Wq-SeH"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Paste" keyEquivalent="v" id="203">
                                 <connections>
                                     <action selector="paste:" target="-1" id="226"/>

@@ -48,6 +48,12 @@
                         <action selector="copyAddress:" target="-1" id="100891"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Copy Raw Address" id="peg-wi-Uav">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="copyRawAddress:" target="-1" id="vIZ-Gl-Xqa"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Paste" id="100803">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -229,7 +235,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
                             <rect key="frame" x="0.0" y="0.0" width="762" height="194"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf" customClass="ZGTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="762" height="177"/>

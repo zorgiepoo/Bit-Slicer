@@ -1323,7 +1323,7 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(copyAddress:))
+	else if (menuItem.action == @selector(copyAddress:) || menuItem.action == @selector(copyRawAddress:))
 	{
 		if ([self selectedVariables].count != 1)
 		{
@@ -1789,6 +1789,11 @@
 - (IBAction)copyAddress:(id)__unused sender
 {
 	[_variableController copyAddress];
+}
+
+- (IBAction)copyRawAddress:(id)sender
+{
+	[_variableController copyRawAddress];
 }
 
 - (IBAction)paste:(id)__unused sender

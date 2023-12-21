@@ -17,6 +17,9 @@
 /* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "286"; */
 "286.title" = "Copiar dirección";
 
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "Iwu-Sv-lDF"; */
+"Iwu-Sv-lDF.title" = "Copy Raw Address";
+
 /* Class = "NSMenuItem"; title = "Go to Call Address"; ObjectID = "292"; */
 "292.title" = "Ir a la dirección de llamada";
 

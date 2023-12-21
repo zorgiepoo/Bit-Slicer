@@ -58,9 +58,11 @@ typedef struct
 
 + (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables;
 + (void)copyVariableAddress:(ZGVariable *)variable;
++ (void)copyVariableRawAddress:(ZGVariable *)variable;
 
 - (void)copyVariables;
 - (void)copyAddress;
+- (void)copyRawAddress;
 - (void)pasteVariables;
 
 - (void)clear;

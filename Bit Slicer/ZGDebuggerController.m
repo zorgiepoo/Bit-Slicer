@@ -1454,7 +1454,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 			return NO;
 		}
 	}
-	else if (userInterfaceItem.action == @selector(copyAddress:))
+	else if (userInterfaceItem.action == @selector(copyAddress:) || userInterfaceItem.action == @selector(copyRawAddress:))
 	{
 		if ([self selectedInstructions].count != 1)
 		{
@@ -1683,6 +1683,12 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
 		[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSPasteboardTypeString];
 	}];
+}
+
+- (IBAction)copyRawAddress:(id)__unused sender
+{
+	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	[ZGVariableController copyVariableRawAddress:selectedInstruction.variable];
 }
 
 - (void)scrollAndSelectRow:(NSUInteger)selectionRow

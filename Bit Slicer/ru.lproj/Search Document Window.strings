@@ -62,6 +62,9 @@
 /* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "100889"; */
 "100889.title" = "Скопировать Адрес";
 
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "peg-wi-Uav"; */
+"peg-wi-Uav.title" = "Copy Raw Address";
+
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "0RQ-cA-Uk7"; */
 "0RQ-cA-Uk7.title" = "Текстовая ячейка";
 

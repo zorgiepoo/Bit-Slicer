@@ -250,7 +250,7 @@
 	{
 		[menuItem setState:_showsDataInspector];
 	}
-	else if (userInterfaceItem.action == @selector(copyAddress:) || userInterfaceItem.action == @selector(showDebugger:))
+	else if (userInterfaceItem.action == @selector(copyAddress:) || userInterfaceItem.action == @selector(copyRawAddress:) || userInterfaceItem.action == @selector(showDebugger:))
 	{
 		if (!self.currentProcess.valid)
 		{
@@ -703,15 +703,29 @@
 
 #pragma mark Copying
 
-- (IBAction)copyAddress:(id)__unused sender
+- (ZGVariable *)_variableFromSelectedAddressRange
 {
 	HFRange selectedAddressRange = [self selectedAddressRange];
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:selectedAddressRange.length address:selectedAddressRange.location type:ZGByteArray qualifier:ZGUnsigned pointerSize:self.currentProcess.pointerSize];
+	
+	return variable;
+}
+
+- (IBAction)copyAddress:(id)__unused sender
+{
+	ZGVariable *variable = [self _variableFromSelectedAddressRange];
 	
 	[ZGVariableController annotateVariables:@[variable] process:self.currentProcess symbols:NO async:NO completionHandler:^{
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
 		[[NSPasteboard generalPasteboard] setString:variable.addressFormula forType:NSPasteboardTypeString];
 	}];
+}
+
+- (IBAction)copyRawAddress:(id)__unused sender
+{
+	ZGVariable *variable = [self _variableFromSelectedAddressRange];
+	
+	[ZGVariableController copyVariableRawAddress:variable];
 }
 
 #pragma mark Showing Debugger

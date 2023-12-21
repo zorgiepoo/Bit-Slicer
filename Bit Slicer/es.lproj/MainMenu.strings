@@ -311,6 +311,9 @@
 /* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "1087"; */
 "1087.title" = "Copiar dirección";
 
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "Y5k-Nh-cGe"; */
+"Y5k-Nh-cGe.title" = "Copy Raw Address";
+
 /* Class = "NSMenuItem"; title = "Check for Updates…"; ObjectID = "1093"; */
 "1093.title" = "Buscar actualizaciones…";
 
