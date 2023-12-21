@@ -2585,6 +2585,8 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	free(tempBuffer);
 	free(currentOffsets);
 	free(currentBaseAddresses);
+	free(narrowRegionsTable);
+	narrowRegionsTable = nullptr;
 	
 	if (staticOtherLibrariesResultSet.length > 0)
 	{
@@ -3680,6 +3682,9 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 			regionValues[regionIndex].bytes = nullptr;
 		}
 	}
+	
+	free(regionValues);
+	regionValues = nullptr;
 	
 	ZGSearchResults *directSearchResults = [[ZGSearchResults alloc] initWithResultSets:directResultSets resultType:ZGSearchResultTypeDirect dataType:dataType stride:pointerSize unalignedAccess:indirectSearchResults.unalignedAccess];
 	
