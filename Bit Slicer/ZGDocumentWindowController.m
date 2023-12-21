@@ -1014,6 +1014,8 @@
 		[self updateOptions];
 		[self markDocumentChange];
 	}
+	
+	[self.window makeFirstResponder:_searchValueTextField];
 }
 
 - (IBAction)changeSearchType:(id)sender
@@ -1716,8 +1718,6 @@
 	
 	_documentData.searchAddress = [NSString stringWithFormat:@"0x%llX", variable.address];
 	_searchValueTextField.stringValue = _documentData.searchAddress;
-	
-	[self.window makeFirstResponder:_searchValueTextField];
 	
 	[self markDocumentChange];
 }
