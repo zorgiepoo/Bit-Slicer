@@ -181,6 +181,7 @@
 	windowController.runningApplicationsPopUpButton.enabled = NO;
 	windowController.dataTypesPopUpButton.enabled = NO;
 	windowController.functionPopUpButton.enabled = NO;
+	windowController.searchTypePopUpButton.enabled = NO;
 }
 
 - (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder
@@ -198,6 +199,8 @@
 	[windowController updateOptions];
 	
 	windowController.functionPopUpButton.enabled = YES;
+	
+	windowController.searchTypePopUpButton.enabled = YES;
 	
 	windowController.runningApplicationsPopUpButton.enabled = YES;
 	
