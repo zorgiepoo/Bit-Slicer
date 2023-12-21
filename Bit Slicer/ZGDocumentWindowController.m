@@ -1449,11 +1449,12 @@
 		}
 		
 		BOOL usesDynamicPointerAddress = selectedVariable.usesDynamicPointerAddress;
+		BOOL watchingBaseAccesess = (usesDynamicPointerAddress && menuItem.alternate);
 		
-		NSString *localizableTitleKey = [NSString stringWithFormat:@"watchAccesses_%ld_%d", menuItem.tag, usesDynamicPointerAddress];
+		NSString *localizableTitleKey = [NSString stringWithFormat:@"watchAccesses_%ld_%d", menuItem.tag, watchingBaseAccesess];
 		menuItem.title = ZGLocalizableSearchDocumentString(localizableTitleKey);
 		
-		if (!usesDynamicPointerAddress)
+		if (!watchingBaseAccesess)
 		{
 			ZGMemoryAddress memoryAddress = selectedVariable.address;
 			ZGMemorySize memorySize = selectedVariable.size;
@@ -1873,7 +1874,9 @@
 	
 	ZGVariable *watchVariable;
 	ZGMemoryAddress baseAddress = 0x0;
-	if (selectedVariable.usesDynamicPointerAddress && [_tableController getBaseAddress:&baseAddress variable:selectedVariable])
+	BOOL watchingBaseAccesess = (selectedVariable.usesDynamicPointerAddress && [(NSMenuItem *)sender isAlternate]);
+	
+	if (watchingBaseAccesess && [_tableController getBaseAddress:&baseAddress variable:selectedVariable])
 	{
 		ZGMemorySize pointerSize = self.currentProcess.pointerSize;
 		watchVariable = [[ZGVariable alloc] initWithValue:NULL size:pointerSize address:baseAddress type:ZGPointer qualifier:0 pointerSize:pointerSize];

@@ -171,10 +171,22 @@
                         <action selector="watchVariable:" target="-1" id="100794"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Watch Write Accesses to Base Address…" alternate="YES" id="LKg-Ix-res">
+                    <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                    <connections>
+                        <action selector="watchVariable:" target="-1" id="Ja7-17-kya"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Watch Read &amp; Write Accesses…" tag="1" id="100885">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="watchVariable:" target="-1" id="100886"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Watch Read &amp; Write Accesses to Base Address…" tag="1" alternate="YES" id="Ule-bH-KzF">
+                    <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                    <connections>
+                        <action selector="watchVariable:" target="-1" id="arU-1i-akx"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="100789"/>
@@ -217,7 +229,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
                             <rect key="frame" x="0.0" y="0.0" width="762" height="194"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf" customClass="ZGTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="762" height="177"/>
@@ -643,7 +655,7 @@
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
-                            <rect key="frame" x="0.0" y="14" width="74" height="25"/>
+                            <rect key="frame" x="-3" y="-4" width="167" height="25"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -701,12 +713,12 @@
                         <popUpButton key="view" verticalHuggingPriority="750" id="t3M-9G-Seh" userLabel="Textured Rounded Button">
                             <rect key="frame" x="0.0" y="14" width="84" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <popUpButtonCell key="cell" type="roundTextured" title="value" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="NpW-LA-vBl" id="dsV-bj-atW">
+                            <popUpButtonCell key="cell" type="roundTextured" title="value" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="NpW-LA-vBl" id="dsV-bj-atW">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="R5h-SD-hix">
                                     <items>
-                                        <menuItem title="value" id="NpW-LA-vBl"/>
+                                        <menuItem title="value" state="on" id="NpW-LA-vBl"/>
                                         <menuItem title="address" tag="1" id="v88-2O-5zY"/>
                                     </items>
                                 </menu>
@@ -719,7 +731,7 @@
                     <toolbarItem implicitItemIdentifier="8E5DA537-8055-458D-9CED-FB55D84CC763" label="Operator" paletteLabel="Operator" title="Item_1" sizingBehavior="auto" id="moB-Wu-fvx">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Icp-Tb-DVJ">
-                            <rect key="frame" x="0.0" y="14" width="74" height="25"/>
+                            <rect key="frame" x="-3" y="-4" width="127" height="25"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -758,7 +770,7 @@
                     <toolbarItem implicitItemIdentifier="52E16CE5-DDC6-4458-A993-F5F7CF90040C" label="Search" paletteLabel="Search" sizingBehavior="auto" id="x8t-Jw-Hi9" userLabel="Search">
                         <nil key="toolTip"/>
                         <searchField key="view" wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WaT-8a-dxh">
-                            <rect key="frame" x="0.0" y="14" width="200" height="22"/>
+                            <rect key="frame" x="0.0" y="0.0" width="200" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Jey-Lt-NQ6"/>
                             </constraints>
