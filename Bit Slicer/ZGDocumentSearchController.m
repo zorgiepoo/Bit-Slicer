@@ -1290,7 +1290,7 @@
 			if (pointerAddressSearch)
 			{
 				// Pointer address searches for initial and narrow searches
-				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, currentProcess.translated, self->_searchData, self, indirectMaxLevelsForNextSearchResults, self->_dataType, initialIndirectSearchResults);
+				self->_temporarySearchResults = ZGSearchForIndirectPointer(currentProcess.processTask, self->_searchData, self, indirectMaxLevelsForNextSearchResults, self->_dataType, initialIndirectSearchResults);
 			}
 			else
 			{
