@@ -226,6 +226,13 @@
 	return needsToReload;
 }
 
+- (BOOL)getBaseAddress:(ZGMemoryAddress *)outBaseAddress variable:(ZGVariable *)variable
+{
+	ZGDocumentWindowController *windowController = _windowController;
+	
+	return [ZGCalculator extractIndirectBaseAddress:outBaseAddress expression:variable.addressFormula process:windowController.currentProcess failedImages:_failedExecutableImages];
+}
+
 - (void)updateWatchVariablesTable:(NSTimer *)__unused timer
 {
 	ZGDocumentWindowController *windowController = _windowController;

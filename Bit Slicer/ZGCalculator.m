@@ -678,6 +678,102 @@
 	return YES;
 }
 
++ (BOOL)_extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress expression:(DDExpression *)expression process:(ZGProcess *)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages
+{
+	switch (expression.expressionType)
+	{
+		case DDExpressionTypeFunction:
+			if ([expression.function isEqualToString:@"add"] && expression.arguments.count == 2)
+			{
+				DDExpression *argumentExpression1 = expression.arguments[0];
+				DDExpression *argumentExpression2 = expression.arguments[1];
+				
+				DDExpression *pointerSubExpression;
+				if (argumentExpression1.expressionType == DDExpressionTypeFunction && [argumentExpression1.function isEqualToString:ZGCalculatePointerFunction])
+				{
+					pointerSubExpression = argumentExpression1;
+				}
+				else if (argumentExpression2.expressionType == DDExpressionTypeFunction && [argumentExpression2.function isEqualToString:ZGCalculatePointerFunction])
+				{
+					pointerSubExpression = argumentExpression2;
+				}
+				else
+				{
+					pointerSubExpression = nil;
+				}
+				
+				if (pointerSubExpression != nil)
+				{
+					return [self _extractIndirectBaseAddress:outBaseAddress expression:pointerSubExpression process:process failedImages:failedImages];
+				}
+				else
+				{
+					// Found base() + offset expression which we need to evaluate
+					NSDictionary<NSString *, id> *substitutions = [self _evaluatorSubstitutionsForProcess:process failedImages:failedImages symbolicates:NO symbolicationRequiresExactMatch:YES currentAddress:0x0];
+					
+					NSError *evaluateError = nil;
+					NSNumber *evaluatedBaseAddressNumber = [[DDMathEvaluator defaultMathEvaluator] evaluateExpression:expression withSubstitutions:substitutions error:&evaluateError];
+					
+					if (evaluatedBaseAddressNumber == nil)
+					{
+						return NO;
+					}
+					else
+					{
+						ZGMemoryAddress baseAddress = (ZGMemoryAddress)evaluatedBaseAddressNumber.unsignedLongLongValue;
+						if (outBaseAddress != NULL)
+						{
+							*outBaseAddress = baseAddress;
+						}
+						
+						return YES;
+					}
+				}
+			}
+			else if ([expression.function isEqualToString:ZGCalculatePointerFunction] && expression.arguments.count == 1)
+			{
+				return [self _extractIndirectBaseAddress:outBaseAddress expression:expression.arguments[0] process:process failedImages:failedImages];
+			}
+			else
+			{
+				// While there can be a base() function in the base expression, we shouldn't encounter it here
+				return NO;
+			}
+		case DDExpressionTypeNumber:
+		{
+			// Found base expression as the evaluated expression
+			ZGMemoryAddress baseAddress = expression.number.unsignedLongLongValue;
+			if (outBaseAddress != NULL)
+			{
+				*outBaseAddress = baseAddress;
+			}
+			
+			return YES;
+		}
+		case DDExpressionTypeVariable:
+			return NO;
+	}
+}
+
++ (BOOL)extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress expression:(NSString *)initialExpression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages
+{
+	NSString *substitutedExpression = [ZGCalculator expressionBySubstitutingCalculatePointerFunctionInExpression:initialExpression];
+	
+	NSError *expressionError = NULL;
+	DDExpression *expression = [DDExpression expressionFromString:substitutedExpression error:&expressionError];
+	if (expression == nil)
+	{
+		return NO;
+	}
+	
+	if (![self _extractIndirectBaseAddress:outBaseAddress expression:expression process:process failedImages:failedImages])
+	{
+		return NO;
+	}
+	
+	return YES;
+}
+
 + (BOOL)isValidExpression:(NSString *)expression
 {
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;

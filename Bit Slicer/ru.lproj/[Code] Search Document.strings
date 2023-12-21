@@ -97,6 +97,18 @@
 /* Relativize multiple variables menu item title */
 "relativizeMultipleVariablesTitle" = "Релятивизировать переменные";
 
+/* Watch Write Accesses */
+"watchAccesses_0_0" = "Следить за попыткой записи…";
+
+/* Watch Write Accesses to Base Address */
+"watchAccesses_0_1" = "Watch Write Accesses to Base Address…";
+
+/* Watch Read & Write Accesses */
+"watchAccesses_1_0" = "Следить за чтением и записью…";
+
+/* Watch Read & Write Accesses to Base Address */
+"watchAccesses_1_1" = "Watch Read & Write Accesses to Base Address…";
+
 /* NOP single variable menu item title */
 "nopSingleVariableTitle" = "NOP-переменная";
 

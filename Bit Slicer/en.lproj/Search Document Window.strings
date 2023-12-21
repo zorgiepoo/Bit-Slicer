@@ -5,9 +5,6 @@
 /* Class = "NSMenuItem"; title = "Show in Debugger"; ObjectID = "100786"; */
 "100786.title" = "Show in Debugger";
 
-/* Class = "NSMenuItem"; title = "Watch Write Accesses…"; ObjectID = "100787"; */
-"100787.title" = "Watch Write Accesses…";
-
 /* Class = "NSMenuItem"; title = "nop_variable"; ObjectID = "100797"; */
 "100797.title" = "nop_variable";
 
@@ -61,9 +58,6 @@
 
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "100859"; */
 "100859.title" = "Pointer";
-
-/* Class = "NSMenuItem"; title = "Watch Read & Write Accesses…"; ObjectID = "100885"; */
-"100885.title" = "Watch Read & Write Accesses…";
 
 /* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "100889"; */
 "100889.title" = "Copy Address";

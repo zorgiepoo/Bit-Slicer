@@ -1448,18 +1448,26 @@
 			return NO;
 		}
 		
-		ZGMemoryAddress memoryAddress = selectedVariable.address;
-		ZGMemorySize memorySize = selectedVariable.size;
-		ZGMemoryProtection memoryProtection;
+		BOOL usesDynamicPointerAddress = selectedVariable.usesDynamicPointerAddress;
 		
-		if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
-		{
-			return NO;
-		}
+		NSString *localizableTitleKey = [NSString stringWithFormat:@"watchAccesses_%ld_%d", menuItem.tag, usesDynamicPointerAddress];
+		menuItem.title = ZGLocalizableSearchDocumentString(localizableTitleKey);
 		
-		if (memoryAddress + memorySize < selectedVariable.address || memoryAddress > selectedVariable.address + selectedVariable.size)
+		if (!usesDynamicPointerAddress)
 		{
-			return NO;
+			ZGMemoryAddress memoryAddress = selectedVariable.address;
+			ZGMemorySize memorySize = selectedVariable.size;
+			ZGMemoryProtection memoryProtection;
+			
+			if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+			{
+				return NO;
+			}
+			
+			if (memoryAddress + memorySize < selectedVariable.address || memoryAddress > selectedVariable.address + selectedVariable.size)
+			{
+				return NO;
+			}
 		}
 	}
 	
@@ -1861,7 +1869,21 @@
 		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController delegate:self.delegate];
 	}
 	
-	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[(NSControl *)sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray<ZGVariable *> *foundVariables) {
+	ZGVariable *selectedVariable = [[self selectedVariables] firstObject];
+	
+	ZGVariable *watchVariable;
+	ZGMemoryAddress baseAddress = 0x0;
+	if (selectedVariable.usesDynamicPointerAddress && [_tableController getBaseAddress:&baseAddress variable:selectedVariable])
+	{
+		ZGMemorySize pointerSize = self.currentProcess.pointerSize;
+		watchVariable = [[ZGVariable alloc] initWithValue:NULL size:pointerSize address:baseAddress type:ZGPointer qualifier:0 pointerSize:pointerSize];
+	}
+	else
+	{
+		watchVariable = selectedVariable;
+	}
+	
+	[_watchVariableWindowController watchVariable:watchVariable withWatchPointType:(ZGWatchPointType)[(NSControl *)sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray<ZGVariable *> *foundVariables) {
 		if (foundVariables.count > 0)
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];

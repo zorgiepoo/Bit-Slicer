@@ -97,6 +97,18 @@
 /* Relativize multiple variables menu item title */
 "relativizeMultipleVariablesTitle" = "Relativize Variables";
 
+/* Watch Write Accesses */
+"watchAccesses_0_0" = "Watch Write Accesses…";
+
+/* Watch Write Accesses to Base Address */
+"watchAccesses_0_1" = "Watch Write Accesses to Base Address…";
+
+/* Watch Read & Write Accesses */
+"watchAccesses_1_0" = "Watch Read & Write Accesses…";
+
+/* Watch Read & Write Accesses to Base Address */
+"watchAccesses_1_1" = "Watch Read & Write Accesses to Base Address…";
+
 /* NOP single variable menu item title */
 "nopSingleVariableTitle" = "NOP Variable";
 
