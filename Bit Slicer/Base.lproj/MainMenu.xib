@@ -668,10 +668,10 @@ CA
                                                 <action selector="watchVariable:" target="-1" id="1051"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Write Accesses to Base Address…" alternate="YES" keyEquivalent="l" id="gOJ-hH-dww">
+                                        <menuItem title="Write Accesses to Base Address…" hidden="YES" keyEquivalent="l" id="gOJ-hH-dww">
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
-                                                <action selector="watchVariable:" target="-1" id="vEa-Yp-bYI"/>
+                                                <action selector="watchVariableBaseAddress:" target="-1" id="sba-au-VgK"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Read &amp; Write Accesses…" tag="1" keyEquivalent="L" id="1052">
@@ -679,10 +679,10 @@ CA
                                                 <action selector="watchVariable:" target="-1" id="1053"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Read &amp; Write Accesses to Base Address…" tag="1" alternate="YES" keyEquivalent="L" id="KQm-HB-Xdh">
+                                        <menuItem title="Read &amp; Write Accesses to Base Address…" tag="1" hidden="YES" keyEquivalent="L" id="KQm-HB-Xdh">
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
-                                                <action selector="watchVariable:" target="-1" id="FQr-XO-g8t"/>
+                                                <action selector="watchVariableBaseAddress:" target="-1" id="Xni-P4-PMU"/>
                                             </connections>
                                         </menuItem>
                                     </items>

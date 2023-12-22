@@ -1434,7 +1434,7 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(watchVariable:))
+	else if (menuItem.action == @selector(watchVariable:) || menuItem.action == @selector(watchVariableBaseAddress:))
 	{
 		if ([_searchController canCancelTask] || !self.currentProcess.valid || [self selectedVariables].count != 1)
 		{
@@ -1443,32 +1443,52 @@
 		
 		ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 		
+		BOOL watchingBaseAccesses = (menuItem.action == @selector(watchVariableBaseAddress:));
+		if (watchingBaseAccesses)
+		{
+			menuItem.hidden = !selectedVariable.usesDynamicPointerAddress;
+		}
+		
 		if (selectedVariable.type == ZGScript)
 		{
 			return NO;
 		}
 		
-		BOOL usesDynamicPointerAddress = selectedVariable.usesDynamicPointerAddress;
-		BOOL watchingBaseAccesess = (usesDynamicPointerAddress && menuItem.alternate);
-		
-		NSString *localizableTitleKey = [NSString stringWithFormat:@"watchAccesses_%ld_%d", menuItem.tag, watchingBaseAccesess];
+		NSString *localizableTitleKey = [NSString stringWithFormat:@"watchAccesses_%ld_%d", menuItem.tag, watchingBaseAccesses];
 		menuItem.title = ZGLocalizableSearchDocumentString(localizableTitleKey);
 		
-		if (!watchingBaseAccesess)
+		ZGMemoryAddress targetMemoryAddress;
+		ZGMemorySize targetMemorySize;
+		if (watchingBaseAccesses)
 		{
-			ZGMemoryAddress memoryAddress = selectedVariable.address;
-			ZGMemorySize memorySize = selectedVariable.size;
-			ZGMemoryProtection memoryProtection;
-			
-			if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+			ZGMemoryAddress baseAddress = 0x0;
+			if (![_tableController getBaseAddress:&baseAddress variable:selectedVariable])
 			{
 				return NO;
 			}
 			
-			if (memoryAddress + memorySize < selectedVariable.address || memoryAddress > selectedVariable.address + selectedVariable.size)
-			{
-				return NO;
-			}
+			targetMemoryAddress = baseAddress;
+			targetMemorySize = self.currentProcess.pointerSize;
+		}
+		else
+		{
+			targetMemoryAddress = selectedVariable.address;
+			targetMemorySize = selectedVariable.size;
+		}
+		
+		ZGMemoryProtection memoryProtection;
+		
+		ZGMemoryAddress memoryAddress = targetMemoryAddress;
+		ZGMemoryAddress memorySize = targetMemorySize;
+		
+		if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		{
+			return NO;
+		}
+		
+		if (memoryAddress + memorySize < targetMemoryAddress || memoryAddress > targetMemoryAddress + targetMemorySize)
+		{
+			return NO;
 		}
 	}
 	
@@ -1869,30 +1889,14 @@
 
 #pragma mark Variable Watching Handling
 
-- (IBAction)watchVariable:(id)sender
+- (void)_watchVariable:(ZGVariable *)variable watchPointType:(ZGWatchPointType)watchPointType
 {
 	if (_watchVariableWindowController == nil)
 	{
 		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController delegate:self.delegate];
 	}
 	
-	ZGVariable *selectedVariable = [[self selectedVariables] firstObject];
-	
-	ZGVariable *watchVariable;
-	ZGMemoryAddress baseAddress = 0x0;
-	BOOL watchingBaseAccesess = (selectedVariable.usesDynamicPointerAddress && [(NSMenuItem *)sender isAlternate]);
-	
-	if (watchingBaseAccesess && [_tableController getBaseAddress:&baseAddress variable:selectedVariable])
-	{
-		ZGMemorySize pointerSize = self.currentProcess.pointerSize;
-		watchVariable = [[ZGVariable alloc] initWithValue:NULL size:pointerSize address:baseAddress type:ZGPointer qualifier:0 pointerSize:pointerSize];
-	}
-	else
-	{
-		watchVariable = selectedVariable;
-	}
-	
-	[_watchVariableWindowController watchVariable:watchVariable withWatchPointType:(ZGWatchPointType)[(NSControl *)sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray<ZGVariable *> *foundVariables) {
+	[_watchVariableWindowController watchVariable:variable withWatchPointType:watchPointType inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray<ZGVariable *> *foundVariables) {
 		if (foundVariables.count > 0)
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];
@@ -1903,6 +1907,31 @@
 			}];
 		}
 	}];
+}
+
+- (IBAction)watchVariableBaseAddress:(id)sender
+{
+	ZGVariable *selectedVariable = [[self selectedVariables] firstObject];
+	
+	ZGMemoryAddress baseAddress = 0x0;
+	if ([_tableController getBaseAddress:&baseAddress variable:selectedVariable])
+	{
+		ZGMemorySize pointerSize = self.currentProcess.pointerSize;
+		ZGVariable *watchVariable = [[ZGVariable alloc] initWithValue:NULL size:pointerSize address:baseAddress type:ZGPointer qualifier:0 pointerSize:pointerSize];
+		
+		[self _watchVariable:watchVariable watchPointType:(ZGWatchPointType)[(NSControl *)sender tag]];
+	}
+	else
+	{
+		NSLog(@"Error: failed to extract base address from variable with address: %@", selectedVariable.addressFormula);
+	}
+}
+
+- (IBAction)watchVariable:(id)sender
+{
+	ZGVariable *selectedVariable = [[self selectedVariables] firstObject];
+	
+	[self _watchVariable:selectedVariable watchPointType:(ZGWatchPointType)[(NSControl *)sender tag]];
 }
 
 #pragma mark Showing Other Controllers

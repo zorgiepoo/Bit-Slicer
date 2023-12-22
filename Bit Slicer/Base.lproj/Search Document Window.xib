@@ -177,10 +177,10 @@
                         <action selector="watchVariable:" target="-1" id="100794"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Watch Write Accesses to Base Address…" alternate="YES" id="LKg-Ix-res">
+                <menuItem title="Watch Write Accesses to Base Address…" hidden="YES" id="LKg-Ix-res">
                     <modifierMask key="keyEquivalentModifierMask" option="YES"/>
                     <connections>
-                        <action selector="watchVariable:" target="-1" id="Ja7-17-kya"/>
+                        <action selector="watchVariableBaseAddress:" target="-1" id="c1o-bT-qCr"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Watch Read &amp; Write Accesses…" tag="1" id="100885">
@@ -189,10 +189,10 @@
                         <action selector="watchVariable:" target="-1" id="100886"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Watch Read &amp; Write Accesses to Base Address…" tag="1" alternate="YES" id="Ule-bH-KzF">
+                <menuItem title="Watch Read &amp; Write Accesses to Base Address…" tag="1" hidden="YES" id="Ule-bH-KzF">
                     <modifierMask key="keyEquivalentModifierMask" option="YES"/>
                     <connections>
-                        <action selector="watchVariable:" target="-1" id="arU-1i-akx"/>
+                        <action selector="watchVariableBaseAddress:" target="-1" id="mQ5-r8-1Il"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="100789"/>
