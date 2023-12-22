@@ -2400,7 +2400,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 				if (narrowRegionsTable != nullptr)
 				{
 					ZGRegionValue *regionValue = &narrowRegionsTable[regionIndex];
-					regionValue->address = address;
+					regionValue->address = region->_address;
 					regionValue->size = region->_size;
 					regionValue->bytes = bytes;
 				}
