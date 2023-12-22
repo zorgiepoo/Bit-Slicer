@@ -1870,17 +1870,24 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 		}
 	}
 	
-	NSArray<NSValue *> *totalStaticSegmentRanges = searchData.totalStaticSegmentRanges;
-	NSValue *firstTotalStaticSegmentRangeValue = totalStaticSegmentRanges.firstObject;
-	
 	uint16_t searchIndirectOffset = searchData->_indirectOffset;
 	
 	__block NSUInteger resultSetIndex = initialResultSetIndex;
+	__block NSMutableData *currentResultSet = resultSets[resultSetIndex];
 	[searchResults enumerateWithCount:searchResultsCount removeResults:NO usingBlock:^(const void * _Nonnull searchResultData, BOOL * __unused _Nonnull stop) {
-		NSMutableData *currentResultSet = resultSets[resultSetIndex];
-		
-		NSUInteger initialStaticMainResultSetLength = (levelIndex == 0) ? staticMainExecutableResultSet.length : 0;
-		NSUInteger initialStaticOtherLibraryResultSetLength = (levelIndex == 0) ? staticOtherLibrariesResultSet.length : 0;
+		NSUInteger initialStaticMainResultSetLength;
+		NSUInteger initialStaticOtherLibraryResultSetLength;
+		if (levelIndex == 0)
+		{
+			currentResultSet = resultSets[resultSetIndex];
+			initialStaticMainResultSetLength = staticMainExecutableResultSet.length;
+			initialStaticOtherLibraryResultSetLength = staticOtherLibrariesResultSet.length;
+		}
+		else
+		{
+			initialStaticMainResultSetLength = 0;
+			initialStaticOtherLibraryResultSetLength = 0;
+		}
 		
 		// Extract base address for searching
 		ZGMemoryAddress baseAddress;
