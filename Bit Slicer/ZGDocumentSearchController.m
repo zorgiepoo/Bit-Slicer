@@ -923,9 +923,19 @@
 	}
 	
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
-	_searchData.indirectStopAtStaticAddresses = addressSearch;
-	_searchData.filterHeapAndStackData = addressSearch;
-	_searchData.excludeStaticDataFromSystemLibraries = addressSearch;
+	
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"ZGDisableAddressFilterOptions"])
+	{
+		_searchData.indirectStopAtStaticAddresses = addressSearch;
+		_searchData.filterHeapAndStackData = addressSearch;
+		_searchData.excludeStaticDataFromSystemLibraries = addressSearch;
+	}
+	else
+	{
+		_searchData.indirectStopAtStaticAddresses = NO;
+		_searchData.filterHeapAndStackData = NO;
+		_searchData.excludeStaticDataFromSystemLibraries = NO;
+	}
 	
 	_searchData.headerAddresses = nil;
 	_searchData.totalStaticSegmentRanges = nil;
