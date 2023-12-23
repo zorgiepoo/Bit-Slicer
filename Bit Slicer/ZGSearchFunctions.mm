@@ -1873,6 +1873,16 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 	NSUInteger resultSetIndex = initialResultSetIndex;
 	NSMutableData *currentResultSet = resultSets[resultSetIndex];
 	
+	uint8_t scratchBufferForResults[4096];
+	ZGMemorySize scratchBufferForResultsCount = 0;
+	ZGMemorySize scratchBufferCapacity = sizeof(scratchBufferForResults) / stride;
+	
+	uint8_t scratchBufferForStaticMainExecutableResults[sizeof(scratchBufferForResults)];
+	ZGMemorySize scratchBufferForStaticMainExecutableResultsCount = 0;
+
+	uint8_t scratchBufferForStaticOtherLibraryExecutableResults[sizeof(scratchBufferForResults)];
+	ZGMemorySize scratchBufferForStaticOtherLibraryExecutableResultsCount = 0;
+	
 	const ZGMemorySize searchResultsStride = offsetMaxComparison ? (pointerSize + sizeof(uint16_t)) : pointerSize;
 	for (NSData *searchResultSet in searchResults.resultSets)
 	{
@@ -1963,28 +1973,49 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 			FOUND_STATIC_BASE_IMAGE:
 				
 				// Write result address and base image index
+				uint8_t *scratchBuffer;
+				ZGMemorySize *scratchBufferCount;
 				uint16_t baseImageIndex;
 				if (matchingTotalStaticSegmentRange == nullptr)
 				{
-					memcpy(tempBuffer, &baseAddress, pointerSize);
-					
 					baseImageIndex = UINT16_MAX;
-					memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
+					scratchBuffer = scratchBufferForResults;
+					scratchBufferCount = &scratchBufferForResultsCount;
+				}
+				else
+				{
+					baseImageIndex = static_cast<uint16_t>(matchingSegmentIndex);
+					if (matchingSegmentIndex == 0)
+					{
+						scratchBuffer = scratchBufferForStaticMainExecutableResults;
+						scratchBufferCount = &scratchBufferForStaticMainExecutableResultsCount;
+					}
+					else
+					{
+						scratchBuffer = scratchBufferForStaticOtherLibraryExecutableResults;
+						scratchBufferCount = &scratchBufferForStaticOtherLibraryExecutableResultsCount;
+					}
+				}
+				
+				uint8_t *writeBuffer = scratchBuffer + stride * (*scratchBufferCount);
+				
+				if (matchingTotalStaticSegmentRange == nullptr)
+				{
+					memcpy(writeBuffer, &baseAddress, pointerSize);
 				}
 				else
 				{
 					ZGMemoryAddress headerAddress = headerAddressValues[matchingSegmentIndex];
 					ZGMemoryAddress offsetAddress = (baseAddress - headerAddress);
 					
-					memcpy(tempBuffer, &offsetAddress, pointerSize);
-					
-					baseImageIndex = static_cast<uint16_t>(matchingSegmentIndex);
-					memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
+					memcpy(writeBuffer, &offsetAddress, pointerSize);
 				}
+				
+				memcpy(writeBuffer + pointerSize, &baseImageIndex, sizeof(baseImageIndex));
 				
 				// Write number of levels
 				uint16_t numberOfLevels = levelIndex + 1;
-				memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize + sizeof(baseImageIndex), &numberOfLevels, sizeof(numberOfLevels));
+				memcpy(writeBuffer + pointerSize + sizeof(baseImageIndex), &numberOfLevels, sizeof(numberOfLevels));
 				
 				// Write offset to currentOffsets
 				if (offsetMaxComparison)
@@ -1996,21 +2027,37 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 					memcpy(currentOffsets + levelIndex, &searchIndirectOffset, sizeof(searchIndirectOffset));
 				}
 				
-				// Populate tempBuffer with offsets
-				memcpy(static_cast<uint8_t *>(tempBuffer) + pointerSize + sizeof(baseImageIndex) + sizeof(numberOfLevels), currentOffsets, sizeof(*currentOffsets) * numberOfLevels);
+				// Populate writeBuffer with offsets
+				memcpy(writeBuffer + pointerSize + sizeof(baseImageIndex) + sizeof(numberOfLevels), currentOffsets, sizeof(*currentOffsets) * numberOfLevels);
 				
-				if (matchingTotalStaticSegmentRange == nullptr)
+				size_t endOffset = pointerSize + sizeof(baseImageIndex) + sizeof(numberOfLevels) + sizeof(*currentOffsets) * numberOfLevels;
+				
+				if (stride > endOffset)
 				{
-					[currentResultSet appendBytes:tempBuffer length:stride];
+					memset(writeBuffer + endOffset, 0, stride - endOffset);
 				}
-				else
+				
+				(*scratchBufferCount)++;
+				
+				if (levelIndex == 0 || *scratchBufferCount == scratchBufferCapacity)
 				{
-					NSMutableData *staticResultSet = (matchingSegmentIndex == 0) ? staticMainExecutableResultSet : staticOtherLibrariesResultSet;
+					NSMutableData *writeDataResultSet;
+					if (baseImageIndex == UINT16_MAX)
+					{
+						writeDataResultSet = currentResultSet;
+					}
+					else if (baseImageIndex == 0)
+					{
+						writeDataResultSet = staticMainExecutableResultSet;
+					}
+					else
+					{
+						writeDataResultSet = staticOtherLibrariesResultSet;
+					}
 					
-					[staticResultSet appendBytes:tempBuffer length:stride];
+					[writeDataResultSet appendBytes:scratchBuffer length:*scratchBufferCount * stride];
+					*scratchBufferCount = 0;
 				}
-				
-				memset(static_cast<uint8_t *>(tempBuffer), 0, stride);
 				
 				uint16_t nextLevelIndex = levelIndex + 1;
 				if (nextLevelIndex < maxLevels && (!stopAtStaticAddresses || matchingTotalStaticSegmentRange == nullptr))
@@ -2032,6 +2079,24 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 				
 				resultSetIndex++;
 			}
+		}
+	}
+	
+	if (levelIndex != 0)
+	{
+		if (scratchBufferForResultsCount > 0)
+		{
+			[currentResultSet appendBytes:scratchBufferForResults length:scratchBufferForResultsCount * stride];
+		}
+		
+		if (scratchBufferForStaticMainExecutableResultsCount > 0)
+		{
+			[staticMainExecutableResultSet appendBytes:scratchBufferForStaticMainExecutableResults length:scratchBufferForStaticMainExecutableResultsCount * stride];
+		}
+		
+		if (scratchBufferForStaticOtherLibraryExecutableResultsCount > 0)
+		{
+			[staticOtherLibrariesResultSet appendBytes:scratchBufferForStaticOtherLibraryExecutableResults length:scratchBufferForStaticOtherLibraryExecutableResultsCount * stride];
 		}
 	}
 }
