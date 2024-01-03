@@ -2487,7 +2487,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			[resultSets addObject:[NSMutableData data]];
 		}
 		
-		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousSearchResults.count];
+		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousIndirectResultSets.count];
 		
 		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES headerAddresses:headerAddresses delegate:delegate];
 		
