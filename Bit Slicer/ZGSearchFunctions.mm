@@ -40,7 +40,7 @@
 #import "ZGStoredData.h"
 #import "HFByteArray_FindReplace.h"
 #import <stdint.h>
-#import <unordered_map>
+#import <limits>
 #import <os/lock.h>
 
 @interface ZGSearchProgressNotifier : NSObject
@@ -2854,11 +2854,15 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 	uint8_t *narrowResultData = static_cast<uint8_t *>(malloc(capacity * resultDataStride));
 	ZGMemorySize numberOfVariablesFound = 0;
 
+	// Make sure we don't integer overflow
+	constexpr P maxAddressTypeValue {std::numeric_limits<P>::max()};
+	const P maxVariableAddressWithDataSize = maxAddressTypeValue - static_cast<P>(dataSize);
+	
 	for (ZGMemorySize oldVariableIndex = 0; oldVariableIndex < oldVariableCount; oldVariableIndex++)
 	{
 		P variableAddress = *(static_cast<P *>(const_cast<void *>(oldResultSetBytes)) + oldVariableIndex);
 		
-		if (variableAddress == 0x0)
+		if (variableAddress == 0x0 || variableAddress > maxVariableAddressWithDataSize)
 		{
 			continue;
 		}
