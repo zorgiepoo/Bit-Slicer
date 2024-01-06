@@ -1890,14 +1890,24 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 	ZGMemoryAddress searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
 	
 	NSNumber *searchValueAddressNumber = @(searchValueAddress);
-	ZGSearchResults *searchResults = [visitedSearchResults objectForKey:searchValueAddressNumber];
-	if (searchResults == nil)
+	ZGSearchResults *cachedSearchResults = [visitedSearchResults objectForKey:searchValueAddressNumber];
+	
+	ZGSearchResults *searchResults;
+	ZGMemorySize searchResultsStride;
+	if (cachedSearchResults == nil)
 	{
 		searchResults = _ZGSearchForSingleLevelPointer(searchValueAddress, pointerValueEntries, pointerValueEntriesCount, processTask, searchData, offsetMaxComparison);
 		
+		searchResultsStride = searchResults.stride;
+		
 		currentBaseAddresses[levelIndex] = searchValueAddress;
 		
-		[visitedSearchResults setObject:searchResults forKey:searchValueAddressNumber];
+		[visitedSearchResults setObject:searchResults forKey:searchValueAddressNumber cost:searchResultsStride * searchResults.count];
+	}
+	else
+	{
+		searchResults = cachedSearchResults;
+		searchResultsStride = searchResults.stride;
 	}
 	
 	uint16_t searchIndirectOffset = searchData->_indirectOffset;
@@ -1914,7 +1924,6 @@ static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *po
 	
 	const ZGMemorySize pointerSize = sizeof(ZGMemoryAddress);
 	
-	const ZGMemorySize searchResultsStride = searchResults.stride;
 	for (NSData *searchResultSet in searchResults.resultSets)
 	{
 		const uint8_t *searchResultSetBytes = static_cast<const uint8_t *>(searchResultSet.bytes);
@@ -2493,6 +2502,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 		}
 		
 		NSCache<NSNumber *, ZGSearchResults *> *visitedSearchResults = [[NSCache alloc] init];
+		visitedSearchResults.totalCostLimit = 10000000000;
 		
 		dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_USER_INITIATED, 0);
 		dispatch_queue_t queue = dispatch_queue_create("com.zgcoder.BitSlicer.PointerAddressSearch", qosAttribute);
