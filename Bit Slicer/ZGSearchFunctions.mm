@@ -375,7 +375,10 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	const void **allResultSets = static_cast<const void **>(calloc(regions.count, sizeof(*allResultSets)));
 	assert(allResultSets != NULL);
 	
-	dispatch_apply(regions.count, dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^(size_t regionIndex) {
+	dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_USER_INITIATED, 0);
+	dispatch_queue_t queue = dispatch_queue_create("com.zgcoder.BitSlicer.ValueSearch", qosAttribute);
+	
+	dispatch_apply(regions.count, queue, ^(size_t regionIndex) {
 		@autoreleasepool
 		{
 			ZGRegion *region = [regions objectAtIndex:regionIndex];
@@ -427,7 +430,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		resultSets = [NSArray array];
 		
 		// Deallocate results into separate queue since this could take some time
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		dispatch_async(queue, ^{
 			for (NSUInteger resultSetIndex = 0; resultSetIndex < regions.count; resultSetIndex++)
 			{
 				const void *resultSetData = allResultSets[resultSetIndex];
@@ -1882,18 +1885,19 @@ static void _ZGWriteIndirectResultToBuffer(uint8_t *writeBuffer, ZGMemoryAddress
 	}
 }
 
-static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *pointerValueEntries, const size_t pointerValueEntriesCount, NSMutableData *currentResultSet, const ZGMemoryAddress *headerAddressValues, const NSRange *totalStaticSegmentRangeValues, ZGMemorySize totalStaticSegmentRangeValuesCount, NSMutableData *staticMainExecutableResultSet, NSMutableData *staticOtherLibrariesResultSet, uint16_t *currentOffsets, ZGMemoryAddress *currentBaseAddresses, NSMutableDictionary<NSNumber *, ZGSearchResults *> *visitedSearchResults, uint16_t levelIndex, void *tempBuffer, void *searchValue, ZGSearchData *searchData, ZGVariableType indirectDataType, ZGMemorySize stride, uint16_t maxLevels, BOOL offsetMaxComparison, BOOL stopAtStaticAddresses, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate, ZGSearchProgressNotifier *progressNotifier)
+static void _ZGSearchForIndirectPointerRecursively(const ZGPointerValueEntry *pointerValueEntries, const size_t pointerValueEntriesCount, NSMutableData *currentResultSet, const ZGMemoryAddress *headerAddressValues, const NSRange *totalStaticSegmentRangeValues, ZGMemorySize totalStaticSegmentRangeValuesCount, NSMutableData *staticMainExecutableResultSet, NSMutableData *staticOtherLibrariesResultSet, uint16_t *currentOffsets, ZGMemoryAddress *currentBaseAddresses, NSCache<NSNumber *, ZGSearchResults *> *visitedSearchResults, uint16_t levelIndex, void *tempBuffer, void *searchValue, ZGSearchData *searchData, ZGVariableType indirectDataType, ZGMemorySize stride, uint16_t maxLevels, BOOL offsetMaxComparison, BOOL stopAtStaticAddresses, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate, ZGSearchProgressNotifier *progressNotifier)
 {
 	ZGMemoryAddress searchValueAddress = *(static_cast<ZGMemoryAddress *>(searchValue));
 	
-	ZGSearchResults *searchResults = visitedSearchResults[@(searchValueAddress)];
+	NSNumber *searchValueAddressNumber = @(searchValueAddress);
+	ZGSearchResults *searchResults = [visitedSearchResults objectForKey:searchValueAddressNumber];
 	if (searchResults == nil)
 	{
 		searchResults = _ZGSearchForSingleLevelPointer(searchValueAddress, pointerValueEntries, pointerValueEntriesCount, processTask, searchData, offsetMaxComparison);
 		
 		currentBaseAddresses[levelIndex] = searchValueAddress;
 		
-		visitedSearchResults[@(searchValueAddress)] = searchResults;
+		[visitedSearchResults setObject:searchResults forKey:searchValueAddressNumber];
 	}
 	
 	uint16_t searchIndirectOffset = searchData->_indirectOffset;
@@ -2360,12 +2364,6 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	
 	ZGMemorySize stride = [ZGSearchResults indirectStrideWithMaxNumberOfLevels:maxLevels pointerSize:pointerSize];
 	
-	void *tempBuffer = static_cast<uint8_t *>(calloc(1, stride));
-	uint16_t *currentOffsets = static_cast<uint16_t *>(calloc(maxLevels, sizeof(currentOffsets)));
-	ZGMemoryAddress *currentBaseAddresses = static_cast<ZGMemoryAddress *>(calloc(maxLevels, sizeof(*currentBaseAddresses)));
-	
-	NSMutableDictionary<NSNumber *, ZGSearchResults *> *visitedSearchResults = [NSMutableDictionary dictionary];
-	
 	BOOL indirectOffsetMaxComparison = searchData.indirectOffsetMaxComparison;
 	BOOL indirectStopAtStaticAddresses = searchData.indirectStopAtStaticAddresses;
 	
@@ -2383,9 +2381,6 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	{
 		totalStaticSegmentRangeValues[totalStaticSegmentRangeIndex++] = totalStaticSegmentRange.rangeValue;
 	}
-	
-	NSMutableData *staticMainExecutableResultSet = [NSMutableData data];
-	NSMutableData *staticOtherLibrariesResultSet = [NSMutableData data];
 	
 	ZGSearchResults *firstLevelSearchResults;
 	if (previousSearchResults == nil)
@@ -2412,6 +2407,8 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 		{
 			[firstLevelResultSets addObject:[NSMutableData data]];
 		}
+		
+		void *tempBuffer = static_cast<uint8_t *>(calloc(1, stride));
 		
 		NSUInteger firstLevelResultSetCounter = 0;
 		
@@ -2448,6 +2445,8 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			}
 		}
 		
+		free(tempBuffer);
+		
 		firstLevelSearchResults = [[ZGSearchResults alloc] initWithResultSets:firstLevelResultSets resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride unalignedAccess:NO];
 	}
 	else
@@ -2457,16 +2456,11 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	
 	// Use prior or one level result sets we created, unless we only had to compute a single level
 	NSMutableArray<NSMutableData *> *resultSets = [NSMutableArray array];
+	NSMutableArray<NSMutableData *> *staticMainExecutableResultSets = [NSMutableArray array];
+	NSMutableArray<NSMutableData *> *staticOtherLibrariesResultSets = [NSMutableArray array];
+	
 	{
-		ZGMemoryAddress searchAddress;
-		if (pointerSize == sizeof(ZGMemoryAddress))
-		{
-			searchAddress = *(static_cast<ZGMemoryAddress *>(searchData.searchValue));
-		}
-		else
-		{
-			searchAddress = *(static_cast<ZG32BitMemoryAddress *>(searchData.searchValue));
-		}
+		ZGMemoryAddress searchAddress = *(static_cast<ZGMemoryAddress *>(searchData.searchValue));;
 		
 		NSArray<NSData *> *previousIndirectResultSets;
 		ZGMemorySize previousIndirectResultSetStride;
@@ -2485,9 +2479,11 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 		for (NSUInteger resultSetIndex = 0; resultSetIndex < previousIndirectResultSetsCount; resultSetIndex++)
 		{
 			[resultSets addObject:[NSMutableData data]];
+			[staticMainExecutableResultSets addObject:[NSMutableData data]];
+			[staticOtherLibrariesResultSets addObject:[NSMutableData data]];
 		}
 		
-		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousIndirectResultSets.count];
+		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:previousIndirectResultSetsCount];
 		
 		ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride notifiesStaticResults:YES headerAddresses:headerAddresses delegate:delegate];
 		
@@ -2496,84 +2492,92 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			[progressNotifier start];
 		}
 		
-		NSUInteger resultSetIndex = 0;
+		NSCache<NSNumber *, ZGSearchResults *> *visitedSearchResults = [[NSCache alloc] init];
+		
+		dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_USER_INITIATED, 0);
+		dispatch_queue_t queue = dispatch_queue_create("com.zgcoder.BitSlicer.PointerAddressSearch", qosAttribute);
+		
 		bool usingFirstLevelSearchResults = (firstLevelSearchResults != nil);
-		for (NSData *previousIndirectResultSet in previousIndirectResultSets)
-		{
-			NSMutableData *newResultSet = resultSets[resultSetIndex];
-			
-			NSUInteger initialStaticMainResultSetLength = staticMainExecutableResultSet.length;
-			NSUInteger initialStaticOtherLibraryResultSetLength = staticOtherLibrariesResultSet.length;
-			
-			const uint8_t *previousIndirectResultSetBytes = static_cast<const uint8_t *>(previousIndirectResultSet.bytes);
-			NSUInteger previousIndirectResultSetCount = previousIndirectResultSet.length / previousIndirectResultSetStride;
-			for (NSUInteger previousIndirectResultSetIndex = 0; previousIndirectResultSetIndex < previousIndirectResultSetCount; previousIndirectResultSetIndex++)
-			{
-				const uint8_t *previousIndirectResult = previousIndirectResultSetBytes + previousIndirectResultSetIndex * previousIndirectResultSetStride;
+		
+		dispatch_apply(previousIndirectResultSetsCount, queue, ^(size_t resultSetIndex) {
+			@autoreleasepool {
+				NSMutableData *newResultSet = resultSets[resultSetIndex];
+				NSMutableData *staticMainExecutableResultSet = staticMainExecutableResultSets[resultSetIndex];
+				NSMutableData *staticOtherLibrariesResultSet = staticOtherLibrariesResultSets[resultSetIndex];
 				
-				uint16_t numberOfLevels;
-				ZGMemoryAddress nextRecurseSearchAddress;
+				ZGMemoryAddress *currentBaseAddresses = static_cast<ZGMemoryAddress *>(calloc(maxLevels, sizeof(*currentBaseAddresses)));
+				uint16_t *currentOffsets = static_cast<uint16_t *>(calloc(maxLevels, sizeof(currentOffsets)));
+				void *tempBuffer = static_cast<uint8_t *>(calloc(1, stride));
 				
-				memset(currentOffsets, 0, sizeof(*currentOffsets) * maxLevels);
-				memset(currentBaseAddresses, 0, sizeof(*currentBaseAddresses) * maxLevels);
-				
-				uint16_t baseImageIndex;
-				
-				if (usingFirstLevelSearchResults)
+				NSData *previousIndirectResultSet = previousIndirectResultSets[resultSetIndex];
+				const uint8_t *previousIndirectResultSetBytes = static_cast<const uint8_t *>(previousIndirectResultSet.bytes);
+				NSUInteger previousIndirectResultSetCount = previousIndirectResultSet.length / previousIndirectResultSetStride;
+				for (NSUInteger previousIndirectResultSetIndex = 0; previousIndirectResultSetIndex < previousIndirectResultSetCount; previousIndirectResultSetIndex++)
 				{
-					ZGRetrieveIndirectAddressInformation(previousIndirectResult, headerAddresses, &numberOfLevels, &baseImageIndex, currentOffsets, &nextRecurseSearchAddress);
+					const uint8_t *previousIndirectResult = previousIndirectResultSetBytes + previousIndirectResultSetIndex * previousIndirectResultSetStride;
 					
-					currentBaseAddresses[0] = searchAddress;
-				}
-				else
-				{
-					ZGMemoryAddress currentAddress;
+					uint16_t numberOfLevels;
+					ZGMemoryAddress nextRecurseSearchAddress;
 					
-					bool evaluatedIndirectAddress = ZGEvaluateIndirectAddress(&currentAddress, processTask, previousIndirectResult, headerAddresses, minPointerValue, maxPointerValue, narrowRegionsTable, narrowRegionsTableCount, &numberOfLevels, &baseImageIndex, currentOffsets, currentBaseAddresses, &nextRecurseSearchAddress);
+					memset(currentOffsets, 0, sizeof(*currentOffsets) * maxLevels);
+					memset(currentBaseAddresses, 0, sizeof(*currentBaseAddresses) * maxLevels);
 					
-					if (!evaluatedIndirectAddress || currentAddress != searchAddress)
+					uint16_t baseImageIndex;
+					
+					if (usingFirstLevelSearchResults)
 					{
-						continue;
+						ZGRetrieveIndirectAddressInformation(previousIndirectResult, headerAddresses, &numberOfLevels, &baseImageIndex, currentOffsets, &nextRecurseSearchAddress);
+						
+						currentBaseAddresses[0] = searchAddress;
+					}
+					else
+					{
+						ZGMemoryAddress currentAddress;
+						
+						bool evaluatedIndirectAddress = ZGEvaluateIndirectAddress(&currentAddress, processTask, previousIndirectResult, headerAddresses, minPointerValue, maxPointerValue, narrowRegionsTable, narrowRegionsTableCount, &numberOfLevels, &baseImageIndex, currentOffsets, currentBaseAddresses, &nextRecurseSearchAddress);
+						
+						if (!evaluatedIndirectAddress || currentAddress != searchAddress)
+						{
+							continue;
+						}
+					}
+					
+					memset(tempBuffer, 0, stride);
+					memcpy(tempBuffer, previousIndirectResult, previousIndirectResultSetStride);
+					
+					BOOL isStatic = (baseImageIndex != UINT16_MAX);
+					if (isStatic)
+					{
+						NSMutableData *staticResultSet = (baseImageIndex == 0) ? staticMainExecutableResultSet : staticOtherLibrariesResultSet;
+						
+						[staticResultSet appendBytes:tempBuffer length:stride];
+					}
+					else
+					{
+						[newResultSet appendBytes:tempBuffer length:stride];
+					}
+					
+					if (!isStatic || !indirectStopAtStaticAddresses)
+					{
+						// Determine if for this indirect result if we should recurse deeper
+						// This will apply to results that have reached the maximum level from the previous indirect search
+						if ((usingFirstLevelSearchResults || numberOfLevels == previousIndirectMaxLevels) && indirectMaxLevels > numberOfLevels)
+						{
+							_ZGSearchForIndirectPointerRecursively(pointerValueEntries, pointerValueEntriesCount, newResultSet, headerAddressValues, totalStaticSegmentRangeValues, totalStaticSegmentRangeValuesCount, staticMainExecutableResultSet, staticOtherLibrariesResultSet, currentOffsets, currentBaseAddresses, visitedSearchResults, numberOfLevels, tempBuffer, &nextRecurseSearchAddress, searchData, indirectDataType, stride, maxLevels, indirectOffsetMaxComparison, indirectStopAtStaticAddresses, processTask, delegate, progressNotifier);
+						}
 					}
 				}
 				
-				memset(tempBuffer, 0, stride);
-				memcpy(tempBuffer, previousIndirectResult, previousIndirectResultSetStride);
-				
-				BOOL isStatic = (baseImageIndex != UINT16_MAX);
-				if (isStatic)
+				if (delegate != nil)
 				{
-					NSMutableData *staticResultSet = (baseImageIndex == 0) ? staticMainExecutableResultSet : staticOtherLibrariesResultSet;
-					
-					[staticResultSet appendBytes:tempBuffer length:stride];
-				}
-				else
-				{
-					[newResultSet appendBytes:tempBuffer length:stride];
+					[progressNotifier addResultSet:newResultSet staticMainExecutableResultSet:staticMainExecutableResultSet staticOtherLibraryResultSet:staticOtherLibrariesResultSet];
 				}
 				
-				if (!isStatic || !indirectStopAtStaticAddresses)
-				{
-					// Determine if for this indirect result if we should recurse deeper
-					// This will apply to results that have reached the maximum level from the previous indirect search
-					if ((usingFirstLevelSearchResults || numberOfLevels == previousIndirectMaxLevels) && indirectMaxLevels > numberOfLevels)
-					{
-						_ZGSearchForIndirectPointerRecursively(pointerValueEntries, pointerValueEntriesCount, newResultSet, headerAddressValues, totalStaticSegmentRangeValues, totalStaticSegmentRangeValuesCount, staticMainExecutableResultSet, staticOtherLibrariesResultSet, currentOffsets, currentBaseAddresses, visitedSearchResults, numberOfLevels, tempBuffer, &nextRecurseSearchAddress, searchData, indirectDataType, stride, maxLevels, indirectOffsetMaxComparison, indirectStopAtStaticAddresses, processTask, delegate, progressNotifier);
-					}
-				}
+				free(currentBaseAddresses);
+				free(currentOffsets);
+				free(tempBuffer);
 			}
-			
-			if (delegate != nil)
-			{
-				NSData *staticMainResultSetSubset = [[staticMainExecutableResultSet subdataWithRange:NSMakeRange(initialStaticMainResultSetLength, staticMainExecutableResultSet.length - initialStaticMainResultSetLength)] copy];
-				
-				NSData *staticOtherLibraryResultSetSubset = [[staticOtherLibrariesResultSet subdataWithRange:NSMakeRange(initialStaticOtherLibraryResultSetLength, staticOtherLibrariesResultSet.length - initialStaticOtherLibraryResultSetLength)] copy];
-				
-				[progressNotifier addResultSet:newResultSet staticMainExecutableResultSet:staticMainResultSetSubset staticOtherLibraryResultSet:staticOtherLibraryResultSetSubset];
-			}
-			
-			resultSetIndex++;
-		}
+		});
 		
 		[progressNotifier stop];
 		
@@ -2588,23 +2592,14 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 		}
 	}
 	
-	free(tempBuffer);
-	free(currentOffsets);
-	free(currentBaseAddresses);
 	free(narrowRegionsTable);
 	narrowRegionsTable = nullptr;
 	free(headerAddressValues);
 	free(totalStaticSegmentRangeValues);
 	
-	if (staticOtherLibrariesResultSet.length > 0)
-	{
-		[resultSets insertObject:staticOtherLibrariesResultSet atIndex:0];
-	}
+	[resultSets insertObjects:staticOtherLibrariesResultSets atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, staticOtherLibrariesResultSets.count)]];
 	
-	if (staticMainExecutableResultSet.length > 0)
-	{
-		[resultSets insertObject:staticMainExecutableResultSet atIndex:0];
-	}
+	[resultSets insertObjects:staticMainExecutableResultSets atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, staticMainExecutableResultSets.count)]];
 	
 	// Assume unaligned access for now(?)
 	BOOL unalignedAccess = NO;
@@ -2698,7 +2693,10 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 	const void **newResultSets = static_cast<const void **>(calloc(newResultSetCount, sizeof(*newResultSets)));
 	assert(newResultSets != NULL);
 	
-	dispatch_apply(newResultSetCount, dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^(size_t resultSetIndex) {
+	dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_USER_INITIATED, 0);
+	dispatch_queue_t queue = dispatch_queue_create("com.zgcoder.BitSlicer.NarrowSearch", qosAttribute);
+	
+	dispatch_apply(newResultSetCount, queue, ^(size_t resultSetIndex) {
 		@autoreleasepool
 		{
 			if (!searchProgress.shouldCancelSearch)
@@ -2732,7 +2730,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 		resultSets = [NSArray array];
 		
 		// Deallocate results into separate queue since this could take some time
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		dispatch_async(queue, ^{
 			for (NSUInteger resultSetIndex = 0; resultSetIndex < newResultSetCount; resultSetIndex++)
 			{
 				const void *resultSetData = newResultSets[resultSetIndex];
