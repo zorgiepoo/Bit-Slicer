@@ -661,9 +661,32 @@
 			[displayComponents addObject:@""];
 		}
 		
+		ZGDocumentWindowController *windowController = _windowController;
+		ZGProcess *currentProcess = windowController.currentProcess;
+		
+		ZGMemoryAddress variableAddress;
+		ZGMemorySize variableSize;
+		
 		if (variable.usesDynamicAddress)
 		{
 			[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"addressTooltipLabel"), variable.addressFormula]];
+			
+			ZGMemoryAddress baseAddress;
+			if ([self getBaseAddress:&baseAddress variable:variable])
+			{
+				variableAddress = baseAddress;
+				variableSize = currentProcess.pointerSize;
+			}
+			else
+			{
+				variableAddress = variable.address;
+				variableSize = variable.size;
+			}
+		}
+		else
+		{
+			variableAddress = variable.address;
+			variableSize = variable.size;
 		}
 		
 		if (variable.type == ZGByteArray)
@@ -671,16 +694,14 @@
 			[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"byteSizeTooltipLabel"), variable.sizeStringValue]];
 		}
 		
-		ZGDocumentWindowController *windowController = _windowController;
-		ZGProcess *currentProcess = windowController.currentProcess;
 		if (variable.type != ZGScript && currentProcess.valid)
 		{
-			ZGMemoryAddress memoryProtectionAddress = variable.address;
-			ZGMemorySize memoryProtectionSize = variable.size;
+			ZGMemoryAddress memoryProtectionAddress = variableAddress;
+			ZGMemorySize memoryProtectionSize = variableSize;
 			ZGMemoryProtection memoryProtection;
 			if (ZGMemoryProtectionInRegion(currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
 			{
-				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
+				if (variableAddress >= memoryProtectionAddress && variableAddress + variableSize <= memoryProtectionAddress + memoryProtectionSize)
 				{
 					NSString *protectionDescription = ZGProtectionDescription(memoryProtection);
 					if (protectionDescription != nil && [variable.name rangeOfString:protectionDescription].location == NSNotFound)
@@ -690,12 +711,12 @@
 				}
 			}
 			
-			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variable.address, variable.size);
+			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variableAddress, variableSize);
 			
-			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variable.address fromMachBinaries:[ZGMachBinary machBinariesInProcess:currentProcess]];
+			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variableAddress fromMachBinaries:[ZGMachBinary machBinariesInProcess:currentProcess]];
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
 			
-			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
+			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variableAddress];
 			NSString *mappedFilePath = [machBinary filePathInProcess:currentProcess];
 			
 			BOOL needsUserTag = userTagDescription != nil && [variable.name rangeOfString:userTagDescription].location == NSNotFound;
@@ -711,7 +732,7 @@
 				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"mappedTooltipLabel"), mappedFilePath]];
 				if (!variable.usesDynamicAddress)
 				{
-					[displayComponents addObject:[NSString stringWithFormat:@"%@ 0x%llX", ZGLocalizableSearchTableString(@"offsetTooltipLabel"), variable.address - machBinary.headerAddress]];
+					[displayComponents addObject:[NSString stringWithFormat:@"%@ 0x%llX", ZGLocalizableSearchTableString(@"offsetTooltipLabel"), variableAddress - machBinary.headerAddress]];
 				}
 			}
 			
