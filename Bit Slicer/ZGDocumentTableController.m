@@ -717,7 +717,6 @@
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
 			
 			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variableAddress];
-			NSString *mappedFilePath = [machBinary filePathInProcess:currentProcess];
 			
 			BOOL needsUserTag = userTagDescription != nil && [variable.name rangeOfString:userTagDescription].location == NSNotFound;
 			BOOL needsSegmentName = segmentName != nil && [variable.name rangeOfString:segmentName].location == NSNotFound;
@@ -727,12 +726,17 @@
 				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"tagTooltipLabel"), userTagDescription]];
 			}
 			
-			if (mappedFilePath != nil)
+			NSRange totalSegmentRange = machBinaryInfo.totalSegmentRange;
+			if (variableAddress >= totalSegmentRange.location && variableAddress <= UINT64_MAX - variableSize && variableAddress + variableSize <= totalSegmentRange.location + totalSegmentRange.length)
 			{
-				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"mappedTooltipLabel"), mappedFilePath]];
-				if (!variable.usesDynamicAddress)
+				NSString *mappedFilePath = [machBinary filePathInProcess:currentProcess];
+				if (mappedFilePath != nil)
 				{
-					[displayComponents addObject:[NSString stringWithFormat:@"%@ 0x%llX", ZGLocalizableSearchTableString(@"offsetTooltipLabel"), variableAddress - machBinary.headerAddress]];
+					[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"mappedTooltipLabel"), mappedFilePath]];
+					if (!variable.usesDynamicAddress)
+					{
+						[displayComponents addObject:[NSString stringWithFormat:@"%@ 0x%llX", ZGLocalizableSearchTableString(@"offsetTooltipLabel"), variableAddress - machBinary.headerAddress]];
+					}
 				}
 			}
 			
