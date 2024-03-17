@@ -512,7 +512,7 @@ template <typename T, typename P, typename F, typename C>
 NSData *ZGSearchWithFunctionHelperRegularAndStoreValueDifference(T *searchValue, F comparisonFunction, C transferBytes, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGMemorySize endLimit, ZGMemoryAddress address, void *bytes, void *extraStorage)
 {
 	size_t capacity = INITIAL_BUFFER_ADDRESSES_CAPACITY;
-	size_t resultSize = sizeof(P) + sizeof(uint16_t);
+	size_t resultSize = sizeof(P) + sizeof(int32_t);
 	uint8_t *results = static_cast<uint8_t *>(malloc(capacity * resultSize));
 	ZGMemorySize numberOfVariablesFound = 0;
 	
@@ -537,7 +537,7 @@ NSData *ZGSearchWithFunctionHelperRegularAndStoreValueDifference(T *searchValue,
 				T theVariableValue = *(static_cast<T *>(variableValue));
 				T theCompareValue = *(static_cast<T *>(searchValue));
 				
-				uint16_t valueDifference = static_cast<uint16_t>(theCompareValue - theVariableValue);
+				int32_t valueDifference = static_cast<int32_t>(theCompareValue - theVariableValue);
 				memcpy(results + numberOfVariablesFound * resultSize + sizeof(P), &valueDifference, sizeof(valueDifference));
 				
 				numberOfVariablesFound++;
@@ -680,7 +680,7 @@ ZGSearchResults *ZGSearchWithFunction(F comparisonFunction, ZGMemoryMap processT
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize pointerSize = searchData.pointerSize;
 	ZGMemorySize dataSize = searchData.dataSize;
-	ZGMemorySize stride = storeValueDifference ? (searchData.pointerSize + sizeof(uint16_t)) : searchData.pointerSize;
+	ZGMemorySize stride = storeValueDifference ? (searchData.pointerSize + sizeof(int32_t)) : searchData.pointerSize;
 	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
 	BOOL unalignedAccesses = searchResultsHaveUnalignedAccess(searchData, rawDataType);
 	BOOL requiresExtraCopy = NO;
@@ -1719,7 +1719,7 @@ END_BINARY_SEARCH:
 				
 				if (storeValueDifference)
 				{
-					uint16_t offset = static_cast<uint16_t>(searchValueAddress - pointerValueEntry.pointerValue);
+					int32_t offset = static_cast<int32_t>(searchValueAddress - pointerValueEntry.pointerValue);
 					[pointerValueResultSet appendBytes:&offset length:sizeof(offset)];
 				}
 			}
@@ -1742,7 +1742,7 @@ END_BINARY_SEARCH:
 				
 				if (storeValueDifference)
 				{
-					uint16_t offset = static_cast<uint16_t>(searchValueAddress - pointerValueEntry.pointerValue);
+					int32_t offset = static_cast<int32_t>(searchValueAddress - pointerValueEntry.pointerValue);
 					[pointerValueResultSet appendBytes:&offset length:sizeof(offset)];
 				}
 			}
@@ -1755,7 +1755,7 @@ END_BINARY_SEARCH:
 		}
 	}
 	
-	const ZGMemorySize stride = storeValueDifference ? (sizeof(ZGMemoryAddress) + sizeof(uint16_t)) : sizeof(ZGMemoryAddress);
+	const ZGMemorySize stride = storeValueDifference ? (sizeof(ZGMemoryAddress) + sizeof(int32_t)) : sizeof(ZGMemoryAddress);
 		
 	ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[pointerValueResultSet] resultType:ZGSearchResultTypeDirect dataType:resultDataType stride:stride unalignedAccess:NO];
 	
@@ -1780,8 +1780,8 @@ static ZGSearchResults *_ZGSearchForSingleLevelPointer(ZGMemoryAddress searchVal
 	{
 		if (offsetMaxComparison)
 		{
-			auto compareFunc = [](const ZGMemoryAddress pointerValue1, const ZGMemoryAddress pointerValue2, const uint16_t offset) {
-				if (pointerValue1 + offset < pointerValue2)
+			auto compareFunc = [](const ZGMemoryAddress pointerValue1, const ZGMemoryAddress pointerValue2, const int32_t offset) {
+				if (pointerValue1 + static_cast<ZGMemoryAddress>(offset) < pointerValue2)
 				{
 					return ZGPointerComparisonResultAscending;
 				}
@@ -1799,8 +1799,8 @@ static ZGSearchResults *_ZGSearchForSingleLevelPointer(ZGMemoryAddress searchVal
 		}
 		else
 		{
-			auto compareFunc = [](const ZGMemoryAddress pointerValue1, const ZGMemoryAddress pointerValue2, const uint16_t offset) {
-				const ZGMemoryAddress pointerValue1WithOffset = pointerValue1 + offset;
+			auto compareFunc = [](const ZGMemoryAddress pointerValue1, const ZGMemoryAddress pointerValue2, const int32_t offset) {
+				const ZGMemoryAddress pointerValue1WithOffset = pointerValue1 + static_cast<ZGMemoryAddress>(offset);
 				
 				if (pointerValue1WithOffset < pointerValue2)
 				{
