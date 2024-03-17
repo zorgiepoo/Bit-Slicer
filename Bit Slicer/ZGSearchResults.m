@@ -50,14 +50,10 @@ static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize 
 	//		uintptr_t baseAddress;
 	//		uint16_t baseImageIndex;
 	//		uint16_t numLevels;
-	//		uint16_t offsets[MAX_NUM_LEVELS];
-	//		uint8_t padding[N];
+	//		int32_t offsets[MAX_NUM_LEVELS];
 	//	}
 	
-	ZGMemorySize minimumSize = pointerSize + sizeof(uint16_t) + numberOfLevels * sizeof(uint16_t) + sizeof(uint16_t);
-	ZGMemorySize remainder = minimumSize % pointerSize;
-	ZGMemorySize padding = (remainder == 0) ? 0 : (pointerSize - remainder);
-	return minimumSize + padding;
+	return pointerSize + sizeof(uint16_t) + sizeof(uint16_t) + numberOfLevels * sizeof(int32_t);
 }
 
 - (id)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess

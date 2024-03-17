@@ -453,8 +453,7 @@
 	//		uintptr_t baseAddress;
 	//		uint16_t baseImageIndex;
 	//		uint16_t numLevels;
-	//		uint16_t offsets[MAX_NUM_LEVELS];
-	//		uint8_t padding[N];
+	//		int32_t offsets[MAX_NUM_LEVELS];
 	//	}
 	
 	if (levelsRecursed > maxLevels)
@@ -524,7 +523,7 @@
 						return NO;
 					}
 					
-					uint16_t offset = (uint16_t)offsetExpression.number.unsignedShortValue;
+					int32_t offset = (int32_t)offsetExpression.number.intValue;
 					memcpy((uint8_t *)buffer + pointerSize + sizeof(uint16_t) + sizeof(numberOfLevels) + levelsRecursed * sizeof(offset), &offset, sizeof(offset));
 				}
 				else

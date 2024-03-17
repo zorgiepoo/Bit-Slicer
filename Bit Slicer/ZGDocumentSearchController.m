@@ -424,8 +424,7 @@
 				//		uintptr_t baseAddress;
 				//		uint16_t baseImageIndex;
 				//		uint16_t numLevels;
-				//		uint16_t offsets[MAX_NUM_LEVELS];
-				//		uint8_t padding[N];
+				//		int32_t offsets[MAX_NUM_LEVELS];
 				//	}
 				
 				ZGMemoryAddress baseAddress;
@@ -441,7 +440,7 @@
 				uint16_t baseImageIndex = *(const uint16_t *)((const void *)((const uint8_t *)data) + pointerSize);
 				
 				uint16_t numberOfLevels = *(const uint16_t *)((const void *)((const uint8_t *)data) + pointerSize + sizeof(baseImageIndex));
-				const uint16_t *offsets = (const uint16_t *)((const void *)((const uint8_t *)data + pointerSize + sizeof(baseImageIndex) + sizeof(numberOfLevels)));
+				const int32_t *offsets = (const int32_t *)((const void *)((const uint8_t *)data + pointerSize + sizeof(baseImageIndex) + sizeof(numberOfLevels)));
 				
 				ZGMemoryAddress finalBaseAddress;
 				if (baseImageIndex == UINT16_MAX)
@@ -457,7 +456,7 @@
 				for (uint16_t level = 0; level < numberOfLevels; level++)
 				{
 					uint16_t offsetIndex = numberOfLevels - level - 1;
-					uint16_t offset = offsets[offsetIndex];
+					int32_t offset = offsets[offsetIndex];
 					
 					addressFormula =
 						offset != 0x0 ?
@@ -890,10 +889,13 @@
 	
 	if ([indirectOffsetStringValue zgIsHexRepresentation])
 	{
+		BOOL isNegativeHexValue = [indirectOffsetStringValue hasPrefix:@"-"];
+		NSString *extractedOffsetStringValue = isNegativeHexValue ? [indirectOffsetStringValue substringFromIndex:1] : indirectOffsetStringValue;
 		unsigned int decodedOffset = 0;
-		if ([[NSScanner scannerWithString:indirectOffsetStringValue] scanHexInt:&decodedOffset])
+		if ([[NSScanner scannerWithString:extractedOffsetStringValue] scanHexInt:&decodedOffset])
 		{
-			_searchData.indirectOffset = (uint16_t)decodedOffset;
+			int32_t finalOffset = isNegativeHexValue ? -(int32_t)decodedOffset : (int32_t)decodedOffset;
+			_searchData.indirectOffset = (int32_t)finalOffset;
 		}
 		else
 		{
@@ -907,7 +909,7 @@
 	}
 	else
 	{
-		_searchData.indirectOffset = (uint16_t)indirectOffsetStringValue.zgUnsignedIntValue;
+		_searchData.indirectOffset = (int32_t)indirectOffsetStringValue.intValue;
 	}
 	
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
