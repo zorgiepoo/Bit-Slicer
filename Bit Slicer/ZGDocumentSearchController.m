@@ -887,30 +887,8 @@
 		indirectOffsetStringValue = _documentData.searchAddressMaxOffset;
 	}
 	
-	if ([indirectOffsetStringValue zgIsHexRepresentation])
-	{
-		BOOL isNegativeHexValue = [indirectOffsetStringValue hasPrefix:@"-"];
-		NSString *extractedOffsetStringValue = isNegativeHexValue ? [indirectOffsetStringValue substringFromIndex:1] : indirectOffsetStringValue;
-		unsigned int decodedOffset = 0;
-		if ([[NSScanner scannerWithString:extractedOffsetStringValue] scanHexInt:&decodedOffset])
-		{
-			int32_t finalOffset = isNegativeHexValue ? -(int32_t)decodedOffset : (int32_t)decodedOffset;
-			_searchData.indirectOffset = (int32_t)finalOffset;
-		}
-		else
-		{
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"addressTypeIndirectOffsetParseError")}];
-			}
-			
-			return NO;
-		}
-	}
-	else
-	{
-		_searchData.indirectOffset = (int32_t)indirectOffsetStringValue.intValue;
-	}
+	NSString *indirectOffsetEvaluatedStringValue = [ZGCalculator evaluateExpression:indirectOffsetStringValue];
+	_searchData.indirectOffset = (int32_t)indirectOffsetEvaluatedStringValue.intValue;
 	
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
 	

@@ -42,6 +42,8 @@
 #import "ZGRegisterEntries.h"
 #import "ZGNullability.h"
 #import "NSArrayAdditions.h"
+#import "ZGVariableDataInfo.h"
+#import "ZGCalculator.h"
 
 #define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
 #define ZG_DEBUG_QUALIFIER @"ZG_DEBUG_QUALIFIER"
@@ -507,8 +509,12 @@
 		ZGRegister *theRegister = [_registers objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"value"])
 		{
+			ZGVariableType dataType = theRegister.variable.type;
+			
+			NSString *evaluatedString = !ZGIsNumericalDataType(dataType) ? object : [ZGCalculator evaluateExpression:object];
+			
 			ZGMemorySize size;
-			void *newValue = ZGValueFromString(_breakPoint.process.type, object, theRegister.variable.type, &size);
+			void *newValue = ZGValueFromString(_breakPoint.process.type, evaluatedString, dataType, &size);
 			if (newValue != NULL)
 			{
 				[self
@@ -519,7 +525,7 @@
 				  initWithValue:newValue
 				  size:size
 				  address:theRegister.variable.address
-				  type:theRegister.variable.type
+				  type:dataType
 				  qualifier:theRegister.variable.qualifier
 				  pointerSize:_breakPoint.process.pointerSize
 				  description:theRegister.variable.fullAttributedDescription

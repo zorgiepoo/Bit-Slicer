@@ -609,8 +609,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
 	
-	BOOL stringIsAHexRepresentation = stringObject.zgIsHexRepresentation;
-	
 	ZGVariableType variableType;
 	if (variable.type == ZGPointer)
 	{
@@ -626,76 +624,32 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	switch (variableType)
 	{
 		case ZGInt8:
-			if (stringIsAHexRepresentation)
-			{
-				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)int32Value];
-				*int8Value = (int8_t)*int32Value;
-			}
-			else
-			{
-				*int8Value = (int8_t)stringObject.intValue;
-			}
+			*int8Value = (int8_t)stringObject.intValue;
 			
 			newValue = int8Value;
 			break;
 		case ZGInt16:
-			if (stringIsAHexRepresentation)
-			{
-				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)int32Value];
-				*int16Value = (int16_t)*int32Value;
-			}
-			else
-			{
-				*int16Value = (int16_t)stringObject.intValue;
-			}
+			*int16Value = (int16_t)stringObject.intValue;
 			
 			newValue = int16Value;
 			break;
 		case ZGInt32:
-			if (stringIsAHexRepresentation)
-			{
-				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)int32Value];
-			}
-			else
-			{
-				*int32Value = stringObject.intValue;
-			}
+			*int32Value = stringObject.intValue;
 			
 			newValue = int32Value;
 			break;
 		case ZGFloat:
-			if (stringIsAHexRepresentation)
-			{
-				[[NSScanner scannerWithString:stringObject] scanHexFloat:floatValue];
-			}
-			else
-			{
-				*floatValue = stringObject.floatValue;
-			}
+			*floatValue = stringObject.floatValue;
 			
 			newValue = floatValue;
 			break;
 		case ZGInt64:
-			if (stringIsAHexRepresentation)
-			{
-				[[NSScanner scannerWithString:stringObject] scanHexLongLong:(unsigned long long *)int64Value];
-			}
-			else
-			{
-				[[NSScanner scannerWithString:stringObject] scanLongLong:int64Value];
-			}
+			[[NSScanner scannerWithString:stringObject] scanLongLong:int64Value];
 			
 			newValue = int64Value;
 			break;
 		case ZGDouble:
-			if (stringIsAHexRepresentation)
-			{
-				[[NSScanner scannerWithString:stringObject] scanHexDouble:doubleValue];
-			}
-			else
-			{
-				*doubleValue = stringObject.doubleValue;
-			}
+			*doubleValue = stringObject.doubleValue;
 			
 			newValue = doubleValue;
 			break;
