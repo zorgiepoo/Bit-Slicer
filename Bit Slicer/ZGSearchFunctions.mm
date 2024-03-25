@@ -1134,7 +1134,7 @@ bool ZGPointerEqualsWithSameOffset(ZGSearchData *__unsafe_unretained searchData,
 	T theVariableValue = *(static_cast<T *>(variableValue));
 	T theCompareValue = *(static_cast<T *>(compareValue));
 	
-	return (theCompareValue >= theVariableValue) && (theCompareValue - theVariableValue == static_cast<T>(searchData->_indirectOffset));
+	return (theCompareValue - theVariableValue == static_cast<T>(searchData->_indirectOffset));
 }
 
 #pragma mark Floating Points
@@ -1712,7 +1712,8 @@ END_BINARY_SEARCH:
 		while (lowerTargetIndex > 0)
 		{
 			ZGPointerValueEntry pointerValueEntry = pointerValueEntries[lowerTargetIndex];
-			if (pointerValueEntry.pointerValue <= searchValueAddress && pointerValueEntry.pointerValue + static_cast<ZGMemoryAddress>(indirectOffset) >= searchValueAddress)
+			ZGPointerComparisonResult compareResult = compareFunc(pointerValueEntry.pointerValue, searchValueAddress, indirectOffset);
+			if (compareResult == ZGPointerComparisonResultEqual)
 			{
 				ZGMemoryAddress address = pointerValueEntry.address;
 				[pointerValueResultSet appendBytes:&address length:sizeof(address)];
@@ -1735,7 +1736,8 @@ END_BINARY_SEARCH:
 		while (higherTargetIndex < end)
 		{
 			ZGPointerValueEntry pointerValueEntry = pointerValueEntries[higherTargetIndex];
-			if (pointerValueEntry.pointerValue <= searchValueAddress && pointerValueEntry.pointerValue + static_cast<ZGMemoryAddress>(indirectOffset) >= searchValueAddress)
+			ZGPointerComparisonResult compareResult = compareFunc(pointerValueEntry.pointerValue, searchValueAddress, indirectOffset);
+			if (compareResult == ZGPointerComparisonResultEqual)
 			{
 				ZGMemoryAddress address = pointerValueEntry.address;
 				[pointerValueResultSet appendBytes:&address length:sizeof(address)];

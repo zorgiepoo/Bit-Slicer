@@ -458,10 +458,18 @@
 					uint16_t offsetIndex = numberOfLevels - level - 1;
 					int32_t offset = offsets[offsetIndex];
 					
-					addressFormula =
-						offset != 0x0 ?
-						[NSString stringWithFormat:@"[%@] + 0x%X", addressFormula, offset] :
-						[NSString stringWithFormat:@"[%@]", addressFormula];
+					if (offset == 0x0)
+					{
+						addressFormula = [NSString stringWithFormat:@"[%@]", addressFormula];;
+					}
+					else if (offset > 0x0)
+					{
+						addressFormula = [NSString stringWithFormat:@"[%@] + 0x%X", addressFormula, offset];
+					}
+					else
+					{
+						addressFormula = [NSString stringWithFormat:@"[%@] - 0x%X", addressFormula, -offset];
+					}
 				}
 				
 				// Even if only one variable comes back, we leave indirect results enabled

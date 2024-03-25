@@ -466,7 +466,9 @@
 	switch (expression.expressionType)
 	{
 		case DDExpressionTypeFunction:
-			if ([expression.function isEqualToString:@"add"] && expression.arguments.count == 2)
+		{
+			BOOL isAddFunction = [expression.function isEqualToString:@"add"];
+			if ((isAddFunction || [expression.function isEqualToString:@"subtract"]) && expression.arguments.count == 2)
 			{
 				DDExpression *argumentExpression1 = expression.arguments[0];
 				DDExpression *argumentExpression2 = expression.arguments[1];
@@ -523,11 +525,12 @@
 						return NO;
 					}
 					
-					int32_t offset = (int32_t)offsetExpression.number.intValue;
+					int32_t initialOffset = (int32_t)offsetExpression.number.intValue;
+					int32_t offset = isAddFunction ? initialOffset : -initialOffset;
 					memcpy((uint8_t *)buffer + pointerSize + sizeof(uint16_t) + sizeof(numberOfLevels) + levelsRecursed * sizeof(offset), &offset, sizeof(offset));
 				}
 				else
-				{	
+				{
 					// Found the static base expression
 					
 					DDExpression *baseAddressArgumentExpression1 = expression.arguments[0];
@@ -626,6 +629,7 @@
 				return NO;
 			}
 			break;
+		}
 		case DDExpressionTypeNumber:
 		{
 			// Found base address without any base()
