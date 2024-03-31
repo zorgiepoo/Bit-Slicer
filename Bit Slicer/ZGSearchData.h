@@ -85,6 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) double epsilon;
 @property (nonatomic) BOOL indirectOffsetMaxComparison;
 @property (nonatomic) int32_t indirectOffset;
+@property (nonatomic) BOOL indirectAbsoluteOffset;
 @property (nonatomic) uint16_t indirectMaxLevels;
 @property (nonatomic) BOOL indirectStopAtStaticAddresses;
 @property (nonatomic) BOOL filterHeapAndStackData;
