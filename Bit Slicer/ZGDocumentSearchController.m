@@ -884,15 +884,24 @@
 	}
 	
 	NSString *indirectOffsetStringValue;
-	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)
+	switch (_documentData.searchAddressOffsetComparison)
 	{
-		_searchData.indirectOffsetMaxComparison = NO;
-		indirectOffsetStringValue = _documentData.searchAddressSameOffset;
-	}
-	else
-	{
-		_searchData.indirectOffsetMaxComparison = YES;
-		indirectOffsetStringValue = _documentData.searchAddressMaxOffset;
+		case ZGSearchAddressOffsetComparisonMax:
+			_searchData.indirectAbsoluteOffset = NO;
+			
+			_searchData.indirectOffsetMaxComparison = YES;
+			indirectOffsetStringValue = _documentData.searchAddressMaxOffset;
+			break;
+		case ZGSearchAddressOffsetComparisonAbsoluteMax:
+			_searchData.indirectAbsoluteOffset = YES;
+			_searchData.indirectOffsetMaxComparison = YES;
+			indirectOffsetStringValue = _documentData.searchAddressMaxOffset;
+			break;
+		case ZGSearchAddressOffsetComparisonSame:
+			_searchData.indirectAbsoluteOffset = NO;
+			_searchData.indirectOffsetMaxComparison = NO;
+			indirectOffsetStringValue = _documentData.searchAddressSameOffset;
+			break;
 	}
 	
 	NSString *indirectOffsetEvaluatedStringValue = [ZGCalculator evaluateExpression:indirectOffsetStringValue];

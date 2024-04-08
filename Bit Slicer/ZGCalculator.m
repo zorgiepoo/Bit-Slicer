@@ -686,7 +686,7 @@
 	switch (expression.expressionType)
 	{
 		case DDExpressionTypeFunction:
-			if ([expression.function isEqualToString:@"add"] && expression.arguments.count == 2)
+			if (([expression.function isEqualToString:@"add"] || [expression.function isEqualToString:@"subtract"]) && expression.arguments.count == 2)
 			{
 				DDExpression *argumentExpression1 = expression.arguments[0];
 				DDExpression *argumentExpression2 = expression.arguments[1];
@@ -711,7 +711,7 @@
 				}
 				else
 				{
-					// Found base() + offset expression which we need to evaluate
+					// Found base() +- offset expression which we need to evaluate
 					NSDictionary<NSString *, id> *substitutions = [self _evaluatorSubstitutionsForProcess:process failedImages:failedImages symbolicates:NO symbolicationRequiresExactMatch:YES currentAddress:0x0];
 					
 					NSError *evaluateError = nil;

@@ -506,13 +506,15 @@
 	
 	[_searchTypePopUpButton selectItemWithTag:(NSInteger)_documentData.searchType];
 	
-	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
+	switch (_documentData.searchAddressOffsetComparison)
 	{
-		_searchAddressOffsetTextField.stringValue = _documentData.searchAddressMaxOffset;
-	}
-	else
-	{
-		_searchAddressOffsetTextField.stringValue = _documentData.searchAddressSameOffset;
+		case ZGSearchAddressOffsetComparisonMax:
+		case ZGSearchAddressOffsetComparisonAbsoluteMax:
+			_searchAddressOffsetTextField.stringValue = _documentData.searchAddressMaxOffset;
+			break;
+		case ZGSearchAddressOffsetComparisonSame:
+			_searchAddressOffsetTextField.stringValue = _documentData.searchAddressSameOffset;
+			break;
 	}
 	
 	[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:(NSInteger)_documentData.searchAddressOffsetComparison];
@@ -1005,6 +1007,8 @@
 					[self _updateSearchAddressMaxLevelsTextField];
 					
 					_documentData.searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
+					[_searchAddressOffsetComparisonPopUpButton selectItemWithTag:ZGSearchAddressOffsetComparisonMax];
+					
 					[self _updateSearchAddressOffsetTextField];
 				}
 				break;
@@ -1125,13 +1129,15 @@
 
 - (IBAction)searchAddressOffsetDidChange:(id)sender
 {
-	if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonMax)
+	switch (_documentData.searchAddressOffsetComparison)
 	{
-		_documentData.searchAddressMaxOffset = _searchAddressOffsetTextField.stringValue;
-	}
-	else
-	{
-		_documentData.searchAddressSameOffset = _searchAddressOffsetTextField.stringValue;
+		case ZGSearchAddressOffsetComparisonMax:
+		case ZGSearchAddressOffsetComparisonAbsoluteMax:
+			_documentData.searchAddressMaxOffset = _searchAddressOffsetTextField.stringValue;
+			break;
+		case ZGSearchAddressOffsetComparisonSame:
+			_documentData.searchAddressSameOffset = _searchAddressOffsetTextField.stringValue;
+			break;
 	}
 	
 	[self markDocumentChange];
@@ -1143,6 +1149,7 @@
 	switch (offsetComparison)
 	{
 		case ZGSearchAddressOffsetComparisonMax:
+		case ZGSearchAddressOffsetComparisonAbsoluteMax:
 			_searchAddressOffsetTextField.stringValue = _documentData.searchAddressMaxOffset;
 			break;
 		case ZGSearchAddressOffsetComparisonSame:

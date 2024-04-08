@@ -73,7 +73,8 @@ typedef NS_ENUM(NSInteger, ZGSearchType)
 typedef NS_ENUM(NSInteger, ZGSearchAddressOffsetComparison)
 {
 	ZGSearchAddressOffsetComparisonMax = 0,
-	ZGSearchAddressOffsetComparisonSame = 1
+	ZGSearchAddressOffsetComparisonSame = 1,
+	ZGSearchAddressOffsetComparisonAbsoluteMax = 2,
 };
 
 @interface ZGDocumentData : NSObject

@@ -260,6 +260,7 @@
 	switch ((ZGSearchAddressOffsetComparison)decodedOffsetComparison)
 	{
 		case ZGSearchAddressOffsetComparisonMax:
+		case ZGSearchAddressOffsetComparisonAbsoluteMax:
 		case ZGSearchAddressOffsetComparisonSame:
 			offsetComparison = decodedOffsetComparison;
 			break;
