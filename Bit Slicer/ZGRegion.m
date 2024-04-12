@@ -186,7 +186,7 @@
 			return nil;
 		}
 		
-		if (filterHeapAndStackData && !ZGUserTagIsStackOrHeapData(region.userTag))
+		if (!ZGUserTagIsStackOrHeapData(region.userTag))
 		{
 			NSUInteger binaryIndex = 0;
 			NSValue *matchingSegmentRangeValue = [totalStaticSegmentRanges zgBinarySearchUsingBlock:^NSComparisonResult(NSValue *__unsafe_unretained  _Nonnull currentValue) {
@@ -204,20 +204,24 @@
 				return NSOrderedSame;
 			} getIndex:&binaryIndex];
 			
-			if (matchingSegmentRangeValue == nil)
+			if (matchingSegmentRangeValue != nil)
 			{
-				return nil;
-			}
-			
-			if (excludeStaticDataFromSystemLibraries && binaryIndex > 0 && filePaths != nil)
-			{
-				NSString *filePath = filePaths[binaryIndex];
-				if ([filePath hasPrefix:@"/System/"] ||
-					([filePath hasPrefix:@"/usr/"] && ![filePath hasPrefix:@"/usr/local/"]) ||
-					[filePath hasPrefix:@"/Library/Apple/"])
+				// We don't filter out static segment ranges unless we have a filter for excluding system libraries
+				if (excludeStaticDataFromSystemLibraries && binaryIndex > 0 && filePaths != nil)
 				{
-					return nil;
+					NSString *filePath = filePaths[binaryIndex];
+					if ([filePath hasPrefix:@"/System/"] ||
+						([filePath hasPrefix:@"/usr/"] && ![filePath hasPrefix:@"/usr/local/"]) ||
+						[filePath hasPrefix:@"/Library/Apple/"])
+					{
+						return nil;
+					}
 				}
+			}
+			else if (filterHeapAndStackData)
+			{
+				// We don't have stack/heap data and we don't have a static segment data
+				return nil;
 			}
 		}
 		
