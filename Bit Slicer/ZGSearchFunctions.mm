@@ -2330,6 +2330,8 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	ZGMemoryAddress maxPointerValue = searchData.endAddress;
 	ZGMemoryAddress minPointerValue = MAX(firstTotalStaticSegmentRangeValue.rangeValue.location, searchData.beginAddress);
 	
+	ZGMemorySize dataAlignment = searchData.dataAlignment;
+	
 	if (needsToBuildPointerTableData || previousSearchResults != nil)
 	{
 		BOOL includeSharedMemory = searchData.includeSharedMemory;
@@ -2348,8 +2350,6 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 			narrowRegionsTableCount = 0;
 			narrowRegionsTable = nullptr;
 		}
-		
-		ZGMemorySize dataAlignment = searchData.dataAlignment;
 		
 		if (needsToBuildPointerTableData)
 		{
@@ -2667,8 +2667,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	
 	[resultSets insertObjects:staticMainExecutableResultSets atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, staticMainExecutableResultSets.count)]];
 	
-	// Assume unaligned access for now(?)
-	BOOL unalignedAccess = NO;
+	BOOL unalignedAccess = (dataAlignment == 1);
 	ZGSearchResults *indirectSearchResults = [[ZGSearchResults alloc] initWithResultSets:[resultSets copy] resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride unalignedAccess:unalignedAccess];
 	
 	indirectSearchResults.indirectMaxLevels = maxLevels;
