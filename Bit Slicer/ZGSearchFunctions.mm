@@ -2372,10 +2372,11 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 				{
 					ZGMemoryAddress endAddress = (region->_address + region->_size);
 					
-					const ZGMemoryAddress *dataBytes = static_cast<const ZGMemoryAddress *>(bytes);
-					while (address < endAddress)
+					const uint8_t *dataBytes = static_cast<const uint8_t *>(bytes);
+					ZGMemoryAddress pointerValue;
+					while (address + sizeof(pointerValue) <= endAddress)
 					{
-						ZGMemoryAddress pointerValue = *dataBytes;
+						memcpy(&pointerValue, dataBytes, sizeof(pointerValue));
 						if (pointerValue >= minPointerValue && pointerValue < maxPointerValue)
 						{
 							ZGPointerValueEntry pointerValueEntry;
@@ -2385,7 +2386,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 							[pointerTableData appendBytes:&pointerValueEntry length:sizeof(pointerValueEntry)];
 						}
 						
-						dataBytes++;
+						dataBytes += dataAlignment;
 						address += dataAlignment;
 					}
 				}
