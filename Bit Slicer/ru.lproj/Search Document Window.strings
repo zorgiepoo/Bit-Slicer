@@ -205,3 +205,9 @@
 
 /* Class = "NSMenuItem"; title = "Float"; ObjectID = "xya-wF-ZfW"; */
 "xya-wF-ZfW.title" = "Плавающее (Float4 байта)";
+
+/* Class = "NSMenuItem"; title = "value"; ObjectID = "NpW-LA-vBl"; */
+"NpW-LA-vBl.title" = "Значение";
+
+/* Class = "NSMenuItem"; title = "address"; ObjectID = "v88-2O-5zY"; */
+"v88-2O-5zY.title" = "aдрес";
