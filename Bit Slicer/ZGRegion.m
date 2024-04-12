@@ -213,7 +213,7 @@
 			{
 				NSString *filePath = filePaths[binaryIndex];
 				if ([filePath hasPrefix:@"/System/"] ||
-					[filePath hasPrefix:@"/usr/"] ||
+					([filePath hasPrefix:@"/usr/"] && ![filePath hasPrefix:@"/usr/local/"]) ||
 					[filePath hasPrefix:@"/Library/Apple/"])
 				{
 					return nil;
