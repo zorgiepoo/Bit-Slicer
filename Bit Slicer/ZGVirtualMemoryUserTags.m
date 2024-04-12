@@ -52,7 +52,7 @@ case value: \
 #define MAC_OS_VERSION_14_0 140000
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_VERSION_14_2
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_VERSION_14_4
 #pragma message("Need to update the user tag descriptions")
 #endif
 
