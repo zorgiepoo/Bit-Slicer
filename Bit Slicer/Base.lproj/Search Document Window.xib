@@ -18,6 +18,7 @@
                 <outlet property="_searchAddressMaxLevelsStepper" destination="QsO-dZ-JLm" id="n7V-al-Wdf"/>
                 <outlet property="_searchAddressMaxLevelsTextField" destination="krU-4S-mNx" id="bJz-Ed-Kib"/>
                 <outlet property="_searchAddressOffsetComparisonPopUpButton" destination="igZ-EE-KLe" id="gpH-91-lOU"/>
+                <outlet property="_searchAddressOffsetComparisonSameMenuItem" destination="RUR-Zy-RpG" id="QQe-ci-Y8C"/>
                 <outlet property="_searchAddressOffsetTextField" destination="so8-Ni-dAC" id="B5d-st-t4K"/>
                 <outlet property="_searchAddressVerticalDivider" destination="hE3-Lr-YU6" id="qv5-Fp-AmF"/>
                 <outlet property="_searchTypePopUpButton" destination="t3M-9G-Seh" id="xlv-r6-s8l"/>
@@ -838,10 +839,10 @@
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="igZ-EE-KLe">
                     <rect key="frame" x="-3" y="0.0" width="82" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <popUpButtonCell key="cell" type="push" title=" Offset  ≤" bezelStyle="rounded" alignment="right" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="BrH-0b-bdg" id="WBP-2a-ZOR">
+                    <popUpButtonCell key="cell" type="push" title=" Offset  ≤" bezelStyle="rounded" alignment="right" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" autoenablesItems="NO" selectedItem="BrH-0b-bdg" id="WBP-2a-ZOR">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
-                        <menu key="menu" id="PyO-3S-6cM">
+                        <menu key="menu" autoenablesItems="NO" id="PyO-3S-6cM">
                             <items>
                                 <menuItem title=" Offset  ≤" state="on" id="BrH-0b-bdg"/>
                                 <menuItem title="|Offset| ≤" tag="2" id="4Bc-vD-9HW"/>

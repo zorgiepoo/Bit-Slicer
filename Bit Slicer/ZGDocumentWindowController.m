@@ -119,6 +119,7 @@
 	IBOutlet NSTextField *_searchAddressOffsetLabel;
 	IBOutlet NSBox *_searchAddressVerticalDivider;
 	IBOutlet NSPopUpButton *_searchAddressOffsetComparisonPopUpButton;
+	IBOutlet NSMenuItem *_searchAddressOffsetComparisonSameMenuItem;
 	IBOutlet AGScopeBar *_scopeBar;
 	IBOutlet NSView *_scopeBarFlagsView;
 	IBOutlet NSView *_scopeBarAddressSearchOptionsView;
@@ -863,7 +864,7 @@
 		
 		_searchAddressOffsetTextField.hidden = NO;
 		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
-		_searchAddressOffsetComparisonPopUpButton.enabled = YES;
+		_searchAddressOffsetComparisonSameMenuItem.enabled = YES;
 		
 		// If the search offset comparison was previously same and was not usable, we should
 		// update the default offset comparison to max
@@ -886,7 +887,7 @@
 	{
 		_searchAddressOffsetTextField.hidden = NO;
 		_searchAddressOffsetComparisonPopUpButton.hidden = NO;
-		_searchAddressOffsetComparisonPopUpButton.enabled = NO;
+		_searchAddressOffsetComparisonSameMenuItem.enabled = NO;
 		
 		if (_documentData.searchAddressOffsetComparison == ZGSearchAddressOffsetComparisonSame)
 		{
