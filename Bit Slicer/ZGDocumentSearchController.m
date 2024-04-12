@@ -909,15 +909,13 @@
 	
 	_searchData.indirectMaxLevels = (uint16_t)_documentData.searchAddressMaxLevels;
 	
-	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"ZGDisableAddressFilterOptions"])
+	if (addressSearch)
 	{
-		_searchData.indirectStopAtStaticAddresses = addressSearch;
-		_searchData.filterHeapAndStackData = addressSearch;
-		_searchData.excludeStaticDataFromSystemLibraries = addressSearch;
+		_searchData.filterHeapAndStackData = _documentData.indirectFilterHeapAndStackData;
+		_searchData.excludeStaticDataFromSystemLibraries = _documentData.indirectExcludeStaticDataFromSystemLibraries;
 	}
 	else
 	{
-		_searchData.indirectStopAtStaticAddresses = NO;
 		_searchData.filterHeapAndStackData = NO;
 		_searchData.excludeStaticDataFromSystemLibraries = NO;
 	}

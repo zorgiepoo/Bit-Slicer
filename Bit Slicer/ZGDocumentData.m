@@ -59,6 +59,8 @@
 		_searchAddressOffsetComparison = ZGSearchAddressOffsetComparisonMax;
 		_valueProtectionMode = ZGProtectionAll;
 		_addressProtectionMode = ZGProtectionWrite;
+		_indirectFilterHeapAndStackData = YES;
+		_indirectExcludeStaticDataFromSystemLibraries = YES;
 	}
 	return self;
 }

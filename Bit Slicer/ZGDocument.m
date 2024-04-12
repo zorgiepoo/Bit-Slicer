@@ -167,6 +167,18 @@
 	[keyedArchiver
 	 encodeBool:_searchData.includeSharedMemory
 	 forKey:ZGIncludeSharedMemoryKey];
+	
+	[keyedArchiver
+	 encodeBool:_searchData.indirectStopAtStaticAddresses
+	 forKey:ZGIndirectStopAtStaticAddressesKey];
+	
+	[keyedArchiver
+	 encodeBool:_data.indirectFilterHeapAndStackData
+	 forKey:ZGIndirectFilterHeapAndStackDataKey];
+	
+	[keyedArchiver
+	 encodeBool:_data.indirectExcludeStaticDataFromSystemLibraries
+	 forKey:ZGIndirectExcludeStaticDataFromSystemLibrariesKey];
     
 	[keyedArchiver
 	 encodeObject:_data.lastEpsilonValue
@@ -271,6 +283,20 @@
 	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEndingAddressKey]];
 	
 	_searchData.includeSharedMemory = [keyedUnarchiver decodeBoolForKey:ZGIncludeSharedMemoryKey];
+	if ([keyedUnarchiver containsValueForKey:ZGIndirectStopAtStaticAddressesKey])
+	{
+		_searchData.indirectStopAtStaticAddresses = [keyedUnarchiver decodeBoolForKey:ZGIndirectStopAtStaticAddressesKey];
+	}
+	
+	if ([keyedUnarchiver containsValueForKey:ZGIndirectFilterHeapAndStackDataKey])
+	{
+		_data.indirectFilterHeapAndStackData = [keyedUnarchiver decodeBoolForKey:ZGIndirectFilterHeapAndStackDataKey];
+	}
+	
+	if ([keyedUnarchiver containsValueForKey:ZGIndirectExcludeStaticDataFromSystemLibrariesKey])
+	{
+		_data.indirectExcludeStaticDataFromSystemLibraries = [keyedUnarchiver decodeBoolForKey:ZGIndirectExcludeStaticDataFromSystemLibrariesKey];
+	}
 	
 	_data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
 	if (_data.byteOrderTag == CFByteOrderUnknown)

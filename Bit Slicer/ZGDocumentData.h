@@ -59,6 +59,9 @@
 #define ZGSearchStringValueKeyOld @"ZGSearchStringValueKey" // legacy
 #define ZGSearchStringAddressKey @"ZGSearchStringAddressKey"
 #define ZGIncludeSharedMemoryKey @"ZGIncludeSharedMemoryKey"
+#define ZGIndirectStopAtStaticAddressesKey @"ZGIndirectStopAtStaticAddressesKey"
+#define ZGIndirectFilterHeapAndStackDataKey @"ZGIndirectFilterHeapAndStackDataKey"
+#define ZGIndirectExcludeStaticDataFromSystemLibrariesKey @"ZGIndirectExcludeStaticDataFromSystemLibrariesKey"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -100,6 +103,8 @@ typedef NS_ENUM(NSInteger, ZGSearchAddressOffsetComparison)
 @property (copy, nonatomic, nullable) NSString *lastBelowRangeValue;
 @property (nonatomic) ZGProtectionMode valueProtectionMode;
 @property (nonatomic) ZGProtectionMode addressProtectionMode;
+@property (nonatomic) BOOL indirectFilterHeapAndStackData;
+@property (nonatomic) BOOL indirectExcludeStaticDataFromSystemLibraries;
 
 @end
 

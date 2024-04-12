@@ -58,6 +58,8 @@
 		_dataAlignment = dataAlignment;
 		_pointerSize = pointerSize;
 		
+		_indirectStopAtStaticAddresses = YES;
+		
 		[self setSearchValue:searchValue];
 	}
 	return self;
