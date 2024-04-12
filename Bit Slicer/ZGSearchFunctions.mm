@@ -3717,10 +3717,10 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 	ZGMemorySize indirectResultsStride = indirectSearchResults.stride;
 	for (NSData *resultSet in indirectResultSets)
 	{
-		NSMutableData *newResultSet = [[NSMutableData alloc] init];
-		
 		const uint8_t *resultSetBytes = static_cast<const uint8_t *>(resultSet.bytes);
 		ZGMemorySize numberOfResults = static_cast<ZGMemorySize>(resultSet.length) / indirectResultsStride;
+		
+		uint8_t *newResultSetBytes = static_cast<uint8_t *>(calloc(numberOfResults, pointerSize));
 		
 		for (ZGMemorySize resultIndex = 0; resultIndex < numberOfResults; resultIndex++)
 		{
@@ -3735,17 +3735,18 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 			switch (pointerSize)
 			{
 				case sizeof(ZGMemoryAddress):
-					[newResultSet appendBytes:&address length:pointerSize];
+					memcpy(newResultSetBytes + resultIndex * pointerSize, &address, pointerSize);
 					break;
 				case sizeof(ZG32BitMemoryAddress):
 				{
 					ZG32BitMemoryAddress halfAddress = static_cast<ZG32BitMemoryAddress>(address);
-					[newResultSet appendBytes:&halfAddress length:pointerSize];
+					memcpy(newResultSetBytes + resultIndex * pointerSize, &halfAddress, pointerSize);
 					break;
 				}
 			}
 		}
 		
+		NSData *newResultSet = [[NSData alloc] initWithBytesNoCopy:newResultSetBytes length:numberOfResults * pointerSize];
 		[directResultSets addObject:newResultSet];
 	}
 	
