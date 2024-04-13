@@ -148,10 +148,17 @@
 
 #pragma mark Report information
 
-- (BOOL)isVariableNarrowable:(ZGVariable *)variable dataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch
+- (BOOL)isVariableNarrowable:(ZGVariable *)variable dataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch processType:(ZGProcessType)processType
 {
+	// Quick check for not allowing narrow indirect value searches for legacy 32-bit processes
+	// Address searches for 32-bit processes are already disallowed in retrieveSearchDataWithDataType
+	if (!ZG_PROCESS_TYPE_IS_64_BIT(processType) && !pointerAddressSearch && variable.usesDynamicPointerAddress)
+	{
+		return NO;
+	}
+	
 	// If we are doing a pointer address search, the variable must have a dynamic pointer address
-	// If we are doing a regular value search, variable could be a normal address or dynamic pointer address
+	// If we are doing a regular value search, variable could be a normal address or dynamic pointer address (as long as it's a 64-bit process)
 	return (variable.enabled && variable.type == dataType && !variable.isFrozen) && (!pointerAddressSearch || variable.usesDynamicPointerAddress) && !variable.usesDynamicSymbolAddress;
 }
 
@@ -871,16 +878,19 @@
 	else
 	{
 		_searchData.protectionMode = _documentData.addressProtectionMode;
-		
-		if (!ZG_PROCESS_TYPE_IS_64_BIT(process.type))
+	}
+	
+	if (!ZG_PROCESS_TYPE_IS_64_BIT(process.type))
+	{
+		if (_documentData.searchType == ZGSearchTypeAddress || (_searchResults.resultType == ZGSearchResultTypeIndirect && _searchResults.count > 0))
 		{
 			if (error != NULL)
 			{
 				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"addressTypeNotSupportedFor32Bit")}];
 			}
-			
-			return NO;
 		}
+		
+		return NO;
 	}
 	
 	NSString *indirectOffsetStringValue;
@@ -927,16 +937,19 @@
 	return YES;
 }
 
-- (BOOL)isNarrowingSearchWithDataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch
+- (BOOL)isNarrowingSearchWithDataType:(ZGVariableType)dataType pointerAddressSearch:(BOOL)pointerAddressSearch processType:(ZGProcessType)processType
 {
 	return [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
-		return [self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch];
+		return [self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch processType:processType];
 	}];
 }
 
 - (NSUInteger)currentSearchAddressNumberOfIndirectLevelsWithDataType:(ZGVariableType)dataType
 {
-	BOOL isNarrowingSearch = [self isNarrowingSearchWithDataType:dataType pointerAddressSearch:YES];
+	ZGProcess *process = _windowController.currentProcess;
+	ZGProcessType processType = process.type;
+	
+	BOOL isNarrowingSearch = [self isNarrowingSearchWithDataType:dataType pointerAddressSearch:YES processType:processType];
 	if (!isNarrowingSearch)
 	{
 		return 0;
@@ -945,7 +958,7 @@
 	uint16_t computedIndirectMaxLevelsFromTable = 0;
 	for (ZGVariable *variable in _documentData.variables)
 	{
-		if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:YES])
+		if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:YES processType:processType])
 		{
 			uint16_t numberOfDynamicPointersInAddress = (uint16_t)(variable.numberOfDynamicPointersInAddress);
 			if (numberOfDynamicPointersInAddress > computedIndirectMaxLevelsFromTable)
@@ -984,6 +997,8 @@
 	_functionType = functionType;
 	_searchValueString = [searchStringValue copy];
 	
+	ZGProcessType processType = _windowController.currentProcess.type;
+	
 	NSError *error = nil;
 	if (![self retrieveSearchDataWithDataType:dataType addressSearch:pointerAddressSearch error:&error])
 	{
@@ -994,7 +1009,7 @@
 	NSMutableArray<ZGVariable *> *notSearchedVariables = [[NSMutableArray alloc] init];
 	NSMutableArray<ZGVariable *> *searchedVariables = [[NSMutableArray alloc] init];
 	
-	BOOL isNarrowingSearch = [self isNarrowingSearchWithDataType:dataType pointerAddressSearch:pointerAddressSearch];
+	BOOL isNarrowingSearch = [self isNarrowingSearchWithDataType:dataType pointerAddressSearch:pointerAddressSearch processType:processType];
 	
 	ZGDocumentWindowController *windowController = _windowController;
 	
@@ -1021,7 +1036,7 @@
 		
 		for (ZGVariable *variable in variables)
 		{
-			if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch])
+			if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch processType:processType])
 			{
 				uint16_t numberOfDynamicPointersInAddress = (uint16_t)(variable.numberOfDynamicPointersInAddress);
 				if (numberOfDynamicPointersInAddress > computedIndirectMaxLevels)
@@ -1079,7 +1094,7 @@
 			// Nothing to narrow
 			[notSearchedVariables addObject:variable];
 		}
-		else if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch])
+		else if ([self isVariableNarrowable:variable dataType:dataType pointerAddressSearch:pointerAddressSearch processType:processType])
 		{
 			if (pointerAddressSearch)
 			{
