@@ -22,7 +22,7 @@
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		TW06E1zSjq60TNLD4WnVRt7/218=
+		HHeL5D61tkf5t/3AbyHIzIvgkIY=
 		</data>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
 		<data>
@@ -450,7 +450,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			xZjyKASZdwg70f4m29uGtJjFUgQ=
+			Qw6/m/LeQ/b+ApIWLXJp2ByBp7k=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -459,7 +459,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			d+ifBccX26E56rM7eOY72BKC5aY=
+			ddXQhUAjY+oi62JXHPY2OYvbpa4=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -468,7 +468,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			vidckNwrgXZkzwbptfj9ycGywxE=
+			30lZbzu4QerfbEwayFqoboTwLSs=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -523,6 +523,33 @@
 			<key>hash</key>
 			<data>
 			HUFefTfqhwJx6nNNmACg3qxtHKo=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/nn.lproj/SUUpdateAlert.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			v2c8gYdlWN2U2PbZlUQwmfWIeGk=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/nn.lproj/SUUpdatePermissionPrompt.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			xNizW6Xg8cPtYBhWBmexjNf5j8U=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/nn.lproj/Sparkle.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			8GnPpOmTh7bQRiUCzZDL6pq1KNE=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -912,10 +939,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			wQb+fVRiD1iMCqrig3kw0FRZZWc=
+			0RM7GGG7rdRgmdMH3HDQDRtxpsA=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"c106fe7d54620f588c0aaae2837930d054596567" or cdhash H"ff6b216dede4bec0eed2f5067898a91d83e45575"</string>
+			<string>cdhash H"d1133b1861bbadd46099d307dc70d00d1b71a6c0" or cdhash H"44402eeda713481125814566b445348877609da1"</string>
 		</dict>
 		<key>Headers/SPUDownloadData.h</key>
 		<dict>
@@ -984,7 +1011,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			FZyzRoNn6SIm0ugYRKGMzlmq0C60WknB8YHjZtfmmYw=
+			YZFL1dFrfvMYOnFeSkEzpIzMuvrqGf7Uj3AXhtHu+kM=
 			</data>
 		</dict>
 		<key>Headers/SPUUserUpdateState.h</key>
@@ -1159,7 +1186,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			cNsMuwemjGrrOPZ87jtFgFcKNj7ZMR6YcRzR4mo5uZA=
+			I4qRxRzCFmkz5DXhz7uaUdbl8V53JCNnMAX8W2AUN+o=
 			</data>
 		</dict>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
@@ -1594,7 +1621,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			shkQwYfF0rI+GzhWoVLqI7A1hKTnRr/o4wnUFb3Vhik=
+			/sIr/9ihcLhTxpc9CG0ZmCyhtI5lxHnRU2AY2Z7KjnA=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -1603,7 +1630,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			lqPQJYKtJlVGV2/UpetCpxTEpb4u5aUUU9CjmZO2OaI=
+			Q6RJbOzFDzk17QpGPfUciOrtuitReWCBlt8ucofX2AM=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -1612,7 +1639,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			YqbMnU7mRpPLmsdD7YIXgMZkaxkkL5aaeoiv4bLN93I=
+			5GHHunaDv0dty7CogRs+i3C+zY3SkTVkReD90hjRdGk=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -1667,6 +1694,33 @@
 			<key>hash2</key>
 			<data>
 			tBjWBavMtayqool9JGs+xH56A2Kui/7dRQX27xG2jx0=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/nn.lproj/SUUpdateAlert.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			giHYMaf7DkBFSModZ1CL3EswwwGHyOmkxRjtDP6bmk8=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/nn.lproj/SUUpdatePermissionPrompt.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			V7VdecLbSo5sr8pMVUBnsJ04no1tM8XXsU/SHRWphs8=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>Resources/nn.lproj/Sparkle.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ouNyYGUrFy2VqYdwZnSn1emcGTGoyHGqb8Sb9Cg0cWk=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -2053,10 +2107,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			PgOLHKpBZ93Si56vUr5Ii03d+EE=
+			Q8oarfP8iotjC2Am/eNQdFG51vU=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"3e038b1caa4167ddd28b9eaf52be488b4dddf841" or cdhash H"bb968ec86a2dfefb1d120eb2d486fdc1b8324064"</string>
+			<string>cdhash H"43ca1aadf3fc8a8b630b6026fde3507451b9d6f5" or cdhash H"2d0a146991beab70a94091aca6a14596fac1d461"</string>
 		</dict>
 	</dict>
 	<key>rules</key>

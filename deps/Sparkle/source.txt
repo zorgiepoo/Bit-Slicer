@@ -1,6 +1,6 @@
 Source: https://github.com/sparkle-project/Sparkle
 Branch: 2.x
-Commit: 9e9830eb0f0099063cf5ccb8d48a188a122c869f
+Commit: 2e1bdb98f1eecb0fff0fdfc944570829fb708015
 
 Instructions:
 In ConfigCommon.xcconfig set deployment target and disable:
