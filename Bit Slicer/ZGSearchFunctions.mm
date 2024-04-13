@@ -3712,14 +3712,13 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 	ZGMemoryAddress minPointerAddress = searchData.beginAddress;
 	ZGMemoryAddress maxPointerAddress = searchData.endAddress;
 	
-	ZGMemorySize pointerSize = searchData.pointerSize;
 	ZGMemorySize indirectResultsStride = indirectSearchResults.stride;
 	for (NSData *resultSet in indirectResultSets)
 	{
 		const uint8_t *resultSetBytes = static_cast<const uint8_t *>(resultSet.bytes);
 		ZGMemorySize numberOfResults = static_cast<ZGMemorySize>(resultSet.length) / indirectResultsStride;
 		
-		uint8_t *newResultSetBytes = static_cast<uint8_t *>(calloc(numberOfResults, pointerSize));
+		ZGMemoryAddress *newResultSetBytes = static_cast<ZGMemoryAddress *>(calloc(numberOfResults, sizeof(*newResultSetBytes)));
 		
 		for (ZGMemorySize resultIndex = 0; resultIndex < numberOfResults; resultIndex++)
 		{
@@ -3731,21 +3730,10 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 				address = 0x0;
 			}
 			
-			switch (pointerSize)
-			{
-				case sizeof(ZGMemoryAddress):
-					memcpy(newResultSetBytes + resultIndex * pointerSize, &address, pointerSize);
-					break;
-				case sizeof(ZG32BitMemoryAddress):
-				{
-					ZG32BitMemoryAddress halfAddress = static_cast<ZG32BitMemoryAddress>(address);
-					memcpy(newResultSetBytes + resultIndex * pointerSize, &halfAddress, pointerSize);
-					break;
-				}
-			}
+			newResultSetBytes[resultIndex] = address;
 		}
 		
-		NSData *newResultSet = [[NSData alloc] initWithBytesNoCopy:newResultSetBytes length:numberOfResults * pointerSize];
+		NSData *newResultSet = [[NSData alloc] initWithBytesNoCopy:newResultSetBytes length:numberOfResults * sizeof(*newResultSetBytes)];
 		[directResultSets addObject:newResultSet];
 	}
 	
@@ -3762,7 +3750,7 @@ ZGSearchResults *ZGNarrowIndirectSearchForData(ZGMemoryMap processTask, BOOL tra
 	free(regionValues);
 	regionValues = nullptr;
 	
-	ZGSearchResults *directSearchResults = [[ZGSearchResults alloc] initWithResultSets:directResultSets resultType:ZGSearchResultTypeDirect dataType:dataType stride:pointerSize unalignedAccess:indirectSearchResults.unalignedAccess];
+	ZGSearchResults *directSearchResults = [[ZGSearchResults alloc] initWithResultSets:directResultSets resultType:ZGSearchResultTypeDirect dataType:dataType stride:sizeof(ZGMemoryAddress) unalignedAccess:indirectSearchResults.unalignedAccess];
 	
 	ZGSearchResults *narrowSearchResults = _ZGNarrowSearchForData(processTask, translated, searchData, delegate, dataType, integerQualifier, functionType, directSearchResults, nullptr, indirectSearchResults);
 	
