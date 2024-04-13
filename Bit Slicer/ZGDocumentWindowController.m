@@ -801,11 +801,11 @@
 		
 		if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
 		{
-			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:2];
-			[[_functionPopUpButton itemAtIndex:2] setTag:ZGGreaterThan];
+			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:2];
+			[[_functionPopUpButton itemAtIndex:2] setTag:ZGLessThan];
 			
-			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:3];
-			[[_functionPopUpButton itemAtIndex:3] setTag:ZGLessThan];
+			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:3];
+			[[_functionPopUpButton itemAtIndex:3] setTag:ZGGreaterThan];
 		}
 	}
 	
