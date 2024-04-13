@@ -661,7 +661,7 @@
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
-                            <rect key="frame" x="-3" y="-4" width="167" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="74" height="25"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -737,7 +737,7 @@
                     <toolbarItem implicitItemIdentifier="8E5DA537-8055-458D-9CED-FB55D84CC763" label="Operator" paletteLabel="Operator" title="Item_1" sizingBehavior="auto" id="moB-Wu-fvx">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Icp-Tb-DVJ">
-                            <rect key="frame" x="-3" y="-4" width="127" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="74" height="25"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -776,7 +776,7 @@
                     <toolbarItem implicitItemIdentifier="52E16CE5-DDC6-4458-A993-F5F7CF90040C" label="Search" paletteLabel="Search" sizingBehavior="auto" id="x8t-Jw-Hi9" userLabel="Search">
                         <nil key="toolTip"/>
                         <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WaT-8a-dxh">
-                            <rect key="frame" x="0.0" y="0.0" width="200" height="22"/>
+                            <rect key="frame" x="0.0" y="14" width="200" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Jey-Lt-NQ6"/>
                             </constraints>
@@ -785,6 +785,9 @@
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </searchFieldCell>
+                            <connections>
+                                <outlet property="nextKeyView" destination="hY6-jr-dYH" id="cDn-rZ-eyA"/>
+                            </connections>
                         </searchField>
                     </toolbarItem>
                 </allowedToolbarItems>
@@ -818,6 +821,7 @@
                     </textFieldCell>
                     <connections>
                         <action selector="changeFlags:" target="-2" id="DMV-A6-D8D"/>
+                        <outlet property="nextKeyView" destination="so8-Ni-dAC" id="qQT-S1-Jrv"/>
                     </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3S-5O-0jn">
@@ -864,6 +868,7 @@
                     </textFieldCell>
                     <connections>
                         <action selector="searchAddressOffsetDidChange:" target="-2" id="z8c-Qk-Ofr"/>
+                        <outlet property="nextKeyView" destination="krU-4S-mNx" id="uBW-Kz-9TD"/>
                     </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gI5-SN-blY">
@@ -889,6 +894,7 @@
                     </textFieldCell>
                     <connections>
                         <action selector="searchAddressMaxLevelsDidChange:" target="-2" id="4Bx-lw-0Vi"/>
+                        <outlet property="nextKeyView" destination="WaT-8a-dxh" id="kHM-Ss-j7G"/>
                     </connections>
                 </textField>
                 <box horizontalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="hE3-Lr-YU6">
