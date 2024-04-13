@@ -2667,7 +2667,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 	
 	[resultSets insertObjects:staticMainExecutableResultSets atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, staticMainExecutableResultSets.count)]];
 	
-	BOOL unalignedAccess = (dataAlignment == 1);
+	BOOL unalignedAccess = (dataAlignment == 1) || (previousSearchResults != nil && previousSearchResults.unalignedAccess);
 	ZGSearchResults *indirectSearchResults = [[ZGSearchResults alloc] initWithResultSets:[resultSets copy] resultType:ZGSearchResultTypeIndirect dataType:indirectDataType stride:stride unalignedAccess:unalignedAccess];
 	
 	indirectSearchResults.indirectMaxLevels = maxLevels;
