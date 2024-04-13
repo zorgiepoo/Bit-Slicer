@@ -87,6 +87,10 @@
 	[self updateNavigationButtons];
 }
 
+- (IBAction)toggleSearchType:(id)__unused sender
+{
+}
+
 - (IBAction)navigate:(id)sender
 {
 	switch ([(NSSegmentedControl *)sender selectedSegment])
@@ -142,6 +146,15 @@
 		{
 			return NO;
 		}
+	}
+	else if (userInterfaceItem.action == @selector(toggleSearchType:))
+	{
+		if ([(NSObject *)userInterfaceItem isKindOfClass:[NSMenuItem class]])
+		{
+			((NSMenuItem *)userInterfaceItem).hidden = YES;
+		}
+		
+		return NO;
 	}
 	
 	return [super validateUserInterfaceItem:userInterfaceItem];

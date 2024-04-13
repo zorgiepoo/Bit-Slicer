@@ -121,6 +121,9 @@
 /* Next Operator menu item title */
 "nextOperatorMenuItem" = "Следующий оператор";
 
+/* Toggle Search Type menu item title */
+"toggleSearchTypeMenuItem" = "Toggle Search Type";
+
 /* Title of Stored Value menu item in search menu of the search field */
 "storedValueTokenTitle" = "Сохраненное значение";
 

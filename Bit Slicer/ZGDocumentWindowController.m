@@ -1105,6 +1105,16 @@
 	[self selectNewFunctionTypeAtIndex:newIndex];
 }
 
+- (IBAction)toggleSearchType:(id)sender
+{
+	NSInteger selectedIndex = [_searchTypePopUpButton indexOfSelectedItem];
+	NSInteger newIndex = (selectedIndex + 1) % [_searchTypePopUpButton numberOfItems];
+	
+	NSMenuItem *newItem = [_searchTypePopUpButton itemAtIndex:newIndex];
+	[_searchTypePopUpButton selectItem:newItem];
+	[self changeSearchType:_searchTypePopUpButton];
+}
+
 - (IBAction)searchAddressMaxLevelsDidChange:(id)sender
 {
 	if (sender == _searchAddressMaxLevelsTextField)
@@ -1569,6 +1579,16 @@
 		{
 			menuItem.title = ZGLocalizableSearchDocumentString(@"nextOperatorMenuItem");
 		}
+		
+		if ([_searchController canCancelTask])
+		{
+			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(toggleSearchType:))
+	{
+		menuItem.hidden = NO;
+		menuItem.title = ZGLocalizableSearchDocumentString(@"toggleSearchTypeMenuItem");
 		
 		if ([_searchController canCancelTask])
 		{
