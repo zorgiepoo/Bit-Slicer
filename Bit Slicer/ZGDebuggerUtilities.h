@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
 + (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPointController:(ZGBreakPointController *)breakPointController;
 
-+ (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer processType:(ZGProcessType)processType error:(NSError **)error;
++ (nullable NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer processType:(ZGProcessType)processType error:(NSError **)error;
 
 + (nullable id<ZGDisassemblerObject>)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask processType:(ZGProcessType)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
 

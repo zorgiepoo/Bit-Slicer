@@ -224,8 +224,11 @@ static void ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(NSMutableArray<N
 	}
 	
 CREATE_NEW_RESULT_SETS:
-	_resultSets = [newResultSets copy];
-	_count = _resultCount(newResultSets, stride);
+	if (newResultSets != nil)
+	{
+		_resultSets = [newResultSets copy];
+		_count = _resultCount(newResultSets, stride);
+	}
 }
 
 @end

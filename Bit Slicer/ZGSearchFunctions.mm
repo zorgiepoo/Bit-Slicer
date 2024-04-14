@@ -2582,7 +2582,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 				NSMutableData *staticOtherLibrariesResultSet = staticOtherLibrariesResultSets[resultSetIndex];
 				
 				ZGMemoryAddress *currentBaseAddresses = static_cast<ZGMemoryAddress *>(calloc(maxLevels, sizeof(*currentBaseAddresses)));
-				int32_t *currentOffsets = static_cast<int32_t *>(calloc(maxLevels, sizeof(currentOffsets)));
+				int32_t *currentOffsets = static_cast<int32_t *>(calloc(maxLevels, sizeof(*currentOffsets)));
 				void *tempBuffer = static_cast<uint8_t *>(calloc(1, stride));
 				
 				NSData *previousIndirectResultSet = previousIndirectResultSets[resultSetIndex];

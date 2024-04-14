@@ -1269,6 +1269,8 @@
 					}
 				}
 				
+				free(indirectBuffer);
+				
 				ZGSearchResults *newSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] resultType:ZGSearchResultTypeIndirect dataType:dataType stride:currentIndirectStride unalignedAccess:narrowingUnalignedAddressAccess];
 				
 				newSearchResults.indirectMaxLevels = indirectMaxLevelsForCurrentSearchResults;
