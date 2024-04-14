@@ -171,7 +171,10 @@ static ZGMemorySize ZGPageSizeForRegionAlignment(ZGMemoryMap processTask, BOOL t
 	
 	resultSets = [self->_resultSets copy];
 	
-	if (_notifiesStaticResults)
+	// Storing value of non-changing ivar just to silence static analyzer
+	BOOL notifiesStaticResults = _notifiesStaticResults;
+	
+	if (notifiesStaticResults)
 	{
 		staticMainExecutableResultSets = [self->_staticMainExecutableResultSets copy];
 		staticOtherLibraryResultSets = [self->_staticOtherLibraryResultSets copy];
@@ -179,7 +182,7 @@ static ZGMemorySize ZGPageSizeForRegionAlignment(ZGMemoryMap processTask, BOOL t
 	
 	[_resultSets removeAllObjects];
 	
-	if (_notifiesStaticResults)
+	if (notifiesStaticResults)
 	{
 		[_staticMainExecutableResultSets removeAllObjects];
 		[_staticOtherLibraryResultSets removeAllObjects];
@@ -191,8 +194,8 @@ static ZGMemorySize ZGPageSizeForRegionAlignment(ZGMemoryMap processTask, BOOL t
 	if (resultSetsCount > 0)
 	{
 		NSUInteger resultSetsLength = ZGLengthForResultSets(resultSets);
-		NSUInteger staticMainExecutableResultSetsLength = _notifiesStaticResults ? ZGLengthForResultSets(staticMainExecutableResultSets) : 0;
-		NSUInteger staticOtherLibraryResultSetsLength = _notifiesStaticResults ? ZGLengthForResultSets(staticOtherLibraryResultSets) : 0;
+		NSUInteger staticMainExecutableResultSetsLength = notifiesStaticResults ? ZGLengthForResultSets(staticMainExecutableResultSets) : 0;
+		NSUInteger staticOtherLibraryResultSetsLength = notifiesStaticResults ? ZGLengthForResultSets(staticOtherLibraryResultSets) : 0;
 		
 		_searchProgress.numberOfVariablesFound += (resultSetsLength + staticMainExecutableResultSetsLength + staticOtherLibraryResultSetsLength) / self->_stride;
 		
@@ -231,7 +234,12 @@ static ZGMemorySize ZGPageSizeForRegionAlignment(ZGMemoryMap processTask, BOOL t
 	
 	if (_notifiesStaticResults)
 	{
+		// Assert just to silence static analyzer
+		assert(staticMainExecutableResultSet != nil);
 		[_staticMainExecutableResultSets addObject:staticMainExecutableResultSet];
+		
+		// Assert just to silence static analyzer
+		assert(staticOtherLibraryResultSet != nil);
 		[_staticOtherLibraryResultSets addObject:staticOtherLibraryResultSet];
 	}
 	
