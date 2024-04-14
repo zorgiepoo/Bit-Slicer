@@ -1328,6 +1328,7 @@
 					[[NSProcessInfo processInfo] endActivity:searchDataActivity];
 				}
 				
+				BOOL onlySingleNewNotableVariableFound;
 				if (!self->_searchProgress.shouldCancelSearch)
 				{
 					ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self->_searchProgress], nil);
@@ -1340,6 +1341,9 @@
 						
 						self->_searchResults = self->_temporarySearchResults;
 						self->_documentData.variables = notSearchedVariables;
+						
+						onlySingleNewNotableVariableFound = (self->_searchResults.count == 1 && self->_searchResults.resultType == ZGSearchResultTypeDirect);
+						
 						[self fetchVariablesFromResultsAndFinishedSearch:YES];
 						[windowController.variablesTableView reloadData];
 						
@@ -1352,12 +1356,16 @@
 						// New search didn't return any new results, so let's show old variables again
 						self->_documentData.variables = oldVariables;
 						[windowController.variablesTableView reloadData];
+						
+						onlySingleNewNotableVariableFound = NO;
 					}
 				}
 				else
 				{
 					self->_documentData.variables = oldVariables;
 					[windowController.variablesTableView reloadData];
+					
+					onlySingleNewNotableVariableFound = NO;
 				}
 				
 				dispatch_async(self->_machBinaryAnnotationInfoQueue, ^{
@@ -1375,18 +1383,10 @@
 				
 				// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what they were looking for.
 				// But don't do this if the user is searching for indirect variables
-				if (!pointerAddressSearch && !self->_searchProgress.shouldCancelSearch && self->_documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+				if (onlySingleNewNotableVariableFound)
 				{
-					NSArray<ZGVariable *> *filteredVariables = [self->_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
-						return variable.enabled;
-					}];
-					
-					// Make sure single variable is not indirect variable from a value search
-					if (filteredVariables.count == 1 && !filteredVariables[0].usesDynamicPointerAddress)
-					{
-						[windowController.window makeFirstResponder:windowController.variablesTableView];
-						shouldMakeSearchFieldFirstResponder = NO;
-					}
+					[windowController.window makeFirstResponder:windowController.variablesTableView];
+					shouldMakeSearchFieldFirstResponder = NO;
 				}
 				
 				[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
