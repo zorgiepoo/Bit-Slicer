@@ -825,12 +825,15 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		
 		NSArray<ZGInstruction *> *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process breakPointController:self->objcSelf->_breakPointController processType:self->processType];
 		
-		NSData * _Nonnull codeData = [NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len];
+		NSData *codeData = [NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len];
 		
 		NSError *error = nil;
 		BOOL injectedCode =
 		[ZGDebuggerUtilities
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull" // Ignore bogus warning
 		 injectCode:codeData
+#pragma clang diagnostic pop
 		 intoAddress:destinationAddress
 		 hookingIntoOriginalInstructions:originalInstructions
 		 process:self->objcSelf->_process
