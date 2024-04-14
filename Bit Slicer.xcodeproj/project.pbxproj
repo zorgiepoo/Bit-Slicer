@@ -2668,6 +2668,7 @@
 					"-Wno-auto-import",
 					"-Wno-c11-extensions",
 					"-Wno-declaration-after-statement",
+					"-Wno-c++98-compat-pedantic",
 				);
 			};
 			name = Debug;
@@ -2776,6 +2777,7 @@
 					"-Wno-auto-import",
 					"-Wno-c11-extensions",
 					"-Wno-declaration-after-statement",
+					"-Wno-c++98-compat-pedantic",
 				);
 			};
 			name = Release;
