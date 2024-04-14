@@ -2357,6 +2357,7 @@ ZGSearchResults *ZGSearchForIndirectPointer(ZGMemoryMap processTask, ZGSearchDat
 		{
 			narrowRegionsTableCount = regions.count;
 			narrowRegionsTable = static_cast<ZGRegionValue *>(calloc(narrowRegionsTableCount, sizeof(*narrowRegionsTable)));
+			assert(narrowRegionsTable != nullptr);
 		}
 		else
 		{
