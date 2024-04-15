@@ -186,10 +186,11 @@
 			return nil;
 		}
 		
-		if (!ZGUserTagIsStackOrHeapData(region.userTag))
+		NSValue *matchingSegmentRangeValue;
+		if (excludeStaticDataFromSystemLibraries)
 		{
 			NSUInteger binaryIndex = 0;
-			NSValue *matchingSegmentRangeValue = [totalStaticSegmentRanges zgBinarySearchUsingBlock:^NSComparisonResult(NSValue *__unsafe_unretained  _Nonnull currentValue) {
+			matchingSegmentRangeValue = [totalStaticSegmentRanges zgBinarySearchUsingBlock:^NSComparisonResult(NSValue *__unsafe_unretained  _Nonnull currentValue) {
 				NSRange totalSegmentRange = currentValue.rangeValue;
 				if (region.address + region.size <= totalSegmentRange.location)
 				{
@@ -212,17 +213,23 @@
 					NSString *filePath = filePaths[binaryIndex];
 					if ([filePath hasPrefix:@"/System/"] ||
 						([filePath hasPrefix:@"/usr/"] && ![filePath hasPrefix:@"/usr/local/"]) ||
-						[filePath hasPrefix:@"/Library/Apple/"])
+						[filePath hasPrefix:@"/Library/Apple/"] ||
+						[filePath containsString:@"/Xcode.app/"])
 					{
 						return nil;
 					}
 				}
 			}
-			else if (filterHeapAndStackData)
-			{
-				// We don't have stack/heap data and we don't have a static segment data
-				return nil;
-			}
+		}
+		else
+		{
+			matchingSegmentRangeValue = nil;
+		}
+		
+		if (filterHeapAndStackData && matchingSegmentRangeValue == nil && !ZGUserTagLikelyContainsProcessSpecificPointers(region.userTag))
+		{
+			// We don't have stack/heap data and we don't have a static segment data
+			return nil;
 		}
 		
 		return region;

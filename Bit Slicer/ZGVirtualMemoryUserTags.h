@@ -43,7 +43,7 @@ NSString * _Nullable ZGUserTagDescription(uint32_t userTag);
 NSString * _Nullable ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
 
 bool ZGUserTagIsSharedMemory(uint32_t userTag);
-bool ZGUserTagIsStackOrHeapData(uint32_t userTag);
+bool ZGUserTagLikelyContainsProcessSpecificPointers(uint32_t userTag);
 	
 NS_ASSUME_NONNULL_END
 	
