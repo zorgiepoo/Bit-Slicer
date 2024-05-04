@@ -38,6 +38,7 @@
 #import "ZGEditAddressWindowController.h"
 #import "ZGEditDescriptionWindowController.h"
 #import "ZGEditSizeWindowController.h"
+#import "ZGEditLabelWindowController.h"
 #import "ZGScriptManager.h"
 #import "ZGProcessList.h"
 #import "ZGProcess.h"
@@ -45,6 +46,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGPreferencesController.h"
 #import "ZGDocumentData.h"
+#import "ZGDocumentLabelController.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
@@ -97,6 +99,7 @@
 	ZGEditAddressWindowController * _Nullable _editAddressWindowController;
 	ZGEditDescriptionWindowController * _Nullable _editDescriptionWindowController;
 	ZGEditSizeWindowController * _Nullable _editSizeWindowController;
+	ZGEditLabelWindowController * _Nullable _editLabelWindowController;
 	
 	BOOL _loadedDocumentBefore;
 	NSString * _Nullable _flagsLabelStringValue;
@@ -306,6 +309,7 @@
 	_variableController = [[ZGVariableController alloc] initWithWindowController:self];
 	_searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
 	_scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
+	_labelController = [[ZGDocumentLabelController alloc] initWithDocumentData:_documentData];
 	
 	_searchValueTextField.target = self;
 	_searchValueTextField.action = @selector(searchValue:);
@@ -1392,6 +1396,19 @@
 			return NO;
 		}
 	}
+	
+	else if (menuItem.action == @selector(requestEditingVariableLabel:))
+	{
+		if ([_searchController canCancelTask] || [self selectedVariables].count < 1 || !self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		if ([(ZGVariable *)[self selectedVariables][0] type] == ZGScript)
+		{
+			return NO;
+		}
+	}
     
     else if (menuItem.action == @selector(requestEditingVariablesSize:))
     {
@@ -1908,6 +1925,16 @@
 	}
 	
 	[_editSizeWindowController requestEditingSizesFromVariables:[self selectedVariables] attachedToWindow:ZGUnwrapNullableObject(self.window)];
+}
+
+- (IBAction)requestEditingVariableLabel:(id)sender
+{
+	if (_editLabelWindowController == nil)
+	{
+		_editLabelWindowController = [[ZGEditLabelWindowController alloc] initWithVariableController:_variableController];
+	}
+	
+	[_editLabelWindowController requestEditingLabelsFromVariables:[self selectedVariables] attachedToWindow:ZGUnwrapNullableObject(self.window)];
 }
 
 - (IBAction)relativizeVariablesAddress:(id)__unused sender

@@ -50,6 +50,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGNameKey @"ZGNameKey" // legacy
 #define ZGDynamicAddressKey @"ZGIsPointerKey" // value is for backwards compatibility
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
+#define ZGLabelKey @"ZGLabelKey"
 #define ZGScriptKey @"ZGScriptKey"
 #define ZGScriptCachePathKey @"ZGScriptCachePathKey"
 #define ZGScriptCacheUUIDKey @"ZGScriptCacheUUIDKey"
@@ -114,6 +115,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 encodeObject:[self addressFormula]
 	 forKey:ZGAddressFormulaKey];
 	
+	[coder encodeObject:_label forKey:ZGLabelKey];
+	
 	if (_rawValue != nil)
 	{
 		[coder
@@ -168,6 +171,16 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		
 		_usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
 		_addressFormula = [coder decodeObjectOfClass:[NSString class] forKey:ZGAddressFormulaKey];
+
+		NSString *decodedLabel = [coder decodeObjectOfClass:[NSString class] forKey:ZGLabelKey];
+		if (decodedLabel != nil)
+		{
+			_label = decodedLabel;
+		}
+		else
+		{
+			_label = @"";
+		}
 		
 		NSAttributedString *variableDescription = [coder decodeObjectOfClass:[NSAttributedString class] forKey:ZGDescriptionKey];
 		if (variableDescription == nil)
@@ -312,6 +325,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		{
 			_fullAttributedDescription = [description copy];
 		}
+		
+		_label = @"";
 	}
 	
 	return self;

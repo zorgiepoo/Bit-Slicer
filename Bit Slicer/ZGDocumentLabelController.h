@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mayur Pawashe
+ * Copyright (c) 2024 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,32 +31,18 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "pythonlib.h"
 #import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
-
-@class ZGScriptingInterpreter;
-@class ZGScriptManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
-@class ZGDocumentLabelController;
-@class ZGVariableController;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
+@class ZGDocumentData;
+@class ZGVariable;
 
-+ (nullable PyObject *)loadPythonClassInMainModule:(PyObject *)module;
+@interface ZGDocumentLabelController : NSObject
 
-- (nullable id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager labelController:(ZGDocumentLabelController *)labelController variableController:(ZGVariableController *)variableController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
+- (instancetype)initWithDocumentData:(ZGDocumentData *)documentData;
 
-@property (nonatomic, weak, readonly) ZGScriptManager *scriptManager;
-@property (nonatomic, readonly, nullable) PyObject *object;
+- (nullable ZGVariable *)variableForLabel:(NSString *)label;
 
 @end
 

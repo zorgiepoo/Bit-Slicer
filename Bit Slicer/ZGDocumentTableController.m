@@ -207,6 +207,7 @@
 		NSString *newAddressString =
 			[ZGCalculator
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
+			 labelController:windowController.labelController
 			 process:windowController.currentProcess
 			 failedImages:_failedExecutableImages
 			 error:&error];
@@ -218,7 +219,8 @@
 		}
 		
 		// We don't have to evaluate it more than once if we're not doing any pointer calculations
-		if (error == nil && !variable.usesDynamicPointerAddress)
+		// and it's not using a label
+		if (error == nil && !variable.usesDynamicPointerAddress && !variable.usesDynamicLabelAddress)
 		{
 			variable.finishedEvaluatingDynamicAddress = YES;
 		}

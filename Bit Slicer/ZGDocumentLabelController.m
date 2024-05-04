@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mayur Pawashe
+ * Copyright (c) 2024 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,34 +30,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "pythonlib.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
+#import "ZGDocumentLabelController.h"
+#import "ZGDocumentData.h"
+#import "ZGVariable.h"
 
-@class ZGScriptingInterpreter;
-@class ZGScriptManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
-@class ZGDocumentLabelController;
-@class ZGVariableController;
+@implementation ZGDocumentLabelController
+{
+	ZGDocumentData *_documentData;
+}
 
-NS_ASSUME_NONNULL_BEGIN
+- (instancetype)initWithDocumentData:(ZGDocumentData *)documentData
+{
+	self = [super init];
+	if (self != nil)
+	{
+		_documentData = documentData;
+	}
+	return self;
+}
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
-
-+ (nullable PyObject *)loadPythonClassInMainModule:(PyObject *)module;
-
-- (nullable id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager labelController:(ZGDocumentLabelController *)labelController variableController:(ZGVariableController *)variableController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
-
-@property (nonatomic, weak, readonly) ZGScriptManager *scriptManager;
-@property (nonatomic, readonly, nullable) PyObject *object;
+- (nullable ZGVariable *)variableForLabel:(NSString *)label
+{
+	for (ZGVariable *variable in _documentData.variables)
+	{
+		if ([variable.label isEqualToString:label])
+		{
+			return variable;
+		}
+	}
+	return nil;
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

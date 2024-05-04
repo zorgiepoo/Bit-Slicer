@@ -34,9 +34,11 @@
 #import "ZGVariable.h"
 
 @class ZGProcess;
+@class ZGDocumentLabelController;
 
 #define ZGBaseAddressFunction @"base"
 #define ZGFindSymbolFunction @"symbol"
+#define ZGFindLabelFunction @"label"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL usesDynamicPointerAddress;
 @property (nonatomic, readonly) BOOL usesDynamicBaseAddress;
 @property (nonatomic, readonly) BOOL usesDynamicSymbolAddress;
+@property (nonatomic, readonly) BOOL usesDynamicLabelAddress;
 
 - (NSUInteger)numberOfDynamicPointersInAddress;
 
@@ -62,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
 // And also has a base() function that takes in a string, and returns the first address to a region such that the passed string partially matches the end of the corresponding region's mapped path
-+ (nullable NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess *)process failedImages:(nullable NSMutableArray<NSString *> *)failedImages error:(NSError **)error;
++ (nullable NSString *)evaluateExpression:(NSString *)expression labelController:(nullable ZGDocumentLabelController *)labelController process:(ZGProcess *)process failedImages:(nullable NSMutableArray<NSString *> *)failedImages error:(NSError **)error;
 + (nullable NSString *)evaluateAndSymbolicateExpression:(NSString *)expression process:(ZGProcess *)process currentAddress:(ZGMemoryAddress)currentAddress didSymbolicate:(nullable BOOL *)didSymbolicate error:(NSError **)error;
 
 @end

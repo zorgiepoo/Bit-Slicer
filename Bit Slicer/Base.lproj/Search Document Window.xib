@@ -145,6 +145,12 @@
                         <action selector="requestEditingVariablesValue:" target="-1" id="ne0-SG-W7g"/>
                     </connections>
                 </menuItem>
+                <menuItem title="edit_variable_label" id="amg-mC-Rhg">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="requestEditingVariableLabel:" target="-1" id="EI6-kT-9it"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="edit_variable_size" id="100822">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>

@@ -80,6 +80,7 @@ extern NSString *ZGVariablePboardType;
 @property (copy, nonatomic) NSAttributedString *fullAttributedDescription;
 @property (nonatomic, readonly) NSString *shortDescription;
 @property (nonatomic, readonly) NSString *name;
+@property (nonatomic, copy) NSString *label;
 
 - (id)initWithValue:(nullable const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize;
 

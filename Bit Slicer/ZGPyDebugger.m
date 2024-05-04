@@ -56,6 +56,8 @@
 #import "ZGHotKey.h"
 #import "ZGScriptPrompt.h"
 #import "ZGNullability.h"
+#import "ZGDocumentLabelController.h"
+#import "ZGVariableController.h"
 
 @class ZGPyDebugger;
 
@@ -106,6 +108,8 @@ declareDebugPrototypeMethod(stepOver)
 declareDebugPrototypeMethod(stepOut)
 declareDebugPrototypeMethod(backtrace)
 declareDebugPrototypeMethod(writeRegisters)
+declareDebugPrototypeMethod(updateVariable)
+declareDebugPrototypeMethod(variableAddress)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
 #define declareDebugMethod(name) declareDebugMethod2(name, METH_VARARGS)
@@ -142,6 +146,8 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(stepOut)
 	declareDebugMethod(backtrace)
 	declareDebugMethod(writeRegisters)
+	declareDebugMethod(updateVariable)
+	declareDebugMethod(variableAddress)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -195,6 +201,8 @@ static PyTypeObject DebuggerType =
 	__weak ZGScriptManager * _Nullable _scriptManager;
 	ZGBreakPointController * _Nonnull _breakPointController;
 	ZGLoggerWindowController * _Nonnull _loggerWindowController;
+	ZGDocumentLabelController *_Nonnull _labelController;
+	ZGVariableController *_Nonnull _variableController;
 	NSMutableDictionary<NSNumber *, NSNumber *> * _Nonnull _cachedInstructionPointers;
 	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
 	ZGProcess * _Nonnull _process;
@@ -230,7 +238,7 @@ static PyTypeObject DebuggerType =
 	return debuggerException;
 }
 
-- (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter  scriptManager:(ZGScriptManager *)scriptManager labelController:(ZGDocumentLabelController *)labelController variableController:(ZGVariableController *)variableController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super init];
 	if (self != nil)
@@ -245,6 +253,8 @@ static PyTypeObject DebuggerType =
 		_scriptManager = scriptManager;
 		_scriptingInterpreter = scriptingInterpreter;
 		_process = [[ZGProcess alloc] initWithProcess:process];
+		_labelController = labelController;
+		_variableController = variableController;
 		_breakPointController = breakPointController;
 		_loggerWindowController = loggerWindowController;
 		_hotKeyCenter = hotKeyCenter;
@@ -1463,6 +1473,86 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	}
 	
 	return success ? Py_BuildValue("") : NULL;
+}
+
+static PyObject *Debugger_updateVariable(DebuggerClass *self, PyObject *args)
+{
+	PyObject *addressObject;
+	char *labelCString = NULL;
+	if (!PyArg_ParseTuple(args, "sO:updateVariable", &labelCString, &addressObject))
+	{
+		return NULL;
+	}
+	
+	NSString *labelString = @(labelCString);
+	if (labelString == nil)
+	{
+		PyErr_SetString(PyExc_ValueError, "debug.updateVariable failed to interpret label");
+		
+		return NULL;
+	}
+	
+	PyObject *addressStringObject = PyObject_Str(addressObject);
+	PyObject *unicodeObject = PyUnicode_AsUTF8String(addressStringObject);
+	char *addressCString = PyBytes_AsString(unicodeObject);
+	
+	NSString *addressString = @(addressCString);
+	
+	Py_XDECREF(unicodeObject);
+	Py_XDECREF(addressStringObject);
+	
+	if (addressString == nil)
+	{
+		PyErr_SetString(PyExc_ValueError, "debug.updateVariable failed to interpret address, which must be a number or a string");
+		
+		return NULL;
+	}
+	
+	ZGDocumentLabelController *labelController = self->objcSelf->_labelController;
+	ZGVariableController *variableController = self->objcSelf->_variableController;
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		ZGVariable *variable = [labelController variableForLabel:labelString];
+		
+		[variableController editVariable:variable addressFormula:addressString];
+	});
+	
+	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_variableAddress(DebuggerClass *self, PyObject *args)
+{
+	char *labelCString = NULL;
+	if (!PyArg_ParseTuple(args, "s:variableAddress", &labelCString))
+	{
+		return NULL;
+	}
+	
+	NSString *labelString = @(labelCString);
+	if (labelString == nil)
+	{
+		PyErr_SetString(PyExc_ValueError, "debug.variableAddress failed to interpret label");
+		
+		return NULL;
+	}
+	
+	__block ZGMemoryAddress variableAddress;
+	__block BOOL foundAddress;
+	ZGDocumentLabelController *labelController = self->objcSelf->_labelController;
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		ZGVariable *variable = [labelController variableForLabel:labelString];
+		foundAddress = (variable != nil);
+		variableAddress = variable.address;
+	});
+	
+	if (!foundAddress)
+	{
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.variableAddress failed because a variable with label %@ could not be found", labelString] UTF8String]);
+		
+		return NULL;
+	}
+	
+	return Py_BuildValue("K", variableAddress);
 }
 
 @end
