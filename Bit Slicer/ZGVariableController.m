@@ -248,11 +248,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			
 			NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
 			
-			for (ZGVariable *variable in variablesToInsertArray)
-			{
-				variable.label = @"";
-			}
-			
 			[self
 			 addVariables:variablesToInsertArray
 			 atRowIndexes:indexesToInsert];
@@ -389,9 +384,36 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self updateFrozenActivity];
 }
 
+- (NSSet<NSString *> *)usedLabels
+{
+	NSMutableSet<NSString *> *labels = [[NSMutableSet alloc] init];
+	for (ZGVariable *variable in _documentData.variables)
+	{
+		NSString *label = variable.label;
+		if (label.length > 0)
+		{
+			[labels addObject:label];
+		}
+	}
+	
+	return labels;
+}
+
 - (void)addVariables:(NSArray<ZGVariable *> *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
+	
+	// Make sure we do not end up with duplicate labels
+	// New variables that have a label that already exists have their labels removed
+	NSSet<NSString *> *oldLabels = [self usedLabels];
+	for (ZGVariable *variable in variables)
+	{
+		NSString *label = variable.label;
+		if (label.length > 0 && [oldLabels containsObject:label])
+		{
+			variable.label = @"";
+		}
+	}
 	
 	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];

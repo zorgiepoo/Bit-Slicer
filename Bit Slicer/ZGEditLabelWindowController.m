@@ -34,6 +34,9 @@
 #import "ZGVariableController.h"
 #import "ZGVariable.h"
 #import "ZGNullability.h"
+#import "ZGRunAlertPanel.h"
+
+#define ZGEditLabelLocalizableTable @"[Code] Edit Variable Label"
 
 @implementation ZGEditLabelWindowController
 {
@@ -75,9 +78,7 @@
 
 - (IBAction)editVariablesLabels:(id)__unused sender
 {
-	NSWindow *window = ZGUnwrapNullableObject(self.window);
-	[NSApp endSheet:window];
-	[window close];
+	NSSet<NSString *> *usedLabels = _variableController.usedLabels;
 	
 	NSMutableArray<NSString *> *requestedLabels = [[NSMutableArray alloc] init];
 	
@@ -96,6 +97,18 @@
 			[requestedLabels addObject:[NSString stringWithFormat:@"%@_%lu", newLabel, variableIndex]];
 		}
 	}
+	
+	NSSet<NSString *> *requestedLabelsSet = [NSSet setWithArray:requestedLabels];
+	if ([usedLabels intersectsSet:requestedLabelsSet])
+	{
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"alreadyUsedLabelAlertTitle", ZGEditLabelLocalizableTable, nil), NSLocalizedStringFromTable(@"alreadyUsedLabelAlertMessage", ZGEditLabelLocalizableTable, nil));
+		
+		return;
+	}
+	
+	NSWindow *window = ZGUnwrapNullableObject(self.window);
+	[NSApp endSheet:window];
+	[window close];
 	
 	[_variableController editVariables:ZGUnwrapNullableObject(_variables) requestedLabels:requestedLabels];
 	
