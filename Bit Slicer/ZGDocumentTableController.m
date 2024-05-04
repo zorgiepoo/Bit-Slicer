@@ -209,7 +209,6 @@
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
 			 labelController:windowController.labelController
 			 process:windowController.currentProcess
-			 variable:variable
 			 failedImages:_failedExecutableImages
 			 error:&error];
 		
