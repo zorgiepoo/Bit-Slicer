@@ -121,18 +121,38 @@
 	
 	NSRange ordinalRange = [newRequestedLabel rangeOfString:@"$n" options:NSBackwardsSearch | NSLiteralSearch];
 	
-	NSUInteger variableIndex;
+	BOOL changedVariables = NO;
 	NSUInteger variableCount = _variables.count;
-	for (variableIndex = 0; variableIndex < variableCount; variableIndex++)
+	for (NSUInteger variableIndex = 0; variableIndex < variableCount; variableIndex++)
 	{
+		NSString *newLabel;
 		if (ordinalRange.location != NSNotFound)
 		{
-			[requestedLabels addObject:[newRequestedLabel stringByReplacingCharactersInRange:ordinalRange withString:[NSString stringWithFormat:@"%lu", variableIndex]]];
+			newLabel = [newRequestedLabel stringByReplacingCharactersInRange:ordinalRange withString:[NSString stringWithFormat:@"%lu", variableIndex]];
+			
+			[requestedLabels addObject:newLabel];
 		}
 		else
 		{
-			[requestedLabels addObject:newRequestedLabel];
+			newLabel = newRequestedLabel;
 		}
+		
+		if (![_variables[variableIndex].label isEqualToString:newLabel])
+		{
+			changedVariables = YES;
+		}
+		
+		[requestedLabels addObject:newLabel];
+	}
+	
+	if (!changedVariables)
+	{
+		// Nothing to change here
+		NSWindow *window = ZGUnwrapNullableObject(self.window);
+		[NSApp endSheet:window];
+		[window close];
+		
+		return;
 	}
 	
 	NSSet<NSString *> *requestedLabelsSet = [NSSet setWithArray:requestedLabels];
