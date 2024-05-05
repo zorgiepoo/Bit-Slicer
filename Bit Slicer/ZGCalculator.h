@@ -59,6 +59,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress expression:(NSString *)initialExpression process:(ZGProcess * __unsafe_unretained)process variableController:(nullable ZGVariableController * __unsafe_unretained)variableController failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages;
 
++ (nullable NSString *)extractFirstDependentLabelFromExpression:(NSString *)expression;
+
 + (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString * _Nullable * _Nonnull)additiveConstantString multiplicateConstant:(NSString *_Nullable * _Nonnull)multiplicativeConstantString;
 
 + (nullable NSString *)evaluateExpression:(NSString *)expression;

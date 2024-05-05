@@ -1307,7 +1307,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			NSString *label = variable.label;
 			
 			NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];
-			if (label.length > 0) [validDescriptionComponents addObject:[NSString stringWithFormat:@"Label %@", label]];
+			if (label.length > 0)
+			{
+				[validDescriptionComponents addObject:[NSString stringWithFormat:@"Label %@", label]];
+			}
+			else if (variable.usesDynamicLabelAddress)
+			{
+				NSString *dependentLabel = [ZGCalculator extractFirstDependentLabelFromExpression:variable.addressFormula];
+				
+				if (dependentLabel != nil)
+				{
+					[validDescriptionComponents addObject:[NSString stringWithFormat:@"→ Label %@", dependentLabel]];
+				}
+			}
+			
 			if (symbol.length > 0) [validDescriptionComponents addObject:symbol];
 			if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
 			if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];

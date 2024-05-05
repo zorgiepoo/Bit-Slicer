@@ -880,6 +880,80 @@
 	return YES;
 }
 
++ (nullable NSString *)_extractFirstDependentLabelFromExpression:(DDExpression *)expression
+{
+	switch (expression.expressionType)
+	{
+		case DDExpressionTypeFunction:
+		{
+			if ([expression.function isEqualToString:ZGFindLabelFunction])
+			{
+				if (expression.arguments.count != 1)
+				{
+					return nil;
+				}
+				
+				DDExpression *argumentExpression1 = expression.arguments[0];
+				if (argumentExpression1.expressionType != DDExpressionTypeVariable)
+				{
+					return nil;
+				}
+				
+				return argumentExpression1.variable;
+			}
+			
+			if (expression.arguments.count != 2)
+			{
+				return nil;
+			}
+			
+			DDExpression *argumentExpression1 = expression.arguments[0];
+			DDExpression *argumentExpression2 = expression.arguments[1];
+			
+			if (argumentExpression1.expressionType == DDExpressionTypeFunction && [argumentExpression1.function isEqualToString:ZGFindLabelFunction])
+			{
+				return [self _extractFirstDependentLabelFromExpression:argumentExpression1];
+			}
+			
+			if (argumentExpression2.expressionType == DDExpressionTypeFunction && [argumentExpression2.function isEqualToString:ZGFindLabelFunction])
+			{
+				return [self _extractFirstDependentLabelFromExpression:argumentExpression2];
+			}
+			
+			if (argumentExpression1.expressionType == DDExpressionTypeFunction)
+			{
+				NSString *dependentLabelCandidate1 = [self _extractFirstDependentLabelFromExpression:argumentExpression1];
+				if (dependentLabelCandidate1 != nil)
+				{
+					return dependentLabelCandidate1;
+				}
+			}
+			
+			if (argumentExpression2.expressionType == DDExpressionTypeFunction)
+			{
+				return [self _extractFirstDependentLabelFromExpression:argumentExpression1];
+			}
+			
+			return nil;
+		}
+		case DDExpressionTypeVariable:
+		case DDExpressionTypeNumber:
+			return nil;
+	}
+}
+
++ (nullable NSString *)extractFirstDependentLabelFromExpression:(NSString *)initialExpression
+{
+	NSError *expressionError = NULL;
+	DDExpression *expression = [DDExpression expressionFromString:initialExpression error:&expressionError];
+	if (expression == nil)
+	{
+		return nil;
+	}
+	
+	return [self _extractFirstDependentLabelFromExpression:expression];
+}
+
 + (BOOL)isValidExpression:(NSString *)expression
 {
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;
