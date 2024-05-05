@@ -1091,7 +1091,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		ZGMemoryAddress baseAddress = 0x0;
 		isIndirectVariable = [ZGCalculator extractIndirectBaseAddress:&baseAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages];
 		
-		variableAddress = baseAddress;
+		if (isIndirectVariable)
+		{
+			variableAddress = baseAddress;
+		}
+		else
+		{
+			variableAddress = variable.address;
+		}
 	}
 	else if (variable.usesDynamicPointerAddress)
 	{
