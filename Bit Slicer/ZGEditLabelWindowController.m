@@ -145,6 +145,14 @@
 	
 	BOOL changedVariables = NO;
 	NSUInteger variableCount = _variables.count;
+	
+	if (ordinalRange.location == NSNotFound && variableCount > 1 && newRequestedLabel.length > 0)
+	{
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"requireUsingOrdinalAlertTitle", ZGEditLabelLocalizableTable, nil), NSLocalizedStringFromTable(@"requireUsingOrdinalAlertMessage", ZGEditLabelLocalizableTable, nil));
+		
+		return;
+	}
+	
 	for (NSUInteger variableIndex = 0; variableIndex < variableCount; variableIndex++)
 	{
 		NSString *newLabel;
@@ -184,7 +192,14 @@
 	NSSet<NSString *> *requestedLabelsSet = [NSSet setWithArray:requestedLabels];
 	if ([usedLabels intersectsSet:requestedLabelsSet])
 	{
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"alreadyUsedLabelAlertTitle", ZGEditLabelLocalizableTable, nil), NSLocalizedStringFromTable(@"alreadyUsedLabelAlertMessage", ZGEditLabelLocalizableTable, nil));
+		if (requestedLabels.count == 1)
+		{
+			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"alreadyUsedLabelAlertTitle", ZGEditLabelLocalizableTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"alreadyUsedSingleLabelAlertMessageFormat", ZGEditLabelLocalizableTable, nil), requestedLabels.firstObject]);
+		}
+		else
+		{
+			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"alreadyUsedLabelAlertTitle", ZGEditLabelLocalizableTable, nil), NSLocalizedStringFromTable(@"alreadyUsedLabelAlertMessage", ZGEditLabelLocalizableTable, nil));
+		}
 		
 		return;
 	}

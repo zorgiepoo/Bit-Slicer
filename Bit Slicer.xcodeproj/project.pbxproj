@@ -17,6 +17,7 @@
 		720C192C271B4F9700740C8E /* ZGSearchProtectionMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */; };
 		72130FC82BE6836A00691AED /* ZGEditLabelWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72130FC62BE6836A00691AED /* ZGEditLabelWindowController.m */; };
 		72130FCC2BE83BF400691AED /* Edit Label Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72130FCB2BE83BF400691AED /* Edit Label Dialog.xib */; };
+		72130FD52BE84B4B00691AED /* [Code] Edit Variable Label.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72130FD32BE84B4B00691AED /* [Code] Edit Variable Label.strings */; };
 		721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
 		7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		721B3C4D2AED913200F85660 /* ZGSearchProtectionMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */; };
@@ -327,6 +328,9 @@
 		72130FCE2BE83BF900691AED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Edit Label Dialog.strings"; sourceTree = "<group>"; };
 		72130FD02BE83BFB00691AED /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "ru.lproj/Edit Label Dialog.strings"; sourceTree = "<group>"; };
 		72130FD22BE83BFC00691AED /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Edit Label Dialog.strings"; sourceTree = "<group>"; };
+		72130FD42BE84B4B00691AED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Edit Variable Label.strings"; sourceTree = "<group>"; };
+		72130FD62BE84B5B00691AED /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Edit Variable Label.strings"; sourceTree = "<group>"; };
+		72130FD72BE84B6400691AED /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Edit Variable Label.strings"; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
@@ -1034,6 +1038,7 @@
 				724A9F1B19A1657500E72C9D /* [Code] Variable Actions.strings */,
 				724A9F3719A813D600E72C9D /* [Code] Edit Variable Value.strings */,
 				724A9F3A19A8173900E72C9D /* [Code] Edit Variable Size.strings */,
+				72130FD32BE84B4B00691AED /* [Code] Edit Variable Label.strings */,
 				724A9F3D19A823C300E72C9D /* [Code] Search Document.strings */,
 				724A9F4F19A8F54600E72C9D /* [Code] Search Document.stringsdict */,
 				724A9F4019A85D3F00E72C9D /* [Code] Search Table.strings */,
@@ -1616,6 +1621,7 @@
 				722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */,
 				726CA2B619606DD200A6AD40 /* Change Memory Protection Dialog.xib in Resources */,
 				724A9F3919A813D600E72C9D /* [Code] Edit Variable Value.strings in Resources */,
+				72130FD52BE84B4B00691AED /* [Code] Edit Variable Label.strings in Resources */,
 				724A9F2919A1657500E72C9D /* [Code] Variable Actions.strings in Resources */,
 				724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */,
 				726CA2BF19606DF200A6AD40 /* Software Update View.xib in Resources */,
@@ -1847,6 +1853,16 @@
 			);
 			name = "Edit Label Dialog.xib";
 			path = "Bit Slicer";
+			sourceTree = "<group>";
+		};
+		72130FD32BE84B4B00691AED /* [Code] Edit Variable Label.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				72130FD42BE84B4B00691AED /* en */,
+				72130FD62BE84B5B00691AED /* es */,
+				72130FD72BE84B6400691AED /* ru */,
+			);
+			name = "[Code] Edit Variable Label.strings";
 			sourceTree = "<group>";
 		};
 		7231440C19C6230F00FBE342 /* [Code] Watch Variable.stringsdict */ = {
