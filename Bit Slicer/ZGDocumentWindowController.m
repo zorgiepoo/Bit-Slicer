@@ -1397,14 +1397,19 @@
 	
 	else if (menuItem.action == @selector(requestEditingVariableLabel:))
 	{
+		menuItem.title = ([self selectedVariables].count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableLabelsTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableLabelTitle");
+		
 		if ([_searchController canCancelTask] || [self selectedVariables].count < 1 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
 		
-		if ([(ZGVariable *)[self selectedVariables][0] type] == ZGScript)
+		for (ZGVariable *variable in [self selectedVariables])
 		{
-			return NO;
+			if (variable.type == ZGScript)
+			{
+				return NO;
+			}
 		}
 	}
     
