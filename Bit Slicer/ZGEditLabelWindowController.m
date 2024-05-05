@@ -66,8 +66,43 @@
 	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	ZGVariable *firstVariable = [variables objectAtIndex:0];
+	NSString *firstVariableLabel = firstVariable.label;
 	
-	_labelTextField.stringValue = firstVariable.label;
+	NSString *labelStringValue;
+	NSString *labelPlaceholderStringValue;
+	
+	if (variables.count > 1)
+	{
+		if (firstVariableLabel.length == 0)
+		{
+			labelStringValue = @"";
+			labelPlaceholderStringValue = @"Foo_%n";
+		}
+		else
+		{
+			NSRange digitsRange = [firstVariableLabel rangeOfCharacterFromSet:NSCharacterSet.decimalDigitCharacterSet options:NSBackwardsSearch | NSLiteralSearch];
+			
+			if (digitsRange.location != NSNotFound)
+			{
+				labelStringValue = [NSString stringWithFormat:@"%@$n", [firstVariableLabel substringToIndex:digitsRange.location]];
+			}
+			else
+			{
+				labelStringValue = [NSString stringWithFormat:@"%@_$n", firstVariableLabel];
+			}
+			
+			labelPlaceholderStringValue = @"";
+		}
+	}
+	else
+	{
+		labelStringValue = firstVariableLabel;
+		labelPlaceholderStringValue = @"";
+	}
+	
+	_labelTextField.stringValue = labelStringValue;
+	_labelTextField.placeholderString = labelPlaceholderStringValue;
+	
 	[_labelTextField selectText:nil];
 	
 	_variables = variables;
@@ -82,19 +117,21 @@
 	
 	NSMutableArray<NSString *> *requestedLabels = [[NSMutableArray alloc] init];
 	
-	NSString *newLabel = _labelTextField.stringValue;
+	NSString *newRequestedLabel = _labelTextField.stringValue;
+	
+	NSRange ordinalRange = [newRequestedLabel rangeOfString:@"$n" options:NSBackwardsSearch | NSLiteralSearch];
 	
 	NSUInteger variableIndex;
 	NSUInteger variableCount = _variables.count;
 	for (variableIndex = 0; variableIndex < variableCount; variableIndex++)
 	{
-		if (variableCount == 1)
+		if (ordinalRange.location != NSNotFound)
 		{
-			[requestedLabels addObject:newLabel];
+			[requestedLabels addObject:[newRequestedLabel stringByReplacingCharactersInRange:ordinalRange withString:[NSString stringWithFormat:@"%lu", variableIndex]]];
 		}
 		else
 		{
-			[requestedLabels addObject:[NSString stringWithFormat:@"%@_%lu", newLabel, variableIndex]];
+			[requestedLabels addObject:newRequestedLabel];
 		}
 	}
 	
