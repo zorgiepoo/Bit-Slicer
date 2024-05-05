@@ -127,8 +127,6 @@
 	_labelTextField.stringValue = labelStringValue;
 	_labelTextField.placeholderString = labelPlaceholderStringValue;
 	
-	[_labelTextField selectText:nil];
-	
 	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
 	}];
 }
