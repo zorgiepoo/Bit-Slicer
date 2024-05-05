@@ -135,7 +135,7 @@
 
 - (IBAction)editVariablesLabels:(id)__unused sender
 {
-	NSSet<NSString *> *usedLabels = _variableController.usedLabels;
+	NSMutableSet<NSString *> *usedLabels = [_variableController.usedLabels mutableCopy];
 	
 	NSMutableArray<NSString *> *requestedLabels = [[NSMutableArray alloc] init];
 	
@@ -151,8 +151,6 @@
 		if (ordinalRange.location != NSNotFound)
 		{
 			newLabel = [newRequestedLabel stringByReplacingCharactersInRange:ordinalRange withString:[NSString stringWithFormat:@"%lu", variableIndex]];
-			
-			[requestedLabels addObject:newLabel];
 		}
 		else
 		{
@@ -162,6 +160,12 @@
 		if (![_variables[variableIndex].label isEqualToString:newLabel])
 		{
 			changedVariables = YES;
+		}
+		else
+		{
+			// If a label hasn't changed, we don't care about recording it
+			// usedLabels is later used to test we don't have duplicate labels
+			[usedLabels removeObject:newLabel];
 		}
 		
 		[requestedLabels addObject:newLabel];
