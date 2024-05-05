@@ -519,7 +519,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
 	
 	if (variable.type != ZGScript) {
-		[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+		[self annotateVariablesAutomatically:@[variable] process:windowController.currentProcess];
 	}
 }
 
@@ -984,7 +984,26 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	variable.finishedEvaluatingDynamicAddress = NO;
 	
-	[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+	NSMutableArray<ZGVariable *> *variablesToAnnotate = [NSMutableArray arrayWithObject:variable];
+	if (variable.label.length > 0)
+	{
+		// Other variables may be referencing this variable
+		// We will want to update their annotations too
+		for (ZGVariable *otherVariable in _documentData.variables)
+		{
+			if (otherVariable == variable)
+			{
+				continue;
+			}
+			
+			if (otherVariable.usesDynamicLabelAddress)
+			{
+				[variablesToAnnotate addObject:otherVariable];
+			}
+		}
+	}
+	
+	[self annotateVariablesAutomatically:variablesToAnnotate process:windowController.currentProcess];
 	
 	[windowController updateSearchAddressOptions];
 }
@@ -1014,7 +1033,22 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	
 	// Re-annotate the variables so the labels are in the descriptions
-	[self annotateVariablesAutomatically:variables process:windowController.currentProcess];
+	// Also annotate other variables that may be referencing these edited variables
+	NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
+	for (ZGVariable *otherVariable in _documentData.variables)
+	{
+		if ([variablesToAnnotate containsObject:otherVariable])
+		{
+			continue;
+		}
+		
+		if (otherVariable.usesDynamicLabelAddress)
+		{
+			[variablesToAnnotate addObject:otherVariable];
+		}
+	}
+	
+	[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
 }
 
 #pragma mark Relativizing Variable Addresses
@@ -1054,7 +1088,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		// It's not obvious if a variable that uses a label is indirect or not, so we will need
 		// to try computing the indirect base address to find out
-		isIndirectVariable = [ZGCalculator extractIndirectBaseAddress:&variableAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages];
+		ZGMemoryAddress baseAddress = 0x0;
+		isIndirectVariable = [ZGCalculator extractIndirectBaseAddress:&baseAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages];
+		
+		variableAddress = baseAddress;
 	}
 	else if (variable.usesDynamicPointerAddress)
 	{
@@ -1193,11 +1230,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[[self class] annotateVariables:variablesToAnnotate process:process variableController:self symbols:YES async:YES completionHandler:^{
 		[windowController.variablesTableView reloadData];
 	}];
-}
-
-- (void)annotateVariableAutomatically:(ZGVariable *)variable process:(ZGProcess *)process
-{
-	[self annotateVariablesAutomatically:@[variable] process:process];
 }
 
 + (ZGMachBinaryAnnotationInfo)machBinaryAnnotationInfoForProcess:(ZGProcess *)process
