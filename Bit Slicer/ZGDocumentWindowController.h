@@ -55,7 +55,6 @@
 @class ZGHotKeyCenter;
 @class ZGDocument;
 @class ZGAppTerminationState;
-@class ZGDocumentLabelController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -78,7 +77,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ZGVariableController *variableController;
 @property (nonatomic, readonly) ZGDocumentSearchController *searchController;
 @property (nonatomic, readonly) ZGScriptManager *scriptManager;
-@property (nonatomic, readonly) ZGDocumentLabelController *labelController;
 
 @property (nonatomic, readonly) ZGDocumentData *documentData;
 @property (nonatomic, readonly) ZGSearchData *searchData;

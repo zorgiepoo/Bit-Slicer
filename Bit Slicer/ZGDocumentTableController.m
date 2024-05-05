@@ -207,7 +207,7 @@
 		NSString *newAddressString =
 			[ZGCalculator
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
-			 labelController:windowController.labelController
+			 variableController:windowController.variableController
 			 process:windowController.currentProcess
 			 failedImages:_failedExecutableImages
 			 error:&error];

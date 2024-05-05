@@ -46,7 +46,6 @@
 #import "ZGRunningProcess.h"
 #import "ZGPreferencesController.h"
 #import "ZGDocumentData.h"
-#import "ZGDocumentLabelController.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
@@ -309,7 +308,6 @@
 	_variableController = [[ZGVariableController alloc] initWithWindowController:self];
 	_searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
 	_scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
-	_labelController = [[ZGDocumentLabelController alloc] initWithDocumentData:_documentData];
 	
 	_searchValueTextField.target = self;
 	_searchValueTextField.action = @selector(searchValue:);

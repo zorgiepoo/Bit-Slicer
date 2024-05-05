@@ -56,7 +56,6 @@
 #import "ZGHotKey.h"
 #import "ZGScriptPrompt.h"
 #import "ZGNullability.h"
-#import "ZGDocumentLabelController.h"
 #import "ZGVariableController.h"
 
 @class ZGPyDebugger;
@@ -201,7 +200,6 @@ static PyTypeObject DebuggerType =
 	__weak ZGScriptManager * _Nullable _scriptManager;
 	ZGBreakPointController * _Nonnull _breakPointController;
 	ZGLoggerWindowController * _Nonnull _loggerWindowController;
-	ZGDocumentLabelController *_Nonnull _labelController;
 	ZGVariableController *_Nonnull _variableController;
 	NSMutableDictionary<NSNumber *, NSNumber *> * _Nonnull _cachedInstructionPointers;
 	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
@@ -238,7 +236,7 @@ static PyTypeObject DebuggerType =
 	return debuggerException;
 }
 
-- (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter  scriptManager:(ZGScriptManager *)scriptManager labelController:(ZGDocumentLabelController *)labelController variableController:(ZGVariableController *)variableController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter  scriptManager:(ZGScriptManager *)scriptManager variableController:(ZGVariableController *)variableController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super init];
 	if (self != nil)
@@ -253,7 +251,6 @@ static PyTypeObject DebuggerType =
 		_scriptManager = scriptManager;
 		_scriptingInterpreter = scriptingInterpreter;
 		_process = [[ZGProcess alloc] initWithProcess:process];
-		_labelController = labelController;
 		_variableController = variableController;
 		_breakPointController = breakPointController;
 		_loggerWindowController = loggerWindowController;
@@ -1508,11 +1505,10 @@ static PyObject *Debugger_updateVariable(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGDocumentLabelController *labelController = self->objcSelf->_labelController;
 	ZGVariableController *variableController = self->objcSelf->_variableController;
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		ZGVariable *variable = [labelController variableForLabel:labelString];
+		ZGVariable *variable = [variableController variableForLabel:labelString];
 		
 		[variableController editVariable:variable addressFormula:addressString];
 	});
@@ -1538,9 +1534,9 @@ static PyObject *Debugger_variableAddress(DebuggerClass *self, PyObject *args)
 	
 	__block ZGMemoryAddress variableAddress;
 	__block BOOL foundAddress;
-	ZGDocumentLabelController *labelController = self->objcSelf->_labelController;
+	ZGVariableController *variableController = self->objcSelf->_variableController;
 	dispatch_sync(dispatch_get_main_queue(), ^{
-		ZGVariable *variable = [labelController variableForLabel:labelString];
+		ZGVariable *variable = [variableController variableForLabel:labelString];
 		foundAddress = (variable != nil);
 		variableAddress = variable.address;
 	});

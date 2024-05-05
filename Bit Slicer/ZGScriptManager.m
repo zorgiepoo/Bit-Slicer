@@ -585,7 +585,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		
 		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess virtualMemoryException:(PyObject * _Nonnull)self->_scriptingInterpreter.virtualMemoryException];
 		
-		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptingInterpreter:self->_scriptingInterpreter scriptManager:self labelController:windowController.labelController variableController:windowController.variableController breakPointController:windowController.breakPointController hotKeyCenter:windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
+		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptingInterpreter:self->_scriptingInterpreter scriptManager:self variableController:windowController.variableController breakPointController:windowController.breakPointController hotKeyCenter:windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
 		
 		script.virtualMemoryInstance = virtualMemoryInstance;
 		script.debuggerInstance = debuggerInstance;

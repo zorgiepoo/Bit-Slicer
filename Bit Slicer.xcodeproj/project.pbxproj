@@ -15,7 +15,6 @@
 		7208450624E084F400F3D449 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7208450524E084F400F3D449 /* Python.framework */; };
 		7208450724E0851000F3D449 /* Python.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7208450524E084F400F3D449 /* Python.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		720C192C271B4F9700740C8E /* ZGSearchProtectionMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */; };
-		72130FC42BE67E2000691AED /* ZGDocumentLabelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72130FC32BE67E2000691AED /* ZGDocumentLabelController.m */; };
 		72130FC82BE6836A00691AED /* ZGEditLabelWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72130FC62BE6836A00691AED /* ZGEditLabelWindowController.m */; };
 		72130FC92BE6836A00691AED /* Edit Label Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72130FC72BE6836A00691AED /* Edit Label Dialog.xib */; };
 		721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
@@ -322,8 +321,6 @@
 		720C1929271B46B600740C8E /* ReadMe.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ReadMe.md; sourceTree = "<group>"; };
 		720C192A271B4F9700740C8E /* ZGSearchProtectionMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGSearchProtectionMode.h; path = "Bit Slicer/ZGSearchProtectionMode.h"; sourceTree = "<group>"; };
 		720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGSearchProtectionMode.m; path = "Bit Slicer/ZGSearchProtectionMode.m"; sourceTree = "<group>"; };
-		72130FC22BE67E2000691AED /* ZGDocumentLabelController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGDocumentLabelController.h; path = "Bit Slicer/ZGDocumentLabelController.h"; sourceTree = "<group>"; };
-		72130FC32BE67E2000691AED /* ZGDocumentLabelController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentLabelController.m; path = "Bit Slicer/ZGDocumentLabelController.m"; sourceTree = "<group>"; };
 		72130FC52BE6836A00691AED /* ZGEditLabelWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGEditLabelWindowController.h; path = "Bit Slicer/ZGEditLabelWindowController.h"; sourceTree = "<group>"; };
 		72130FC62BE6836A00691AED /* ZGEditLabelWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGEditLabelWindowController.m; path = "Bit Slicer/ZGEditLabelWindowController.m"; sourceTree = "<group>"; };
 		72130FC72BE6836A00691AED /* Edit Label Dialog.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "Edit Label Dialog.xib"; path = "Bit Slicer/Edit Label Dialog.xib"; sourceTree = "<group>"; };
@@ -1341,8 +1338,6 @@
 				77F115F917D2EE6F009E002A /* ZGDocumentSearchController.m */,
 				77F115FB17D2EE7E009E002A /* ZGDocumentTableController.h */,
 				77F115FC17D2EE7E009E002A /* ZGDocumentTableController.m */,
-				72130FC22BE67E2000691AED /* ZGDocumentLabelController.h */,
-				72130FC32BE67E2000691AED /* ZGDocumentLabelController.m */,
 				77FFC104186BDA3600122357 /* ZGWatchVariableWindowController.h */,
 				77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */,
 				7739728017D26A1600B958EE /* Scripting */,
@@ -1719,7 +1714,6 @@
 				773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */,
 				77FFC107186BDA3600122357 /* ZGWatchVariableWindowController.m in Sources */,
 				77F115A817D2E87E009E002A /* VDKQueue.m in Sources */,
-				72130FC42BE67E2000691AED /* ZGDocumentLabelController.m in Sources */,
 				77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */,
 				77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */,
 				77282123189E769B0044E4BC /* ZGStoredData.m in Sources */,

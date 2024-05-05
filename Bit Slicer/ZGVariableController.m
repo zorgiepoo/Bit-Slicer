@@ -399,6 +399,18 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	return labels;
 }
 
+- (nullable ZGVariable *)variableForLabel:(NSString *)label
+{
+	for (ZGVariable *variable in _documentData.variables)
+	{
+		if ([variable.label isEqualToString:label])
+		{
+			return variable;
+		}
+	}
+	return nil;
+}
+
 - (void)addVariables:(NSArray<ZGVariable *> *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;

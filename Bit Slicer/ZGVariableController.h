@@ -91,6 +91,8 @@ typedef struct
 - (void)editVariables:(NSArray<ZGVariable *> *)variables requestedSizes:(NSArray<NSNumber *> *)requestedSizes;
 - (void)editVariables:(NSArray<ZGVariable *> *)variables requestedLabels:(NSArray<NSString *> *)requestedLabels;
 
+- (nullable ZGVariable *)variableForLabel:(NSString *)label;
+
 @property (nonatomic, readonly) NSSet<NSString *> *usedLabels;
 
 @end
