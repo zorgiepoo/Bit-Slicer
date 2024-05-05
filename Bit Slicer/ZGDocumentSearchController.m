@@ -159,7 +159,7 @@
 	
 	// If we are doing a pointer address search, the variable must have a dynamic pointer address
 	// If we are doing a regular value search, variable could be a normal address or dynamic pointer address (as long as it's a 64-bit process)
-	return (variable.enabled && variable.type == dataType && !variable.isFrozen) && (!pointerAddressSearch || variable.usesDynamicPointerAddress) && !variable.usesDynamicSymbolAddress;
+	return (variable.enabled && variable.type == dataType && !variable.isFrozen) && (!pointerAddressSearch || variable.usesDynamicPointerAddress) && !variable.usesDynamicSymbolAddress && !variable.usesDynamicLabelAddress && variable.label.length == 0;
 }
 
 - (BOOL)canStartTask

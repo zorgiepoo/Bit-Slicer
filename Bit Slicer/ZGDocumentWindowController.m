@@ -962,7 +962,7 @@
 					ZGVariable *foundDirectVariable = nil;
 					for (ZGVariable *variable in _documentData.variables)
 					{
-						if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
+						if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && !variable.usesDynamicLabelAddress && variable.label.length == 0 && variable.stringValue.length > 0)
 						{
 							if (variable.usesDynamicPointerAddress)
 							{
