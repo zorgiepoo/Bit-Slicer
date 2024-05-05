@@ -44,6 +44,8 @@
 	NSArray<ZGVariable *> * _Nullable _variables;
 	
 	IBOutlet NSTextField *_labelTextField;
+	IBOutlet NSTextField *_multipleSelectionExplanationTextField;
+	IBOutlet NSButton *_cancelButton;
 }
 
 - (NSString *)windowNibName
@@ -61,8 +63,30 @@
 	return self;
 }
 
+- (void)windowDidLoad
+{
+	if (_variables.count == 1)
+	{
+		[_multipleSelectionExplanationTextField removeFromSuperview];
+		
+		NSLayoutConstraint *layoutConstraint =
+		[NSLayoutConstraint
+		 constraintWithItem:_labelTextField
+		 attribute:NSLayoutAttributeBottom
+		 relatedBy:NSLayoutRelationEqual
+		 toItem:_cancelButton
+		 attribute:NSLayoutAttributeTop
+		 multiplier:1.0
+		 constant:-12.0];
+		
+		[self.window.contentView addConstraint:layoutConstraint];
+	}
+}
+
 - (void)requestEditingLabelsFromVariables:(NSArray<ZGVariable *> *)variables attachedToWindow:(NSWindow *)parentWindow
 {
+	_variables = variables;
+	
 	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	ZGVariable *firstVariable = [variables objectAtIndex:0];
@@ -104,8 +128,6 @@
 	_labelTextField.placeholderString = labelPlaceholderStringValue;
 	
 	[_labelTextField selectText:nil];
-	
-	_variables = variables;
 	
 	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
 	}];

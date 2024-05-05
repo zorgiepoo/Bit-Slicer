@@ -1935,10 +1935,10 @@
 
 - (IBAction)requestEditingVariableLabel:(id)sender
 {
-	if (_editLabelWindowController == nil)
-	{
-		_editLabelWindowController = [[ZGEditLabelWindowController alloc] initWithVariableController:_variableController];
-	}
+	// We will always instantiate a new ZGEditLabelWindowController
+	// because its window view may differ based on if a single or
+	// multiple variable labels are being edited
+	_editLabelWindowController = [[ZGEditLabelWindowController alloc] initWithVariableController:_variableController];
 	
 	[_editLabelWindowController requestEditingLabelsFromVariables:[self selectedVariables] attachedToWindow:ZGUnwrapNullableObject(self.window)];
 }

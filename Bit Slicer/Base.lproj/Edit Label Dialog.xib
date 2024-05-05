@@ -8,7 +8,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGEditLabelWindowController">
             <connections>
+                <outlet property="_cancelButton" destination="8CG-ND-ekn" id="mLV-Jc-q1p"/>
                 <outlet property="_labelTextField" destination="tPv-2m-2zz" id="Th2-F2-zwX"/>
+                <outlet property="_multipleSelectionExplanationTextField" destination="ICq-SA-Bcg" id="LNc-17-VxA"/>
                 <outlet property="window" destination="NC3-BH-hKw" id="0Wh-qC-PEv"/>
             </connections>
         </customObject>
