@@ -1479,7 +1479,8 @@
 		BOOL watchingBaseAccesses = (menuItem.action == @selector(watchVariableBaseAddress:));
 		if (watchingBaseAccesses)
 		{
-			menuItem.hidden = !selectedVariable.usesDynamicPointerAddress;
+			// Hide menu item for now, but unhide if it we are able to retrieve a base address
+			menuItem.hidden = YES;
 		}
 		
 		if (selectedVariable.type == ZGScript)
@@ -1499,6 +1500,8 @@
 			{
 				return NO;
 			}
+			
+			menuItem.hidden = NO;
 			
 			targetMemoryAddress = baseAddress;
 			targetMemorySize = self.currentProcess.pointerSize;
@@ -1955,7 +1958,7 @@
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];
 			[self->_variableController addVariables:foundVariables atRowIndexes:rowIndexes];
 			[self->_variablesTableView scrollRowToVisible:0];
-			[ZGVariableController annotateVariables:foundVariables process:self.currentProcess symbols:YES async:YES completionHandler:^{
+			[ZGVariableController annotateVariables:foundVariables process:self.currentProcess variableController:nil symbols:YES async:YES completionHandler:^{
 				[self->_variablesTableView reloadData];
 			}];
 		}

@@ -715,7 +715,7 @@
 {
 	ZGVariable *variable = [self _variableFromSelectedAddressRange];
 	
-	[ZGVariableController annotateVariables:@[variable] process:self.currentProcess symbols:NO async:NO completionHandler:^{
+	[ZGVariableController annotateVariables:@[variable] process:self.currentProcess variableController:nil symbols:NO async:NO completionHandler:^{
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
 		[[NSPasteboard generalPasteboard] setString:variable.addressFormula forType:NSPasteboardTypeString];
 	}];

@@ -232,7 +232,7 @@
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	return [ZGCalculator extractIndirectBaseAddress:outBaseAddress expression:variable.addressFormula process:windowController.currentProcess failedImages:_failedExecutableImages];
+	return [ZGCalculator extractIndirectBaseAddress:outBaseAddress expression:variable.addressFormula process:windowController.currentProcess variableController:windowController.variableController failedImages:_failedExecutableImages];
 }
 
 - (void)updateWatchVariablesTable:(NSTimer *)__unused timer

@@ -740,61 +740,98 @@
 	return YES;
 }
 
-+ (BOOL)_extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress expression:(DDExpression *)expression process:(ZGProcess *)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages
++ (BOOL)_extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress foundPointerFunction:(BOOL *)foundPointerFunction expression:(DDExpression *)expression process:(ZGProcess *)process variableController:(ZGVariableController *)variableController visitedLabels:(NSMutableSet<NSString *> *)visitedLabels failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages
 {
 	switch (expression.expressionType)
 	{
 		case DDExpressionTypeFunction:
-			if (([expression.function isEqualToString:@"add"] || [expression.function isEqualToString:@"subtract"]) && expression.arguments.count == 2)
+			if ([expression.function isEqualToString:ZGFindLabelFunction] && expression.arguments.count == 1)
+			{
+				DDExpression *argumentExpression = expression.arguments[0];
+				if (argumentExpression.expressionType != DDExpressionTypeVariable)
+				{
+					return NO;
+				}
+				
+				NSString *label = argumentExpression.variable;
+				
+				if ([visitedLabels containsObject:label])
+				{
+					// Prevent recursive/cyclic lookups
+					return NO;
+				}
+				
+				ZGVariable *labelVariable = [variableController variableForLabel:label];
+				if (labelVariable == nil)
+				{
+					return NO;
+				}
+				
+				// Recurse into the labeled variable's address
+				NSString *addressFormula = labelVariable.addressFormula;
+				NSString *substitutedAddressFormulaExpression = [ZGCalculator expressionBySubstitutingCalculatePointerFunctionInExpression:addressFormula];
+				
+				NSError *expressionError = NULL;
+				DDExpression *addressFormulaExpression = [DDExpression expressionFromString:substitutedAddressFormulaExpression error:&expressionError];
+				if (addressFormulaExpression == nil)
+				{
+					return NO;
+				}
+				
+				[visitedLabels addObject:label];
+				
+				return [self _extractIndirectBaseAddress:outBaseAddress foundPointerFunction:foundPointerFunction expression:addressFormulaExpression process:process variableController:variableController visitedLabels:visitedLabels failedImages:failedImages];
+			}
+			else if (([expression.function isEqualToString:@"add"] || [expression.function isEqualToString:@"subtract"]) && expression.arguments.count == 2)
 			{
 				DDExpression *argumentExpression1 = expression.arguments[0];
 				DDExpression *argumentExpression2 = expression.arguments[1];
 				
-				DDExpression *pointerSubExpression;
 				if (argumentExpression1.expressionType == DDExpressionTypeFunction && [argumentExpression1.function isEqualToString:ZGCalculatePointerFunction])
 				{
-					pointerSubExpression = argumentExpression1;
+					return [self _extractIndirectBaseAddress:outBaseAddress foundPointerFunction:foundPointerFunction expression:argumentExpression1 process:process variableController:variableController visitedLabels:visitedLabels failedImages:failedImages];
 				}
 				else if (argumentExpression2.expressionType == DDExpressionTypeFunction && [argumentExpression2.function isEqualToString:ZGCalculatePointerFunction])
 				{
-					pointerSubExpression = argumentExpression2;
-				}
-				else
-				{
-					pointerSubExpression = nil;
+					return [self _extractIndirectBaseAddress:outBaseAddress foundPointerFunction:foundPointerFunction expression:argumentExpression2 process:process variableController:variableController visitedLabels:visitedLabels failedImages:failedImages];
 				}
 				
-				if (pointerSubExpression != nil)
+				if (argumentExpression1.expressionType == DDExpressionTypeFunction && [argumentExpression1.function isEqualToString:ZGFindLabelFunction])
 				{
-					return [self _extractIndirectBaseAddress:outBaseAddress expression:pointerSubExpression process:process failedImages:failedImages];
+					return [self _extractIndirectBaseAddress:outBaseAddress foundPointerFunction:foundPointerFunction expression:argumentExpression1 process:process variableController:variableController visitedLabels:visitedLabels failedImages:failedImages];
 				}
-				else
+				else if (argumentExpression2.expressionType == DDExpressionTypeFunction && [argumentExpression2.function isEqualToString:ZGFindLabelFunction])
 				{
-					// Found base() +- offset expression which we need to evaluate
-					NSDictionary<NSString *, id> *substitutions = [self _evaluatorSubstitutionsForProcess:process variableController:nil failedImages:failedImages symbolicates:NO symbolicationRequiresExactMatch:YES currentAddress:0x0];
-					
-					NSError *evaluateError = nil;
-					NSNumber *evaluatedBaseAddressNumber = [[DDMathEvaluator defaultMathEvaluator] evaluateExpression:expression withSubstitutions:substitutions error:&evaluateError];
-					
-					if (evaluatedBaseAddressNumber == nil)
-					{
-						return NO;
-					}
-					else
-					{
-						ZGMemoryAddress baseAddress = (ZGMemoryAddress)evaluatedBaseAddressNumber.unsignedLongLongValue;
-						if (outBaseAddress != NULL)
-						{
-							*outBaseAddress = baseAddress;
-						}
-						
-						return YES;
-					}
+					return [self _extractIndirectBaseAddress:outBaseAddress foundPointerFunction:foundPointerFunction expression:argumentExpression2 process:process variableController:variableController visitedLabels:visitedLabels failedImages:failedImages];
 				}
+				
+				// Found base() +- offset expression which we need to evaluate
+				NSDictionary<NSString *, id> *substitutions = [self _evaluatorSubstitutionsForProcess:process variableController:nil failedImages:failedImages symbolicates:NO symbolicationRequiresExactMatch:YES currentAddress:0x0];
+				
+				NSError *evaluateError = nil;
+				NSNumber *evaluatedBaseAddressNumber = [[DDMathEvaluator defaultMathEvaluator] evaluateExpression:expression withSubstitutions:substitutions error:&evaluateError];
+				
+				if (evaluatedBaseAddressNumber == nil)
+				{
+					return NO;
+				}
+				
+				ZGMemoryAddress baseAddress = (ZGMemoryAddress)evaluatedBaseAddressNumber.unsignedLongLongValue;
+				if (outBaseAddress != NULL)
+				{
+					*outBaseAddress = baseAddress;
+				}
+				
+				return YES;
 			}
 			else if ([expression.function isEqualToString:ZGCalculatePointerFunction] && expression.arguments.count == 1)
 			{
-				return [self _extractIndirectBaseAddress:outBaseAddress expression:expression.arguments[0] process:process failedImages:failedImages];
+				if (foundPointerFunction != NULL)
+				{
+					*foundPointerFunction = YES;
+				}
+				
+				return [self _extractIndirectBaseAddress:outBaseAddress foundPointerFunction:foundPointerFunction expression:expression.arguments[0] process:process variableController:variableController visitedLabels:visitedLabels failedImages:failedImages];
 			}
 			else
 			{
@@ -817,7 +854,7 @@
 	}
 }
 
-+ (BOOL)extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress expression:(NSString *)initialExpression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages
++ (BOOL)extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress expression:(NSString *)initialExpression process:(ZGProcess * __unsafe_unretained)process variableController:(ZGVariableController * __unsafe_unretained)variableController failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages
 {
 	NSString *substitutedExpression = [ZGCalculator expressionBySubstitutingCalculatePointerFunctionInExpression:initialExpression];
 	
@@ -828,7 +865,14 @@
 		return NO;
 	}
 	
-	if (![self _extractIndirectBaseAddress:outBaseAddress expression:expression process:process failedImages:failedImages])
+	NSMutableSet<NSString *> *visitedLabels = [NSMutableSet set];
+	BOOL foundPointerFunction = NO;
+	if (![self _extractIndirectBaseAddress:outBaseAddress foundPointerFunction:&foundPointerFunction expression:expression process:process variableController:variableController visitedLabels:visitedLabels failedImages:failedImages])
+	{
+		return NO;
+	}
+	
+	if (!foundPointerFunction)
 	{
 		return NO;
 	}

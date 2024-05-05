@@ -1038,7 +1038,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	[[self class] annotateVariables:variables process:windowController.currentProcess symbols:YES async:YES completionHandler:^{
+	[[self class] annotateVariables:variables process:windowController.currentProcess variableController:windowController.variableController symbols:YES async:YES completionHandler:^{
 		NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
 		
 		windowController.undoManager.actionName = actionName;
@@ -1046,13 +1046,19 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}];
 }
 
-+ (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries filePathDictionary:(NSDictionary<NSNumber *, NSString *> *)machFilePathDictionary process:(ZGProcess *)process failedImages:(NSMutableArray<NSString *> *)failedImages getAddress:(ZGMemoryAddress *)outVariableAddress
++ (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries filePathDictionary:(NSDictionary<NSNumber *, NSString *> *)machFilePathDictionary process:(ZGProcess *)process variableController:(ZGVariableController *)variableController failedImages:(NSMutableArray<NSString *> *)failedImages getAddress:(ZGMemoryAddress *)outVariableAddress
 {
 	ZGMemoryAddress variableAddress;
-	BOOL isIndirectVariable = variable.usesDynamicPointerAddress;
-	if (isIndirectVariable)
+	BOOL isIndirectVariable;
+	if (variable.usesDynamicLabelAddress)
 	{
-		if (![ZGCalculator extractIndirectBaseAddress:&variableAddress expression:variable.addressFormula process:process failedImages:failedImages])
+		// It's not obvious if a variable that uses a label is indirect or not, so we will need
+		// to try computing the indirect base address to find out
+		isIndirectVariable = [ZGCalculator extractIndirectBaseAddress:&variableAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages];
+	}
+	else if (variable.usesDynamicPointerAddress)
+	{
+		if (![ZGCalculator extractIndirectBaseAddress:&variableAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages])
 		{
 			if (outVariableAddress != NULL)
 			{
@@ -1060,10 +1066,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 			return nil;
 		}
+		
+		isIndirectVariable = YES;
 	}
 	else
 	{
 		variableAddress = variable.address;
+		isIndirectVariable = NO;
 	}
 	
 	if (outVariableAddress != NULL)
@@ -1181,7 +1190,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	
 	// Re-annotate the variables
-	[[self class] annotateVariables:variablesToAnnotate process:process symbols:YES async:YES completionHandler:^{
+	[[self class] annotateVariables:variablesToAnnotate process:process variableController:self symbols:YES async:YES completionHandler:^{
 		[windowController.variablesTableView reloadData];
 	}];
 }
@@ -1211,14 +1220,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	return annotationInfo;
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process variableController:(ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMachBinaryAnnotationInfo annotationInfo = {0};
 	
-	[self annotateVariables:variables annotationInfo:annotationInfo process:process symbols:requiresSymbols async:async completionHandler:completionHandler];
+	[self annotateVariables:variables annotationInfo:annotationInfo process:process variableController:variableController symbols:requiresSymbols async:async completionHandler:completionHandler];
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process variableController:(ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMemoryMap processTask = process.processTask;
 	NSUInteger capacity = variables.count;
@@ -1232,7 +1241,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		for (ZGVariable *variable in variables)
 		{
 			ZGMemoryAddress variableAddress;
-			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process failedImages:failedImages getAddress:&variableAddress];
+			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process variableController:variableController failedImages:failedImages getAddress:&variableAddress];
 			
 			[variableAddresses addObject:@(variableAddress)];
 			
