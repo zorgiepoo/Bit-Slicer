@@ -207,6 +207,7 @@
 		NSString *newAddressString =
 			[ZGCalculator
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
+			 variableController:windowController.variableController
 			 process:windowController.currentProcess
 			 failedImages:_failedExecutableImages
 			 error:&error];
@@ -218,7 +219,8 @@
 		}
 		
 		// We don't have to evaluate it more than once if we're not doing any pointer calculations
-		if (error == nil && !variable.usesDynamicPointerAddress)
+		// and it's not using a label
+		if (error == nil && !variable.usesDynamicPointerAddress && !variable.usesDynamicLabelAddress)
 		{
 			variable.finishedEvaluatingDynamicAddress = YES;
 		}
@@ -230,7 +232,7 @@
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	return [ZGCalculator extractIndirectBaseAddress:outBaseAddress expression:variable.addressFormula process:windowController.currentProcess failedImages:_failedExecutableImages];
+	return [ZGCalculator extractIndirectBaseAddress:outBaseAddress expression:variable.addressFormula process:windowController.currentProcess variableController:windowController.variableController failedImages:_failedExecutableImages];
 }
 
 - (void)updateWatchVariablesTable:(NSTimer *)__unused timer

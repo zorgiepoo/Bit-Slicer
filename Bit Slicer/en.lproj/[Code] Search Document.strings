@@ -85,6 +85,12 @@
 /* Edit multiple variable values menu item title */
 "editMultipleVariableValuesTitle" = "Edit Variable Values…";
 
+/* Edit single variable label menu item title */
+"editSingleVariableLabelTitle" = "Edit Variable Label…";
+
+/* Edit multiple variable labels menu item title */
+"editMultipleVariableLabelsTitle" = "Edit Variable Labels…";
+
 /* Edit single variable size menu item title */
 "editSingleVariableSizeTitle" = "Edit Variable Size…";
 

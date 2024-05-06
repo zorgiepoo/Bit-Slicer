@@ -1,0 +1,15 @@
+
+/* Alert title indicating that the variable label is already in use */
+"alreadyUsedLabelAlertTitle" = "Label already in use";
+
+/* Alert message indicating that a single variable label is already in use */
+"alreadyUsedSingleLabelAlertMessageFormat" = "The label %@ is already in use by another variable.";
+
+/* Alert message indicating that a single variable label is already in use */
+"alreadyUsedLabelAlertMessage" = "One of the supplied labels is already in use by another variable.";
+
+/* Alert title indicating that a label must use a number token */
+"requireUsingOrdinalAlertTitle" = "Label must include $n";
+
+/* Alert message indicating that a label must use a number token */
+"requireUsingOrdinalAlertMessage" = "The label name must use $n when modifying multiple labels so each variable is assigned a different label.";

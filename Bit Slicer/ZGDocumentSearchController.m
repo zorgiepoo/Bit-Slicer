@@ -159,7 +159,7 @@
 	
 	// If we are doing a pointer address search, the variable must have a dynamic pointer address
 	// If we are doing a regular value search, variable could be a normal address or dynamic pointer address (as long as it's a 64-bit process)
-	return (variable.enabled && variable.type == dataType && !variable.isFrozen) && (!pointerAddressSearch || variable.usesDynamicPointerAddress) && !variable.usesDynamicSymbolAddress;
+	return (variable.enabled && variable.type == dataType && !variable.isFrozen) && (!pointerAddressSearch || variable.usesDynamicPointerAddress) && !variable.usesDynamicSymbolAddress && !variable.usesDynamicLabelAddress && variable.label.length == 0;
 }
 
 - (BOOL)canStartTask
@@ -517,7 +517,7 @@
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			// Waiting for completion would lead to a bad user experience and there is no need to
-			[ZGVariableController annotateVariables:newVariables annotationInfo:annotationInfo process:currentProcess symbols:YES async:YES completionHandler:^{
+			[ZGVariableController annotateVariables:newVariables annotationInfo:annotationInfo process:currentProcess variableController:nil symbols:YES async:YES completionHandler:^{
 				[windowController.variablesTableView reloadData];
 			}];
 		});

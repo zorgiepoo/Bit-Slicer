@@ -340,6 +340,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 addVariables:variablesToRemove
 	 atRowIndexes:rowIndexes];
 	
+	BOOL removedAnyLabelVariable = NO;
 	for (ZGVariable *variable in variablesToRemove)
 	{
 		if (variable.enabled)
@@ -353,6 +354,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				// If the user undos this remove, the variable won't automatically rewrite values
 				variable.isFrozen = NO;
 			}
+		}
+		
+		if (!removedAnyLabelVariable && variable.label.length > 0)
+		{
+			removedAnyLabelVariable = YES;
 		}
 	}
 	
@@ -369,6 +375,21 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[windowController.variablesTableView reloadData];
 	
 	[windowController updateSearchAddressOptions];
+	
+	if (removedAnyLabelVariable)
+	{
+		// Re-annotate other variables that may be referencing variables that were just removed
+		NSMutableArray<ZGVariable *> *variablesToAnnotate = [NSMutableArray array];
+		for (ZGVariable *variable in _documentData.variables)
+		{
+			if (variable.usesDynamicLabelAddress)
+			{
+				[variablesToAnnotate addObject:variable];
+			}
+		}
+		
+		[self annotateVariablesAutomatically:variablesToAnnotate process:windowController.currentProcess];
+	}
 }
 
 - (void)disableHarmfulVariables:(NSArray<ZGVariable *> *)variables
@@ -384,9 +405,59 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self updateFrozenActivity];
 }
 
+- (NSSet<NSString *> *)usedLabels
+{
+	NSMutableSet<NSString *> *labels = [[NSMutableSet alloc] init];
+	for (ZGVariable *variable in _documentData.variables)
+	{
+		NSString *label = variable.label;
+		if (label.length > 0)
+		{
+			[labels addObject:label];
+		}
+	}
+	
+	return labels;
+}
+
+- (nullable ZGVariable *)variableForLabel:(NSString *)label
+{
+	// We could maintain a dictionary cache for label -> variable lookups
+	// However I don't believe the complexity of managing changes to this state is worth it
+	// and it should not be a bottleneck realistically
+	for (ZGVariable *variable in _documentData.variables)
+	{
+		if ([variable.label isEqualToString:label])
+		{
+			return variable;
+		}
+	}
+	return nil;
+}
+
 - (void)addVariables:(NSArray<ZGVariable *> *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
+	
+	// Make sure we do not end up with duplicate labels
+	// New variables that have a label that already exists have their labels removed
+	NSSet<NSString *> *oldLabels = [self usedLabels];
+	BOOL addedLabeledVariable = NO;
+	for (ZGVariable *variable in variables)
+	{
+		NSString *label = variable.label;
+		if (label.length > 0)
+		{
+			if ([oldLabels containsObject:label])
+			{
+				variable.label = @"";
+			}
+			else
+			{
+				addedLabeledVariable = YES;
+			}
+		}
+	}
 	
 	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
@@ -414,6 +485,32 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	[windowController updateNumberOfValuesDisplayedStatus];
 	[windowController updateSearchAddressOptions];
+	
+	if (!addedLabeledVariable)
+	{
+		[self annotateVariablesAutomatically:variables process:windowController.currentProcess];
+	}
+	else
+	{
+		// Update annotations for all variables that reference labels as well as the variables we just added
+		// It's possible any of these variables may be referencing a label to a variable we just added
+		NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
+		
+		for (ZGVariable *variable in _documentData.variables)
+		{
+			if ([variablesToAnnotate containsObject:variable])
+			{
+				continue;
+			}
+			
+			if (variable.usesDynamicLabelAddress)
+			{
+				[variablesToAnnotate addObject:variable];
+			}
+		}
+		
+		[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
+	}
 }
 
 - (void)removeSelectedSearchValues
@@ -478,7 +575,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
 	
 	if (variable.type != ZGScript) {
-		[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+		[self annotateVariablesAutomatically:@[variable] process:windowController.currentProcess];
 	}
 }
 
@@ -930,7 +1027,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 addressFormula:variable.addressFormula];
 	
 	variable.addressFormula = newAddressFormula;
-	if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress || variable.usesDynamicSymbolAddress)
+	if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress || variable.usesDynamicSymbolAddress || variable.usesDynamicLabelAddress)
 	{
 		variable.usesDynamicAddress = YES;
 	}
@@ -943,9 +1040,71 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	variable.finishedEvaluatingDynamicAddress = NO;
 	
-	[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+	NSMutableArray<ZGVariable *> *variablesToAnnotate = [NSMutableArray arrayWithObject:variable];
+	if (variable.label.length > 0)
+	{
+		// Other variables may be referencing this variable
+		// We will want to update their annotations too
+		for (ZGVariable *otherVariable in _documentData.variables)
+		{
+			if (otherVariable == variable)
+			{
+				continue;
+			}
+			
+			if (otherVariable.usesDynamicLabelAddress)
+			{
+				[variablesToAnnotate addObject:otherVariable];
+			}
+		}
+	}
+	
+	[self annotateVariablesAutomatically:variablesToAnnotate process:windowController.currentProcess];
 	
 	[windowController updateSearchAddressOptions];
+}
+
+#pragma mark Edit Variable Labels
+
+- (void)editVariables:(NSArray<ZGVariable *> *)variables requestedLabels:(NSArray<NSString *> *)requestedLabels
+{
+	ZGDocumentWindowController *windowController = _windowController;
+	
+	NSMutableArray<NSString *> *oldLabels = [NSMutableArray array];
+	for (ZGVariable *variable in variables)
+	{
+		[oldLabels addObject:variable.label];
+	}
+	
+	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoLabelChange");
+	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
+	 editVariables:variables
+	 requestedLabels:oldLabels];
+	
+	NSUInteger labelIndex = 0;
+	for (ZGVariable *variable in variables)
+	{
+		variable.label = requestedLabels[labelIndex];
+		labelIndex++;
+	}
+	
+	// Re-annotate the variables so the labels are in the descriptions
+	// Also annotate other variables that may be referencing these edited variables
+	NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
+	for (ZGVariable *otherVariable in _documentData.variables)
+	{
+		if ([variablesToAnnotate containsObject:otherVariable])
+		{
+			continue;
+		}
+		
+		if (otherVariable.usesDynamicLabelAddress)
+		{
+			[variablesToAnnotate addObject:otherVariable];
+		}
+	}
+	
+	[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
 }
 
 #pragma mark Relativizing Variable Addresses
@@ -969,7 +1128,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	[[self class] annotateVariables:variables process:windowController.currentProcess symbols:YES async:YES completionHandler:^{
+	[[self class] annotateVariables:variables process:windowController.currentProcess variableController:windowController.variableController symbols:YES async:YES completionHandler:^{
 		NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
 		
 		windowController.undoManager.actionName = actionName;
@@ -977,13 +1136,29 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}];
 }
 
-+ (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries filePathDictionary:(NSDictionary<NSNumber *, NSString *> *)machFilePathDictionary process:(ZGProcess *)process failedImages:(NSMutableArray<NSString *> *)failedImages getAddress:(ZGMemoryAddress *)outVariableAddress
++ (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries filePathDictionary:(NSDictionary<NSNumber *, NSString *> *)machFilePathDictionary process:(ZGProcess *)process variableController:(ZGVariableController *)variableController failedImages:(NSMutableArray<NSString *> *)failedImages getAddress:(ZGMemoryAddress *)outVariableAddress
 {
 	ZGMemoryAddress variableAddress;
-	BOOL isIndirectVariable = variable.usesDynamicPointerAddress;
-	if (isIndirectVariable)
+	BOOL isIndirectVariable;
+	if (variable.usesDynamicLabelAddress)
 	{
-		if (![ZGCalculator extractIndirectBaseAddress:&variableAddress expression:variable.addressFormula process:process failedImages:failedImages])
+		// It's not obvious if a variable that uses a label is indirect or not, so we will need
+		// to try computing the indirect base address to find out
+		ZGMemoryAddress baseAddress = 0x0;
+		isIndirectVariable = [ZGCalculator extractIndirectBaseAddress:&baseAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages];
+		
+		if (isIndirectVariable)
+		{
+			variableAddress = baseAddress;
+		}
+		else
+		{
+			variableAddress = variable.address;
+		}
+	}
+	else if (variable.usesDynamicPointerAddress)
+	{
+		if (![ZGCalculator extractIndirectBaseAddress:&variableAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages])
 		{
 			if (outVariableAddress != NULL)
 			{
@@ -991,10 +1166,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 			return nil;
 		}
+		
+		isIndirectVariable = YES;
 	}
 	else
 	{
 		variableAddress = variable.address;
+		isIndirectVariable = NO;
 	}
 	
 	if (outVariableAddress != NULL)
@@ -1016,7 +1194,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		if (variableAddress >= totalSegmentRange.location && variableAddress < totalSegmentRange.location + totalSegmentRange.length)
 		{
 			NSString *partialPath = [machFilePath lastPathComponent];
-			if (!variable.usesDynamicBaseAddress)
+			if (!variable.usesDynamicBaseAddress && !variable.usesDynamicSymbolAddress && !variable.usesDynamicLabelAddress)
 			{
 				NSString *pathToUse = nil;
 				NSString *baseArgument = @"";
@@ -1088,22 +1266,33 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	return staticVariableDescription;
 }
 
-- (void)annotateVariableAutomatically:(ZGVariable *)variable process:(ZGProcess *)process
+- (void)annotateVariablesAutomatically:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process
 {
-	if (!variable.userAnnotated)
+	ZGDocumentWindowController *windowController = _windowController;
+	ZGDocumentTableController *tableController = windowController.tableController;
+	
+	NSMutableArray<ZGVariable *> *variablesToAnnotate = [NSMutableArray array];
+	
+	for (ZGVariable *variable in variables)
 	{
-		// Clear the description so we can automatically fill it again
-		variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
-		
-		// Update the variable's address
-		ZGDocumentWindowController *windowController = _windowController;
-		[windowController.tableController updateDynamicVariableAddress:variable];
-		
-		// Re-annotate the variable
-		[[self class] annotateVariables:@[variable] process:process symbols:YES async:YES completionHandler:^{
-			[windowController.variablesTableView reloadData];
-		}];
+		if (!variable.userAnnotated)
+		{
+			[variablesToAnnotate addObject:variable];
+			
+			// Clear the description so we can automatically fill it again
+			variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
+			
+			// Update the variable's address
+			[tableController updateDynamicVariableAddress:variable];
+			
+			[variablesToAnnotate addObject:variable];
+		}
 	}
+	
+	// Re-annotate the variables
+	[[self class] annotateVariables:variablesToAnnotate process:process variableController:self symbols:YES async:YES completionHandler:^{
+		[windowController.variablesTableView reloadData];
+	}];
 }
 
 + (ZGMachBinaryAnnotationInfo)machBinaryAnnotationInfoForProcess:(ZGProcess *)process
@@ -1126,14 +1315,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	return annotationInfo;
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process variableController:(ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMachBinaryAnnotationInfo annotationInfo = {0};
 	
-	[self annotateVariables:variables annotationInfo:annotationInfo process:process symbols:requiresSymbols async:async completionHandler:completionHandler];
+	[self annotateVariables:variables annotationInfo:annotationInfo process:process variableController:variableController symbols:requiresSymbols async:async completionHandler:completionHandler];
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process variableController:(ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMemoryMap processTask = process.processTask;
 	NSUInteger capacity = variables.count;
@@ -1147,7 +1336,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		for (ZGVariable *variable in variables)
 		{
 			ZGMemoryAddress variableAddress;
-			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process failedImages:failedImages getAddress:&variableAddress];
+			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process variableController:variableController failedImages:failedImages getAddress:&variableAddress];
 			
 			[variableAddresses addObject:@(variableAddress)];
 			
@@ -1210,7 +1399,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				protectionDescription = ZGProtectionDescription(cachedInfo.protection);
 			}
 			
+			NSString *label = variable.label;
+			
 			NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];
+			if (label.length > 0)
+			{
+				[validDescriptionComponents addObject:[NSString stringWithFormat:@"Label %@", label]];
+			}
+			else if (variable.usesDynamicLabelAddress)
+			{
+				NSString *dependentLabel = [ZGCalculator extractFirstDependentLabelFromExpression:variable.addressFormula];
+				
+				if (dependentLabel != nil)
+				{
+					[validDescriptionComponents addObject:[NSString stringWithFormat:@"→ Label %@", dependentLabel]];
+				}
+			}
+			
 			if (symbol.length > 0) [validDescriptionComponents addObject:symbol];
 			if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
 			if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];

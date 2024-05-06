@@ -38,6 +38,7 @@
 #import "ZGEditAddressWindowController.h"
 #import "ZGEditDescriptionWindowController.h"
 #import "ZGEditSizeWindowController.h"
+#import "ZGEditLabelWindowController.h"
 #import "ZGScriptManager.h"
 #import "ZGProcessList.h"
 #import "ZGProcess.h"
@@ -97,6 +98,7 @@
 	ZGEditAddressWindowController * _Nullable _editAddressWindowController;
 	ZGEditDescriptionWindowController * _Nullable _editDescriptionWindowController;
 	ZGEditSizeWindowController * _Nullable _editSizeWindowController;
+	ZGEditLabelWindowController * _Nullable _editLabelWindowController;
 	
 	BOOL _loadedDocumentBefore;
 	NSString * _Nullable _flagsLabelStringValue;
@@ -960,7 +962,7 @@
 					ZGVariable *foundDirectVariable = nil;
 					for (ZGVariable *variable in _documentData.variables)
 					{
-						if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && variable.stringValue.length > 0)
+						if (variable.type == selectedDataType && !variable.usesDynamicSymbolAddress && !variable.usesDynamicLabelAddress && variable.label.length == 0 && variable.stringValue.length > 0)
 						{
 							if (variable.usesDynamicPointerAddress)
 							{
@@ -1392,6 +1394,24 @@
 			return NO;
 		}
 	}
+	
+	else if (menuItem.action == @selector(requestEditingVariableLabel:))
+	{
+		menuItem.title = ([self selectedVariables].count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableLabelsTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableLabelTitle");
+		
+		if ([_searchController canCancelTask] || [self selectedVariables].count < 1 || !self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		for (ZGVariable *variable in [self selectedVariables])
+		{
+			if (variable.type == ZGScript)
+			{
+				return NO;
+			}
+		}
+	}
     
     else if (menuItem.action == @selector(requestEditingVariablesSize:))
     {
@@ -1464,7 +1484,8 @@
 		BOOL watchingBaseAccesses = (menuItem.action == @selector(watchVariableBaseAddress:));
 		if (watchingBaseAccesses)
 		{
-			menuItem.hidden = !selectedVariable.usesDynamicPointerAddress;
+			// Hide menu item for now, but unhide if it we are able to retrieve a base address
+			menuItem.hidden = YES;
 		}
 		
 		if (selectedVariable.type == ZGScript)
@@ -1484,6 +1505,8 @@
 			{
 				return NO;
 			}
+			
+			menuItem.hidden = NO;
 			
 			targetMemoryAddress = baseAddress;
 			targetMemorySize = self.currentProcess.pointerSize;
@@ -1910,6 +1933,16 @@
 	[_editSizeWindowController requestEditingSizesFromVariables:[self selectedVariables] attachedToWindow:ZGUnwrapNullableObject(self.window)];
 }
 
+- (IBAction)requestEditingVariableLabel:(id)sender
+{
+	// We will always instantiate a new ZGEditLabelWindowController
+	// because its window view may differ based on if a single or
+	// multiple variable labels are being edited
+	_editLabelWindowController = [[ZGEditLabelWindowController alloc] initWithVariableController:_variableController];
+	
+	[_editLabelWindowController requestEditingLabelsFromVariables:[self selectedVariables] attachedToWindow:ZGUnwrapNullableObject(self.window)];
+}
+
 - (IBAction)relativizeVariablesAddress:(id)__unused sender
 {
 	[_variableController relativizeVariables:[self selectedVariables]];
@@ -1930,7 +1963,7 @@
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];
 			[self->_variableController addVariables:foundVariables atRowIndexes:rowIndexes];
 			[self->_variablesTableView scrollRowToVisible:0];
-			[ZGVariableController annotateVariables:foundVariables process:self.currentProcess symbols:YES async:YES completionHandler:^{
+			[ZGVariableController annotateVariables:foundVariables process:self.currentProcess variableController:nil symbols:YES async:YES completionHandler:^{
 				[self->_variablesTableView reloadData];
 			}];
 		}

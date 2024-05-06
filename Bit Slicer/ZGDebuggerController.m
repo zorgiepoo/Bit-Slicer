@@ -1627,7 +1627,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 		 return (BOOL)(!variable.usesDynamicAddress);
 	 }];
 	
-	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess symbols:symbols async:async completionHandler:^{
+	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess variableController:nil symbols:symbols async:async completionHandler:^{
 		for (ZGInstruction *instruction in instructions)
 		{
 			if (instruction.variable.fullAttributedDescription.length == 0)

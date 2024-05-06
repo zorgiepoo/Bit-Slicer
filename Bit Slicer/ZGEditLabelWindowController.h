@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mayur Pawashe
+ * Copyright (c) 2024 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,32 +30,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "pythonlib.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
-
-@class ZGScriptingInterpreter;
-@class ZGScriptManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
-@class ZGVariableController;
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
+@class ZGVariableController;
+@class ZGVariable;
 
-+ (nullable PyObject *)loadPythonClassInMainModule:(PyObject *)module;
+@interface ZGEditLabelWindowController : NSWindowController
 
-- (nullable id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager variableController:(ZGVariableController *)variableController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
+- (instancetype)initWithVariableController:(ZGVariableController *)variableController;
 
-@property (nonatomic, weak, readonly) ZGScriptManager *scriptManager;
-@property (nonatomic, readonly, nullable) PyObject *object;
+- (void)requestEditingLabelsFromVariables:(NSArray<ZGVariable *> *)variables attachedToWindow:(NSWindow *)parentWindow;
 
 @end
 

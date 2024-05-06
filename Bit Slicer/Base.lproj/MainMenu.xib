@@ -641,6 +641,12 @@ CA
                                     <action selector="requestEditingVariableAddress:" target="-1" id="yPE-QT-jnw"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Edit Variable Label…" keyEquivalent="E" id="uQ5-Wj-45I">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="requestEditingVariableLabel:" target="-1" id="xj1-r0-w4c"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Edit Variable Size…" keyEquivalent="e" id="833">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
