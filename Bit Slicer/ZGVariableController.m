@@ -401,6 +401,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 - (nullable ZGVariable *)variableForLabel:(NSString *)label
 {
+	// We could maintain a dictionary cache for label -> variable lookups
+	// However I don't believe the complexity of managing changes to this state is worth it
+	// and it should not be a bottleneck realistically
 	for (ZGVariable *variable in _documentData.variables)
 	{
 		if ([variable.label isEqualToString:label])
