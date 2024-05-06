@@ -340,6 +340,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 addVariables:variablesToRemove
 	 atRowIndexes:rowIndexes];
 	
+	BOOL removedAnyLabelVariable = NO;
 	for (ZGVariable *variable in variablesToRemove)
 	{
 		if (variable.enabled)
@@ -353,6 +354,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				// If the user undos this remove, the variable won't automatically rewrite values
 				variable.isFrozen = NO;
 			}
+		}
+		
+		if (!removedAnyLabelVariable && variable.label.length > 0)
+		{
+			removedAnyLabelVariable = YES;
 		}
 	}
 	
@@ -369,6 +375,21 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[windowController.variablesTableView reloadData];
 	
 	[windowController updateSearchAddressOptions];
+	
+	if (removedAnyLabelVariable)
+	{
+		// Re-annotate other variables that may be referencing variables that were just removed
+		NSMutableArray<ZGVariable *> *variablesToAnnotate = [NSMutableArray array];
+		for (ZGVariable *variable in _documentData.variables)
+		{
+			if (variable.usesDynamicLabelAddress)
+			{
+				[variablesToAnnotate addObject:variable];
+			}
+		}
+		
+		[self annotateVariablesAutomatically:variablesToAnnotate process:windowController.currentProcess];
+	}
 }
 
 - (void)disableHarmfulVariables:(NSArray<ZGVariable *> *)variables
@@ -421,12 +442,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	// Make sure we do not end up with duplicate labels
 	// New variables that have a label that already exists have their labels removed
 	NSSet<NSString *> *oldLabels = [self usedLabels];
+	BOOL addedLabeledVariable = NO;
 	for (ZGVariable *variable in variables)
 	{
 		NSString *label = variable.label;
-		if (label.length > 0 && [oldLabels containsObject:label])
+		if (label.length > 0)
 		{
-			variable.label = @"";
+			if ([oldLabels containsObject:label])
+			{
+				variable.label = @"";
+			}
+			else
+			{
+				addedLabeledVariable = YES;
+			}
 		}
 	}
 	
@@ -457,7 +486,31 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[windowController updateNumberOfValuesDisplayedStatus];
 	[windowController updateSearchAddressOptions];
 	
-	[self annotateVariablesAutomatically:variables process:windowController.currentProcess];
+	if (!addedLabeledVariable)
+	{
+		[self annotateVariablesAutomatically:variables process:windowController.currentProcess];
+	}
+	else
+	{
+		// Update annotations for all variables that reference labels as well as the variables we just added
+		// It's possible any of these variables may be referencing a label to a variable we just added
+		NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
+		
+		for (ZGVariable *variable in _documentData.variables)
+		{
+			if ([variablesToAnnotate containsObject:variable])
+			{
+				continue;
+			}
+			
+			if (variable.usesDynamicLabelAddress)
+			{
+				[variablesToAnnotate addObject:variable];
+			}
+		}
+		
+		[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
+	}
 }
 
 - (void)removeSelectedSearchValues
