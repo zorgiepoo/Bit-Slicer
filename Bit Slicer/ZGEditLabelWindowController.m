@@ -45,6 +45,7 @@
 
 @implementation ZGLabelTextFormatter
 {
+	NSCharacterSet *_validCharacterSet;
 	NSCharacterSet *_invalidCharacterSet;
 }
 
@@ -53,9 +54,9 @@
 	self = [super init];
 	if (self != nil)
 	{
-		NSCharacterSet *validCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_$"];
+		_validCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_$"];
 		
-		_invalidCharacterSet = [validCharacterSet invertedSet];
+		_invalidCharacterSet = [_validCharacterSet invertedSet];
 	}
 	return self;
 }
@@ -72,6 +73,22 @@
 
 - (BOOL)getObjectValue:(out id  _Nullable __autoreleasing *)obj forString:(NSString *)string errorDescription:(out NSString * _Nullable __autoreleasing *)error
 {
+	if (obj != NULL)
+	{
+		NSUInteger stringLength = string.length;
+		NSMutableString *newString = [[NSMutableString alloc] initWithCapacity:stringLength];
+		
+		for (NSUInteger characterIndex = 0; characterIndex < stringLength; characterIndex++)
+		{
+			unichar character = [string characterAtIndex:characterIndex];
+			if ([_validCharacterSet characterIsMember:character])
+			{
+				[newString appendFormat:@"%C", character];
+			}
+		}
+		
+		*obj = [newString copy];
+	}
 	return YES;
 }
 
@@ -87,7 +104,12 @@
 	}
 	
 	NSRange invalidRange = [*partialStringPtr rangeOfCharacterFromSet:_invalidCharacterSet];
-	return (invalidRange.location == NSNotFound);
+	if (invalidRange.location != NSNotFound)
+	{
+		return NO;
+	}
+	
+	return YES;
 }
 
 @end
