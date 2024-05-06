@@ -154,10 +154,11 @@
 	
 	if (variables.count > 1)
 	{
+		labelPlaceholderStringValue = @"Foo_%n";
+		
 		if (firstVariableLabel.length == 0)
 		{
 			labelStringValue = @"";
-			labelPlaceholderStringValue = @"Foo_%n";
 		}
 		else
 		{
@@ -171,8 +172,6 @@
 			{
 				labelStringValue = [NSString stringWithFormat:@"%@_$n", firstVariableLabel];
 			}
-			
-			labelPlaceholderStringValue = @"";
 		}
 	}
 	else
