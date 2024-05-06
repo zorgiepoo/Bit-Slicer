@@ -38,6 +38,60 @@
 
 #define ZGEditLabelLocalizableTable @"[Code] Edit Variable Label"
 
+#define MAX_LABEL_LENGTH 50
+
+@interface ZGLabelTextFormatter : NSFormatter
+@end
+
+@implementation ZGLabelTextFormatter
+{
+	NSCharacterSet *_invalidCharacterSet;
+}
+
+- (instancetype)init
+{
+	self = [super init];
+	if (self != nil)
+	{
+		NSCharacterSet *validCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_$"];
+		
+		_invalidCharacterSet = [validCharacterSet invertedSet];
+	}
+	return self;
+}
+
+- (NSString *)stringForObjectValue:(id)anObject
+{
+	if (![(NSObject *)anObject isKindOfClass:[NSString class]])
+	{
+		return nil;
+	}
+	
+	return anObject;
+}
+
+- (BOOL)getObjectValue:(out id  _Nullable __autoreleasing *)obj forString:(NSString *)string errorDescription:(out NSString * _Nullable __autoreleasing *)error
+{
+	return YES;
+}
+
+- (BOOL)isPartialStringValid:(NSString * __autoreleasing *)partialStringPtr
+   proposedSelectedRange:(NSRangePointer)proposedSelRangePtr
+		  originalString:(NSString *)origString
+   originalSelectedRange:(NSRange)origSelRange
+		errorDescription:(NSString * __autoreleasing *)error
+{
+	if ([*partialStringPtr length] > MAX_LABEL_LENGTH)
+	{
+		return NO;
+	}
+	
+	NSRange invalidRange = [*partialStringPtr rangeOfCharacterFromSet:_invalidCharacterSet];
+	return (invalidRange.location == NSNotFound);
+}
+
+@end
+
 @implementation ZGEditLabelWindowController
 {
 	ZGVariableController * _Nonnull _variableController;
@@ -81,6 +135,9 @@
 		
 		[self.window.contentView addConstraint:layoutConstraint];
 	}
+	
+	ZGLabelTextFormatter *formatter = [[ZGLabelTextFormatter alloc] init];
+	_labelTextField.formatter = formatter;
 }
 
 - (void)requestEditingLabelsFromVariables:(NSArray<ZGVariable *> *)variables attachedToWindow:(NSWindow *)parentWindow
