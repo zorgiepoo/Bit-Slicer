@@ -367,12 +367,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	_documentData.variables = [NSArray arrayWithArray:temporaryArray];
 	
-	NSUInteger firstRemovedIndex = rowIndexes.firstIndex;
-	if (firstRemovedIndex > 0)
-	{
-		[windowController.variablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:firstRemovedIndex - 1] byExtendingSelection:NO];
-	}
-	
 	[windowController.searchController fetchVariablesFromResults];
 	
 	[windowController updateNumberOfValuesDisplayedStatus];
@@ -380,6 +374,12 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self updateFrozenActivity];
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
+	
+	NSUInteger firstRemovedIndex = rowIndexes.firstIndex;
+	if (firstRemovedIndex > 0)
+	{
+		[windowController.variablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:firstRemovedIndex - 1] byExtendingSelection:NO];
+	}
 	
 	[windowController updateSearchAddressOptions];
 	
@@ -469,14 +469,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
 	
-	[windowController.variablesTableView selectRowIndexes:rowIndexes byExtendingSelection:NO];
-	
 	[self disableHarmfulVariables:variables];
 	
 	_documentData.variables = [NSArray arrayWithArray:temporaryArray];
 	
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
+	
+	[windowController.variablesTableView selectRowIndexes:rowIndexes byExtendingSelection:NO];
 	
 	NSString *undoActionName = nil;
 	if (windowController.undoManager.isUndoing)
