@@ -1,6 +1,6 @@
 ---
 triple:          'arm64-apple-darwin'
-binary-path:     '/Users/msp/Documents/Programming/Sparkle/build/Sparkle.8QscZ8/Build/Products/Release/Updater.app/Contents/MacOS/Updater'
+binary-path:     '/Users/msp/Documents/Programming/Sparkle/build/Sparkle.cUfbPQ/Build/Products/Release/Updater.app/Contents/MacOS/Updater'
 relocations:
   - { offsetInCU: 0x27, offset: 0x27, size: 0x8, addend: 0x0, symName: '-[SPUAppcastItemState initWithMajorUpgrade:criticalUpdate:informationalUpdate:minimumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK:]', symObjAddr: 0x0, symBinAddr: 0x100001FD4, symSize: 0x7C }
   - { offsetInCU: 0x1E9, offset: 0x1E9, size: 0x8, addend: 0x0, symName: '-[SPUAppcastItemState initWithMajorUpgrade:criticalUpdate:informationalUpdate:minimumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK:]', symObjAddr: 0x0, symBinAddr: 0x100001FD4, symSize: 0x7C }
