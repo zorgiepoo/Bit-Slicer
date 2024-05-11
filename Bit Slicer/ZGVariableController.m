@@ -366,6 +366,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[temporaryArray removeObjectsAtIndexes:rowIndexes];
 	
 	_documentData.variables = [NSArray arrayWithArray:temporaryArray];
+	
+	NSUInteger firstRemovedIndex = rowIndexes.firstIndex;
+	if (firstRemovedIndex > 0)
+	{
+		[windowController.variablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:firstRemovedIndex - 1] byExtendingSelection:NO];
+	}
+	
 	[windowController.searchController fetchVariablesFromResults];
 	
 	[windowController updateNumberOfValuesDisplayedStatus];
@@ -461,6 +468,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
+	
+	[windowController.variablesTableView selectRowIndexes:rowIndexes byExtendingSelection:NO];
 	
 	[self disableHarmfulVariables:variables];
 	
@@ -570,9 +579,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		variable.scriptValue = [scriptValue stringByReplacingOccurrencesOfString:@"`" withString:indentationString];
 	}
 
+	// If the selected variable is enabled, insert the variable at the top of the table
+	// Otherwise insert the variable at one row above the selected variable row
+	NSUInteger insertRowIndex;
+	ZGVariable *selectedVariable = windowController.selectedVariables.firstObject;
+	if (selectedVariable == nil || (selectedVariable.enabled && selectedVariable.type != ZGScript && !selectedVariable.isFrozen))
+	{
+		insertRowIndex = 0;
+	}
+	else
+	{
+		NSIndexSet *selectedVariableIndexes = windowController.selectedVariableIndexes;
+		insertRowIndex = selectedVariableIndexes.firstIndex + 1;
+	}
+	
 	[self
 	 addVariables:@[variable]
-	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
+	 atRowIndexes:[NSIndexSet indexSetWithIndex:insertRowIndex]];
 	
 	if (variable.type != ZGScript) {
 		[self annotateVariablesAutomatically:@[variable] process:windowController.currentProcess];
