@@ -1453,7 +1453,8 @@
 				return NO;
 			}
 			
-			if (variable.usesDynamicAddress)
+			// Allow "relativizing" variables if they can still be annotated further
+			if (variable.usesDynamicAddress && (variable.userAnnotated || variable.fullAttributedDescription.length != 0))
 			{
 				return NO;
 			}

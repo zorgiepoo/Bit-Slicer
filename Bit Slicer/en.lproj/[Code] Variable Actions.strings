@@ -59,18 +59,6 @@
 /* Undo action for changing variable addresses */
 "undoAddressChanges" = "Address Changes";
 
-/* Undo action for relativizing a single variable */
-"undoRelativizeSingleVariable" = "Relativize Variable";
-
-/* Undo action for relativizing multiple variables */
-"undoRelativizeMultipleVariables" = "Relativize Variables";
-
-/* Undo action for unrelativizing a single variable */
-"undoUnrelativizeSingleVariable" = "Unrelativize Variable";
-
-/* Undo action for unrelativizing multiple variables */
-"undoUnrelativizeMultipleVariables" = "Unrelativize Variables";
-
 /* Undo action for changing variable size */
 "undoSizeChange" = "Size Change";
 

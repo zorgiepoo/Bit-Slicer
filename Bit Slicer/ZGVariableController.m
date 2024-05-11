@@ -1221,31 +1221,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 #pragma mark Relativizing Variable Addresses
 
-- (void)unrelativizeVariables:(NSArray<ZGVariable *> *)variables
-{
-	for (ZGVariable *variable in variables)
-	{
-		variable.addressFormula = variable.addressStringValue;
-		variable.usesDynamicAddress = NO;
-	}
-	
-	NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoUnrelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoUnrelativizeMultipleVariables");
-	
-	ZGDocumentWindowController *windowController = _windowController;
-	windowController.undoManager.actionName = actionName;
-	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] relativizeVariables:variables];
-}
-
 - (void)relativizeVariables:(NSArray<ZGVariable *> *)variables
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
-	[[self class] annotateVariables:variables process:windowController.currentProcess variableController:windowController.variableController symbols:YES async:YES completionHandler:^{
-		NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
-		
-		windowController.undoManager.actionName = actionName;
-		[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
-	}];
+	[self annotateVariablesAutomatically:variables process:windowController.currentProcess];
 }
 
 + (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries filePathDictionary:(NSDictionary<NSNumber *, NSString *> *)machFilePathDictionary process:(ZGProcess *)process variableController:(ZGVariableController *)variableController failedImages:(NSMutableArray<NSString *> *)failedImages getAddress:(ZGMemoryAddress *)outVariableAddress
