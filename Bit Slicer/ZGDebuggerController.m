@@ -1624,7 +1624,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 {
 	NSArray<ZGVariable *> *variablesToAnnotate = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.variable; }]
 	 zgFilterUsingBlock:^(ZGVariable *variable) {
-		 return (BOOL)(!variable.usesDynamicAddress);
+		 return (BOOL)(!variable.userAnnotated);
 	 }];
 	
 	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess variableController:nil symbols:symbols async:async completionHandler:^{
@@ -1640,6 +1640,8 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 				[newDescription appendAttributedString:instruction.variable.fullAttributedDescription];
 				instruction.variable.fullAttributedDescription = newDescription;
 			}
+			
+			instruction.variable.userAnnotated = YES;
 		}
 		
 		completionHandler();

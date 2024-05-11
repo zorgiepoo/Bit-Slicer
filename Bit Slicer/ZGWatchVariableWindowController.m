@@ -274,6 +274,7 @@
 	}
 	
 	instruction.variable.fullAttributedDescription = description;
+	instruction.variable.userAnnotated = YES;
 }
 
 - (void)dataAccessedByBreakPoint:(ZGBreakPoint *)__unused breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionAddress withRegistersState:(ZGRegistersState *)registersState
