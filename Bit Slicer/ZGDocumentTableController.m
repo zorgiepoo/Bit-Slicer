@@ -386,16 +386,18 @@
 	return NSDragOperationNone;
 }
 
-- (void)reorderVariables:(NSArray<ZGVariable *> *)newVariables
+- (void)reorderVariables:(NSArray<ZGVariable *> *)newVariables oldRowIndexes:(NSIndexSet *)oldRowIndexes newRowIndexes:(NSIndexSet *)newRowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	NSUndoManager *undoManager = windowController.undoManager;
 	undoManager.actionName = ZGLocalizableSearchTableString(@"undoMoveAction");
-	[(ZGDocumentTableController *)[undoManager prepareWithInvocationTarget:self] reorderVariables:_documentData.variables];
+	[(ZGDocumentTableController *)[undoManager prepareWithInvocationTarget:self] reorderVariables:_documentData.variables oldRowIndexes:newRowIndexes newRowIndexes:oldRowIndexes];
 	
 	_documentData.variables = [NSArray arrayWithArray:newVariables];
 	
 	[_variablesTableView reloadData];
+	
+	[_variablesTableView selectRowIndexes:newRowIndexes byExtendingSelection:NO];
 }
 
 - (BOOL)tableView:(NSTableView *)__unused tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
@@ -434,11 +436,15 @@
 			}
 			
 			// Insert the objects to the new position
+			NSUInteger firstNewRow = (NSUInteger)newRow;
+			NSMutableIndexSet *oldRowIndexes = [NSMutableIndexSet indexSet];
 			for (NSNumber *row in rows)
 			{
 				[variables
 				 insertObject:[_documentData.variables objectAtIndex:row.unsignedIntegerValue]
 				 atIndex:(NSUInteger)newRow];
+				
+				[oldRowIndexes addIndex:row.unsignedIntegerValue];
 				
 				newRow++;
 			}
@@ -447,7 +453,9 @@
 			[variables removeObject:(id)[NSNull null]];
 			
 			// Set the new variables
-			[self reorderVariables:variables];
+			NSIndexSet *newRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(firstNewRow, (NSUInteger)newRow - firstNewRow)];
+			
+			[self reorderVariables:variables oldRowIndexes:oldRowIndexes newRowIndexes:newRowIndexes];
 		}
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType])
