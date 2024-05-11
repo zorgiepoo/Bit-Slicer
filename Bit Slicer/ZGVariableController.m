@@ -1300,8 +1300,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		if (!variable.userAnnotated)
 		{
-			[variablesToAnnotate addObject:variable];
-			
 			// Clear the description so we can automatically fill it again
 			variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 			
