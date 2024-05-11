@@ -1434,6 +1434,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 + (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process variableController:(ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
+	BOOL processIsValid = process.valid;
 	ZGMemoryMap processTask = process.processTask;
 	NSUInteger capacity = variables.count;
 	
@@ -1445,12 +1446,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		for (ZGVariable *variable in variables)
 		{
-			ZGMemoryAddress variableAddress;
-			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process variableController:variableController failedImages:failedImages getAddress:&variableAddress];
-			
-			[variableAddresses addObject:@(variableAddress)];
-			
-			[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
+			if (processIsValid)
+			{
+				ZGMemoryAddress variableAddress;
+				NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process variableController:variableController failedImages:failedImages getAddress:&variableAddress];
+				
+				[variableAddresses addObject:@(variableAddress)];
+				
+				[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
+			}
+			else
+			{
+				[variableAddresses addObject:@(variable.address)];
+				[staticDescriptions addObject:[NSNull null]];
+			}
 		}
 		
 		*staticDescriptionsRef = staticDescriptions;
@@ -1462,8 +1471,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		NSMutableArray *symbols = [[NSMutableArray alloc] initWithCapacity:capacity];
 		for (NSNumber *variableAddress in variableAddresses)
 		{
-			NSString *symbol = [process.symbolicator symbolAtAddress:variableAddress.unsignedLongLongValue relativeOffset:NULL];
-			[symbols addObject:symbol != nil ? symbol : [NSNull null]];
+			if (processIsValid)
+			{
+				NSString *symbol = [process.symbolicator symbolAtAddress:variableAddress.unsignedLongLongValue relativeOffset:NULL];
+				[symbols addObject:symbol != nil ? symbol : [NSNull null]];
+			}
+			else
+			{
+				[symbols addObject:[NSNull null]];
+			}
 		}
 		return symbols;
 	};
@@ -1490,23 +1506,25 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			
 			ZGMemoryAddress variableAddress = [variableAddresses[index] unsignedLongLongValue];
 			
-			if (cachedRegionAddress >= variableAddress || cachedRegionAddress + cachedRegionSize <= variableAddress)
-			{
-				cachedRegionAddress = variableAddress;
-				if (!ZGRegionExtendedInfo(processTask, &cachedRegionAddress, &cachedRegionSize, &cachedInfo))
-				{
-					cachedRegionAddress = 0;
-					cachedRegionSize = 0;
-				}
-			}
-			
 			NSString *userTagDescription = nil;
 			NSString *protectionDescription = nil;
-			
-			if (cachedRegionAddress <= variableAddress && cachedRegionAddress + cachedRegionSize >= variableAddress)
+			if (processIsValid)
 			{
-				userTagDescription = ZGUserTagDescription(cachedInfo.user_tag);
-				protectionDescription = ZGProtectionDescription(cachedInfo.protection);
+				if (cachedRegionAddress >= variableAddress || cachedRegionAddress + cachedRegionSize <= variableAddress)
+				{
+					cachedRegionAddress = variableAddress;
+					if (!ZGRegionExtendedInfo(processTask, &cachedRegionAddress, &cachedRegionSize, &cachedInfo))
+					{
+						cachedRegionAddress = 0;
+						cachedRegionSize = 0;
+					}
+				}
+				
+				if (cachedRegionAddress <= variableAddress && cachedRegionAddress + cachedRegionSize >= variableAddress)
+				{
+					userTagDescription = ZGUserTagDescription(cachedInfo.user_tag);
+					protectionDescription = ZGProtectionDescription(cachedInfo.protection);
+				}
 			}
 			
 			NSString *label = variable.label;
