@@ -1014,7 +1014,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	ZGDocumentWindowController *windowController = _windowController;
 	ZGProcess *process = windowController.currentProcess;
 	
-	// If there are any duplicate addresses or any address is zero or the addresses are < than the labeled variable
+	// If there are any duplicate addresses or any address is zero or the addresses are <= than the labeled variable
 	// we will assume the variable's addresses are not meaningful and can be overwritten based on stride
 	// Otherwise we will assume the current addresses are meaningful and are relative to the labeled variable
 	ZGMemoryAddress labeledVariableAddress = labeledVariable.address;
@@ -1022,7 +1022,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	BOOL currentAddressesRelatable = YES;
 	for (ZGVariable *variable in variables)
 	{
-		if (variable.address == 0x0 || variable.address < labeledVariableAddress)
+		if (variable.address == 0x0 || variable.address <= labeledVariableAddress)
 		{
 			currentAddressesRelatable = NO;
 			break;
