@@ -436,12 +436,13 @@
 			}
 			
 			// Insert the objects to the new position
-			NSUInteger firstNewRow = (NSUInteger)newRow;
+			NSArray<ZGVariable *> *documentVariables = _documentData.variables;
+			ZGVariable *firstInsertedVariable = documentVariables[rows.firstObject.unsignedIntegerValue];
 			NSMutableIndexSet *oldRowIndexes = [NSMutableIndexSet indexSet];
 			for (NSNumber *row in rows)
 			{
 				[variables
-				 insertObject:[_documentData.variables objectAtIndex:row.unsignedIntegerValue]
+				 insertObject:[documentVariables objectAtIndex:row.unsignedIntegerValue]
 				 atIndex:(NSUInteger)newRow];
 				
 				[oldRowIndexes addIndex:row.unsignedIntegerValue];
@@ -452,9 +453,11 @@
 			// Remove all the old objects
 			[variables removeObject:(id)[NSNull null]];
 			
-			// Set the new variables
-			NSIndexSet *newRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(firstNewRow, (NSUInteger)newRow - firstNewRow)];
+			// Find the index where the first reordered variable is after removing all the old objects
+			NSUInteger indexOfFirstInsertedVariable = [variables indexOfObject:firstInsertedVariable];
+			NSIndexSet *newRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(indexOfFirstInsertedVariable, rows.count)];
 			
+			// Set the new variables
 			[self reorderVariables:variables oldRowIndexes:oldRowIndexes newRowIndexes:newRowIndexes];
 		}
 	}
