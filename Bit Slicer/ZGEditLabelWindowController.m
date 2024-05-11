@@ -176,7 +176,7 @@
 	
 	if (variables.count > 1)
 	{
-		labelPlaceholderStringValue = @"Foo_%n";
+		labelPlaceholderStringValue = @"Foo_$n";
 		
 		if (firstVariableLabel.length == 0)
 		{
