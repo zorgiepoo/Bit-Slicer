@@ -1444,8 +1444,6 @@
 			return NO;
 		}
 		
-		NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
-		ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];
 		for (ZGVariable *variable in selectedVariables)
 		{
 			if (variable.type == ZGScript)
@@ -1454,19 +1452,9 @@
 			}
 			
 			// Allow "relativizing" variables if they can still be annotated further
-			if (variable.usesDynamicAddress && (variable.userAnnotated || variable.fullAttributedDescription.length != 0))
-			{
-				return NO;
-			}
-			
-			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variable.address fromMachBinaries:machBinaries];
-			if (machBinary == nil)
-			{
-				return NO;
-			}
-			
-			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
-			if (machBinaryInfo.slide == 0 && machBinary.headerAddress == mainMachBinary.headerAddress)
+			// This is including if they were annotated before, in case the annotation
+			// can be updated.
+			if (variable.usesDynamicAddress && variable.userAnnotated)
 			{
 				return NO;
 			}
