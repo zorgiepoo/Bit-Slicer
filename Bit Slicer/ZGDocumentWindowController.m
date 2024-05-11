@@ -1399,7 +1399,7 @@
 	{
 		menuItem.title = ([self selectedVariables].count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableLabelsTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableLabelTitle");
 		
-		if ([_searchController canCancelTask] || [self selectedVariables].count < 1 || !self.currentProcess.valid)
+		if ([_searchController canCancelTask] || [self selectedVariables].count < 1)
 		{
 			return NO;
 		}
