@@ -1507,10 +1507,21 @@ static PyObject *Debugger_updateVariable(DebuggerClass *self, PyObject *args)
 	
 	ZGVariableController *variableController = self->objcSelf->_variableController;
 	
+	ZGPyDebugger *debugger = self->objcSelf;
 	dispatch_async(dispatch_get_main_queue(), ^{
 		ZGVariable *variable = [variableController variableForLabel:labelString];
-		
-		[variableController editVariables:@[variable] addressFormulas:@[addressString]];
+		if (variable == nil)
+		{
+			[debugger->_loggerWindowController writeLine:[NSString stringWithFormat:@"Error: updateVariable() failed to identify variable with label '%@'", labelString]];
+		}
+		else
+		{
+			NSString *cycleInfo = nil;
+			if (![variableController editVariables:@[variable] addressFormulas:@[addressString] cycleInfo:&cycleInfo])
+			{
+				[debugger->_loggerWindowController writeLine:[NSString stringWithFormat:@"Error: updateVariable() failed to update label '%@' with address '%@' due to cycle '%@'", labelString, addressString, cycleInfo]];
+			}
+		}
 	});
 	
 	return Py_BuildValue("");

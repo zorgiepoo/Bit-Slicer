@@ -945,13 +945,118 @@
 + (nullable NSString *)extractFirstDependentLabelFromExpression:(NSString *)initialExpression
 {
 	NSError *expressionError = NULL;
-	DDExpression *expression = [DDExpression expressionFromString:initialExpression error:&expressionError];
+	NSString *substitutedExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:initialExpression];
+	DDExpression *expression = [DDExpression expressionFromString:substitutedExpression error:&expressionError];
 	if (expression == nil)
 	{
 		return nil;
 	}
 	
 	return [self _extractFirstDependentLabelFromExpression:expression];
+}
+
++ (BOOL)_expressionIsCyclic:(DDExpression *)expression cycle:(NSArray<NSString *> * __autoreleasing *)outCycle variableController:(ZGVariableController *)variableController visitedLabels:(NSMutableOrderedSet<NSString *> *)visitedLabels
+{
+	switch (expression.expressionType)
+	{
+		case DDExpressionTypeFunction:
+		{
+			if ([expression.function isEqualToString:ZGFindLabelFunction])
+			{
+				if (expression.arguments.count != 1)
+				{
+					return NO;
+				}
+				
+				DDExpression *argumentExpression1 = expression.arguments[0];
+				if (argumentExpression1.expressionType != DDExpressionTypeVariable)
+				{
+					return NO;
+				}
+				
+				NSString *label = argumentExpression1.variable;
+				if ([visitedLabels containsObject:label])
+				{
+					if (outCycle != NULL)
+					{
+						*outCycle = [visitedLabels.array arrayByAddingObject:label];
+					}
+					return YES;
+				}
+				
+				[visitedLabels addObject:label];
+				
+				ZGVariable *newLabelVariable = [variableController variableForLabel:label];
+				if (newLabelVariable == nil)
+				{
+					return NO;
+				}
+				
+				// Recurse into the new variable label
+				NSString *addressFormula = newLabelVariable.addressFormula;
+				NSString *substitutedAddressFormulaExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:addressFormula];
+				
+				NSError *expressionError = NULL;
+				DDExpression *addressFormulaExpression = [DDExpression expressionFromString:substitutedAddressFormulaExpression error:&expressionError];
+				if (addressFormulaExpression == nil)
+				{
+					return NO;
+				}
+				
+				return [self _expressionIsCyclic:addressFormulaExpression cycle:outCycle variableController:variableController visitedLabels:visitedLabels];
+			}
+			
+			if (expression.arguments.count != 2)
+			{
+				return NO;
+			}
+			
+			DDExpression *argumentExpression1 = expression.arguments[0];
+			DDExpression *argumentExpression2 = expression.arguments[1];
+			
+			BOOL hasCycleInExpression1 = NO;
+			if (argumentExpression1.expressionType == DDExpressionTypeFunction)
+			{
+				// If we have label("A") + label("B") we want to use two different copies of visitedLabels
+				hasCycleInExpression1 = [self _expressionIsCyclic:argumentExpression1 cycle:outCycle variableController:variableController visitedLabels:[visitedLabels mutableCopy]];
+				if (hasCycleInExpression1)
+				{
+					return YES;
+				}
+			}
+			
+			if (argumentExpression2.expressionType == DDExpressionTypeFunction)
+			{
+				return [self _expressionIsCyclic:argumentExpression2 cycle:outCycle variableController:variableController visitedLabels:visitedLabels];
+			}
+			
+			return NO;
+		}
+		case DDExpressionTypeVariable:
+		case DDExpressionTypeNumber:
+			return NO;
+	}
+}
+
++ (BOOL)getVariableCycle:(NSArray<NSString *> * __autoreleasing *)outCycle variable:(ZGVariable *)variable variableController:(ZGVariableController *)variableController
+{
+	NSString *label = variable.label;
+	if (label.length == 0 || !variable.usesDynamicLabelAddress)
+	{
+		return NO;
+	}
+	
+	NSString *initialExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:variable.addressFormula];
+	
+	NSError *expressionError = NULL;
+	DDExpression *expression = [DDExpression expressionFromString:initialExpression error:&expressionError];
+	if (expression == nil)
+	{
+		return NO;
+	}
+	
+	NSMutableOrderedSet<NSString *> *visitedLabels = [NSMutableOrderedSet orderedSetWithObject:label];
+	return [self _expressionIsCyclic:expression cycle:outCycle variableController:variableController visitedLabels:visitedLabels];
 }
 
 + (BOOL)isValidExpression:(NSString *)expression

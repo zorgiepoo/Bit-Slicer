@@ -1,0 +1,6 @@
+
+/* Alert title indicating that this address would create a cycle */
+"addressCycleAlertTitle" = "Address creates a cycle";
+
+/* Alert message indicating that this address would create a cycle */
+"addressCycleAlertMessageFormat" = "The address '%@' cannot be set because it creates a cycle between labels '%@'";

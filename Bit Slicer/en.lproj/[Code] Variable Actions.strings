@@ -67,3 +67,9 @@
 
 /* Alert message title for changing variable size */
 "failedChangeSizeAlertMessage" = "The size could not be changed. Perhaps the requested size is too big?";
+
+/* Alert title for failing to change variable address due to a label cycle */
+"failedRelateVariablesAlertTitle" = "Label creates a cycle";
+
+/* Alert message for failing to change variable address due to a label cycle */
+"failedRelateVariablesAlertMessageFormat" = "A label cannot be set because it creates a cycle '%@'";

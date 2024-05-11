@@ -280,11 +280,16 @@
 		return;
 	}
 	
+	NSString *cycleInfo = nil;
+	if (![_variableController editVariables:ZGUnwrapNullableObject(_variables) requestedLabels:requestedLabels cycleInfo:&cycleInfo])
+	{
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"labelCycleAlertTitle", ZGEditLabelLocalizableTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"labelCycleAlertMessageFormat", ZGEditLabelLocalizableTable, nil), cycleInfo]);
+		return;
+	}
+	
 	NSWindow *window = ZGUnwrapNullableObject(self.window);
 	[NSApp endSheet:window];
 	[window close];
-	
-	[_variableController editVariables:ZGUnwrapNullableObject(_variables) requestedLabels:requestedLabels];
 	
 	_variables = nil;
 }

@@ -449,7 +449,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	// Make sure we do not end up with duplicate labels
 	// New variables that have a label that already exists have their labels removed
 	NSSet<NSString *> *oldLabels = [self usedLabels];
-	BOOL addedLabeledVariable = NO;
 	for (ZGVariable *variable in variables)
 	{
 		NSString *label = variable.label;
@@ -457,6 +456,22 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			if ([oldLabels containsObject:label])
 			{
+				variable.label = @"";
+			}
+		}
+	}
+	
+	// Also make sure we don't end up with new cycles caused by labels
+	BOOL addedLabeledVariable = NO;
+	for (ZGVariable *variable in variables)
+	{
+		NSString *label = variable.label;
+		if (label.length > 0)
+		{
+			NSArray<NSString *> *cycleInfo = nil;
+			if ([ZGCalculator getVariableCycle:&cycleInfo variable:variable variableController:self])
+			{
+				NSLog(@"Error: failed to assign label '%@' to added variable ('%@') due to cycle '%@'", variable.label, variable.addressFormula, [cycleInfo componentsJoinedByString:@" → "]);
 				variable.label = @"";
 			}
 			else
@@ -1073,7 +1088,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		}
 	}
 	
-	[self editVariables:variables addressFormulas:newAddressFormulas];
+	NSString *cycleInfo = nil;
+	if (![self editVariables:variables addressFormulas:newAddressFormulas cycleInfo:&cycleInfo])
+	{
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromVariableActionsTable(@"failedRelateVariablesAlertTitle"), [NSString stringWithFormat:ZGLocalizedStringFromVariableActionsTable(@"failedRelateVariablesAlertMessageFormat"), cycleInfo]);
+	}
 }
 
 #pragma mark Edit Variables Values
@@ -1103,29 +1122,66 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 #pragma mark Edit Variables Address
 
-- (void)editVariables:(NSArray<ZGVariable *> *)variables addressFormulas:(NSArray<NSString *> *)newAddressFormulas
+- (BOOL)editVariables:(NSArray<ZGVariable *> *)variables addressFormulas:(NSArray<NSString *> *)newAddressFormulas cycleInfo:(NSString * __autoreleasing *)outCycleInfo
 {
-	ZGDocumentWindowController *windowController = _windowController;
-	
 	NSArray<NSString *> *oldAddressFormulas = [variables zgMapUsingBlock:^id _Nonnull(ZGVariable *variable) {
 		return variable.addressFormula;
 	}];
+	
+	// Detect if we have any cycles from usages of variable labels
+	BOOL foundCycle = NO;
+	{
+		NSUInteger variableIndex = 0;
+		for (ZGVariable *variable in variables)
+		{
+			NSString *newAddressFormula = newAddressFormulas[variableIndex];
+			variable.addressFormula = newAddressFormula;
+			
+			variableIndex++;
+		}
+		
+		for (ZGVariable *variable in variables)
+		{
+			NSArray *cycleInfo = nil;
+			if ([ZGCalculator getVariableCycle:&cycleInfo variable:variable variableController:self])
+			{
+				NSString *cycleInfoString = [cycleInfo componentsJoinedByString:@" → "];
+				NSLog(@"Error: found cycle (%@) while editing address of %@", cycleInfoString, variable.addressFormula);
+				if (outCycleInfo != NULL)
+				{
+					*outCycleInfo = cycleInfoString;
+				}
+				foundCycle = YES;
+				break;
+			}
+		}
+	}
+	
+	if (foundCycle)
+	{
+		NSUInteger variableIndex = 0;
+		for (ZGVariable *variable in variables)
+		{
+			NSString *oldAddressFormula = oldAddressFormulas[variableIndex];
+			variable.addressFormula = oldAddressFormula;
+		}
+		return NO;
+	}
+	
+	ZGDocumentWindowController *windowController = _windowController;
 	
 	NSString *undoActionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoAddressChange") : ZGLocalizedStringFromVariableActionsTable(@"undoAddressChanges");
 	windowController.undoManager.actionName = undoActionName;
 	
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
-	 addressFormulas:oldAddressFormulas];
+	 addressFormulas:oldAddressFormulas
+	 cycleInfo:NULL];
 	
 	BOOL needsToReloadTable = NO;
 	BOOL anyVariableHasLabel = NO;
-	NSUInteger variableIndex = 0;
 	for (ZGVariable *variable in variables)
 	{
-		NSString *newAddressFormula = newAddressFormulas[variableIndex];
-		
-		variable.addressFormula = newAddressFormula;
 		if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress || variable.usesDynamicSymbolAddress || variable.usesDynamicLabelAddress)
 		{
 			variable.usesDynamicAddress = YES;
@@ -1133,7 +1189,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		else
 		{
 			variable.usesDynamicAddress = NO;
-			variable.addressStringValue = [ZGCalculator evaluateExpression:newAddressFormula];
+			variable.addressStringValue = [ZGCalculator evaluateExpression:variable.addressFormula];
 			
 			needsToReloadTable = YES;
 		}
@@ -1143,8 +1199,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			anyVariableHasLabel = YES;
 		}
-		
-		variableIndex++;
 	}
 	
 	if (needsToReloadTable)
@@ -1174,31 +1228,63 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
 	
 	[windowController updateSearchAddressOptions];
+	
+	return YES;
 }
 
 #pragma mark Edit Variable Labels
 
-- (void)editVariables:(NSArray<ZGVariable *> *)variables requestedLabels:(NSArray<NSString *> *)requestedLabels
+- (BOOL)editVariables:(NSArray<ZGVariable *> *)variables requestedLabels:(NSArray<NSString *> *)requestedLabels cycleInfo:(NSString * __autoreleasing *)outCycleInfo
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	NSMutableArray<NSString *> *oldLabels = [NSMutableArray array];
+	NSArray<NSString *> *oldLabels = [variables zgMapUsingBlock:^(ZGVariable *variable) {
+		return variable.label;
+	}];
+	
+	{
+		NSUInteger labelIndex = 0;
+		for (ZGVariable *variable in variables)
+		{
+			variable.label = requestedLabels[labelIndex];
+			labelIndex++;
+		}
+	}
+	
+	BOOL foundCycle = NO;
 	for (ZGVariable *variable in variables)
 	{
-		[oldLabels addObject:variable.label];
+		NSArray<NSString *> *cycleInfo = nil;
+		if ([ZGCalculator getVariableCycle:&cycleInfo variable:variable variableController:self])
+		{
+			NSString *cycleInfoString = [cycleInfo componentsJoinedByString:@" → "];
+			NSLog(@"Error: detected cycle (%@) while assigning variable (%@) label '%@'", cycleInfoString, variable.addressFormula, variable.label);
+			if (outCycleInfo != NULL)
+			{
+				*outCycleInfo = cycleInfoString;
+			}
+			
+			foundCycle = YES;
+			break;
+		}
+	}
+	
+	if (foundCycle)
+	{
+		NSUInteger labelIndex = 0;
+		for (ZGVariable *variable in variables)
+		{
+			variable.label = oldLabels[labelIndex];
+			labelIndex++;
+		}
+		return NO;
 	}
 	
 	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoLabelChange");
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
-	 requestedLabels:oldLabels];
-	
-	NSUInteger labelIndex = 0;
-	for (ZGVariable *variable in variables)
-	{
-		variable.label = requestedLabels[labelIndex];
-		labelIndex++;
-	}
+	 requestedLabels:oldLabels
+	 cycleInfo:NULL];
 	
 	// Re-annotate the variables so the labels are in the descriptions
 	// Also annotate other variables that may be referencing these edited variables
@@ -1217,6 +1303,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	
 	[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
+	
+	return YES;
 }
 
 #pragma mark Relativizing Variable Addresses

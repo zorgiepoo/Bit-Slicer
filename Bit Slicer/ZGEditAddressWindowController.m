@@ -34,6 +34,9 @@
 #import "ZGVariableController.h"
 #import "ZGVariable.h"
 #import "ZGNullability.h"
+#import "ZGRunAlertPanel.h"
+
+#define ZGEditAddressLocalizableTable @"[Code] Edit Variable Address"
 
 @implementation ZGEditAddressWindowController
 {
@@ -73,11 +76,17 @@
 
 - (IBAction)editAddress:(id)__unused sender
 {
+	NSString *newAddressFormula = _addressTextField.stringValue;
+	NSString *cycleInfo = nil;
+	if (![_variableController editVariables:@[ZGUnwrapNullableObject(_variable)] addressFormulas:@[newAddressFormula] cycleInfo:&cycleInfo])
+	{
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"addressCycleAlertTitle", ZGEditAddressLocalizableTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"addressCycleAlertMessageFormat", ZGEditAddressLocalizableTable, nil), newAddressFormula, cycleInfo]);
+		return;
+	}
+	
 	NSWindow *window = ZGUnwrapNullableObject([self window]);
 	[NSApp endSheet:window];
 	[window close];
-	
-	[_variableController editVariables:@[ZGUnwrapNullableObject(_variable)] addressFormulas:@[_addressTextField.stringValue]];
 	
 	_variable = nil;
 }

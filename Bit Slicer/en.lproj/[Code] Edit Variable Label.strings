@@ -8,6 +8,12 @@
 /* Alert message indicating that a single variable label is already in use */
 "alreadyUsedLabelAlertMessage" = "One of the supplied labels is already in use by another variable.";
 
+/* Alert title indicating that a label would create a cycle */
+"labelCycleAlertTitle" = "Label creates a cycle";
+
+/* Alert message indicating that a label would creates a new cycle */
+"labelCycleAlertMessageFormat" = "A label cannot be set because it creates a cycle '%@'";
+
 /* Alert title indicating that a label must use a number token */
 "requireUsingOrdinalAlertTitle" = "Label must include $n";
 
