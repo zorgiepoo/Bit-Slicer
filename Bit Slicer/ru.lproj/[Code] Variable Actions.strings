@@ -55,6 +55,9 @@
 /* Undo action for changing variable address */
 "undoAddressChange" = "Изменение адреса";
 
+/* Undo action for changing variable addresses */
+"undoAddressChanges" = "Address Changes";
+
 /* Undo action for relativizing a single variable */
 "undoRelativizeSingleVariable" = "РевиталиRelativize Variable";
 

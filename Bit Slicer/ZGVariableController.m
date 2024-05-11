@@ -1013,6 +1013,73 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 }
 
+- (void)relateVariables:(NSArray<ZGVariable *> *)variables toLabeledVariable:(ZGVariable *)labeledVariable
+{
+	ZGDocumentWindowController *windowController = _windowController;
+	ZGProcess *process = windowController.currentProcess;
+	
+	// If there are any duplicate addresses or any address is zero or the addresses are < than the labeled variable
+	// we will assume the variable's addresses are not meaningful and can be overwritten based on stride
+	// Otherwise we will assume the current addresses are meaningful and are relative to the labeled variable
+	ZGMemoryAddress labeledVariableAddress = labeledVariable.address;
+	NSMutableSet<NSNumber *> *visitedAddresses = [NSMutableSet set];
+	BOOL currentAddressesRelatable = YES;
+	for (ZGVariable *variable in variables)
+	{
+		if (variable.address == 0x0 || variable.address < labeledVariableAddress)
+		{
+			currentAddressesRelatable = NO;
+			break;
+		}
+		
+		if ([visitedAddresses containsObject:@(variable.address)])
+		{
+			currentAddressesRelatable = NO;
+			break;
+		}
+		
+		[visitedAddresses addObject:@(variable.address)];
+	}
+	
+	NSMutableArray<NSString *> *newAddressFormulas = [NSMutableArray array];
+	NSString *label = labeledVariable.label;
+	if (!currentAddressesRelatable)
+	{
+		ZGMemoryAddress currentAddress = labeledVariableAddress + labeledVariable.size;
+		
+		ZGProcessType processType = process.type;
+		for (ZGVariable *variable in variables)
+		{
+			ZGMemorySize variableSize = variable.size;
+			
+			// Fix any data potential data alignment
+			ZGMemorySize dataAlignment = ZGDataAlignment(processType, variable.type, variableSize);
+			ZGMemorySize unalignedSize = (currentAddress % dataAlignment);
+			if (unalignedSize != 0)
+			{
+				currentAddress += dataAlignment - unalignedSize;
+			}
+			
+			NSString *newAddressFormula = [NSString stringWithFormat:@"label(\"%@\") + 0x%llX", label, currentAddress - labeledVariableAddress];
+			
+			[newAddressFormulas addObject:newAddressFormula];
+			
+			currentAddress += variableSize;
+		}
+	}
+	else
+	{
+		for (ZGVariable *variable in variables)
+		{
+			NSString *newAddressFormula = [NSString stringWithFormat:@"label(\"%@\") + 0x%llX", label, variable.address - labeledVariableAddress];
+			
+			[newAddressFormulas addObject:newAddressFormula];
+		}
+	}
+	
+	[self editVariables:variables addressFormulas:newAddressFormulas];
+}
+
 #pragma mark Edit Variables Values
 
 - (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues
@@ -1040,37 +1107,63 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 #pragma mark Edit Variables Address
 
-- (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula
+- (void)editVariables:(NSArray<ZGVariable *> *)variables addressFormulas:(NSArray<NSString *> *)newAddressFormulas
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoAddressChange");
-	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
-	 editVariable:variable
-	 addressFormula:variable.addressFormula];
+	NSArray<NSString *> *oldAddressFormulas = [variables zgMapUsingBlock:^id _Nonnull(ZGVariable *variable) {
+		return variable.addressFormula;
+	}];
 	
-	variable.addressFormula = newAddressFormula;
-	if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress || variable.usesDynamicSymbolAddress || variable.usesDynamicLabelAddress)
+	NSString *undoActionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoAddressChange") : ZGLocalizedStringFromVariableActionsTable(@"undoAddressChanges");
+	windowController.undoManager.actionName = undoActionName;
+	
+	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
+	 editVariables:variables
+	 addressFormulas:oldAddressFormulas];
+	
+	BOOL needsToReloadTable = NO;
+	BOOL anyVariableHasLabel = NO;
+	NSUInteger variableIndex = 0;
+	for (ZGVariable *variable in variables)
 	{
-		variable.usesDynamicAddress = YES;
-	}
-	else
-	{
-		variable.usesDynamicAddress = NO;
-		variable.addressStringValue = [ZGCalculator evaluateExpression:newAddressFormula];
+		NSString *newAddressFormula = newAddressFormulas[variableIndex];
 		
+		variable.addressFormula = newAddressFormula;
+		if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress || variable.usesDynamicSymbolAddress || variable.usesDynamicLabelAddress)
+		{
+			variable.usesDynamicAddress = YES;
+		}
+		else
+		{
+			variable.usesDynamicAddress = NO;
+			variable.addressStringValue = [ZGCalculator evaluateExpression:newAddressFormula];
+			
+			needsToReloadTable = YES;
+		}
+		variable.finishedEvaluatingDynamicAddress = NO;
+		
+		if (variable.label.length > 0)
+		{
+			anyVariableHasLabel = YES;
+		}
+		
+		variableIndex++;
+	}
+	
+	if (needsToReloadTable)
+	{
 		[windowController.variablesTableView reloadData];
 	}
-	variable.finishedEvaluatingDynamicAddress = NO;
 	
-	NSMutableArray<ZGVariable *> *variablesToAnnotate = [NSMutableArray arrayWithObject:variable];
-	if (variable.label.length > 0)
+	NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
+	if (anyVariableHasLabel > 0)
 	{
 		// Other variables may be referencing this variable
 		// We will want to update their annotations too
 		for (ZGVariable *otherVariable in _documentData.variables)
 		{
-			if (otherVariable == variable)
+			if ([variablesToAnnotate containsObject:otherVariable])
 			{
 				continue;
 			}
@@ -1082,7 +1175,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		}
 	}
 	
-	[self annotateVariablesAutomatically:variablesToAnnotate process:windowController.currentProcess];
+	[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
 	
 	[windowController updateSearchAddressOptions];
 }

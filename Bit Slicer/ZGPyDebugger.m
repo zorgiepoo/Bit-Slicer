@@ -1510,7 +1510,7 @@ static PyObject *Debugger_updateVariable(DebuggerClass *self, PyObject *args)
 	dispatch_async(dispatch_get_main_queue(), ^{
 		ZGVariable *variable = [variableController variableForLabel:labelString];
 		
-		[variableController editVariable:variable addressFormula:addressString];
+		[variableController editVariables:@[variable] addressFormulas:@[addressString]];
 	});
 	
 	return Py_BuildValue("");

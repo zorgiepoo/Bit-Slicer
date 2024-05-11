@@ -77,7 +77,7 @@
 	[NSApp endSheet:window];
 	[window close];
 	
-	[_variableController editVariable:ZGUnwrapNullableObject(_variable) addressFormula:_addressTextField.stringValue];
+	[_variableController editVariables:@[ZGUnwrapNullableObject(_variable)] addressFormulas:@[_addressTextField.stringValue]];
 	
 	_variable = nil;
 }

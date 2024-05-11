@@ -63,7 +63,7 @@
 	ZGTableView * _Nullable _variablesTableView;
 }
 
-#define ZGVariableReorderType @"ZGVariableReorderType"
+#define ZGVariableRowsType @"ZGVariableRowsType"
 
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 
@@ -90,7 +90,7 @@
 	_variablesTableView = tableView;
 	[_variablesTableView setDataSource:self];
 	[_variablesTableView setDelegate:self];
-	[_variablesTableView registerForDraggedTypes:@[ZGVariableReorderType, ZGVariablePboardType]];
+	[_variablesTableView registerForDraggedTypes:@[ZGVariableRowsType, ZGVariablePboardType]];
 }
 
 - (void)cleanUp
@@ -336,10 +336,46 @@
 
 #pragma mark Table View Drag & Drop
 
-- (NSDragOperation)tableView:(NSTableView *)__unused tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)__unused row proposedDropOperation:(NSTableViewDropOperation)operation
+- (NSDragOperation)tableView:(NSTableView *)__unused tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)proposedRow proposedDropOperation:(NSTableViewDropOperation)operation
 {
-	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
+	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableRowsType])
 	{
+		if (operation == NSTableViewDropOn)
+		{
+			if (proposedRow < 0)
+			{
+				return NO;
+			}
+			
+			NSArray<NSNumber *> *draggingRows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableRowsType];
+			
+			if ([draggingRows containsObject:@(proposedRow)])
+			{
+				return NSDragOperationNone;
+			}
+			
+			NSArray<ZGVariable *> *documentVariables = _documentData.variables;
+			if ((NSUInteger)proposedRow >= documentVariables.count)
+			{
+				return NSDragOperationNone;
+			}
+			
+			ZGVariable *variableAtProposedRow = documentVariables[(NSUInteger)proposedRow];
+			if (variableAtProposedRow.label.length == 0)
+			{
+				return NSDragOperationNone;
+			}
+			
+			for (NSNumber *draggingRow in draggingRows)
+			{
+				ZGVariable *draggingVariable = documentVariables[draggingRow.unsignedIntegerValue];
+				if (draggingVariable.type == ZGScript || draggingVariable.usesDynamicLabelAddress)
+				{
+					return NSDragOperationNone;
+				}
+			}
+		}
+		
 		return NSDragOperationMove;
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType] && operation != NSTableViewDropOn)
@@ -362,41 +398,57 @@
 	[_variablesTableView reloadData];
 }
 
-- (BOOL)tableView:(NSTableView *)__unused tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)__unused operation
+- (BOOL)tableView:(NSTableView *)__unused tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
 {
 	if (newRow < 0)
 	{
 		return NO;
 	}
 	
-	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
+	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableRowsType])
 	{
-		NSMutableArray<ZGVariable *> *variables = [NSMutableArray arrayWithArray:_documentData.variables];
-		NSArray<NSNumber *> *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
+		NSArray<NSNumber *> *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableRowsType];
 		
-		// Fill in the current rows with null objects
-		for (NSNumber *row in rows)
+		if (operation == NSTableViewDropOn)
 		{
-			[variables
-			 replaceObjectAtIndex:row.unsignedIntegerValue
-			 withObject:(id)[NSNull null]];
-		}
-		
-		// Insert the objects to the new position
-		for (NSNumber *row in rows)
-		{
-			[variables
-			 insertObject:[_documentData.variables objectAtIndex:row.unsignedIntegerValue]
-			 atIndex:(NSUInteger)newRow];
+			NSArray<ZGVariable *> *documentVariables = _documentData.variables;
 			
-			newRow++;
+			ZGVariable *targetLabeledVariable = documentVariables[(NSUInteger)newRow];
+			NSArray<ZGVariable *> *draggedVariables = [rows zgMapUsingBlock:^id _Nonnull(NSNumber *row) {
+				return documentVariables[row.unsignedIntegerValue];
+			}];
+			
+			ZGDocumentWindowController *windowController = _windowController;
+			[windowController.variableController relateVariables:draggedVariables toLabeledVariable:targetLabeledVariable];
 		}
-		
-		// Remove all the old objects
-		[variables removeObject:(id)[NSNull null]];
-		
-		// Set the new variables
-		[self reorderVariables:variables];
+		else
+		{
+			NSMutableArray<ZGVariable *> *variables = [NSMutableArray arrayWithArray:_documentData.variables];
+			
+			// Fill in the current rows with null objects
+			for (NSNumber *row in rows)
+			{
+				[variables
+				 replaceObjectAtIndex:row.unsignedIntegerValue
+				 withObject:(id)[NSNull null]];
+			}
+			
+			// Insert the objects to the new position
+			for (NSNumber *row in rows)
+			{
+				[variables
+				 insertObject:[_documentData.variables objectAtIndex:row.unsignedIntegerValue]
+				 atIndex:(NSUInteger)newRow];
+				
+				newRow++;
+			}
+			
+			// Remove all the old objects
+			[variables removeObject:(id)[NSNull null]];
+			
+			// Set the new variables
+			[self reorderVariables:variables];
+		}
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType])
 	{
@@ -411,7 +463,7 @@
 		NSArray<ZGVariable *> *variables = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [ZGVariable class]]] fromData:pasteboardData error:&unarchiveError];
 		if (variables == nil)
 		{
-			NSLog(@"Error: failed to unarchive variables in drag-dsop: %@", unarchiveError);
+			NSLog(@"Error: failed to unarchive variables in drag-drop: %@", unarchiveError);
 			return NO;
 		}
 		
@@ -430,13 +482,13 @@
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pasteboard
 {
-	[pasteboard declareTypes:@[ZGVariableReorderType, ZGVariablePboardType] owner:self];
+	[pasteboard declareTypes:@[ZGVariableRowsType, ZGVariablePboardType] owner:self];
 	
 	NSMutableArray<NSNumber *> *rows = [[NSMutableArray alloc] init];
 	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL * __unused stop) {
 		[rows addObject:@(index)];
 	}];
-	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableReorderType];
+	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableRowsType];
 	
 	NSArray<ZGVariable *> *variables = [_documentData.variables objectsAtIndexes:rowIndexes];
 	
