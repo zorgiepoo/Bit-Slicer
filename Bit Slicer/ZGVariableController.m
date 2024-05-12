@@ -1029,7 +1029,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	ZGDocumentWindowController *windowController = _windowController;
 	ZGProcess *process = windowController.currentProcess;
 	
-	// If there are any duplicate addresses or any address is zero or the addresses are <= than the labeled variable
+	ZGMemoryAddress mainBinaryHeaderAddress = process.mainMachBinary.headerAddress;
+	
+	// If there are any duplicate addresses or any address < mainBinaryHeaderAddress
 	// we will assume the variable's addresses are not meaningful and can be overwritten based on stride
 	// Otherwise we will assume the current addresses are meaningful and are relative to the labeled variable
 	ZGMemoryAddress labeledVariableAddress = labeledVariable.address;
@@ -1037,19 +1039,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	BOOL currentAddressesRelatable = YES;
 	for (ZGVariable *variable in variables)
 	{
-		if (variable.address == 0x0 || variable.address <= labeledVariableAddress)
+		if (variable.address < mainBinaryHeaderAddress)
 		{
 			currentAddressesRelatable = NO;
 			break;
 		}
 		
-		if ([visitedAddresses containsObject:@(variable.address)])
+		NSNumber *variableAddress = @(variable.address);
+		if ([visitedAddresses containsObject:variableAddress])
 		{
 			currentAddressesRelatable = NO;
 			break;
 		}
 		
-		[visitedAddresses addObject:@(variable.address)];
+		[visitedAddresses addObject:variableAddress];
 	}
 	
 	NSMutableArray<NSString *> *newAddressFormulas = [NSMutableArray array];
@@ -1082,7 +1085,16 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		for (ZGVariable *variable in variables)
 		{
-			NSString *newAddressFormula = [NSString stringWithFormat:@"label(\"%@\") + 0x%llX", label, variable.address - labeledVariableAddress];
+			ZGMemoryAddress variableAddress = variable.address;
+			NSString *newAddressFormula;
+			if (variableAddress >= labeledVariableAddress)
+			{
+				newAddressFormula = [NSString stringWithFormat:@"label(\"%@\") + 0x%llX", label, variableAddress - labeledVariableAddress];
+			}
+			else
+			{
+				newAddressFormula = [NSString stringWithFormat:@"label(\"%@\") - 0x%llX", label, labeledVariableAddress - variableAddress];
+			}
 			
 			[newAddressFormulas addObject:newAddressFormula];
 		}

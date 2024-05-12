@@ -369,7 +369,10 @@
 			for (NSNumber *draggingRow in draggingRows)
 			{
 				ZGVariable *draggingVariable = documentVariables[draggingRow.unsignedIntegerValue];
-				if (draggingVariable.type == ZGScript || draggingVariable.usesDynamicLabelAddress)
+				// Even if the label already uses a label in its address,
+				// we should still allow the user to override the address if they want
+				// to change the relation of the variable from one label to another one
+				if (draggingVariable.type == ZGScript)
 				{
 					return NSDragOperationNone;
 				}
