@@ -1743,13 +1743,16 @@
 				if (copySigningInfoCode == noErr)
 				{
 					NSNumber *codeInfoFlags = signingInformation[(NSString *)kSecCodeInfoFlags];
-					SecCodeSignatureFlags codeSignatureFlags = codeInfoFlags.unsignedIntValue;
-					
-					// I don't think kSecCodeSignatureRuntime is really correct (apps can opt into hardened runtime
-					// and still be debugged), but it's probably a good enough heuristic
-					if ((codeSignatureFlags & kSecCodeSignatureRestrict) != 0 || (codeSignatureFlags & kSecCodeSignatureRuntime) != 0)
+					if (codeInfoFlags != nil)
 					{
-						return YES;
+						SecCodeSignatureFlags codeSignatureFlags = codeInfoFlags.unsignedIntValue;
+						
+						// I don't think kSecCodeSignatureRuntime is really correct (apps can opt into hardened runtime
+						// and still be debugged), but it's probably a good enough heuristic
+						if ((codeSignatureFlags & kSecCodeSignatureRestrict) != 0 || (codeSignatureFlags & kSecCodeSignatureRuntime) != 0)
+						{
+							return YES;
+						}
 					}
 				}
 			}
