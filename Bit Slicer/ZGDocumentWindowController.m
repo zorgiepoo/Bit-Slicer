@@ -65,6 +65,8 @@
 #import "ZGNullability.h"
 #import "ZGCalculator.h"
 #import <libproc.h>
+#import <Security/CodeSigning.h>
+#import <Security/SecCode.h>
 
 #import <TargetConditionals.h>
 
@@ -1701,15 +1703,20 @@
 		{
 			// We failed to grant access to this process the user is trying to search in
 			// Notify the user why this may be the case
-			if ([self isCurrentProcessProtectedByEntitlement])
-			{
-				ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), self.currentProcess.name], self);
-			}
-			else
-			{
-				// While we don't show apps that are running as root user, some processes can still require the debugger running as root to access them
-				ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), self.currentProcess.name]);
-			}
+			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+				BOOL isProtectedByEntitlement = [self isCurrentProcessProtectedByEntitlement];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					if (isProtectedByEntitlement)
+					{
+						ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), self.currentProcess.name], self);
+					}
+					else
+					{
+						// While we don't show apps that are running as root user, some processes can still require the debugger running as root to access them
+						ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), self.currentProcess.name]);
+					}
+				});
+			});
 		}
 	}
 }
@@ -1720,49 +1727,30 @@
 	int numberOfBytesRead = proc_pidpath(self.currentProcess.processID, pathBuffer, sizeof(pathBuffer));
 	if (numberOfBytesRead > 0)
 	{
-		NSString *path = [[NSString alloc] initWithBytes:pathBuffer length:(NSUInteger)numberOfBytesRead encoding:NSUTF8StringEncoding];
-		if (path != nil)
+		NSURL *fileURL = [[NSURL alloc] initFileURLWithFileSystemRepresentation:pathBuffer isDirectory:NO relativeToURL:nil];
+		
+		if (fileURL != nil)
 		{
-			NSString *codesignPath = @"/usr/bin/codesign";
-			if ([[NSFileManager defaultManager] fileExistsAtPath:codesignPath])
+			SecStaticCodeRef staticCode = NULL;
+			OSStatus staticCodeResult = SecStaticCodeCreateWithPath((__bridge CFURLRef)fileURL, kSecCSDefaultFlags, &staticCode);
+			if (staticCodeResult == noErr)
 			{
-				NSTask *codesignTask = [[NSTask alloc] init];
-				codesignTask.launchPath = codesignPath;
-				codesignTask.arguments = @[@"-dv", path];
+				CFDictionaryRef cfSigningInformation = NULL;
+				OSStatus copySigningInfoCode = SecCodeCopySigningInformation(staticCode, kSecCSSigningInformation, &cfSigningInformation);
 				
-				NSPipe *outputPipe = [NSPipe pipe];
-				codesignTask.standardError = outputPipe;
+				NSDictionary *signingInformation = CFBridgingRelease(cfSigningInformation);
 				
-				@try
+				if (copySigningInfoCode == noErr)
 				{
-					[codesignTask launch];
-					[codesignTask waitUntilExit];
+					NSNumber *codeInfoFlags = signingInformation[(NSString *)kSecCodeInfoFlags];
+					SecCodeSignatureFlags codeSignatureFlags = codeInfoFlags.unsignedIntValue;
 					
-					NSFileHandle *fileHandle = [outputPipe fileHandleForReading];
-					NSData *dataRead = [fileHandle readDataToEndOfFile];
-					if (dataRead != nil)
+					// I don't think kSecCodeSignatureRuntime is really correct (apps can opt into hardened runtime
+					// and still be debugged), but it's probably a good enough heuristic
+					if ((codeSignatureFlags & kSecCodeSignatureRestrict) != 0 || (codeSignatureFlags & kSecCodeSignatureRuntime) != 0)
 					{
-						__block BOOL foundProtection = NO;
-						NSString *contents = [[NSString alloc] initWithData:dataRead encoding:NSUTF8StringEncoding];
-						[contents enumerateLinesUsingBlock:^(NSString * _Nonnull line, BOOL * _Nonnull stop) {
-							NSString *trimmedLine = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-							// Google Chrome opted into restrict bit a couple years before 10.14 came about
-							// Apps opting in notarization will have the runtime bit set
-							if ([trimmedLine hasPrefix:@"CodeDirectory"])
-							{
-								if (([trimmedLine containsString:@"restrict"] || [trimmedLine containsString:@"runtime"]))
-								{
-									foundProtection = YES;
-								}
-								*stop = YES;
-							}
-						}];
-						return foundProtection;
+						return YES;
 					}
-				}
-				@catch (NSException *exception)
-				{
-					NSLog(@"Failed to execute codesign verification command: %@", exception);
 				}
 			}
 		}
