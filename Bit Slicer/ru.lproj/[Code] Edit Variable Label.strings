@@ -19,3 +19,6 @@
 
 /* Alert message indicating that a label must use a number token */
 "requireUsingOrdinalAlertMessage" = "The label name must use $n when modifying multiple labels so each variable is assigned a different label.";
+
+/* Placeholder prefix for editing batch of new labels */
+"newLabelPlaceholderPrefix" = "NewLabel";

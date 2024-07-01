@@ -176,7 +176,7 @@
 	
 	if (variables.count > 1)
 	{
-		labelPlaceholderStringValue = @"NewLabel_$n";
+		labelPlaceholderStringValue = [NSString stringWithFormat:@"%@_$n", NSLocalizedStringFromTable(@"newLabelPlaceholderPrefix", ZGEditLabelLocalizableTable, nil)];
 		
 		if (firstVariableLabel.length == 0)
 		{
