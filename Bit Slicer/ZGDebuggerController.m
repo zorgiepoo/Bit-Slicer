@@ -237,7 +237,11 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDebuggerAddressField];
 	[coder encodeObject:[(ZGProcess *)self.runningApplicationsPopUpButton.selectedItem.representedObject internalName] forKey:ZGDebuggerProcessInternalName];
 	[coder encodeObject:@(_offsetFromBase) forKey:ZGDebuggerOffsetFromBase];
-	[coder encodeObject:_mappedFilePath == nil ? [NSNull null] : _mappedFilePath forKey:ZGDebuggerMappedFilePath];
+	
+	if (_mappedFilePath != nil)
+	{
+		[coder encodeObject:_mappedFilePath forKey:ZGDebuggerMappedFilePath];
+	}
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
@@ -252,11 +256,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	
 	_offsetFromBase = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:ZGDebuggerOffsetFromBase] unsignedLongLongValue];
 	
-	_mappedFilePath = [coder decodeObjectOfClass:[NSObject class] forKey:ZGDebuggerMappedFilePath];
-	if ((id)_mappedFilePath == [NSNull null])
-	{
-		_mappedFilePath = nil;
-	}
+	_mappedFilePath = [coder decodeObjectOfClass:[NSString class] forKey:ZGDebuggerMappedFilePath];
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGDebuggerProcessInternalName];
 	[self updateRunningProcesses];
