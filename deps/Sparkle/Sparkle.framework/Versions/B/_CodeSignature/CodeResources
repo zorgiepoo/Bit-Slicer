@@ -22,7 +22,7 @@
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		2tQHOgN1x0tbngsLbiGzLjoMd84=
+		7Nd6QQ6Z7t2v3QNHz0D28eNL8ao=
 		</data>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
 		<data>
@@ -30,7 +30,7 @@
 		</data>
 		<key>Resources/SUStatus.nib</key>
 		<data>
-		ZAnGku07bS8gPWfDKzQvhK49E+A=
+		eQk+EGXV04Czsisk0GAXskdJXSI=
 		</data>
 		<key>Resources/ar.lproj/SUUpdateAlert.strings</key>
 		<dict>
@@ -939,10 +939,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			KYUrQDMqWdAz5hhgMFt7mQMiCZs=
+			XBsC4OwQ4xg7ScC2UcmZKo7eS0A=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"29852b40332a59d033e61860305b7b990322099b" or cdhash H"d9e716dc4490a21f3c798cb023d557d0684e5ab5"</string>
+			<string>cdhash H"5c1b02e0ec10e3183b49c0b651c9992a8ede4b40" or cdhash H"84933cf22aa6c0027163157b664f69390daf09d6"</string>
 		</dict>
 		<key>Headers/SPUDownloadData.h</key>
 		<dict>
@@ -1186,7 +1186,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			fgQgzZZEOtMRLFmrW5fTzFpeO1bg6HGsiK0NzAe1I9Y=
+			r5wa0bDCHnpytsQrGkw9mYUUGtA7ZzVMFKvft2DmPUI=
 			</data>
 		</dict>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
@@ -1200,7 +1200,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			EKe925NYcAgvdxcboaIaOFNtL17zDmjuLzUz7/YDpM0=
+			rr9H6inemzywaKM70QBO7LoXtbym/o2JXEg76jWSP3I=
 			</data>
 		</dict>
 		<key>Resources/ar.lproj/SUUpdateAlert.strings</key>
@@ -2107,10 +2107,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			pPAilvMP/dkjuqdm563M5FEk8BU=
+			3h0OaFzAHxUGGhIKhk4OczaAQXI=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"a4f02296f30ffdd923baa766e7adcce45124f015" or cdhash H"26b289b27b0e292514515e131b4d07243dfb0b14"</string>
+			<string>cdhash H"de1d0e685cc01f15061a120a864e0e7336804172" or cdhash H"8bed035b8ac89d75046282d01160d1d3a854c18a"</string>
 		</dict>
 	</dict>
 	<key>rules</key>

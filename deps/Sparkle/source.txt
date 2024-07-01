@@ -1,6 +1,6 @@
 Source: https://github.com/sparkle-project/Sparkle
 Branch: 2.x
-Commit: 41847a58cdef7506b257591fcca6f9495df591d4
+Commit: 2.6.4
 
 Instructions:
 In ConfigCommon.xcconfig set deployment target and disable:
@@ -10,4 +10,3 @@ SPARKLE_BUILD_LEGACY_SUUPDATER
 SPARKLE_BUILD_LEGACY_DSA_SUPPORT (and remove -DSPARKLE_BUILD_LEGACY_DSA_SUPPORT)
 SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
 SPARKLE_BUILD_PACKAGE_SUPPORT (and remove -DSPARKLE_BUILD_PACKAGE_SUPPORT)
-SPARKLE_BUILD_DMG_SUPPORT (and remove -DSPARKLE_BUILD_DMG_SUPPORT)
