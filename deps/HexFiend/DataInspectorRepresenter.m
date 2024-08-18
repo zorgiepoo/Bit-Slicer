@@ -316,6 +316,11 @@ NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows
     }
 }
 
+- (BOOL)zg_editing
+{
+	return table.editedRow != -1;
+}
+
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor {
     USE(control);
     NSInteger row = [table editedRow];

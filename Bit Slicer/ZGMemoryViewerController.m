@@ -613,7 +613,7 @@
 
 - (void)updateDisplayTimer:(NSTimer *)__unused timer
 {
-	if (_currentMemorySize > 0)
+	if (_currentMemorySize > 0 && !_dataInspectorRepresenter.zg_editing)
 	{
 		HFFPRange displayedLineRange = _textView.controller.displayedLineRange;
 		

@@ -19,6 +19,9 @@ extern NSString * const DataInspectorDidDeleteAllRows;
 
 - (NSUInteger)rowCount;
 
+// Bit Slicer addition: is the data inspector being edited?
+@property (nonatomic, readonly) BOOL zg_editing;
+
 - (IBAction)addRow:(id)sender;
 - (IBAction)removeRow:(id)sender;
 - (IBAction)doubleClickedTable:(id)sender;
