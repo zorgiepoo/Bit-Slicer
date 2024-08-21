@@ -1,10 +1,9 @@
-Source: https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tgz
+Source: https://www.python.org/ftp/python/3.12.5/Python-3.12.5.tgz
 
 Config:
 Check Mac/README.rst for info
 
-# Don't pass --enable-optimizations --with-lto as it may cause bugs
-env MACOSX_DEPLOYMENT_TARGET=10.14.6 ./configure --enable-framework=/Users/msp/Desktop/python-install/ --enable-universalsdk --with-universal-archs=universal2
+env MACOSX_DEPLOYMENT_TARGET=10.14.6 ./configure --enable-framework=/Users/msp/Desktop/python-install/ --enable-universalsdk --with-universal-archs=universal2 --enable-optimizations --with-lto
 
 env MACOSX_DEPLOYMENT_TARGET=10.14.6 make
 sudo make install # sudo is needed otherwise everything won't be installed, will install in /usr/local/bin/
@@ -46,6 +45,9 @@ rm -rf unittest
 rm -rf wsgiref
 rm doctest.pyc
 rm pydoc.pyc
+rm -rf venv
+rm -rf lib2to3
+rm -rf idle lib
 
 cd lib-dynload
 rm _curses_panel.cpython-312-darwin.so
