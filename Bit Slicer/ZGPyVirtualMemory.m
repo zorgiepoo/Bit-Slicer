@@ -206,7 +206,7 @@ static PyTypeObject VirtualMemoryType =
 	0, // tp_init
 	0, // tp_alloc
 	0, // tp_new
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
 @implementation ZGPyVirtualMemory
@@ -371,7 +371,7 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 		void *bytes = NULL;
 		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytes))
 		{
-			retValue = Py_BuildValue("y#", bytes, numberOfBytes);
+			retValue = PyBytes_FromStringAndSize(bytes, (long)numberOfBytes);
 			ZGFreeBytes(bytes, numberOfBytes);
 		}
 		else

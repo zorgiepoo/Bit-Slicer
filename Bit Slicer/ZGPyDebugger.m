@@ -190,7 +190,7 @@ static PyTypeObject DebuggerType =
 	0, // tp_init
 	0, // tp_alloc
 	0, // tp_new
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
 @implementation ZGPyDebugger
@@ -614,7 +614,7 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args, PyObject
 			
 			if (assembledData != nil)
 			{
-				retValue = Py_BuildValue("y#", assembledData.bytes, assembledData.length);
+				retValue = PyBytes_FromStringAndSize(assembledData.bytes, (long)assembledData.length);
 			}
 			else
 			{
@@ -683,7 +683,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 		NSData *readData = [ZGDebuggerUtilities readDataWithProcessTask:self->processTask address:address size:size breakPoints:self->objcSelf->_breakPointController.breakPoints];
 		if (readData != nil)
 		{
-			retValue = Py_BuildValue("y#", readData.bytes, readData.length);
+			retValue = PyBytes_FromStringAndSize(readData.bytes, (long)readData.length);
 		}
 		else
 		{
@@ -803,7 +803,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 				bufferIterator += instruction.variable.size;
 			}
 			
-			retValue = Py_BuildValue("y#", buffer, bufferLength);
+			retValue = PyBytes_FromStringAndSize(buffer, (long)bufferLength);
 			
 			free(buffer);
 		}

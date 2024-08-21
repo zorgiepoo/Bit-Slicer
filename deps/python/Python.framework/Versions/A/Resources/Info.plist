@@ -17,12 +17,14 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.9.1, (c) 2001-2019 Python Software Foundation.</string>
+	<string>3.12.5, (c) 2001-2023 Python Software Foundation.</string>
 	<key>CFBundleLongVersionString</key>
-	<string>3.9.1, (c) 2001-2019 Python Software Foundation.</string>
+	<string>3.12.5, (c) 2001-2023 Python Software Foundation.</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>3.9.1</string>
+	<string>3.12.5</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 </dict>
 </plist>
