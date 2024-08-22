@@ -2726,6 +2726,7 @@
 					"-Wno-c11-extensions",
 					"-Wno-declaration-after-statement",
 					"-Wno-c++98-compat-pedantic",
+					"-Wno-disabled-macro-expansion",
 				);
 			};
 			name = Debug;
@@ -2835,6 +2836,7 @@
 					"-Wno-c11-extensions",
 					"-Wno-declaration-after-statement",
 					"-Wno-c++98-compat-pedantic",
+					"-Wno-disabled-macro-expansion",
 				);
 			};
 			name = Release;

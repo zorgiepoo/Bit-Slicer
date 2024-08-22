@@ -171,7 +171,7 @@
 	NSBundle *pythonBundle = [NSBundle bundleWithPath:[privateFrameworksPath stringByAppendingPathComponent:@"Python.framework"]];
 	assert(pythonBundle != nil);
 	
-	NSString *pythonDirectory = [pythonBundle pathForResource:@"python3.9" ofType:nil];
+	NSString *pythonDirectory = [pythonBundle pathForResource:@"python" ofType:nil];
 	assert(pythonDirectory != nil);
 	
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
@@ -290,7 +290,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		}
 		else
 		{
-			registerObject = Py_BuildValue("y#", value, registerEntry->size);
+			registerObject = PyBytes_FromStringAndSize(value, (long)registerEntry->size);
 		}
 		
 		if (registerObject != NULL)
