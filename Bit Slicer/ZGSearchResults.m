@@ -34,116 +34,201 @@
 
 @implementation ZGSearchResults
 
-- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize unalignedAccess:(BOOL)unalignedAccess
+static ZGMemoryAddress _resultCount(NSArray<NSData *> *resultSets, ZGMemorySize stride)
+{
+	NSUInteger count = 0;
+	for (NSData *result in resultSets)
+	{
+		count += result.length / stride;
+	}
+	return count;
+}
+
++ (ZGMemorySize)indirectStrideWithMaxNumberOfLevels:(ZGMemorySize)numberOfLevels pointerSize:(ZGMemorySize)pointerSize
+{
+	//	Struct {
+	//		uintptr_t baseAddress;
+	//		uint16_t baseImageIndex;
+	//		uint16_t numLevels;
+	//		int32_t offsets[MAX_NUM_LEVELS];
+	//	}
+	
+	return pointerSize + sizeof(uint16_t) + sizeof(uint16_t) + numberOfLevels * sizeof(int32_t);
+}
+
+- (id)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess
 {
 	self = [super init];
 	if (self != nil)
 	{
-		_resultSets = resultSets;
-		_pointerSize = pointerSize;
-		for (NSData *result in _resultSets)
+		NSMutableArray<NSData *> *newResultSets = [NSMutableArray array];
+		for (NSData *resultData in resultSets)
 		{
-			_addressCount += result.length / _pointerSize;
+			if (resultData.length > 0)
+			{
+				[newResultSets addObject:resultData];
+			}
 		}
-		_dataSize = dataSize;
+		
+		_resultSets = [newResultSets copy];
+		_resultType = resultType;
+		_dataType = dataType;
+		_stride = stride;
+		_count = _resultCount(newResultSets, stride);
 		_unalignedAccess = unalignedAccess;
 	}
 	return self;
 }
 
-- (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses
+static void ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(NSMutableArray<NSData *> *newResultSets, NSArray<NSData *> *resultSets, ZGMemorySize currentStride, ZGMemorySize newStride)
 {
-	_addressIndex += numberOfAddresses;
-	_addressCount -= numberOfAddresses;
-	
-	if (_addressCount == 0)
+	if (currentStride == newStride)
 	{
-		_resultSets = @[];
+		[newResultSets addObjectsFromArray:resultSets];
+		return;
+	}
+	
+	assert(currentStride < newStride);
+	
+	for (NSData *resultSet in resultSets)
+	{
+		const uint8_t *resultSetBytes = (const uint8_t *)(resultSet.bytes);
+		ZGMemorySize resultSetCount = resultSet.length / currentStride;
+		
+		uint8_t *newResultSetBytes = calloc(resultSetCount, newStride);
+		assert(newResultSetBytes != NULL);
+		
+		for (ZGMemorySize resultSetIndex = 0; resultSetIndex < resultSetCount; resultSetIndex++)
+		{
+			memcpy(newResultSetBytes + resultSetIndex * newStride, resultSetBytes + resultSetIndex * currentStride, currentStride);
+		}
+		
+		NSData *newResultSet = [[NSData alloc] initWithBytesNoCopy:newResultSetBytes length:resultSetCount * newStride];
+		[newResultSets addObject:newResultSet];
 	}
 }
 
-- (void)enumerateInRange:(NSRange)range usingBlock:(zg_enumerate_search_results_t)addressCallback
+- (instancetype)indirectSearchResultsByAppendingIndirectSearchResults:(ZGSearchResults *)theirSearchResults
 {
-	ZGMemoryAddress absoluteLocation = range.location * _pointerSize;
-	ZGMemoryAddress absoluteLength = range.length * _pointerSize;
+	assert(theirSearchResults.resultType == _resultType && theirSearchResults.dataType == _dataType && _resultType == ZGSearchResultTypeIndirect);
 	
-	BOOL setBeginOffset = NO;
-	BOOL setEndOffset = NO;
-	ZGMemoryAddress beginOffset = 0;
-	ZGMemoryAddress endOffset = 0;
-	ZGMemoryAddress accumulator = 0;
+	ZGMemorySize newStride = (_stride > theirSearchResults.stride ? _stride : theirSearchResults.stride);
+	uint16_t newIndirectMaxLevels = (_indirectMaxLevels > theirSearchResults.indirectMaxLevels ? _indirectMaxLevels : theirSearchResults.indirectMaxLevels);
 	
-	BOOL shouldStopEnumerating = NO;
+	NSMutableArray<NSData *> *newResultSets = [NSMutableArray array];
+	ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(newResultSets, _resultSets, _stride, newStride);
+	ZGAppendAndIncreaseIndirectResultSetsStrideIfNeeded(newResultSets, theirSearchResults.resultSets, theirSearchResults.stride, newStride);
 	
-	ZGMemorySize pointerSize = _pointerSize;
+	ZGSearchResults *newSearchResults = [[ZGSearchResults alloc] initWithResultSets:newResultSets resultType:_resultType dataType:_dataType stride:newStride unalignedAccess:_unalignedAccess || theirSearchResults.unalignedAccess];
 	
-	for (NSData *resultSet in _resultSets)
+	newSearchResults.indirectMaxLevels = newIndirectMaxLevels;
+	newSearchResults.headerAddresses = theirSearchResults.headerAddresses;
+	newSearchResults.totalStaticSegmentRanges = theirSearchResults.totalStaticSegmentRanges;
+	newSearchResults.filePaths = theirSearchResults.filePaths;
+	
+	return newSearchResults;
+}
+
+- (void)updateHeaderAddresses:(NSArray<NSNumber *> *)headerAddresses totalStaticSegmentRanges:(NSArray<NSValue *> *)totalStaticSegmentRanges usingFilePaths:(NSArray<NSString *> *)filePaths
+{
+	assert(_filePaths != nil);
+	
+	// We want to keep filePaths at same indexes but update headerAddresses and totalStaticSegmentRanges
+	NSMutableDictionary<NSString *, NSNumber *> *newFilePathsTable = [[NSMutableDictionary alloc] initWithCapacity:filePaths.count];
+	
 	{
-		NSUInteger resultSetLength = resultSet.length;
-		accumulator += resultSetLength;
-		
-		if (!setBeginOffset && accumulator > absoluteLocation)
+		NSUInteger filePathIndex = 0;
+		for (NSString *filePath in filePaths)
 		{
-			beginOffset = resultSetLength - (accumulator - absoluteLocation);
-			setBeginOffset = YES;
+			newFilePathsTable[filePath] = @(filePathIndex);
+			filePathIndex++;
 		}
-		else if (setBeginOffset)
+	}
+	
+	NSMutableArray<NSNumber *> *newHeaderAddresses = [[NSMutableArray alloc] init];
+	NSMutableArray<NSValue *> *newTotalStaticSegmentRanges = [[NSMutableArray alloc] init];
+	for (NSString *filePath in _filePaths)
+	{
+		NSNumber *filePathIndexNumber = newFilePathsTable[filePath];
+		if (filePathIndexNumber != nil)
 		{
-			beginOffset = 0;
-		}
-		
-		if (!setEndOffset && accumulator >= absoluteLocation + absoluteLength)
-		{
-			endOffset = resultSetLength - (accumulator - (absoluteLocation + absoluteLength));
-			setEndOffset = YES;
+			NSUInteger filePathIndex = filePathIndexNumber.unsignedIntegerValue;
+			[newHeaderAddresses addObject:headerAddresses[filePathIndex]];
+			[newTotalStaticSegmentRanges addObject:totalStaticSegmentRanges[filePathIndex]];
 		}
 		else
 		{
-			endOffset = resultSetLength;
-		}
-		
-		if (setBeginOffset)
-		{
-			const void *resultBytes = resultSet.bytes;
-			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += pointerSize)
-			{
-				ZGMemoryAddress address;
-				switch (pointerSize)
-				{
-					case sizeof(ZGMemoryAddress):
-						address = *(const ZGMemoryAddress *)(const void *)((const uint8_t *)resultBytes + offset);
-						break;
-					case sizeof(ZG32BitMemoryAddress):
-						address = *(const ZG32BitMemoryAddress *)(const void *)((const uint8_t *)resultBytes + offset);
-						break;
-					default:
-						assert("Retrieved unexpected pointer size" == NULL);
-				}
-				
-				addressCallback(address, &shouldStopEnumerating);
-				
-				if (shouldStopEnumerating)
-				{
-					break;
-				}
-			}
-			
-			if (setEndOffset || shouldStopEnumerating)
-			{
-				break;
-			}
+			[newHeaderAddresses addObject:@(0)];
+			[newTotalStaticSegmentRanges addObject:[NSValue valueWithRange:NSMakeRange(0, 0)]];
 		}
 	}
+	
+	_headerAddresses = [newHeaderAddresses copy];
+	_totalStaticSegmentRanges = [newTotalStaticSegmentRanges copy];
 }
 
-- (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback
+- (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
-	[self enumerateInRange:NSMakeRange(_addressIndex, addressCount) usingBlock:addressCallback];
-}
+	if (count == 0)
+	{
+		return;
+	}
+	
+	NSMutableArray<NSData *> *newResultSets = removeResults ? [NSMutableArray array] : nil;
 
-- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback
-{
-	[self enumerateWithCount:_addressCount usingBlock:addressCallback];
+	ZGMemorySize stride = _stride;
+	
+	NSUInteger resultsProcessed = 0;
+	
+	BOOL shouldStopEnumerating = NO;
+	NSUInteger resultSetIndex = 0;
+	NSArray<NSData *> *resultSets = _resultSets;
+	for (NSData *resultSet in resultSets)
+	{
+		const void *resultBytes = resultSet.bytes;
+		ZGMemoryAddress resultSetLength = resultSet.length;
+		for (ZGMemoryAddress offset = 0; offset < resultSetLength; offset += stride)
+		{
+			addressCallback((const void *)((const uint8_t *)resultBytes + offset), &shouldStopEnumerating);
+			resultsProcessed++;
+			
+			if (resultsProcessed >= count || shouldStopEnumerating)
+			{
+				if (!removeResults)
+				{
+					return;
+				}
+				else
+				{
+					// Is there any left over data from current result set
+					if (offset + stride < resultSetLength)
+					{
+						[newResultSets addObject:[resultSet subdataWithRange:NSMakeRange(offset + stride, resultSetLength - offset - stride)]];
+					}
+					
+					// Grab the remaining result sets we haven't processed
+					NSUInteger resultSetsCount = resultSets.count;
+					if (resultSetIndex + 1 < resultSetsCount)
+					{
+						NSArray<NSData *> *remainingResultSets = [resultSets subarrayWithRange:NSMakeRange(resultSetIndex + 1, resultSetsCount - resultSetIndex - 1)];
+						
+						[newResultSets addObjectsFromArray:remainingResultSets];
+					}
+					
+					goto CREATE_NEW_RESULT_SETS;
+				}
+			}
+		}
+		
+		resultSetIndex++;
+	}
+	
+CREATE_NEW_RESULT_SETS:
+	if (newResultSets != nil)
+	{
+		_resultSets = [newResultSets copy];
+		_count = _resultCount(newResultSets, stride);
+	}
 }
 
 @end

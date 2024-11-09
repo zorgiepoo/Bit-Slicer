@@ -5,9 +5,6 @@
 /* Class = "NSMenuItem"; title = "Show in Debugger"; ObjectID = "100786"; */
 "100786.title" = "Mostrar en depurador";
 
-/* Class = "NSMenuItem"; title = "Watch Write Accesses…"; ObjectID = "100787"; */
-"100787.title" = "Observar los accesos de escritura…";
-
 /* Class = "NSMenuItem"; title = "nop_variable"; ObjectID = "100797"; */
 "100797.title" = "nop_variable";
 
@@ -62,11 +59,11 @@
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "100859"; */
 "100859.title" = "Pointer";
 
-/* Class = "NSMenuItem"; title = "Watch Read & Write Accesses…"; ObjectID = "100885"; */
-"100885.title" = "Observar los accesos de lectura y escritura…";
-
 /* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "100889"; */
 "100889.title" = "Copiar dirección";
+
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "peg-wi-Uav"; */
+"peg-wi-Uav.title" = "Copy Raw Address";
 
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "0RQ-cA-Uk7"; */
 "0RQ-cA-Uk7.title" = "Text Cell";
@@ -117,7 +114,7 @@
 "GzQ-9Y-rMY.title" = "Pointer";
 
 /* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "JI2-jh-sbh"; */
-"JI2-jh-sbh.title" = "Buscar Pointer a variable";
+"JI2-jh-sbh.title" = "Buscar Pointers a variable";
 
 /* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "JKq-De-dsT"; */
 "JKq-De-dsT.title" = "16-bit Integer";
@@ -208,3 +205,9 @@
 
 /* Class = "NSMenuItem"; title = "Float"; ObjectID = "xya-wF-ZfW"; */
 "xya-wF-ZfW.title" = "Float";
+
+/* Class = "NSMenuItem"; title = "value"; ObjectID = "NpW-LA-vBl"; */
+"NpW-LA-vBl.title" = "valor";
+
+/* Class = "NSMenuItem"; title = "address"; ObjectID = "v88-2O-5zY"; */
+"v88-2O-5zY.title" = "dirección";

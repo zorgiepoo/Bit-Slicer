@@ -43,6 +43,7 @@
 @class ZGBreakPointController;
 @class ZGLoggerWindowController;
 @class ZGHotKeyCenter;
+@class ZGVariableController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -50,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable PyObject *)loadPythonClassInMainModule:(PyObject *)module;
 
-- (nullable id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+- (nullable id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager variableController:(ZGVariableController *)variableController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 - (void)cleanup;
 
 @property (nonatomic, weak, readonly) ZGScriptManager *scriptManager;

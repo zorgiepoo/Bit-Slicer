@@ -33,6 +33,7 @@
 #import "ZGRegion.h"
 #import <mach/mach_vm.h>
 #import "NSArrayAdditions.h"
+#import "ZGVirtualMemoryUserTags.h"
 
 @implementation ZGRegion
 
@@ -167,11 +168,71 @@
 	return regions;
 }
 
-+ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory
++ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory filterHeapAndStackData:(BOOL)filterHeapAndStackData totalStaticSegmentRanges:(NSArray<NSValue *> * _Nullable)totalStaticSegmentRanges excludeStaticDataFromSystemLibraries:(BOOL)excludeStaticDataFromSystemLibraries filePaths:(NSArray<NSString *> * _Nullable)filePaths
 {
-	return [regions zgFilterUsingBlock:^(ZGRegion *region) {
-		// For shared memory / pmap, see https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/vm/vm.html
-		return (BOOL)(region.address < endAddress && region.address + region.size > beginAddress && ZGMemoryProtectionMatchesProtectionMode(region.protection, protectionMode) && (includeSharedMemory || region.userTag != VM_MEMORY_SHARED_PMAP));
+	return [regions zgFlatMapUsingBlock:^ZGRegion *(ZGRegion *region) {
+		if (endAddress <= region.address || beginAddress >= region.address + region.size)
+		{
+			return nil;
+		}
+		
+		if (!ZGMemoryProtectionMatchesProtectionMode(region.protection, protectionMode))
+		{
+			return nil;
+		}
+		
+		if (!includeSharedMemory && ZGUserTagIsSharedMemory(region.userTag))
+		{
+			return nil;
+		}
+		
+		NSValue *matchingSegmentRangeValue;
+		if (excludeStaticDataFromSystemLibraries)
+		{
+			NSUInteger binaryIndex = 0;
+			matchingSegmentRangeValue = [totalStaticSegmentRanges zgBinarySearchUsingBlock:^NSComparisonResult(NSValue *__unsafe_unretained  _Nonnull currentValue) {
+				NSRange totalSegmentRange = currentValue.rangeValue;
+				if (region.address + region.size <= totalSegmentRange.location)
+				{
+					return NSOrderedDescending;
+				}
+				
+				if (region.address >= totalSegmentRange.location + totalSegmentRange.length)
+				{
+					return NSOrderedAscending;
+				}
+				
+				return NSOrderedSame;
+			} getIndex:&binaryIndex];
+			
+			if (matchingSegmentRangeValue != nil)
+			{
+				// We don't filter out static segment ranges unless we have a filter for excluding system libraries
+				if (excludeStaticDataFromSystemLibraries && binaryIndex > 0 && filePaths != nil)
+				{
+					NSString *filePath = filePaths[binaryIndex];
+					if ([filePath hasPrefix:@"/System/"] ||
+						([filePath hasPrefix:@"/usr/"] && ![filePath hasPrefix:@"/usr/local/"]) ||
+						[filePath hasPrefix:@"/Library/Apple/"] ||
+						[filePath containsString:@"/Xcode.app/"])
+					{
+						return nil;
+					}
+				}
+			}
+		}
+		else
+		{
+			matchingSegmentRangeValue = nil;
+		}
+		
+		if (filterHeapAndStackData && matchingSegmentRangeValue == nil && !ZGUserTagLikelyContainsProcessSpecificPointers(region.userTag))
+		{
+			// We don't have stack/heap data and we don't have a static segment data
+			return nil;
+		}
+		
+		return region;
 	}];
 }
 

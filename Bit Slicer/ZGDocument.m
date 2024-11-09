@@ -117,9 +117,33 @@
 	 forKey:ZGFunctionTypeTagKey];
 	
 	[keyedArchiver
-	 encodeInt32:(int32_t)_searchData.protectionMode
-	 forKey:ZGProtectionModeKey];
+	 encodeInt32:(int32_t)_data.valueProtectionMode
+	 forKey:ZGValueProtectionModeKey];
+	
+	[keyedArchiver
+	 encodeInt32:(int32_t)_data.addressProtectionMode
+	 forKey:ZGAddressProtectionModeKey];
+	
+	[keyedArchiver
+	 encodeInteger:_data.searchType
+	 forKey:ZGSearchTypeKey];
+	
+	[keyedArchiver
+	 encodeInteger:_data.searchAddressMaxLevels
+	 forKey:ZGSearchAddressMaxLevelsKey];
+	
+	[keyedArchiver
+	 encodeObject:_data.searchAddressMaxOffset
+	 forKey:ZGSearchAddressMaxOffsetKey];
     
+	[keyedArchiver
+	 encodeObject:_data.searchAddressSameOffset
+	 forKey:ZGSearchAddressSameOffsetKey];
+	
+	[keyedArchiver
+	 encodeInteger:_data.searchAddressOffsetComparison
+	 forKey:ZGSearchAddressOffsetComparisonKey];
+	
 	[keyedArchiver
 	 encodeBool:_data.ignoreDataAlignment
 	 forKey:ZGIgnoreDataAlignmentKey];
@@ -143,6 +167,18 @@
 	[keyedArchiver
 	 encodeBool:_searchData.includeSharedMemory
 	 forKey:ZGIncludeSharedMemoryKey];
+	
+	[keyedArchiver
+	 encodeBool:_searchData.indirectStopAtStaticAddresses
+	 forKey:ZGIndirectStopAtStaticAddressesKey];
+	
+	[keyedArchiver
+	 encodeBool:_data.indirectFilterHeapAndStackData
+	 forKey:ZGIndirectFilterHeapAndStackDataKey];
+	
+	[keyedArchiver
+	 encodeBool:_data.indirectExcludeStaticDataFromSystemLibraries
+	 forKey:ZGIndirectExcludeStaticDataFromSystemLibrariesKey];
     
 	[keyedArchiver
 	 encodeObject:_data.lastEpsilonValue
@@ -159,6 +195,10 @@
 	[keyedArchiver
 	 encodeObject:_data.searchValue
 	 forKey:ZGSearchStringValueKeyNew];
+	
+	[keyedArchiver
+	 encodeObject:_data.searchAddress
+	 forKey:ZGSearchStringAddressKey];
 	
 	[keyedArchiver finishEncoding];
 	
@@ -209,15 +249,54 @@
 	_data.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
 	_data.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
 	_data.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
-	_searchData.protectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGProtectionModeKey];
+	_data.valueProtectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGValueProtectionModeKey];
+	_data.addressProtectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGAddressProtectionModeKey];
 	_data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
 	_searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
 	_searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
+	_data.searchType = [keyedUnarchiver decodeIntegerForKey:ZGSearchTypeKey];
+	
+	NSInteger decodedMaxLevels = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressMaxLevelsKey];
+	_data.searchAddressMaxLevels = (decodedMaxLevels > 0 ? decodedMaxLevels : 1);
+	
+	NSString *decodedSearchAddressMaxOffset = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchAddressMaxOffsetKey];
+	
+	_data.searchAddressMaxOffset = (decodedSearchAddressMaxOffset != nil ? decodedSearchAddressMaxOffset : @"");
+	
+	NSString *decodedSearchAddressSameOffset = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchAddressSameOffsetKey];
+	
+	_data.searchAddressSameOffset = (decodedSearchAddressSameOffset != nil ? decodedSearchAddressSameOffset : @"");
+	
+	NSInteger decodedOffsetComparison = [keyedUnarchiver decodeIntegerForKey:ZGSearchAddressOffsetComparisonKey];
+	NSInteger offsetComparison = ZGSearchAddressOffsetComparisonMax;
+	switch ((ZGSearchAddressOffsetComparison)decodedOffsetComparison)
+	{
+		case ZGSearchAddressOffsetComparisonMax:
+		case ZGSearchAddressOffsetComparisonAbsoluteMax:
+		case ZGSearchAddressOffsetComparisonSame:
+			offsetComparison = decodedOffsetComparison;
+			break;
+	}
+	_data.searchAddressOffsetComparison = offsetComparison;
 	
 	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBeginningAddressKey]];
 	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEndingAddressKey]];
 	
 	_searchData.includeSharedMemory = [keyedUnarchiver decodeBoolForKey:ZGIncludeSharedMemoryKey];
+	if ([keyedUnarchiver containsValueForKey:ZGIndirectStopAtStaticAddressesKey])
+	{
+		_searchData.indirectStopAtStaticAddresses = [keyedUnarchiver decodeBoolForKey:ZGIndirectStopAtStaticAddressesKey];
+	}
+	
+	if ([keyedUnarchiver containsValueForKey:ZGIndirectFilterHeapAndStackDataKey])
+	{
+		_data.indirectFilterHeapAndStackData = [keyedUnarchiver decodeBoolForKey:ZGIndirectFilterHeapAndStackDataKey];
+	}
+	
+	if ([keyedUnarchiver containsValueForKey:ZGIndirectExcludeStaticDataFromSystemLibrariesKey])
+	{
+		_data.indirectExcludeStaticDataFromSystemLibraries = [keyedUnarchiver decodeBoolForKey:ZGIndirectExcludeStaticDataFromSystemLibrariesKey];
+	}
 	
 	_data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
 	if (_data.byteOrderTag == CFByteOrderUnknown)
@@ -238,6 +317,10 @@
 	}
 	
 	_data.searchValue = (searchValue != nil) ? searchValue : @"";
+	
+	NSString *searchAddress = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchStringAddressKey];
+	
+	_data.searchAddress = (searchAddress != nil) ? searchAddress : @"";
 	
 	NSString *lastEpsilonValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEpsilonKey];
 	_data.lastEpsilonValue = lastEpsilonValue != nil ? lastEpsilonValue : @"";

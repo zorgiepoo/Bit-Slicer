@@ -1,0 +1,12 @@
+
+/* Class = "NSTextFieldCell"; title = "$n will be substituted with an incrementing number."; ObjectID = "DIb-kM-KCk"; */
+"DIb-kM-KCk.title" = "$n will be substituted with an incrementing number.";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "UNH-Xz-JjJ"; */
+"UNH-Xz-JjJ.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "Uwq-TR-2ZJ"; */
+"Uwq-TR-2ZJ.title" = "Cancel";
+
+/* Class = "NSTextFieldCell"; title = "Label:"; ObjectID = "tdw-96-OLh"; */
+"tdw-96-OLh.title" = "Label:";

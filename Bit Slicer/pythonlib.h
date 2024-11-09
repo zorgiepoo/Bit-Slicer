@@ -37,6 +37,9 @@
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #pragma clang diagnostic ignored "-Wcast-align"
 
+// Need to include this in order for # arg parsing to work:
+// https://docs.python.org/3/c-api/arg.html#arg-parsing
+#define PY_SSIZE_T_CLEAN
 #import <Python/Python.h>
 #import <Python/structmember.h>
 

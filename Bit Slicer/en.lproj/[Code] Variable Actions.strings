@@ -56,17 +56,8 @@
 /* Undo action for changing variable address */
 "undoAddressChange" = "Address Change";
 
-/* Undo action for relativizing a single variable */
-"undoRelativizeSingleVariable" = "Relativize Variable";
-
-/* Undo action for relativizing multiple variables */
-"undoRelativizeMultipleVariables" = "Relativize Variables";
-
-/* Undo action for unrelativizing a single variable */
-"undoUnrelativizeSingleVariable" = "Unrelativize Variable";
-
-/* Undo action for unrelativizing multiple variables */
-"undoUnrelativizeMultipleVariables" = "Unrelativize Variables";
+/* Undo action for changing variable addresses */
+"undoAddressChanges" = "Address Changes";
 
 /* Undo action for changing variable size */
 "undoSizeChange" = "Size Change";
@@ -76,3 +67,9 @@
 
 /* Alert message title for changing variable size */
 "failedChangeSizeAlertMessage" = "The size could not be changed. Perhaps the requested size is too big?";
+
+/* Alert title for failing to change variable address due to a label cycle */
+"failedRelateVariablesAlertTitle" = "Label creates a cycle";
+
+/* Alert message for failing to change variable address due to a label cycle */
+"failedRelateVariablesAlertMessageFormat" = "A label cannot be set because it creates a cycle '%@'";

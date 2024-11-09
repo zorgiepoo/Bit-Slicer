@@ -1,4 +1,3 @@
-
 /* Scope Bar Protection Group */
 "scopeBarProtectionGroup" = "Protection:";
 
@@ -86,6 +85,12 @@
 /* Edit multiple variable values menu item title */
 "editMultipleVariableValuesTitle" = "Edit Variable Values…";
 
+/* Edit single variable label menu item title */
+"editSingleVariableLabelTitle" = "Edit Variable Label…";
+
+/* Edit multiple variable labels menu item title */
+"editMultipleVariableLabelsTitle" = "Edit Variable Labels…";
+
 /* Edit single variable size menu item title */
 "editSingleVariableSizeTitle" = "Edit Variable Size…";
 
@@ -98,6 +103,18 @@
 /* Relativize multiple variables menu item title */
 "relativizeMultipleVariablesTitle" = "Relativize Variables";
 
+/* Watch Write Accesses */
+"watchAccesses_0_0" = "Watch Write Accesses…";
+
+/* Watch Write Accesses to Base Address */
+"watchAccesses_0_1" = "Watch Write Accesses to Base Address…";
+
+/* Watch Read & Write Accesses */
+"watchAccesses_1_0" = "Watch Read & Write Accesses…";
+
+/* Watch Read & Write Accesses to Base Address */
+"watchAccesses_1_1" = "Watch Read & Write Accesses to Base Address…";
+
 /* NOP single variable menu item title */
 "nopSingleVariableTitle" = "NOP Variable";
 
@@ -109,6 +126,9 @@
 
 /* Next Operator menu item title */
 "nextOperatorMenuItem" = "Next Operator";
+
+/* Toggle Search Type menu item title */
+"toggleSearchTypeMenuItem" = "Toggle Search Type";
 
 /* Title of Stored Value menu item in search menu of the search field */
 "storedValueTokenTitle" = "Stored Value";
@@ -142,6 +162,12 @@
 
 /* Error Message for when Beginning Address >= Ending Address */
 "endingAddressIsNotGreaterThanBeginningAddressErrorMessage" = "The value in the Beginning Address field must be less than the value in the Ending Address field, or one or both of the fields can be omitted.";
+
+/* Error Message for when trying address type search for 32-bit targets */
+"addressTypeNotSupportedFor32Bit" = "Searching memory addresses for 32-bit targets is not supported.";
+
+/* Error Message for when the offset value cannot be parsed */
+"addressTypeIndirectOffsetParseError" = "The offset value could not be parsed.";
 
 /* Error message for when the selected data type to seach is a numerical one, and the expression cannot be parsed */
 "invalidNumericalSearchExpressionErrorMessage" = "The search value is not a valid numerical expression.";

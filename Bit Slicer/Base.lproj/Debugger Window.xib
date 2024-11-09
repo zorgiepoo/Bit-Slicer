@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19158" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19158"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -36,6 +36,12 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="copyAddress:" target="-1" id="288"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Copy Raw Address" id="Iwu-Sv-lDF">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="copyRawAddress:" target="-1" id="ci4-Pt-p8F"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="128"/>
@@ -85,7 +91,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="113" y="199" width="839" height="510"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="700" height="414"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="839" height="510"/>
@@ -100,7 +106,7 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <clipView key="contentView" focusRingType="none" id="QCs-yF-iGW">
                                     <rect key="frame" x="0.0" y="0.0" width="840" height="287"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
                                             <rect key="frame" x="0.0" y="0.0" width="840" height="270"/>
@@ -132,7 +138,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                                 </tableColumn>
-                                                <tableColumn identifier="instruction" width="240.8359375" minWidth="40" maxWidth="10000" id="hhm-Yo-i9h">
+                                                <tableColumn identifier="instruction" width="241" minWidth="40" maxWidth="10000" id="hhm-Yo-i9h">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Instruction">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -144,7 +150,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 </tableColumn>
-                                                <tableColumn identifier="symbols" editable="NO" width="155.9609375" minWidth="10" maxWidth="3.4028234663852886e+38" id="t9W-pd-V9s">
+                                                <tableColumn identifier="symbols" editable="NO" width="156" minWidth="10" maxWidth="3.4028234663852886e+38" id="t9W-pd-V9s">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Symbols">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -216,7 +222,7 @@
                             <outlet property="delegate" destination="-2" id="248"/>
                         </connections>
                     </splitView>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QFr-ST-Ct0" userLabel="Status Text Field">
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QFr-ST-Ct0" userLabel="Status Text Field">
                         <rect key="frame" x="-3" y="2" width="824" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="mapped_file_path" id="36G-7f-7uB">
@@ -254,10 +260,6 @@
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fpR-fU-ajG">
                             <rect key="frame" x="-3" y="-4" width="167" height="25"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="bEq-IZ-Wag"/>
-                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="ngH-El-940"/>
-                            </constraints>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vAn-gJ-wjp" id="ohg-Gh-2fU">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -269,6 +271,10 @@
                                     </items>
                                 </menu>
                             </popUpButtonCell>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="bEq-IZ-Wag"/>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="ngH-El-940"/>
+                            </constraints>
                             <connections>
                                 <action selector="runningApplicationsPopUpButton:" target="-2" id="44z-bJ-smY"/>
                             </connections>
@@ -314,7 +320,7 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address/Symbol" paletteLabel="Address/Symbol" sizingBehavior="auto" id="u3o-PN-adL">
                         <nil key="toolTip"/>
-                        <textField key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ztk-ei-XwG">
+                        <textField key="view" focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ztk-ei-XwG">
                             <rect key="frame" x="0.0" y="0.0" width="171" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="49z-Sq-ig3"/>
@@ -353,8 +359,8 @@
         </window>
     </objects>
     <resources>
-        <image name="NSLeftFacingTriangleTemplate" width="10" height="14"/>
-        <image name="NSRightFacingTriangleTemplate" width="10" height="14"/>
+        <image name="NSLeftFacingTriangleTemplate" width="12" height="17"/>
+        <image name="NSRightFacingTriangleTemplate" width="12" height="17"/>
         <image name="continue" width="38" height="38"/>
         <image name="stepin" width="38" height="38"/>
         <image name="stepout" width="38" height="38"/>

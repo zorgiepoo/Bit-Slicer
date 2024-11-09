@@ -237,7 +237,11 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDebuggerAddressField];
 	[coder encodeObject:[(ZGProcess *)self.runningApplicationsPopUpButton.selectedItem.representedObject internalName] forKey:ZGDebuggerProcessInternalName];
 	[coder encodeObject:@(_offsetFromBase) forKey:ZGDebuggerOffsetFromBase];
-	[coder encodeObject:_mappedFilePath == nil ? [NSNull null] : _mappedFilePath forKey:ZGDebuggerMappedFilePath];
+	
+	if (_mappedFilePath != nil)
+	{
+		[coder encodeObject:_mappedFilePath forKey:ZGDebuggerMappedFilePath];
+	}
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
@@ -252,11 +256,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	
 	_offsetFromBase = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:ZGDebuggerOffsetFromBase] unsignedLongLongValue];
 	
-	_mappedFilePath = [coder decodeObjectOfClass:[NSObject class] forKey:ZGDebuggerMappedFilePath];
-	if ((id)_mappedFilePath == [NSNull null])
-	{
-		_mappedFilePath = nil;
-	}
+	_mappedFilePath = [coder decodeObjectOfClass:[NSString class] forKey:ZGDebuggerMappedFilePath];
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGDebuggerProcessInternalName];
 	[self updateRunningProcesses];
@@ -1454,7 +1454,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 			return NO;
 		}
 	}
-	else if (userInterfaceItem.action == @selector(copyAddress:))
+	else if (userInterfaceItem.action == @selector(copyAddress:) || userInterfaceItem.action == @selector(copyRawAddress:))
 	{
 		if ([self selectedInstructions].count != 1)
 		{
@@ -1624,10 +1624,10 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 {
 	NSArray<ZGVariable *> *variablesToAnnotate = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.variable; }]
 	 zgFilterUsingBlock:^(ZGVariable *variable) {
-		 return (BOOL)(!variable.usesDynamicAddress);
+		 return (BOOL)(!variable.userAnnotated);
 	 }];
 	
-	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess symbols:symbols async:async completionHandler:^{
+	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess variableController:nil symbols:symbols async:async completionHandler:^{
 		for (ZGInstruction *instruction in instructions)
 		{
 			if (instruction.variable.fullAttributedDescription.length == 0)
@@ -1640,6 +1640,8 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 				[newDescription appendAttributedString:instruction.variable.fullAttributedDescription];
 				instruction.variable.fullAttributedDescription = newDescription;
 			}
+			
+			instruction.variable.userAnnotated = YES;
 		}
 		
 		completionHandler();
@@ -1683,6 +1685,12 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
 		[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSPasteboardTypeString];
 	}];
+}
+
+- (IBAction)copyRawAddress:(id)__unused sender
+{
+	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	[ZGVariableController copyVariableRawAddress:selectedInstruction.variable];
 }
 
 - (void)scrollAndSelectRow:(NSUInteger)selectionRow

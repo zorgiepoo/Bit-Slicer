@@ -58,9 +58,11 @@ typedef struct
 
 + (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables;
 + (void)copyVariableAddress:(ZGVariable *)variable;
++ (void)copyVariableRawAddress:(ZGVariable *)variable;
 
 - (void)copyVariables;
 - (void)copyAddress;
+- (void)copyRawAddress;
 - (void)pasteVariables;
 
 - (void)clear;
@@ -79,14 +81,21 @@ typedef struct
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
+- (void)relateVariables:(NSArray<ZGVariable *> *)variables toLabeledVariable:(ZGVariable *)labeledVariable;
+
 - (void)relativizeVariables:(NSArray<ZGVariable *> *)variables;
 + (ZGMachBinaryAnnotationInfo)machBinaryAnnotationInfoForProcess:(ZGProcess *)process;
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process symbols:(BOOL)symbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process variableController:(nullable ZGVariableController *)variableController symbols:(BOOL)symbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process variableController:(nullable ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
 
 - (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues;
-- (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;
+- (BOOL)editVariables:(NSArray<ZGVariable *> *)variables addressFormulas:(NSArray<NSString *> *)newAddressFormulas cycleInfo:(NSString * _Nullable __autoreleasing *_Nullable)outCycleInfo;
 - (void)editVariables:(NSArray<ZGVariable *> *)variables requestedSizes:(NSArray<NSNumber *> *)requestedSizes;
+- (BOOL)editVariables:(NSArray<ZGVariable *> *)variables requestedLabels:(NSArray<NSString *> *)requestedLabels cycleInfo:(NSString * _Nullable __autoreleasing *_Nullable)outCycleInfo;
+
+- (nullable ZGVariable *)variableForLabel:(NSString *)label;
+
+@property (nonatomic, readonly) NSSet<NSString *> *usedLabels;
 
 @end
 

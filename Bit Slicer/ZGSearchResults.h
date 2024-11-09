@@ -32,30 +32,46 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, ZGSearchResultType)
+{
+	ZGSearchResultTypeDirect = 0,
+	ZGSearchResultTypeIndirect
+};
+
 @interface ZGSearchResults : NSObject
 
-@property (nonatomic, readonly) ZGMemorySize addressIndex;
-@property (nonatomic, readonly) ZGMemorySize addressCount;
-@property (nonatomic, readonly) ZGMemorySize pointerSize;
-@property (nonatomic, readonly) ZGMemorySize dataSize;
+@property (nonatomic, readonly) ZGMemorySize count;
+
+@property (nonatomic, readonly) ZGMemorySize stride;
 @property (nonatomic, readonly) BOOL unalignedAccess;
 @property (nonatomic, readonly) NSArray<NSData *> *resultSets;
+@property (nonatomic, readonly) ZGSearchResultType resultType;
+@property (nonatomic) uint16_t indirectMaxLevels;
 
-// User data fields
-@property (nonatomic) NSInteger dataType;
-@property (nonatomic) BOOL enabled;
+@property (nonatomic, nullable) NSArray<NSValue *> *totalStaticSegmentRanges;
+@property (nonatomic, nullable) NSArray<NSNumber *> *headerAddresses;
+@property (nonatomic, nullable) NSArray<NSString *> *filePaths;
 
-typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
+// Only used by clients
+@property (nonatomic, readonly) ZGVariableType dataType;
 
-- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize unalignedAccess:(BOOL)unalignedAccess;
+typedef void (^zg_enumerate_search_results_t)(const void *data, BOOL *stop);
 
-- (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses;
++ (ZGMemorySize)indirectStrideWithMaxNumberOfLevels:(ZGMemorySize)maxNumberOfLevels pointerSize:(ZGMemorySize)pointerSize;
 
-- (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback;
-- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback;
+- (instancetype)init NS_UNAVAILABLE;
+
+- (instancetype)initWithResultSets:(NSArray<NSData *> *)resultSets resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType stride:(ZGMemorySize)stride unalignedAccess:(BOOL)unalignedAccess;
+
+- (instancetype)indirectSearchResultsByAppendingIndirectSearchResults:(ZGSearchResults *)newSearchResults;
+
+- (void)enumerateWithCount:(ZGMemorySize)count removeResults:(BOOL)removeResults usingBlock:(zg_enumerate_search_results_t)addressCallback;
+
+- (void)updateHeaderAddresses:(NSArray<NSNumber *> *)headerAddresses totalStaticSegmentRanges:(NSArray<NSValue *> *)totalStaticSegmentRanges usingFilePaths:(NSArray<NSString *> *)filePaths;
 
 @end
 

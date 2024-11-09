@@ -31,15 +31,23 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGSearchResults.h"
 
 @class ZGSearchProgress;
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, ZGSearchResultAddressType)
+{
+	ZGSearchResultAddressTypeRegular = 0,
+	ZGSearchResultAddressTypeStaticMainExecutable,
+	ZGSearchResultAddressTypeStaticOtherLibrary
+};
+
 @protocol ZGSearchProgressDelegate <NSObject>
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet;
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSets:(NSArray<NSData *> *)resultSets totalResultSetLength:(NSUInteger)totalResultSetLength resultType:(ZGSearchResultType)resultType dataType:(ZGVariableType)dataType addressType:(ZGSearchResultAddressType)addressType stride:(ZGMemorySize)stride headerAddresses:(NSArray<NSNumber *> * _Nullable)headerAddresses;
 
 @end
 

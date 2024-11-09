@@ -46,6 +46,10 @@
 	IBOutlet NSButton *_includeSharedMemoryCheckbox;
 	IBOutlet NSTextField *_beginningAddressTextField;
 	IBOutlet NSTextField *_endingAddressTextField;
+	
+	IBOutlet NSButton *_includeOnlyStaticStackAndHeapCheckbox;
+	IBOutlet NSButton *_excludeStaticSystemLibrariesCheckbox;
+	IBOutlet NSButton *_stopTraversingAtFirstStaticAddressCheckbox;
 }
 
 - (id)initWithDocument:(ZGDocument *)document
@@ -66,6 +70,10 @@
 	[_includeSharedMemoryCheckbox setState:_searchData.includeSharedMemory];
 	_beginningAddressTextField.stringValue = _documentData.beginningAddressStringValue;
 	_endingAddressTextField.stringValue = _documentData.endingAddressStringValue;
+	
+	_stopTraversingAtFirstStaticAddressCheckbox.state = _searchData.indirectStopAtStaticAddresses;
+	_includeOnlyStaticStackAndHeapCheckbox.state = _documentData.indirectFilterHeapAndStackData;
+	_excludeStaticSystemLibrariesCheckbox.state = _documentData.indirectExcludeStaticDataFromSystemLibraries;
 }
 
 - (void)loadView
@@ -111,6 +119,30 @@
 		ZGDocument *document = _document;
 		[document markChange];
 	}
+}
+
+- (IBAction)changeIncludeOnlyStaticStackAndHeapData:(id)sender
+{
+	_documentData.indirectFilterHeapAndStackData = ([(NSCell *)sender state] == NSControlStateValueOn);
+	
+	ZGDocument *document = _document;
+	[document markChange];
+}
+
+- (IBAction)changeExcludeStaticSystemLibraries:(id)sender
+{
+	_documentData.indirectExcludeStaticDataFromSystemLibraries = ([(NSCell *)sender state] == NSControlStateValueOn);
+	
+	ZGDocument *document = _document;
+	[document markChange];
+}
+
+- (IBAction)changeStopTraversingAtFirstStaticAddress:(id)sender
+{
+	_searchData.indirectStopAtStaticAddresses = ([(NSCell *)sender state] == NSControlStateValueOn);
+	
+	ZGDocument *document = _document;
+	[document markChange];
 }
 
 @end

@@ -55,17 +55,8 @@
 /* Undo action for changing variable address */
 "undoAddressChange" = "Изменение адреса";
 
-/* Undo action for relativizing a single variable */
-"undoRelativizeSingleVariable" = "РевиталиRelativize Variable";
-
-/* Undo action for relativizing multiple variables */
-"undoRelativizeMultipleVariables" = "Релятивизация переменных";
-
-/* Undo action for unrelativizing a single variable */
-"undoUnrelativizeSingleVariable" = "де-Релятивизация переменной";
-
-/* Undo action for unrelativizing multiple variables */
-"undoUnrelativizeMultipleVariables" = "де-Релятивизация переменных";
+/* Undo action for changing variable addresses */
+"undoAddressChanges" = "Address Changes";
 
 /* Undo action for changing variable size */
 "undoSizeChange" = "Изменение размера";
@@ -75,3 +66,9 @@
 
 /* Alert message title for changing variable size */
 "failedChangeSizeAlertMessage" = "Размер не может быть изменен. Возможно, запрашиваемый размер слишком большой?";
+
+/* Alert title for failing to change variable address due to a label cycle */
+"failedRelateVariablesAlertTitle" = "Label creates a cycle";
+
+/* Alert message for failing to change variable address due to a label cycle */
+"failedRelateVariablesAlertMessageFormat" = "A label cannot be set because it creates a cycle '%@'";

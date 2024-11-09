@@ -47,8 +47,10 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 	ZGMemorySize _dataSize;
+	ZGMemorySize _pointerSize;
 	void * _Nullable _rangeValue;
 	double _epsilon;
+	int32_t _indirectOffset;
 	BOOL _shouldIgnoreStringCase;
 	BOOL _shouldIncludeNullTerminator;
 	
@@ -73,10 +75,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) void *swappedValue;
 @property (nonatomic) BOOL bytesSwapped;
 
+@property (nonatomic, nullable) NSArray<NSValue *> *totalStaticSegmentRanges;
+@property (nonatomic, nullable) NSArray<NSNumber *> *headerAddresses;
+@property (nonatomic, nullable) NSArray<NSString *> *filePaths;
+
 @property (nonatomic, nullable) void *rangeValue;
 @property (nonatomic, nullable) ZGStoredData *savedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
 @property (nonatomic) double epsilon;
+@property (nonatomic) BOOL indirectOffsetMaxComparison;
+@property (nonatomic) int32_t indirectOffset;
+@property (nonatomic) BOOL indirectAbsoluteOffset;
+@property (nonatomic) uint16_t indirectMaxLevels;
+@property (nonatomic) BOOL indirectStopAtStaticAddresses;
+@property (nonatomic) BOOL filterHeapAndStackData;
+@property (nonatomic) BOOL excludeStaticDataFromSystemLibraries;
 @property (nonatomic) BOOL shouldIgnoreStringCase;
 @property (nonatomic) BOOL shouldIncludeNullTerminator;
 @property (nonatomic) ZGMemoryAddress beginAddress;

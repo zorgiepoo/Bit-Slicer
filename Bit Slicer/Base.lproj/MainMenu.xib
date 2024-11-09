@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -166,6 +166,12 @@
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
                                     <action selector="copyAddress:" target="-1" id="1089"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Copy Raw Address" keyEquivalent="c" id="Y5k-Nh-cGe">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="copyRawAddress:" target="-1" id="Mak-Wq-SeH"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Paste" keyEquivalent="v" id="203">
@@ -367,6 +373,11 @@ CA
                             <menuItem title="Forward" keyEquivalent="]" id="1102">
                                 <connections>
                                     <action selector="goForward:" target="-1" id="1104"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="toggle_search_type" keyEquivalent="T" id="b93-EJ-YwD">
+                                <connections>
+                                    <action selector="toggleSearchType:" target="-1" id="Ml9-zr-ozR"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1105"/>
@@ -630,6 +641,12 @@ CA
                                     <action selector="requestEditingVariableAddress:" target="-1" id="yPE-QT-jnw"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Edit Variable Label…" keyEquivalent="E" id="uQ5-Wj-45I">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="requestEditingVariableLabel:" target="-1" id="xj1-r0-w4c"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Edit Variable Size…" keyEquivalent="e" id="833">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
@@ -662,9 +679,21 @@ CA
                                                 <action selector="watchVariable:" target="-1" id="1051"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Write Accesses to Base Address…" hidden="YES" keyEquivalent="l" id="gOJ-hH-dww">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="watchVariableBaseAddress:" target="-1" id="sba-au-VgK"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Read &amp; Write Accesses…" tag="1" keyEquivalent="L" id="1052">
                                             <connections>
                                                 <action selector="watchVariable:" target="-1" id="1053"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Read &amp; Write Accesses to Base Address…" tag="1" hidden="YES" keyEquivalent="L" id="KQm-HB-Xdh">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="watchVariableBaseAddress:" target="-1" id="Xni-P4-PMU"/>
                                             </connections>
                                         </menuItem>
                                     </items>

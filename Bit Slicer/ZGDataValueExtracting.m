@@ -34,10 +34,12 @@
 #import "ZGVariableDataInfo.h"
 #import "NSStringAdditions.h"
 
+// Note: This does not evaluate/simplify hex expressions
+// If you want those expressions to be simplified, the string value should be evaluated before passing
+// it over here.
 void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
 {
 	void *value = NULL;
-	BOOL searchValueIsAHexRepresentation = stringValue.zgIsHexRepresentation;
 	ZGMemorySize tempDataSize = 0;
 	
 	BOOL isProcess64Bit = ZG_PROCESS_TYPE_IS_64_BIT(processType);
@@ -49,18 +51,7 @@ void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVari
 	
 	if (dataType == ZGInt8 && tempDataSize > 0)
 	{
-		int8_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned int theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexInt:&theValue];
-			variableValue = (int8_t)theValue;
-		}
-		else
-		{
-			variableValue = (int8_t)stringValue.intValue;
-		}
+		int8_t variableValue = (int8_t)stringValue.intValue;
 		
 		value = malloc((size_t)tempDataSize);
 		if (value == NULL) return NULL;
@@ -68,18 +59,7 @@ void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVari
 	}
 	else if (dataType == ZGInt16 && tempDataSize > 0)
 	{
-		int16_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned int theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexInt:&theValue];
-			variableValue = (int16_t)theValue;
-		}
-		else
-		{
-			variableValue = (int16_t)stringValue.intValue;
-		}
+		int16_t variableValue = (int16_t)stringValue.intValue;
 		
 		value = malloc((size_t)tempDataSize);
 		if (value == NULL) return NULL;
@@ -87,18 +67,7 @@ void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVari
 	}
 	else if ((dataType == ZGInt32 || (dataType == ZGPointer && !isProcess64Bit)) && tempDataSize > 0)
 	{
-		uint32_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned int theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexInt:&theValue];
-			variableValue = theValue;
-		}
-		else
-		{
-			variableValue = stringValue.zgUnsignedIntValue;
-		}
+		uint32_t variableValue = stringValue.zgUnsignedIntValue;
 		
 		value = malloc((size_t)tempDataSize);
 		if (value == NULL) return NULL;
@@ -106,16 +75,7 @@ void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVari
 	}
 	else if (dataType == ZGFloat && tempDataSize > 0)
 	{
-		float variableValue = 0.0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			[[NSScanner scannerWithString:stringValue] scanHexFloat:&variableValue];
-		}
-		else
-		{
-			variableValue = stringValue.floatValue;
-		}
+		float variableValue = stringValue.floatValue;
 		
 		value = malloc((size_t)tempDataSize);
 		if (value == NULL) return NULL;
@@ -123,18 +83,7 @@ void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVari
 	}
 	else if ((dataType == ZGInt64 || (dataType == ZGPointer && isProcess64Bit)) && tempDataSize > 0)
 	{
-		uint64_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned long long theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexLongLong:&theValue];
-			variableValue = theValue;
-		}
-		else
-		{
-			variableValue = stringValue.zgUnsignedLongLongValue;
-		}
+		uint64_t variableValue = stringValue.zgUnsignedLongLongValue;
 		
 		value = malloc((size_t)tempDataSize);
 		if (value == NULL) return NULL;
@@ -142,16 +91,7 @@ void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVari
 	}
 	else if (dataType == ZGDouble && tempDataSize > 0)
 	{
-		double variableValue = 0.0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			[[NSScanner scannerWithString:stringValue] scanHexDouble:&variableValue];
-		}
-		else
-		{
-			variableValue = stringValue.doubleValue;
-		}
+		double variableValue = stringValue.doubleValue;
 		
 		value = malloc((size_t)tempDataSize);
 		if (value == NULL) return NULL;

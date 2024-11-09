@@ -258,6 +258,11 @@
 	}
 }
 
+- (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)application
+{
+	return YES;
+}
+
 - (BOOL)setRestorationForWindowController:(NSWindowController *)windowController withWindowIdentifier:(NSString *)windowIdentifier
 {
 	BOOL firstTimeLoading = (windowController.window.restorationClass == nil);

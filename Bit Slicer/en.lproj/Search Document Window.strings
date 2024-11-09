@@ -5,9 +5,6 @@
 /* Class = "NSMenuItem"; title = "Show in Debugger"; ObjectID = "100786"; */
 "100786.title" = "Show in Debugger";
 
-/* Class = "NSMenuItem"; title = "Watch Write Accesses…"; ObjectID = "100787"; */
-"100787.title" = "Watch Write Accesses…";
-
 /* Class = "NSMenuItem"; title = "nop_variable"; ObjectID = "100797"; */
 "100797.title" = "nop_variable";
 
@@ -62,11 +59,11 @@
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "100859"; */
 "100859.title" = "Pointer";
 
-/* Class = "NSMenuItem"; title = "Watch Read & Write Accesses…"; ObjectID = "100885"; */
-"100885.title" = "Watch Read & Write Accesses…";
-
 /* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "100889"; */
 "100889.title" = "Copy Address";
+
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "peg-wi-Uav"; */
+"peg-wi-Uav.title" = "Copy Raw Address";
 
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "0RQ-cA-Uk7"; */
 "0RQ-cA-Uk7.title" = "Text Cell";
@@ -116,8 +113,8 @@
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "GzQ-9Y-rMY"; */
 "GzQ-9Y-rMY.title" = "Pointer";
 
-/* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "JI2-jh-sbh"; */
-"JI2-jh-sbh.title" = "Search Pointer to Variable";
+/* Class = "NSMenuItem"; title = "Search Pointers to Variable…"; ObjectID = "JI2-jh-sbh"; */
+"JI2-jh-sbh.title" = "Search Pointers to Variable…";
 
 /* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "JKq-De-dsT"; */
 "JKq-De-dsT.title" = "16-bit Integer";
@@ -208,3 +205,9 @@
 
 /* Class = "NSMenuItem"; title = "Float"; ObjectID = "xya-wF-ZfW"; */
 "xya-wF-ZfW.title" = "Float";
+
+/* Class = "NSMenuItem"; title = "value"; ObjectID = "NpW-LA-vBl"; */
+"NpW-LA-vBl.title" = "value";
+
+/* Class = "NSMenuItem"; title = "address"; ObjectID = "v88-2O-5zY"; */
+"v88-2O-5zY.title" = "address";

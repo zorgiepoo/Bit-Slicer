@@ -48,13 +48,119 @@ case value: \
 		result = description; \
 		break;
 
-#ifndef MAC_OS_VERSION_14_0
-#define MAC_OS_VERSION_14_0 140000
+#ifndef MAC_OS_VERSION_14_5
+#define MAC_OS_VERSION_14_5 140500
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_VERSION_14_2
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_VERSION_14_5
 #pragma message("Need to update the user tag descriptions")
 #endif
+
+bool ZGUserTagIsSharedMemory(uint32_t userTag)
+{
+	// For shared memory / pmap, see https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/vm/vm.html
+	return userTag == VM_MEMORY_SHARED_PMAP;
+}
+
+bool ZGUserTagLikelyContainsProcessSpecificPointers(uint32_t userTag)
+{
+	// We don't include VM_MEMORY_SHARED_PMAP because callers can use ZGUserTagIsSharedMemory()
+	// This function is intended to allow static memory (usually VM user tag 0), stack, heap, and any other
+	// unknown VM user tag
+	switch (userTag)
+	{
+		case VM_MEMORY_SBRK:
+		case VM_MEMORY_ANALYSIS_TOOL:
+		case VM_MEMORY_MACH_MSG:
+		case VM_MEMORY_IOKIT:
+		case VM_MEMORY_GUARD:
+		case VM_MEMORY_OBJC_DISPATCHERS:
+		case VM_MEMORY_UNSHARED_PMAP:
+		case VM_MEMORY_APPKIT:
+		case VM_MEMORY_FOUNDATION:
+		case VM_MEMORY_COREGRAPHICS:
+		case VM_MEMORY_CORESERVICES:
+		case VM_MEMORY_COREDATA:
+		case VM_MEMORY_COREDATA_OBJECTIDS:
+		case VM_MEMORY_ATS:
+		case VM_MEMORY_LAYERKIT:
+		case VM_MEMORY_CGIMAGE:
+		case VM_MEMORY_COREGRAPHICS_DATA:
+		case VM_MEMORY_COREGRAPHICS_SHARED:
+		case VM_MEMORY_COREGRAPHICS_FRAMEBUFFERS:
+		case VM_MEMORY_COREGRAPHICS_XALLOC:
+		case VM_MEMORY_COREGRAPHICS_BACKINGSTORES:
+		case VM_MEMORY_SQLITE:
+		case VM_MEMORY_JAVASCRIPT_CORE:
+		case VM_MEMORY_JAVASCRIPT_JIT_EXECUTABLE_ALLOCATOR:
+		case VM_MEMORY_JAVASCRIPT_JIT_REGISTER_FILE:
+		case VM_MEMORY_GLSL:
+		case VM_MEMORY_OPENCL:
+		case VM_MEMORY_COREIMAGE:
+		case VM_MEMORY_WEBCORE_PURGEABLE_BUFFERS:
+		case VM_MEMORY_IMAGEIO:
+		case VM_MEMORY_COREPROFILE:
+		case VM_MEMORY_ASSETSD:
+		case VM_MEMORY_OS_ALLOC_ONCE:
+		case VM_MEMORY_LIBDISPATCH:
+		case VM_MEMORY_ACCELERATE:
+		case VM_MEMORY_COREUI:
+		case VM_MEMORY_COREUIFILE:
+		case VM_MEMORY_GENEALOGY:
+		case VM_MEMORY_RAWCAMERA:
+		case VM_MEMORY_CORPSEINFO:
+		case VM_MEMORY_ASL:
+		case VM_MEMORY_SWIFT_RUNTIME:
+		case VM_MEMORY_SWIFT_METADATA:
+		case VM_MEMORY_DHMM:
+		case VM_MEMORY_SCENEKIT:
+		case VM_MEMORY_SKYWALK:
+		case VM_MEMORY_IOSURFACE:
+		case VM_MEMORY_LIBNETWORK:
+		case VM_MEMORY_AUDIO:
+		case VM_MEMORY_VIDEOBITSTREAM:
+		case VM_MEMORY_CM_XPC:
+		case VM_MEMORY_CM_RPC:
+		case VM_MEMORY_CM_MEMORYPOOL:
+		case VM_MEMORY_CM_READCACHE:
+		case VM_MEMORY_CM_CRABS:
+		case VM_MEMORY_QUICKLOOK_THUMBNAILS:
+		case VM_MEMORY_ACCOUNTS:
+		case VM_MEMORY_SANITIZER:
+		case VM_MEMORY_IOACCELERATOR:
+		case VM_MEMORY_CM_REGWARP:
+		case VM_MEMORY_EAR_DECODER:
+		case VM_MEMORY_ROSETTA:
+		case VM_MEMORY_ROSETTA_THREAD_CONTEXT:
+		case VM_MEMORY_ROSETTA_INDIRECT_BRANCH_MAP:
+		case VM_MEMORY_ROSETTA_RETURN_STACK:
+		case VM_MEMORY_ROSETTA_EXECUTABLE_HEAP:
+		case VM_MEMORY_ROSETTA_USER_LDT:
+		case VM_MEMORY_ROSETTA_ARENA:
+		case VM_MEMORY_ROSETTA_10:
+			return false;
+		case 0x0: // no tag
+		case VM_MEMORY_MALLOC:
+		case VM_MEMORY_MALLOC_SMALL:
+		case VM_MEMORY_MALLOC_LARGE:
+		case VM_MEMORY_MALLOC_HUGE:
+		case VM_MEMORY_REALLOC:
+		case VM_MEMORY_MALLOC_TINY:
+		case VM_MEMORY_MALLOC_LARGE_REUSABLE:
+		case VM_MEMORY_MALLOC_LARGE_REUSED:
+		case VM_MEMORY_MALLOC_NANO:
+		case VM_MEMORY_MALLOC_MEDIUM:
+		case VM_MEMORY_STACK:
+		case VM_MEMORY_DYLIB:
+		case VM_MEMORY_TCMALLOC:
+		case VM_MEMORY_DYLD:
+		case VM_MEMORY_DYLD_MALLOC:
+			return true;
+		default:
+			// If we don't know about the tag, assume it can store process specific pointers
+			return true;
+	}
+}
 
 NSString *ZGUserTagDescription(uint32_t userTag)
 {
@@ -73,6 +179,7 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_LARGE_REUSED)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ANALYSIS_TOOL)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_NANO)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_MEDIUM)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_MACH_MSG, @"Mach Message")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_IOKIT, @"IOKit")
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_STACK)
@@ -96,6 +203,7 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREGRAPHICS_SHARED, @"Core Graphics Shared")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREGRAPHICS_FRAMEBUFFERS, @"Core Graphics Framebuffers")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREGRAPHICS_BACKINGSTORES, @"Core Graphics Backing Stores")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREGRAPHICS_XALLOC, @"Core Graphics X-alloc")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_DYLD, @"dyld")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_DYLD_MALLOC, @"dyld Malloc")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_SQLITE, @"SQLite")
@@ -170,10 +278,10 @@ NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddre
 	NSString *userTagDescription = nil;
 	ZGMemoryAddress regionAddress = address;
 	ZGMemorySize regionSize = size;
-	ZGMemorySubmapInfo submapInfo;
-	if (ZGRegionSubmapInfo(processTask, &regionAddress, &regionSize, &submapInfo) && regionAddress <= address && address + size <= regionAddress + regionSize)
+	ZGMemoryExtendedInfo extendedInfo;
+	if (ZGRegionExtendedInfo(processTask, &regionAddress, &regionSize, &extendedInfo) && regionAddress <= address && address + size <= regionAddress + regionSize)
 	{
-		userTagDescription = ZGUserTagDescription(submapInfo.user_tag);
+		userTagDescription = ZGUserTagDescription(extendedInfo.user_tag);
 	}
 	return userTagDescription;
 }

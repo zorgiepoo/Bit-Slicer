@@ -63,7 +63,7 @@
 	ZGTableView * _Nullable _variablesTableView;
 }
 
-#define ZGVariableReorderType @"ZGVariableReorderType"
+#define ZGVariableRowsType @"ZGVariableRowsType"
 
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 
@@ -90,7 +90,7 @@
 	_variablesTableView = tableView;
 	[_variablesTableView setDataSource:self];
 	[_variablesTableView setDelegate:self];
-	[_variablesTableView registerForDraggedTypes:@[ZGVariableReorderType, ZGVariablePboardType]];
+	[_variablesTableView registerForDraggedTypes:@[ZGVariableRowsType, ZGVariablePboardType]];
 }
 
 - (void)cleanUp
@@ -207,6 +207,7 @@
 		NSString *newAddressString =
 			[ZGCalculator
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
+			 variableController:windowController.variableController
 			 process:windowController.currentProcess
 			 failedImages:_failedExecutableImages
 			 error:&error];
@@ -218,12 +219,20 @@
 		}
 		
 		// We don't have to evaluate it more than once if we're not doing any pointer calculations
-		if (error == nil && !variable.usesDynamicPointerAddress)
+		// and it's not using a label
+		if (error == nil && !variable.usesDynamicPointerAddress && !variable.usesDynamicLabelAddress)
 		{
 			variable.finishedEvaluatingDynamicAddress = YES;
 		}
 	}
 	return needsToReload;
+}
+
+- (BOOL)getBaseAddress:(ZGMemoryAddress *)outBaseAddress variable:(ZGVariable *)variable
+{
+	ZGDocumentWindowController *windowController = _windowController;
+	
+	return [ZGCalculator extractIndirectBaseAddress:outBaseAddress expression:variable.addressFormula process:windowController.currentProcess variableController:windowController.variableController failedImages:_failedExecutableImages];
 }
 
 - (void)updateWatchVariablesTable:(NSTimer *)__unused timer
@@ -242,7 +251,7 @@
 	{
 		visibleRowsRange = [_variablesTableView rowsInRect:_variablesTableView.visibleRect];
 		
-		if (windowController.searchController.canStartTask && windowController.searchController.searchResults.addressCount > 0 && visibleRowsRange.location + visibleRowsRange.length >= _documentData.variables.count)
+		if (windowController.searchController.canStartTask && windowController.searchController.searchResults.count > 0 && visibleRowsRange.location + visibleRowsRange.length >= _documentData.variables.count)
 		{
 			[windowController.searchController fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH];
 			needsToReloadTable = YES;
@@ -327,10 +336,49 @@
 
 #pragma mark Table View Drag & Drop
 
-- (NSDragOperation)tableView:(NSTableView *)__unused tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)__unused row proposedDropOperation:(NSTableViewDropOperation)operation
+- (NSDragOperation)tableView:(NSTableView *)__unused tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)proposedRow proposedDropOperation:(NSTableViewDropOperation)operation
 {
-	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
+	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableRowsType])
 	{
+		if (operation == NSTableViewDropOn)
+		{
+			if (proposedRow < 0)
+			{
+				return NO;
+			}
+			
+			NSArray<NSNumber *> *draggingRows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableRowsType];
+			
+			if ([draggingRows containsObject:@(proposedRow)])
+			{
+				return NSDragOperationNone;
+			}
+			
+			NSArray<ZGVariable *> *documentVariables = _documentData.variables;
+			if ((NSUInteger)proposedRow >= documentVariables.count)
+			{
+				return NSDragOperationNone;
+			}
+			
+			ZGVariable *variableAtProposedRow = documentVariables[(NSUInteger)proposedRow];
+			if (variableAtProposedRow.label.length == 0)
+			{
+				return NSDragOperationNone;
+			}
+			
+			for (NSNumber *draggingRow in draggingRows)
+			{
+				ZGVariable *draggingVariable = documentVariables[draggingRow.unsignedIntegerValue];
+				// Even if the label already uses a label in its address,
+				// we should still allow the user to override the address if they want
+				// to change the relation of the variable from one label to another one
+				if (draggingVariable.type == ZGScript)
+				{
+					return NSDragOperationNone;
+				}
+			}
+		}
+		
 		return NSDragOperationMove;
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType] && operation != NSTableViewDropOn)
@@ -341,53 +389,80 @@
 	return NSDragOperationNone;
 }
 
-- (void)reorderVariables:(NSArray<ZGVariable *> *)newVariables
+- (void)reorderVariables:(NSArray<ZGVariable *> *)newVariables oldRowIndexes:(NSIndexSet *)oldRowIndexes newRowIndexes:(NSIndexSet *)newRowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	NSUndoManager *undoManager = windowController.undoManager;
 	undoManager.actionName = ZGLocalizableSearchTableString(@"undoMoveAction");
-	[(ZGDocumentTableController *)[undoManager prepareWithInvocationTarget:self] reorderVariables:_documentData.variables];
+	[(ZGDocumentTableController *)[undoManager prepareWithInvocationTarget:self] reorderVariables:_documentData.variables oldRowIndexes:newRowIndexes newRowIndexes:oldRowIndexes];
 	
 	_documentData.variables = [NSArray arrayWithArray:newVariables];
 	
 	[_variablesTableView reloadData];
+	
+	[_variablesTableView selectRowIndexes:newRowIndexes byExtendingSelection:NO];
 }
 
-- (BOOL)tableView:(NSTableView *)__unused tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)__unused operation
+- (BOOL)tableView:(NSTableView *)__unused tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
 {
 	if (newRow < 0)
 	{
 		return NO;
 	}
 	
-	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
+	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableRowsType])
 	{
-		NSMutableArray<ZGVariable *> *variables = [NSMutableArray arrayWithArray:_documentData.variables];
-		NSArray<NSNumber *> *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
+		NSArray<NSNumber *> *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableRowsType];
 		
-		// Fill in the current rows with null objects
-		for (NSNumber *row in rows)
+		if (operation == NSTableViewDropOn)
 		{
-			[variables
-			 replaceObjectAtIndex:row.unsignedIntegerValue
-			 withObject:(id)[NSNull null]];
-		}
-		
-		// Insert the objects to the new position
-		for (NSNumber *row in rows)
-		{
-			[variables
-			 insertObject:[_documentData.variables objectAtIndex:row.unsignedIntegerValue]
-			 atIndex:(NSUInteger)newRow];
+			NSArray<ZGVariable *> *documentVariables = _documentData.variables;
 			
-			newRow++;
+			ZGVariable *targetLabeledVariable = documentVariables[(NSUInteger)newRow];
+			NSArray<ZGVariable *> *draggedVariables = [rows zgMapUsingBlock:^id _Nonnull(NSNumber *row) {
+				return documentVariables[row.unsignedIntegerValue];
+			}];
+			
+			ZGDocumentWindowController *windowController = _windowController;
+			[windowController.variableController relateVariables:draggedVariables toLabeledVariable:targetLabeledVariable];
 		}
-		
-		// Remove all the old objects
-		[variables removeObject:(id)[NSNull null]];
-		
-		// Set the new variables
-		[self reorderVariables:variables];
+		else
+		{
+			NSMutableArray<ZGVariable *> *variables = [NSMutableArray arrayWithArray:_documentData.variables];
+			
+			// Fill in the current rows with null objects
+			for (NSNumber *row in rows)
+			{
+				[variables
+				 replaceObjectAtIndex:row.unsignedIntegerValue
+				 withObject:(id)[NSNull null]];
+			}
+			
+			// Insert the objects to the new position
+			NSArray<ZGVariable *> *documentVariables = _documentData.variables;
+			ZGVariable *firstInsertedVariable = documentVariables[rows.firstObject.unsignedIntegerValue];
+			NSMutableIndexSet *oldRowIndexes = [NSMutableIndexSet indexSet];
+			for (NSNumber *row in rows)
+			{
+				[variables
+				 insertObject:[documentVariables objectAtIndex:row.unsignedIntegerValue]
+				 atIndex:(NSUInteger)newRow];
+				
+				[oldRowIndexes addIndex:row.unsignedIntegerValue];
+				
+				newRow++;
+			}
+			
+			// Remove all the old objects
+			[variables removeObject:(id)[NSNull null]];
+			
+			// Find the index where the first reordered variable is after removing all the old objects
+			NSUInteger indexOfFirstInsertedVariable = [variables indexOfObject:firstInsertedVariable];
+			NSIndexSet *newRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(indexOfFirstInsertedVariable, rows.count)];
+			
+			// Set the new variables
+			[self reorderVariables:variables oldRowIndexes:oldRowIndexes newRowIndexes:newRowIndexes];
+		}
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType])
 	{
@@ -402,7 +477,7 @@
 		NSArray<ZGVariable *> *variables = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [ZGVariable class]]] fromData:pasteboardData error:&unarchiveError];
 		if (variables == nil)
 		{
-			NSLog(@"Error: failed to unarchive variables in drag-dsop: %@", unarchiveError);
+			NSLog(@"Error: failed to unarchive variables in drag-drop: %@", unarchiveError);
 			return NO;
 		}
 		
@@ -421,13 +496,13 @@
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pasteboard
 {
-	[pasteboard declareTypes:@[ZGVariableReorderType, ZGVariablePboardType] owner:self];
+	[pasteboard declareTypes:@[ZGVariableRowsType, ZGVariablePboardType] owner:self];
 	
 	NSMutableArray<NSNumber *> *rows = [[NSMutableArray alloc] init];
 	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL * __unused stop) {
 		[rows addObject:@(index)];
 	}];
-	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableReorderType];
+	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableRowsType];
 	
 	NSArray<ZGVariable *> *variables = [_documentData.variables objectsAtIndexes:rowIndexes];
 	
@@ -654,9 +729,32 @@
 			[displayComponents addObject:@""];
 		}
 		
+		ZGDocumentWindowController *windowController = _windowController;
+		ZGProcess *currentProcess = windowController.currentProcess;
+		
+		ZGMemoryAddress variableAddress;
+		ZGMemorySize variableSize;
+		
 		if (variable.usesDynamicAddress)
 		{
 			[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"addressTooltipLabel"), variable.addressFormula]];
+			
+			ZGMemoryAddress baseAddress;
+			if ([self getBaseAddress:&baseAddress variable:variable])
+			{
+				variableAddress = baseAddress;
+				variableSize = currentProcess.pointerSize;
+			}
+			else
+			{
+				variableAddress = variable.address;
+				variableSize = variable.size;
+			}
+		}
+		else
+		{
+			variableAddress = variable.address;
+			variableSize = variable.size;
 		}
 		
 		if (variable.type == ZGByteArray)
@@ -664,16 +762,14 @@
 			[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"byteSizeTooltipLabel"), variable.sizeStringValue]];
 		}
 		
-		ZGDocumentWindowController *windowController = _windowController;
-		ZGProcess *currentProcess = windowController.currentProcess;
 		if (variable.type != ZGScript && currentProcess.valid)
 		{
-			ZGMemoryAddress memoryProtectionAddress = variable.address;
-			ZGMemorySize memoryProtectionSize = variable.size;
+			ZGMemoryAddress memoryProtectionAddress = variableAddress;
+			ZGMemorySize memoryProtectionSize = variableSize;
 			ZGMemoryProtection memoryProtection;
 			if (ZGMemoryProtectionInRegion(currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
 			{
-				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
+				if (variableAddress >= memoryProtectionAddress && variableAddress + variableSize <= memoryProtectionAddress + memoryProtectionSize)
 				{
 					NSString *protectionDescription = ZGProtectionDescription(memoryProtection);
 					if (protectionDescription != nil && [variable.name rangeOfString:protectionDescription].location == NSNotFound)
@@ -683,13 +779,12 @@
 				}
 			}
 			
-			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variable.address, variable.size);
+			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variableAddress, variableSize);
 			
-			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variable.address fromMachBinaries:[ZGMachBinary machBinariesInProcess:currentProcess]];
+			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variableAddress fromMachBinaries:[ZGMachBinary machBinariesInProcess:currentProcess]];
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
 			
-			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
-			NSString *mappedFilePath = [machBinary filePathInProcess:currentProcess];
+			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variableAddress];
 			
 			BOOL needsUserTag = userTagDescription != nil && [variable.name rangeOfString:userTagDescription].location == NSNotFound;
 			BOOL needsSegmentName = segmentName != nil && [variable.name rangeOfString:segmentName].location == NSNotFound;
@@ -699,12 +794,17 @@
 				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"tagTooltipLabel"), userTagDescription]];
 			}
 			
-			if (mappedFilePath != nil)
+			NSRange totalSegmentRange = machBinaryInfo.totalSegmentRange;
+			if (variableAddress >= totalSegmentRange.location && variableAddress <= UINT64_MAX - variableSize && variableAddress + variableSize <= totalSegmentRange.location + totalSegmentRange.length)
 			{
-				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"mappedTooltipLabel"), mappedFilePath]];
-				if (!variable.usesDynamicAddress)
+				NSString *mappedFilePath = [machBinary filePathInProcess:currentProcess];
+				if (mappedFilePath != nil)
 				{
-					[displayComponents addObject:[NSString stringWithFormat:@"%@ 0x%llX", ZGLocalizableSearchTableString(@"offsetTooltipLabel"), variable.address - machBinary.headerAddress]];
+					[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"mappedTooltipLabel"), mappedFilePath]];
+					if (!variable.usesDynamicAddress)
+					{
+						[displayComponents addObject:[NSString stringWithFormat:@"%@ 0x%llX", ZGLocalizableSearchTableString(@"offsetTooltipLabel"), variableAddress - machBinary.headerAddress]];
+					}
 				}
 			}
 			

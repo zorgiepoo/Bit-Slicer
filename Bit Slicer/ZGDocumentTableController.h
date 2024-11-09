@@ -31,6 +31,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGMemoryTypes.h"
 
 @class ZGDocumentWindowController;
 @class ZGVariable;
@@ -45,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)updateVariableValuesInRange:(NSRange)variableRange;
 
 - (BOOL)updateDynamicVariableAddress:(ZGVariable *)variable;
+- (BOOL)getBaseAddress:(ZGMemoryAddress *)outBaseAddress variable:(ZGVariable *)variable;
 
 - (void)clearCache;
 

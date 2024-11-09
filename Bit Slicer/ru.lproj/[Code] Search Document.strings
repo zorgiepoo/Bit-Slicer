@@ -85,6 +85,12 @@
 /* Edit multiple variable values menu item title */
 "editMultipleVariableValuesTitle" = "Изменить значения…";
 
+/* Edit single variable label menu item title */
+"editSingleVariableLabelTitle" = "Изменить метку переменной…";
+
+/* Edit multiple variable labels menu item title */
+"editMultipleVariableLabelsTitle" = "Изменить метки переменных…";
+
 /* Edit single variable size menu item title */
 "editSingleVariableSizeTitle" = "Изменить размер переменной…";
 
@@ -97,6 +103,18 @@
 /* Relativize multiple variables menu item title */
 "relativizeMultipleVariablesTitle" = "Релятивизировать переменные";
 
+/* Watch Write Accesses */
+"watchAccesses_0_0" = "Следить за попыткой записи…";
+
+/* Watch Write Accesses to Base Address */
+"watchAccesses_0_1" = "Watch Write Accesses to Base Address…";
+
+/* Watch Read & Write Accesses */
+"watchAccesses_1_0" = "Следить за чтением и записью…";
+
+/* Watch Read & Write Accesses to Base Address */
+"watchAccesses_1_1" = "Watch Read & Write Accesses to Base Address…";
+
 /* NOP single variable menu item title */
 "nopSingleVariableTitle" = "NOP-переменная";
 
@@ -108,6 +126,9 @@
 
 /* Next Operator menu item title */
 "nextOperatorMenuItem" = "Следующий оператор";
+
+/* Toggle Search Type menu item title */
+"toggleSearchTypeMenuItem" = "Toggle Search Type";
 
 /* Title of Stored Value menu item in search menu of the search field */
 "storedValueTokenTitle" = "Сохраненное значение";
@@ -141,6 +162,12 @@
 
 /* Error Message for when Beginning Address >= Ending Address */
 "endingAddressIsNotGreaterThanBeginningAddressErrorMessage" = "Значение Начального адреса должно быть меньше, чем значение в Конечном адресе, либо одно или оба поля можгут оставаться пустыми.";
+
+/* Error Message for when trying address type search for 32-bit targets */
+"addressTypeNotSupportedFor32Bit" = "Searching memory addresses for 32-bit targets is not supported.";
+
+/* Error Message for when the offset value cannot be parsed */
+"addressTypeIndirectOffsetParseError" = "The offset value could not be parsed.";
 
 /* Error message for when the selected data type to seach is a numerical one, and the expression cannot be parsed */
 "invalidNumericalSearchExpressionErrorMessage" = "Поисковое значение должно быть числовым.";

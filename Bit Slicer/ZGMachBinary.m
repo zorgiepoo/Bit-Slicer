@@ -258,9 +258,9 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			cachedSize = 0x0;
 			cachedBytes = NULL;
 
-			ZGMemorySubmapInfo regionInfo;
+			ZGMemoryBasicInfo regionInfo;
 			ZGRegion *region = [[ZGRegion alloc] initWithAddress:filePathAddress size:1];
-			if (!ZGRegionSubmapInfo(processTask, &region->_address, &region->_size, &regionInfo) || filePathAddress < region->_address || filePathAddress >= region->_address + region->_size)
+			if (!ZGRegionInfo(processTask, &region->_address, &region->_size, &regionInfo) || filePathAddress < region->_address || filePathAddress >= region->_address + region->_size)
 			{
 				[filePaths addObject:@""];
 				continue;

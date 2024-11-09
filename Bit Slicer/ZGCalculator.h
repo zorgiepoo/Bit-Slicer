@@ -34,9 +34,11 @@
 #import "ZGVariable.h"
 
 @class ZGProcess;
+@class ZGVariableController;
 
 #define ZGBaseAddressFunction @"base"
 #define ZGFindSymbolFunction @"symbol"
+#define ZGFindLabelFunction @"label"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,10 +47,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL usesDynamicPointerAddress;
 @property (nonatomic, readonly) BOOL usesDynamicBaseAddress;
 @property (nonatomic, readonly) BOOL usesDynamicSymbolAddress;
+@property (nonatomic, readonly) BOOL usesDynamicLabelAddress;
+
+- (NSUInteger)numberOfDynamicPointersInAddress;
 
 @end
 
 @interface ZGCalculator : NSObject
+
++ (BOOL)extractIndirectAddressesAndOffsetsFromIntoBuffer:(void *)buffer expression:(NSString *)initialExpression filePaths:(NSArray<NSString *> *)filePaths filePathSuffixIndexCache:(NSMutableDictionary<NSString *, id> *)filePathSuffixIndexCache maxLevels:(uint16_t)maxLevels stride:(ZGMemorySize)stride;
+
++ (BOOL)extractIndirectBaseAddress:(ZGMemoryAddress *)outBaseAddress expression:(NSString *)initialExpression process:(ZGProcess * __unsafe_unretained)process variableController:(nullable ZGVariableController * __unsafe_unretained)variableController failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages;
+
++ (nullable NSString *)extractFirstDependentLabelFromExpression:(NSString *)expression;
++ (BOOL)getVariableCycle:(NSArray<NSString *> * _Nullable __autoreleasing *_Nullable)outCycle variable:(ZGVariable *)variable variableController:(ZGVariableController *)variableController;
 
 + (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString * _Nullable * _Nonnull)additiveConstantString multiplicateConstant:(NSString *_Nullable * _Nonnull)multiplicativeConstantString;
 
@@ -56,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
 // And also has a base() function that takes in a string, and returns the first address to a region such that the passed string partially matches the end of the corresponding region's mapped path
-+ (nullable NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess *)process failedImages:(nullable NSMutableArray<NSString *> *)failedImages error:(NSError **)error;
++ (nullable NSString *)evaluateExpression:(NSString *)expression variableController:(nullable ZGVariableController *)variableController process:(ZGProcess *)process failedImages:(nullable NSMutableArray<NSString *> *)failedImages error:(NSError **)error;
 + (nullable NSString *)evaluateAndSymbolicateExpression:(NSString *)expression process:(ZGProcess *)process currentAddress:(ZGMemoryAddress)currentAddress didSymbolicate:(nullable BOOL *)didSymbolicate error:(NSError **)error;
 
 @end

@@ -71,6 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) IBOutlet NSButton *storeValuesButton;
 @property (nonatomic) IBOutlet NSSearchField *searchValueTextField;
 @property (nonatomic) IBOutlet NSPopUpButton *functionPopUpButton;
+@property (nonatomic) NSPopUpButton *searchTypePopUpButton;
 
 @property (nonatomic, readonly) ZGDocumentTableController *tableController;
 @property (nonatomic, readonly) ZGVariableController *variableController;
@@ -93,6 +94,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)updateNumberOfValuesDisplayedStatus;
 - (void)setStatusString:(NSString *)statusString;
+
+- (void)updateSearchAddressOptions;
 
 - (IBAction)requestEditingVariableDescription:(nullable id)sender;
 - (IBAction)requestEditingVariableAddress:(nullable id)sender;

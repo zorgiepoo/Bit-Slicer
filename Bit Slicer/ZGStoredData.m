@@ -42,7 +42,7 @@
 	
 	NSArray<ZGRegion *> *initialRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] : [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 	
-	NSArray<ZGRegion *> *filteredRegions = [ZGRegion regionsFilteredFromRegions:initialRegions beginAddress:beginAddress endAddress:endAddress protectionMode:protectionMode includeSharedMemory:includeSharedMemory];
+	NSArray<ZGRegion *> *filteredRegions = [ZGRegion regionsFilteredFromRegions:initialRegions beginAddress:beginAddress endAddress:endAddress protectionMode:protectionMode includeSharedMemory:includeSharedMemory filterHeapAndStackData:NO totalStaticSegmentRanges:nil excludeStaticDataFromSystemLibraries:NO filePaths:nil];
 	
 	for (ZGRegion *region in filteredRegions)
 	{

@@ -206,7 +206,7 @@ static PyTypeObject VirtualMemoryType =
 	0, // tp_init
 	0, // tp_alloc
 	0, // tp_new
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
 @implementation ZGPyVirtualMemory
@@ -371,7 +371,7 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 		void *bytes = NULL;
 		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytes))
 		{
-			retValue = Py_BuildValue("y#", bytes, numberOfBytes);
+			retValue = PyBytes_FromStringAndSize(bytes, (long)numberOfBytes);
 			ZGFreeBytes(bytes, numberOfBytes);
 		}
 		else
@@ -633,7 +633,7 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject * __unused 
 	_searchProgress = searchProgress;
 }
 
-- (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSet:(NSData *)__unused resultSet
+- (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSets:(NSArray<NSData *> *)__unused resultSets totalResultSetLength:(NSUInteger)__unused totalResultSetLength resultType:(ZGSearchResultType)__unused resultType dataType:(ZGVariableType)__unused dataType addressType:(ZGSearchResultAddressType)__unused addressType stride:(ZGMemorySize)__unused stride headerAddresses:(NSArray<NSNumber *> * _Nullable)__unused headerAddresses
 {
 }
 
@@ -646,11 +646,25 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 	{
 		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, self->objcSelf, ZGByteArray, 0, ZGEquals);
 		
-		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.addressCount);
+		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.count);
 		PyObject *pythonResults = PyList_New((Py_ssize_t)numberOfEntries);
 		
 		__block Py_ssize_t addressIndex = 0;
-		[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL * __unused stop) {
+		ZGMemorySize pointerSize = results.stride;
+		
+		[results enumerateWithCount:numberOfEntries removeResults:NO usingBlock:^(const void *data, BOOL * __unused stop) {
+			ZGMemoryAddress address;
+			switch (pointerSize)
+			{
+				case sizeof(ZGMemoryAddress):
+					address = *((const ZGMemoryAddress *)data);
+					break;
+				case sizeof(ZG32BitMemoryAddress):
+					address = *((const ZG32BitMemoryAddress *)data);
+					break;
+				default:
+					abort();
+			}
 			PyList_SET_ITEM(pythonResults, addressIndex, Py_BuildValue("K", address));
 			addressIndex++;
 		}];

@@ -311,6 +311,9 @@
 /* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "1087"; */
 "1087.title" = "Скопировать адрес";
 
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "Y5k-Nh-cGe"; */
+"Y5k-Nh-cGe.title" = "Copy Raw Address";
+
 /* Class = "NSMenuItem"; title = "Check for Updates…"; ObjectID = "1093"; */
 "1093.title" = "Проверить обновления…";
 
@@ -404,8 +407,8 @@
 /* Class = "NSMenuItem"; title = "Font"; ObjectID = "cy3-aR-hDp"; */
 "cy3-aR-hDp.title" = "Шрифт";
 
-/* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "dr1-2H-Uqa"; */
-"dr1-2H-Uqa.title" = "Искать указатель перменной";
+/* Class = "NSMenuItem"; title = "Search Pointers to Variable"; ObjectID = "dr1-2H-Uqa"; */
+"dr1-2H-Uqa.title" = "Искать указатели перменной";
 
 /* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "e4N-vH-vLR"; */
 "e4N-vH-vLR.title" = "Использовать по умолчанию";
