@@ -21,10 +21,16 @@ xib files are considered to be code for Bit Slicer under the license above with 
 All the files in the following directories (in "Bit Slicer") are © Aureliano Candido and are not up for re-distribution or modification in binary form without prior written permission from the author:
 
 * bitslicerdocicon.iconset/
-* bitslicericon.iconset/
 * debuggericons/
 * docicons/
 * preficons/
+
+All the files in the following directories (in "Bit Slicer") are © maxtron95 and are not up for re-distribution or modification in binary form without prior written permission from the author:
+
+* bitslicericon.iconset/
+* bitslicericon.svg
+* bitslicerdocicon.iconset/
+* bitslicerdocicon.svg
 
 Below are software licenses to other code that is being used and/or linked in the program. When questioning the license of some used code, look at the license/copyright specified at the top of the source file.
 
