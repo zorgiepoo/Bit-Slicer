@@ -374,32 +374,64 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		regions = searchData.savedData.regions;
 	}
 	
-	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:regions.count];
+	NSUInteger regionCount = regions.count;
+	
+	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:regionCount];
 	
 	ZGSearchProgressNotifier *progressNotifier = [[ZGSearchProgressNotifier alloc] initWithSearchProgress:searchProgress resultType:ZGSearchResultTypeDirect dataType:resultDataType stride:stride notifiesStaticResults:NO headerAddresses:nil delegate:delegate];
 	
 	[progressNotifier start];
 	
-	const void **allResultSets = static_cast<const void **>(calloc(regions.count, sizeof(*allResultSets)));
-	assert(allResultSets != NULL);
+	const void **allResultSets = static_cast<const void **>(calloc(regionCount, sizeof(*allResultSets)));
+	assert(allResultSets != nullptr);
+	
+	// Reading all regions upfront is more efficient than having separate worker threads read the region bytes
+	ZGRegionValue *newRegionValues = static_cast<ZGRegionValue *>(calloc(regionCount, sizeof(*newRegionValues)));
+	assert(newRegionValues != nullptr);
+	{
+		size_t regionIndex = 0;
+		for (ZGRegion *region in regions)
+		{
+			ZGMemoryAddress address = region.address;
+			ZGMemorySize size = region.size;
+			
+			if (dataBeginAddress < address + size && dataEndAddress > address)
+			{
+				if (dataEndAddress < address + size)
+				{
+					size = dataEndAddress - address;
+				}
+				
+				void *newRegionBytes = nullptr;
+				if (ZGReadBytes(processTask, address, &newRegionBytes, &size))
+				{
+					ZGRegionValue regionValue = {address, size, newRegionBytes};
+					newRegionValues[regionIndex] = regionValue;
+				}
+			}
+			
+			regionIndex++;
+		}
+	}
 	
 	dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_USER_INITIATED, 0);
 	dispatch_queue_t queue = dispatch_queue_create("com.zgcoder.BitSlicer.ValueSearch", qosAttribute);
 	
-	dispatch_apply(regions.count, queue, ^(size_t regionIndex) {
+	dispatch_apply(regionCount, queue, ^(size_t regionIndex) {
 		@autoreleasepool
 		{
-			ZGRegion *region = [regions objectAtIndex:regionIndex];
-			ZGMemoryAddress address = region.address;
-			ZGMemorySize size = region.size;
-			void *regionBytes = region.bytes;
+			ZGRegionValue newRegionValue = newRegionValues[regionIndex];
 			
 			NSData *results = nil;
 			
-			ZGMemorySize dataIndex = 0;
-			char *bytes = nullptr;
-			if (dataBeginAddress < address + size && dataEndAddress > address)
+			void *newRegionBytes = newRegionValue.bytes;
+			if (newRegionBytes != nullptr)
 			{
+				ZGMemoryAddress address = newRegionValue.address;
+				ZGMemorySize size = newRegionValue.size;
+				void *savedRegionBytes = regions[regionIndex].bytes;
+				
+				ZGMemorySize dataIndex = 0;
 				if (dataBeginAddress > address)
 				{
 					dataIndex = (dataBeginAddress - address);
@@ -408,25 +440,35 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 						dataIndex += dataAlignment - (dataIndex % dataAlignment);
 					}
 				}
-				if (dataEndAddress < address + size)
-				{
-					size = dataEndAddress - address;
-				}
 				
-				if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, reinterpret_cast<void **>(&bytes), &size))
+				if (!searchProgress.shouldCancelSearch)
 				{
 					void *extraStorage = usesExtraStorage ? calloc(1, dataSize) : nullptr;
 					
-					results = helper(dataIndex, address, size, bytes, regionBytes, extraStorage);
+					results = helper(dataIndex, address, size, newRegionBytes, savedRegionBytes, extraStorage);
 					allResultSets[regionIndex] = CFBridgingRetain(results);
 					
 					free(extraStorage);
-					ZGFreeBytes(bytes, size);
 				}
 			}
 			
 			[progressNotifier addResultSet:results != nil ? results : NSData.data staticMainExecutableResultSet:nil staticOtherLibraryResultSet:nil];
 		}
+	});
+	
+	// Deallocate region data in background
+	dispatch_async(queue, ^{
+		for (size_t newRegionIndex = 0; newRegionIndex < regionCount; newRegionIndex++)
+		{
+			ZGRegionValue newRegionValue = newRegionValues[newRegionIndex];
+			void *bytes = newRegionValue.bytes;
+			if (bytes != nullptr)
+			{
+				ZGFreeBytes(bytes, newRegionValue.size);
+			}
+		}
+		
+		free(newRegionValues);
 	});
 	
 	[progressNotifier stop];
@@ -439,7 +481,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		
 		// Deallocate results into separate queue since this could take some time
 		dispatch_async(queue, ^{
-			for (NSUInteger resultSetIndex = 0; resultSetIndex < regions.count; resultSetIndex++)
+			for (NSUInteger resultSetIndex = 0; resultSetIndex < regionCount; resultSetIndex++)
 			{
 				const void *resultSetData = allResultSets[resultSetIndex];
 				if (resultSetData != nullptr)
@@ -454,7 +496,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	else
 	{
 		NSMutableArray<NSData *> *filteredResultSets = [NSMutableArray array];
-		for (NSUInteger resultSetIndex = 0; resultSetIndex < regions.count; resultSetIndex++)
+		for (NSUInteger resultSetIndex = 0; resultSetIndex < regionCount; resultSetIndex++)
 		{
 			const void *resultSetData = allResultSets[resultSetIndex];
 			if (resultSetData != nullptr)
