@@ -54,7 +54,7 @@
 	<key>SUEnableSystemProfiling</key>
 	<string>YES</string>
 	<key>SUFeedURL</key>
-	<string>https://zgcoder.net/bitslicer/update/appcast_v2.xml</string>
+	<string>https://zgcoder.net/bitslicer/update/appcast_v3.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>motgYIwmnS1wa8Q/5SUDXnOVdKujkprFhm/D7DJW77k=</string>
 	<key>SecTaskAccess</key>
