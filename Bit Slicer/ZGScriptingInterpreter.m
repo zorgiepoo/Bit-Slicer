@@ -181,9 +181,10 @@
 		
 		PyObject *path = PySys_GetObject("path");
 		
-		NSString *nativeLibPath = [[[pythonBundle.bundleURL URLByAppendingPathComponent:@"Frameworks"] URLByResolvingSymlinksInPath] path];
+		NSString *nativeLibPath = [[pythonBundle.executableURL.URLByResolvingSymlinksInPath.URLByDeletingLastPathComponent URLByAppendingPathComponent:@"Frameworks" isDirectory:YES] path];
 		
 		assert(nativeLibPath != nil);
+		assert([NSFileManager.defaultManager fileExistsAtPath:nativeLibPath]);
 		
 		[self appendPath:nativeLibPath toSysPath:path];
 		[self appendPath:[[[self class] scriptCachesURL] path] toSysPath:path];
