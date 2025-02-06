@@ -173,6 +173,9 @@
 	
 	NSString *pythonDirectory = [pythonBundle pathForResource:@"python" ofType:nil];
 	assert(pythonDirectory != nil);
+#ifdef _BSDEBUG
+		assert([NSFileManager.defaultManager fileExistsAtPath:pythonDirectory]);
+#endif
 	
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
 	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
@@ -184,7 +187,9 @@
 		NSString *nativeLibPath = [[pythonBundle.executableURL.URLByResolvingSymlinksInPath.URLByDeletingLastPathComponent URLByAppendingPathComponent:@"Frameworks" isDirectory:YES] path];
 		
 		assert(nativeLibPath != nil);
+#ifdef _BSDEBUG
 		assert([NSFileManager.defaultManager fileExistsAtPath:nativeLibPath]);
+#endif
 		
 		[self appendPath:nativeLibPath toSysPath:path];
 		[self appendPath:[[[self class] scriptCachesURL] path] toSysPath:path];
