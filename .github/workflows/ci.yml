@@ -24,7 +24,7 @@ jobs:
           xcodebuild test-without-building -target 'Bit Slicer Tests' -scheme 'Bit Slicer' -derivedDataPath build
       - name: Archive Test Results
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: 'build-logs'
             path: build/Logs
