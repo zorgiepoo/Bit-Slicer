@@ -61,7 +61,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 @implementation ZGVariableController
 {
 	__weak ZGDocumentWindowController * _Nullable _windowController;
-	
+
 	ZGDocumentData * _Nonnull _documentData;
 	id _Nullable _frozenActivity;
 }
@@ -90,7 +90,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)updateFrozenActivity
 {
 	BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
-	
+
 	if (hasFrozenVariable && _frozenActivity == nil)
 	{
 		_frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
@@ -102,26 +102,26 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 }
 
-- (void)freezeOrUnfreezeVariablesAtRoxIndexes:(NSIndexSet *)rowIndexes
+- (void)freezeOrUnfreezeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
 {
 	for (ZGVariable *variable in [_documentData.variables objectsAtIndexes:rowIndexes])
 	{
 		variable.isFrozen = !variable.isFrozen;
-		
+
 		if (variable.isFrozen)
 		{
 			variable.freezeValue = variable.rawValue;
 		}
 	}
-	
+
 	[self updateFrozenActivity];
-	
+
 	ZGDocumentWindowController *windowController = _windowController;
 	[windowController.variablesTableView reloadData];
-	
+
 	NSString *freezeActionName = ZGLocalizedStringFromVariableActionsTable(@"undoFreezeAction");
 	NSString *unfreezeActionName = ZGLocalizedStringFromVariableActionsTable(@"undoUnfreezeAction");
-	
+
 	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
 	if ([[_documentData.variables objectAtIndex:rowIndexes.firstIndex] isFrozen])
 	{
@@ -145,14 +145,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			windowController.undoManager.actionName = unfreezeActionName;
 		}
 	}
-	
-	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] freezeOrUnfreezeVariablesAtRoxIndexes:rowIndexes];
+
+	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] freezeOrUnfreezeVariablesAtRowIndexes:rowIndexes];
 }
 
 - (void)freezeVariables
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	[self freezeOrUnfreezeVariablesAtRoxIndexes:windowController.selectedVariableIndexes];
+	[self freezeOrUnfreezeVariablesAtRowIndexes:windowController.selectedVariableIndexes];
 }
 
 #pragma mark Copying & Pasting
@@ -162,7 +162,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[NSPasteboard.generalPasteboard
 	 declareTypes:@[NSPasteboardTypeString]
 	 owner:self];
-	
+
 	[NSPasteboard.generalPasteboard
 	 setString:variable.addressFormula
 	 forType:NSPasteboardTypeString];
@@ -179,7 +179,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[NSPasteboard.generalPasteboard
 	 declareTypes:@[NSPasteboardTypeString]
 	 owner:self];
-	
+
 	[NSPasteboard.generalPasteboard
 	 setString:variable.addressStringValue
 	 forType:NSPasteboardTypeString];
@@ -189,18 +189,18 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	ZGVariable *variable = windowController.selectedVariables[0];
-	
+
 	[[self class] copyVariableRawAddress:variable];
 }
 
-+ (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables
++ (BOOL)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables
 {
 	[NSPasteboard.generalPasteboard
 	 declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType]
 	 owner:self];
-	
+
 	NSMutableArray<NSString *> *linesToWrite = [[NSMutableArray alloc] init];
-	
+
 	for (ZGVariable *variable in variables)
 	{
 		if (variable.type != ZGScript)
@@ -208,11 +208,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			[linesToWrite addObject:[@[variable.shortDescription, variable.addressFormula, variable.stringValue] componentsJoinedByString:@"\t"]];
 		}
 	}
-	
+
 	[NSPasteboard.generalPasteboard
 	 setString:[linesToWrite componentsJoinedByString:@"\n"]
 	 forType:NSPasteboardTypeString];
-	
+
 	NSError *archiveError = nil;
 	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
 	if (data != nil)
@@ -220,17 +220,22 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[NSPasteboard.generalPasteboard
 		 setData:data
 		 forType:ZGVariablePboardType];
+		return YES;
 	}
 	else
 	{
 		NSLog(@"Error: failed to copy variables to pasteboard: %@", archiveError);
+		return NO;
 	}
 }
 
 - (void)copyVariables
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	[[self class] copyVariablesToPasteboard:[windowController selectedVariables]];
+	if (![[self class] copyVariablesToPasteboard:[windowController selectedVariables]])
+	{
+		ZGRunAlertPanelWithOKButton(@"Copy Failed", @"Failed to copy variables to pasteboard. There may be an issue with the data format.");
+	}
 }
 
 - (void)pasteVariables
@@ -239,22 +244,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (pasteboardData)
 	{
 		ZGDocumentWindowController *windowController = _windowController;
-		
+
 		NSError *unarchiveError = nil;
 		NSArray<ZGVariable *> *variablesToInsertArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [ZGVariable class]]] fromData:pasteboardData error:&unarchiveError];
 		if (variablesToInsertArray != nil)
 		{
 			NSUInteger currentIndex = windowController.selectedVariableIndexes.count == 0 ? 0 : windowController.selectedVariableIndexes.firstIndex + 1;
-			
+
 			NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
-			
+
 			[self
 			 addVariables:variablesToInsertArray
 			 atRowIndexes:indexesToInsert];
 		}
 		else
 		{
-			NSLog(@"Error: failed to unarchive variables from pastboard for pasting with error %@", unarchiveError);
+			NSLog(@"Error: failed to unarchive variables from pasteboard for pasting with error %@", unarchiveError);
+			ZGRunAlertPanelWithOKButton(@"Paste Failed", @"Failed to paste variables from pasteboard. The data may be corrupted or in an incompatible format.");
 		}
 	}
 }
@@ -264,9 +270,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)clearSearchByFilteringForSearchVariables:(BOOL)shouldFilterForSearchVariables
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	[(ZGDocumentWindowController *)[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:windowController.documentData.variables searchResults:windowController.searchController.searchResults];
-	
+
 	NSArray<ZGVariable *> *newVariables = nil;
 	if (shouldFilterForSearchVariables)
 	{
@@ -278,20 +284,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		newVariables = [NSArray array];
 	}
-	
+
 	windowController.documentData.variables = newVariables;
 	windowController.searchController.searchResults = nil;
-	
+
 	windowController.runningApplicationsPopUpButton.enabled = YES;
 	windowController.dataTypesPopUpButton.enabled = YES;
-	
+
 	if (windowController.currentProcess.valid)
 	{
 		[windowController updateNumberOfValuesDisplayedStatus];
 	}
-	
+
 	[windowController markDocumentChange];
-	
+
 	[windowController.variablesTableView reloadData];
 }
 
@@ -321,7 +327,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithCapacity:_documentData.variables.count];
-	
+
 	NSString *undoActionName = nil;
 	if (windowController.undoManager.isUndoing)
 	{
@@ -331,15 +337,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		undoActionName = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRemoveVariables") : ZGLocalizedStringFromVariableActionsTable(@"undoRemoveVariable");
 	}
-	
+
 	windowController.undoManager.actionName = undoActionName;
-	
+
 	NSArray<ZGVariable *> *variablesToRemove = [_documentData.variables objectsAtIndexes:rowIndexes];
-	
+
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 addVariables:variablesToRemove
 	 atRowIndexes:rowIndexes];
-	
+
 	BOOL removedAnyLabelVariable = NO;
 	for (ZGVariable *variable in variablesToRemove)
 	{
@@ -355,34 +361,34 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				variable.isFrozen = NO;
 			}
 		}
-		
+
 		if (!removedAnyLabelVariable && variable.label.length > 0)
 		{
 			removedAnyLabelVariable = YES;
 		}
 	}
-	
+
 	[temporaryArray addObjectsFromArray:_documentData.variables];
 	[temporaryArray removeObjectsAtIndexes:rowIndexes];
-	
-	_documentData.variables = [NSArray arrayWithArray:temporaryArray];
-	
+
+	_documentData.variables = [temporaryArray copy];
+
 	[windowController.searchController fetchVariablesFromResults];
-	
+
 	[windowController updateNumberOfValuesDisplayedStatus];
-	
+
 	[self updateFrozenActivity];
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
-	
+
 	NSUInteger firstRemovedIndex = rowIndexes.firstIndex;
 	if (firstRemovedIndex > 0)
 	{
 		[windowController.variablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:firstRemovedIndex - 1] byExtendingSelection:NO];
 	}
-	
+
 	[windowController updateSearchAddressOptions];
-	
+
 	if (removedAnyLabelVariable)
 	{
 		// Re-annotate other variables that may be referencing variables that were just removed
@@ -394,7 +400,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				[variablesToAnnotate addObject:variable];
 			}
 		}
-		
+
 		[self annotateVariablesAutomatically:variablesToAnnotate process:windowController.currentProcess];
 	}
 }
@@ -408,7 +414,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			variable.enabled = NO;
 		}
 	}
-	
+
 	[self updateFrozenActivity];
 }
 
@@ -423,7 +429,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			[labels addObject:label];
 		}
 	}
-	
+
 	return labels;
 }
 
@@ -445,7 +451,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)addVariables:(NSArray<ZGVariable *> *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	// Make sure we do not end up with duplicate labels
 	// New variables that have a label that already exists have their labels removed
 	NSSet<NSString *> *oldLabels = [self usedLabels];
@@ -460,7 +466,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 		}
 	}
-	
+
 	// Also make sure we don't end up with new cycles caused by labels
 	BOOL addedLabeledVariable = NO;
 	for (ZGVariable *variable in variables)
@@ -480,19 +486,19 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 		}
 	}
-	
+
 	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
-	
+
 	[self disableHarmfulVariables:variables];
-	
-	_documentData.variables = [NSArray arrayWithArray:temporaryArray];
-	
+
+	_documentData.variables = [temporaryArray copy];
+
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
-	
+
 	[windowController.variablesTableView selectRowIndexes:rowIndexes byExtendingSelection:NO];
-	
+
 	NSString *undoActionName = nil;
 	if (windowController.undoManager.isUndoing)
 	{
@@ -502,14 +508,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		undoActionName = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoAddVariables") : ZGLocalizedStringFromVariableActionsTable(@"undoAddVariable");
 	}
-	
+
 	windowController.undoManager.actionName = undoActionName;
-	
+
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
-	
+
 	[windowController updateNumberOfValuesDisplayedStatus];
 	[windowController updateSearchAddressOptions];
-	
+
 	if (!addedLabeledVariable)
 	{
 		[self annotateVariablesAutomatically:variables process:windowController.currentProcess];
@@ -519,20 +525,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		// Update annotations for all variables that reference labels as well as the variables we just added
 		// It's possible any of these variables may be referencing a label to a variable we just added
 		NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
-		
+
 		for (ZGVariable *variable in _documentData.variables)
 		{
 			if ([variablesToAnnotate containsObject:variable])
 			{
 				continue;
 			}
-			
+
 			if (variable.usesDynamicLabelAddress)
 			{
 				[variablesToAnnotate addObject:variable];
 			}
 		}
-		
+
 		[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
 	}
 }
@@ -540,7 +546,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)removeSelectedSearchValues
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	[self removeVariablesAtRowIndexes:windowController.selectedVariableIndexes];
 	[windowController updateNumberOfValuesDisplayedStatus];
 }
@@ -550,15 +556,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	ZGVariableQualifier qualifier = (ZGVariableQualifier)_documentData.qualifierTag;
 	CFByteOrder byteOrder = _documentData.byteOrderTag;
 	ZGVariableType variableType = (ZGVariableType)[(NSControl *)sender tag];
-	
+
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	// Try to get an initial address from the debugger or the memory viewer's selection
 	id <ZGMemorySelectionDelegate> memorySelectionDelegate = windowController.delegate;
 	NSRange lastMemorySelectionRange = [memorySelectionDelegate lastMemorySelectionForProcess:windowController.currentProcess];
 	ZGMemoryAddress initialAddress = lastMemorySelectionRange.location;
 	ZGMemorySize initialSize = lastMemorySelectionRange.length;
-	
+
 	ZGVariable *variable =
 		[[ZGVariable alloc]
 		 initWithValue:NULL
@@ -570,15 +576,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		 description:[[NSAttributedString alloc] initWithString:variableType == ZGScript ? ZGLocalizedStringFromVariableActionsTable(@"defaultScriptDescription") : @"" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]
 		 enabled:NO
 		 byteOrder:byteOrder];
-	
+
 	if (variable.type == ZGScript)
 	{
 		BOOL usingTabs = [[NSUserDefaults standardUserDefaults] boolForKey:ZGScriptIndentationUsingTabsKey];
 		NSUInteger spacesWidth = (NSUInteger)[[NSUserDefaults standardUserDefaults] integerForKey:ZGScriptIndentationSpacesWidthKey];
 		NSString *indentationString =
 		usingTabs ? @"\t" :
-		[@"" stringByPaddingToLength:spacesWidth withString:@" " startingAtIndex:0]; // equivalent to " " * spacesWidth in a sane language
-		
+		[@"" stringByPaddingToLength:spacesWidth withString:@" " startingAtIndex:0]; // Creates a string with 'spacesWidth' number of spaces
+
 		NSString *scriptValue =
 		@"#Edit Me!\n"
 		@"#Introduction to scripting: https://github.com/zorgiepoo/Bit-Slicer/wiki/Introduction-to-Scripting\n"
@@ -590,7 +596,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		@"``#write some interesting code, or not\n"
 		@"`def finish(self):\n"
 		@"``debug.log('Cleaning up..')\n";
-		
+
 		variable.scriptValue = [scriptValue stringByReplacingOccurrencesOfString:@"`" withString:indentationString];
 	}
 
@@ -607,7 +613,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		NSIndexSet *selectedVariableIndexes = windowController.selectedVariableIndexes;
 		insertRowIndex = selectedVariableIndexes.firstIndex + 1;
 	}
-	
+
 	[self
 	 addVariables:@[variable]
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:insertRowIndex]];
@@ -618,25 +624,32 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (BOOL)nopVariables:(NSArray<ZGVariable *> *)variables withNewValues:(NSArray<NSString *> *)newValues
 {
 	BOOL completeSuccess = YES;
-	
+
 	NSMutableArray<NSString *> *oldValues = [[NSMutableArray alloc] init];
 	for (ZGVariable *variable in variables)
 	{
 		[oldValues addObject:variable.stringValue];
 	}
-	
+
 	for (NSUInteger variableIndex = 0; variableIndex < variables.count; variableIndex++)
 	{
 		ZGVariable *variable = [variables objectAtIndex:variableIndex];
+		NSString *oldValue = variable.stringValue;
 		[self changeVariable:variable newValue:[newValues objectAtIndex:variableIndex] shouldRecordUndo:NO];
+
+		// Check if the value was actually changed
+		if ([oldValue isEqualToString:variable.stringValue])
+		{
+			completeSuccess = NO;
+		}
 	}
-	
+
 	ZGDocumentWindowController *windowController = _windowController;
 	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoNOPChangeAction");
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 nopVariables:variables
 	 withNewValues:oldValues];
-	
+
 	return completeSuccess;
 }
 
@@ -644,11 +657,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	NSMutableArray<NSString *> *nopValues = [[NSMutableArray alloc] init];
 	ZGProcessType processType = process.type;
-	
+
 	for (ZGVariable *variable in variables)
 	{
 		NSArray<NSString *> *nopComponents;
-		
+
 		if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 		{
 			nopComponents = @[@"1F", @"20", @"03", @"D5"];
@@ -664,11 +677,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		}
 		[nopValues addObject:[nopComponents componentsJoinedByString:@" "]];
 	}
-	
+
 	if (![self nopVariables:variables withNewValues:nopValues])
 	{
 		NSString *message = variables.count != 1 ? ZGLocalizedStringFromVariableActionsTable(@"nopMultipleErrorAlertMessage") : ZGLocalizedStringFromVariableActionsTable(@"nopSingleErrorAlertMessage");
-		
+
 		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromVariableActionsTable(@"nopErrorAlertTitle"), message);
 	}
 }
@@ -676,20 +689,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)changeVariable:(ZGVariable *)variable newDescription:(NSAttributedString *)newDescription
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoDescriptionChange");
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
 	 newDescription:variable.fullAttributedDescription];
-	
+
 	// Ignore formatting to detect if user has annotated anything of significance
 	if (![variable.fullAttributedDescription.string isEqualToString:newDescription.string])
 	{
 		variable.userAnnotated = YES;
 	}
-	
+
 	variable.fullAttributedDescription = newDescription;
-	
+
 	if (windowController.undoManager.isUndoing || windowController.undoManager.isRedoing)
 	{
 		[windowController.variablesTableView reloadData];
@@ -699,21 +712,21 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoTypeChange");
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
 	 newType:variable.type
 	 newSize:variable.size];
-	
+
 	[variable
 	 setType:type
 	 requestedSize:size
 	 pointerSize:windowController.currentProcess.pointerSize];
-	
+
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
-	
+
 	[windowController updateSearchAddressOptions];
 }
 
@@ -721,10 +734,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {	
 	const void *newValue = NULL;
 	ZGMemorySize writeSize = variable.size; // specifically needed for byte arrays
-	
+
 	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
 	NSString *oldStringValue = [variable.stringValue copy];
-	
+
 	int8_t *int8Value = malloc(sizeof(int8_t));
 	int16_t *int16Value = malloc(sizeof(int16_t));
 	int32_t *int32Value = malloc(sizeof(int32_t));
@@ -734,12 +747,12 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	void *utf16Value = NULL;
 	void *byteArrayValue = NULL;
 	void *swappedValue = NULL;
-	
+
 	if (ZGIsNumericalDataType(variable.type))
 	{
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
-	
+
 	ZGVariableType variableType;
 	if (variable.type == ZGPointer)
 	{
@@ -749,39 +762,39 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		variableType = variable.type;
 	}
-	
+
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	switch (variableType)
 	{
 		case ZGInt8:
 			*int8Value = (int8_t)stringObject.intValue;
-			
+
 			newValue = int8Value;
 			break;
 		case ZGInt16:
 			*int16Value = (int16_t)stringObject.intValue;
-			
+
 			newValue = int16Value;
 			break;
 		case ZGInt32:
 			*int32Value = stringObject.intValue;
-			
+
 			newValue = int32Value;
 			break;
 		case ZGFloat:
 			*floatValue = stringObject.floatValue;
-			
+
 			newValue = floatValue;
 			break;
 		case ZGInt64:
 			[[NSScanner scannerWithString:stringObject] scanLongLong:int64Value];
-			
+
 			newValue = int64Value;
 			break;
 		case ZGDouble:
 			*doubleValue = stringObject.doubleValue;
-			
+
 			newValue = doubleValue;
 			break;
 		case ZGString8:
@@ -792,7 +805,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		case ZGString16:
 			variable.size = [stringObject length] * sizeof(unichar);
 			writeSize = variable.size;
-			
+
 			if (variable.size > 0)
 			{
 				utf16Value = malloc((size_t)variable.size);
@@ -806,76 +819,76 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				// String "" can be of 0 length
 				utf16Value = malloc(sizeof(unichar));
 				newValue = utf16Value;
-				
+
 				if (newValue != NULL)
 				{
 					unichar nullTerminator = 0;
 					memcpy(utf16Value, &nullTerminator, sizeof(unichar));
 				}
 			}
-			
+
 			break;
-			
+
 		case ZGByteArray:
 		{
 			NSArray<NSString *> *bytesArray = ZGByteArrayComponentsFromString(stringObject);
-			
+
 			if (variable.size != bytesArray.count)
 			{
 				// this is the size the user wants
 				[self editVariables:@[variable] requestedSizes:@[@(bytesArray.count)]];
 			}
-			
+
 			// Update old string value to be the same size as new string value, so that undo/redo's from one size to another will work more nicely
 			void *oldData = NULL;
 			ZGMemorySize oldSize = variable.size;
-			
+
 			if (ZGReadBytes(windowController.currentProcess.processTask, variable.address, &oldData, &oldSize))
 			{
 				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:variable.qualifier pointerSize:windowController.currentProcess.pointerSize description:variable.fullAttributedDescription enabled:variable.enabled byteOrder:variable.byteOrder];
-				
+
 				oldStringValue = oldVariable.stringValue;
-				
+
 				ZGFreeBytes(oldData, oldSize);
 			}
-			
+
 			// this is the maximum size allocated needed
 			byteArrayValue = malloc((size_t)variable.size);
 			newValue = byteArrayValue;
-			
+
 			if (newValue != NULL)
 			{
 				unsigned char *valuePtr = byteArrayValue;
 				writeSize = 0;
-				
+
 				NSArray<NSString *> *oldComponents = ZGByteArrayComponentsFromString(oldStringValue);
-				
+
 				for (NSString *byteString in bytesArray)
 				{
 					// old string value will be same size as new string value so accessing this index is fine
 					NSString *oldComponent = [oldComponents objectAtIndex:writeSize];
-					
+
 					unichar oldCharacters[2];
 					[oldComponent getCharacters:oldCharacters];
-					
+
 					unichar newCharacters[2];
 					[byteString getCharacters:newCharacters	];
-					
+
 					unichar replaceCharacters[2];
 					replaceCharacters[0] = (newCharacters[0] == '?' || newCharacters[0] == '*') ? oldCharacters[0] : newCharacters[0];
 					replaceCharacters[1] = (newCharacters[1] == '?' || newCharacters[1] == '*') ? oldCharacters[1] : newCharacters[1];
-					
+
 					unsigned int replaceValue = 0;
 					[[NSScanner scannerWithString:[NSString stringWithCharacters:replaceCharacters length:2]] scanHexInt:&replaceValue];
-					
+
 					*valuePtr = (unsigned char)replaceValue;
 					valuePtr++;
-					
+
 					if ([byteString stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet].length == 0)
 					{
 						break;
 					}
-					
+
 					writeSize++;
 				}
 			}
@@ -883,14 +896,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				variable.size = writeSize;
 			}
-			
+
 			break;
 		}
 		case ZGPointer:
 		case ZGScript:
 			break;
 	}
-	
+
 	if (newValue != NULL)
 	{
 		if (variable.byteOrder != CFByteOrderGetCurrent())
@@ -898,11 +911,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			swappedValue = ZGSwappedValue(windowController.currentProcess.type, newValue, variableType, writeSize);
 			newValue = swappedValue;
 		}
-		
+
 		if (variable.isFrozen)
 		{
 			variable.freezeValue = newValue;
-			
+
 			if (recordUndoFlag)
 			{
 				windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoFreezeValueChange");
@@ -910,7 +923,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				 changeVariable:variable
 				 newValue:variable.stringValue
 				 shouldRecordUndo:YES];
-				
+
 				if (windowController.undoManager.isUndoing || windowController.undoManager.isRedoing)
 				{
 					[windowController.variablesTableView reloadData];
@@ -920,7 +933,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		else
 		{
 			BOOL successfulWrite = YES;
-			
+
 			if (writeSize)
 			{
 				if (!ZGWriteBytesIgnoringProtection(windowController.currentProcess.processTask, variable.address, newValue, writeSize))
@@ -932,7 +945,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				successfulWrite = NO;
 			}
-			
+
 			if (successfulWrite && variableType == ZGString16)
 			{
 				// Don't forget to write the null terminator
@@ -942,7 +955,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 					successfulWrite = NO;
 				}
 			}
-			
+
 			if (successfulWrite && recordUndoFlag)
 			{
 				windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoValueChange");
@@ -950,7 +963,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				 changeVariable:variable
 				 newValue:oldStringValue
 				 shouldRecordUndo:YES];
-				
+
 				if (windowController.undoManager.isUndoing || windowController.undoManager.isRedoing)
 				{
 					[windowController.variablesTableView reloadData];
@@ -958,7 +971,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 		}
 	}
-	
+
 	free(int8Value);
 	free(int16Value);
 	free(int32Value);
@@ -973,10 +986,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	NSMutableIndexSet *undoableRowIndexes = [[NSMutableIndexSet alloc] init];
 	NSUInteger currentIndex = rowIndexes.firstIndex;
-	
+
 	while (currentIndex != NSNotFound)
 	{
 		ZGVariable *variable = [_documentData.variables objectAtIndex:currentIndex];
@@ -996,28 +1009,28 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			[undoableRowIndexes addIndex:currentIndex];
 		}
-		
+
 		currentIndex = [rowIndexes indexGreaterThanIndex:currentIndex];
 	}
-	
+
 	if (!windowController.undoManager.isUndoing && !windowController.undoManager.isRedoing && undoableRowIndexes.count > 1)
 	{
 		windowController.variablesTableView.shouldIgnoreNextSelection = YES;
 	}
-	
+
 	[self updateFrozenActivity];
-	
+
 	// the table view always needs to be reloaded because of being able to select multiple indexes
 	[windowController.variablesTableView reloadData];
-	
+
 	[windowController updateSearchAddressOptions];
-	
+
 	if (undoableRowIndexes.count > 0)
 	{
 		NSString *activeChangeAction = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoMultipleActiveChange") : ZGLocalizedStringFromVariableActionsTable(@"undoSingleActiveChange");
-		
+
 		windowController.undoManager.actionName = activeChangeAction;
-		
+
 		[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 		 changeVariableEnabled:!enabled
 		 rowIndexes:undoableRowIndexes];
@@ -1028,9 +1041,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	ZGProcess *process = windowController.currentProcess;
-	
+
 	ZGMemoryAddress mainBinaryHeaderAddress = process.mainMachBinary.headerAddress;
-	
+
 	// If there are any duplicate addresses or any address < mainBinaryHeaderAddress
 	// we will assume the variable's addresses are not meaningful and can be overwritten based on stride
 	// Otherwise we will assume the current addresses are meaningful and are relative to the labeled variable
@@ -1044,28 +1057,28 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			currentAddressesRelatable = NO;
 			break;
 		}
-		
+
 		NSNumber *variableAddress = @(variable.address);
 		if ([visitedAddresses containsObject:variableAddress])
 		{
 			currentAddressesRelatable = NO;
 			break;
 		}
-		
+
 		[visitedAddresses addObject:variableAddress];
 	}
-	
+
 	NSMutableArray<NSString *> *newAddressFormulas = [NSMutableArray array];
 	NSString *label = labeledVariable.label;
 	if (!currentAddressesRelatable)
 	{
 		ZGMemoryAddress currentAddress = labeledVariableAddress + labeledVariable.size;
-		
+
 		ZGProcessType processType = process.type;
 		for (ZGVariable *variable in variables)
 		{
 			ZGMemorySize variableSize = variable.size;
-			
+
 			// Fix any data potential data alignment
 			ZGMemorySize dataAlignment = ZGDataAlignment(processType, variable.type, variableSize);
 			ZGMemorySize unalignedSize = (currentAddress % dataAlignment);
@@ -1073,11 +1086,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				currentAddress += dataAlignment - unalignedSize;
 			}
-			
+
 			NSString *newAddressFormula = [NSString stringWithFormat:@"label(\"%@\") + 0x%llX", label, currentAddress - labeledVariableAddress];
-			
+
 			[newAddressFormulas addObject:newAddressFormula];
-			
+
 			currentAddress += variableSize;
 		}
 	}
@@ -1095,11 +1108,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				newAddressFormula = [NSString stringWithFormat:@"label(\"%@\") - 0x%llX", label, labeledVariableAddress - variableAddress];
 			}
-			
+
 			[newAddressFormulas addObject:newAddressFormula];
 		}
 	}
-	
+
 	NSString *cycleInfo = nil;
 	if (![self editVariables:variables addressFormulas:newAddressFormulas cycleInfo:&cycleInfo])
 	{
@@ -1112,20 +1125,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	NSMutableArray<NSString *> *oldValues = [[NSMutableArray alloc] init];
-	
+
 	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop) {
 		[oldValues addObject:variable.stringValue];
-		 
+
 		 [self
 		  changeVariable:variable
 		  newValue:[newValues objectAtIndex:index]
 		  shouldRecordUndo:NO];
 	 }];
-	
+
 	[windowController.variablesTableView reloadData];
-	
+
 	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoEditVariablesChange");
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
@@ -1139,7 +1152,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	NSArray<NSString *> *oldAddressFormulas = [variables zgMapUsingBlock:^id _Nonnull(ZGVariable *variable) {
 		return variable.addressFormula;
 	}];
-	
+
 	// Detect if we have any cycles from usages of variable labels
 	BOOL foundCycle = NO;
 	{
@@ -1148,10 +1161,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			NSString *newAddressFormula = newAddressFormulas[variableIndex];
 			variable.addressFormula = newAddressFormula;
-			
+
 			variableIndex++;
 		}
-		
+
 		for (ZGVariable *variable in variables)
 		{
 			NSArray *cycleInfo = nil;
@@ -1168,7 +1181,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 		}
 	}
-	
+
 	if (foundCycle)
 	{
 		NSUInteger variableIndex = 0;
@@ -1179,17 +1192,17 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		}
 		return NO;
 	}
-	
+
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	NSString *undoActionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoAddressChange") : ZGLocalizedStringFromVariableActionsTable(@"undoAddressChanges");
 	windowController.undoManager.actionName = undoActionName;
-	
+
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
 	 addressFormulas:oldAddressFormulas
 	 cycleInfo:NULL];
-	
+
 	BOOL needsToReloadTable = NO;
 	BOOL anyVariableHasLabel = NO;
 	for (ZGVariable *variable in variables)
@@ -1202,22 +1215,22 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			variable.usesDynamicAddress = NO;
 			variable.addressStringValue = [ZGCalculator evaluateExpression:variable.addressFormula];
-			
+
 			needsToReloadTable = YES;
 		}
 		variable.finishedEvaluatingDynamicAddress = NO;
-		
+
 		if (variable.label.length > 0)
 		{
 			anyVariableHasLabel = YES;
 		}
 	}
-	
+
 	if (needsToReloadTable)
 	{
 		[windowController.variablesTableView reloadData];
 	}
-	
+
 	NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
 	if (anyVariableHasLabel > 0)
 	{
@@ -1229,18 +1242,18 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				continue;
 			}
-			
+
 			if (otherVariable.usesDynamicLabelAddress)
 			{
 				[variablesToAnnotate addObject:otherVariable];
 			}
 		}
 	}
-	
+
 	[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
-	
+
 	[windowController updateSearchAddressOptions];
-	
+
 	return YES;
 }
 
@@ -1249,11 +1262,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (BOOL)editVariables:(NSArray<ZGVariable *> *)variables requestedLabels:(NSArray<NSString *> *)requestedLabels cycleInfo:(NSString * __autoreleasing *)outCycleInfo
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	NSArray<NSString *> *oldLabels = [variables zgMapUsingBlock:^(ZGVariable *variable) {
 		return variable.label;
 	}];
-	
+
 	{
 		NSUInteger labelIndex = 0;
 		for (ZGVariable *variable in variables)
@@ -1262,7 +1275,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			labelIndex++;
 		}
 	}
-	
+
 	BOOL foundCycle = NO;
 	for (ZGVariable *variable in variables)
 	{
@@ -1275,12 +1288,12 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				*outCycleInfo = cycleInfoString;
 			}
-			
+
 			foundCycle = YES;
 			break;
 		}
 	}
-	
+
 	if (foundCycle)
 	{
 		NSUInteger labelIndex = 0;
@@ -1291,13 +1304,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		}
 		return NO;
 	}
-	
+
 	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoLabelChange");
 	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
 	 requestedLabels:oldLabels
 	 cycleInfo:NULL];
-	
+
 	// Re-annotate the variables so the labels are in the descriptions
 	// Also annotate other variables that may be referencing these edited variables
 	NSMutableOrderedSet<ZGVariable *> *variablesToAnnotate = [NSMutableOrderedSet orderedSetWithArray:variables];
@@ -1307,15 +1320,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			continue;
 		}
-		
+
 		if (otherVariable.usesDynamicLabelAddress)
 		{
 			[variablesToAnnotate addObject:otherVariable];
 		}
 	}
-	
+
 	[self annotateVariablesAutomatically:variablesToAnnotate.array process:windowController.currentProcess];
-	
+
 	return YES;
 }
 
@@ -1337,7 +1350,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		// to try computing the indirect base address to find out
 		ZGMemoryAddress baseAddress = 0x0;
 		isIndirectVariable = [ZGCalculator extractIndirectBaseAddress:&baseAddress expression:variable.addressFormula process:process variableController:variableController failedImages:failedImages];
-		
+
 		if (isIndirectVariable)
 		{
 			variableAddress = baseAddress;
@@ -1357,7 +1370,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 			return nil;
 		}
-		
+
 		isIndirectVariable = YES;
 	}
 	else
@@ -1365,23 +1378,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		variableAddress = variable.address;
 		isIndirectVariable = NO;
 	}
-	
+
 	if (outVariableAddress != NULL)
 	{
 		*outVariableAddress = variableAddress;
 	}
-	
+
 	NSString *staticVariableDescription = nil;
-	
+
 	ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variableAddress fromMachBinaries:machBinaries];
-	
+
 	NSString *machFilePath = [machFilePathDictionary objectForKey:@(machBinary.filePathAddress)];
-	
+
 	if (machFilePath != nil)
 	{
 		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:process];
 		NSRange totalSegmentRange = machBinaryInfo.totalSegmentRange;
-		
+
 		if (variableAddress >= totalSegmentRange.location && variableAddress < totalSegmentRange.location + totalSegmentRange.length)
 		{
 			NSString *partialPath = [machFilePath lastPathComponent];
@@ -1389,14 +1402,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				NSString *pathToUse = nil;
 				NSString *baseArgument = @"";
-				
+
 				if (machBinary != [machBinaries objectAtIndex:0])
 				{
 					if ([[machFilePath stringByDeletingLastPathComponent] length] > 0)
 					{
 						partialPath = [@"/" stringByAppendingString:partialPath];
 					}
-					
+
 					int numberOfMatchingPaths = 0;
 					for (ZGMachBinary *binaryImage in machBinaries)
 					{
@@ -1407,30 +1420,30 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 							if (numberOfMatchingPaths > 1) break;
 						}
 					}
-					
+
 					pathToUse = numberOfMatchingPaths > 1 ? machFilePath : partialPath;
 					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
 				}
-				
+
 				NSString *baseFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variableAddress - machBinary.headerAddress];
-				
+
 				if (isIndirectVariable)
 				{
 					NSString *pointerReference = [NSString stringWithFormat:@"[0x%llX]", variableAddress];
-					
+
 					variable.addressFormula = [variable.addressFormula stringByReplacingOccurrencesOfString:pointerReference withString:[NSString stringWithFormat:@"[%@]", baseFormula]];
 				}
 				else
 				{
 					variable.addressFormula = baseFormula;
 				}
-				
+
 				variable.usesDynamicAddress = YES;
 				variable.finishedEvaluatingDynamicAddress = !isIndirectVariable;
 			}
-			
+
 			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variableAddress];
-			
+
 			NSMutableString *newDescription = [[NSMutableString alloc] initWithString:partialPath];
 			if (segmentName != nil)
 			{
@@ -1441,7 +1454,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				[newDescription appendString:@" "];
 			}
 			[newDescription appendString:(isIndirectVariable ? @"(static, indirect)" : @"(static)")];
-			
+
 			staticVariableDescription = [newDescription copy];
 		}
 		else if (isIndirectVariable)
@@ -1453,7 +1466,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		staticVariableDescription = @"Indirect";
 	}
-	
+
 	return staticVariableDescription;
 }
 
@@ -1461,23 +1474,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	ZGDocumentTableController *tableController = windowController.tableController;
-	
+
 	NSMutableArray<ZGVariable *> *variablesToAnnotate = [NSMutableArray array];
-	
+
 	for (ZGVariable *variable in variables)
 	{
 		if (!variable.userAnnotated)
 		{
 			// Clear the description so we can automatically fill it again
 			variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
-			
+
 			// Update the variable's address
 			[tableController updateDynamicVariableAddress:variable];
-			
+
 			[variablesToAnnotate addObject:variable];
 		}
 	}
-	
+
 	// Re-annotate the variables
 	[[self class] annotateVariables:variablesToAnnotate process:process variableController:self symbols:YES async:YES completionHandler:^{
 		[windowController.variablesTableView reloadData];
@@ -1488,7 +1501,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
 	NSMutableDictionary<NSNumber *, NSString *> *machFilePathDictionary = [[NSMutableDictionary alloc] init];
-	
+
 	NSArray<NSString *> *filePaths = [ZGMachBinary filePathsForMachBinaries:machBinaries inProcess:process];
 	[machBinaries enumerateObjectsUsingBlock:^(ZGMachBinary * _Nonnull machBinary, NSUInteger index, BOOL * _Nonnull __unused stop) {
 		NSString *filePath = [filePaths objectAtIndex:index];
@@ -1497,7 +1510,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
 		}
 	}];
-	
+
 	ZGMachBinaryAnnotationInfo annotationInfo;
 	annotationInfo.machBinaries = machBinaries;
 	annotationInfo.machFilePathDictionary = machFilePathDictionary;
@@ -1507,7 +1520,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 + (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process variableController:(ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMachBinaryAnnotationInfo annotationInfo = {0};
-	
+
 	[self annotateVariables:variables annotationInfo:annotationInfo process:process variableController:variableController symbols:requiresSymbols async:async completionHandler:completionHandler];
 }
 
@@ -1516,22 +1529,22 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	BOOL processIsValid = process.valid;
 	ZGMemoryMap processTask = process.processTask;
 	NSUInteger capacity = variables.count;
-	
+
 	NSMutableArray<NSString *> *failedImages = [NSMutableArray array];
-	
+
 	NSArray<NSNumber *> *(^relativizeVariables)(NSArray<ZGMachBinary *> *, NSDictionary<NSNumber *, NSString *> *, NSArray **) = ^(NSArray<ZGMachBinary *> *machBinaries, NSDictionary<NSNumber *, NSString *> *machFilePathDictionary, NSArray **staticDescriptionsRef) {
 		NSMutableArray *staticDescriptions = [[NSMutableArray alloc] initWithCapacity:capacity];
 		NSMutableArray<NSNumber *> *variableAddresses = [[NSMutableArray alloc] initWithCapacity:capacity];
-		
+
 		for (ZGVariable *variable in variables)
 		{
 			if (processIsValid)
 			{
 				ZGMemoryAddress variableAddress;
 				NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process variableController:variableController failedImages:failedImages getAddress:&variableAddress];
-				
+
 				[variableAddresses addObject:@(variableAddress)];
-				
+
 				[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
 			}
 			else
@@ -1540,12 +1553,12 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				[staticDescriptions addObject:[NSNull null]];
 			}
 		}
-		
+
 		*staticDescriptionsRef = staticDescriptions;
-		
+
 		return variableAddresses;
 	};
-	
+
 	NSArray *(^retrieveSymbols)(NSArray<NSNumber *> *) = ^(NSArray<NSNumber *> *variableAddresses) {
 		NSMutableArray *symbols = [[NSMutableArray alloc] initWithCapacity:capacity];
 		for (NSNumber *variableAddress in variableAddresses)
@@ -1562,16 +1575,16 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		}
 		return symbols;
 	};
-	
+
 	void (^finishAnnotations)(NSArray *, NSArray *, NSArray *) = ^(NSArray * _Nullable symbols, NSArray *staticDescriptions, NSArray<NSNumber *> *variableAddresses) {
 		__block ZGMemoryAddress cachedRegionAddress = 0;
 		__block ZGMemorySize cachedRegionSize = 0;
 		__block ZGMemoryExtendedInfo cachedInfo;
-		
+
 		[variables enumerateObjectsUsingBlock:^(ZGVariable * _Nonnull variable, NSUInteger index, BOOL * _Nonnull __unused stop) {
 			id staticDescriptionObject = staticDescriptions[index];
 			NSString *staticDescription = (staticDescriptionObject != [NSNull null]) ? staticDescriptionObject : nil;
-			
+
 			NSString *symbol;
 			if (symbols != nil)
 			{
@@ -1582,9 +1595,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				symbol = nil;
 			}
-			
+
 			ZGMemoryAddress variableAddress = [variableAddresses[index] unsignedLongLongValue];
-			
+
 			NSString *userTagDescription = nil;
 			NSString *protectionDescription = nil;
 			if (processIsValid)
@@ -1598,16 +1611,16 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 						cachedRegionSize = 0;
 					}
 				}
-				
+
 				if (cachedRegionAddress <= variableAddress && cachedRegionAddress + cachedRegionSize >= variableAddress)
 				{
 					userTagDescription = ZGUserTagDescription(cachedInfo.user_tag);
 					protectionDescription = ZGProtectionDescription(cachedInfo.protection);
 				}
 			}
-			
+
 			NSString *label = variable.label;
-			
+
 			NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];
 			if (label.length > 0)
 			{
@@ -1616,18 +1629,18 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			else if (variable.usesDynamicLabelAddress)
 			{
 				NSString *dependentLabel = [ZGCalculator extractFirstDependentLabelFromExpression:variable.addressFormula];
-				
+
 				if (dependentLabel != nil)
 				{
 					[validDescriptionComponents addObject:[NSString stringWithFormat:@"→ Label %@", dependentLabel]];
 				}
 			}
-			
+
 			if (symbol.length > 0) [validDescriptionComponents addObject:symbol];
 			if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
 			if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
 			if (protectionDescription != nil) [validDescriptionComponents addObject:protectionDescription];
-			
+
 			if (variable.fullAttributedDescription.length == 0)
 			{
 				variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:[validDescriptionComponents componentsJoinedByString:@", "] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
@@ -1641,20 +1654,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			}
 		}];
 	};
-	
+
 	if (async)
 	{
 		if (annotationInfo.machBinaries != nil && annotationInfo.machFilePathDictionary != nil)
 		{
 			NSArray<ZGMachBinary *> *machBinaries = annotationInfo.machBinaries;
 			NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = annotationInfo.machFilePathDictionary;
-			
+
 			NSArray *staticDescriptions = nil;
 			NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
-			
+
 			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
 				NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
-				
+
 				dispatch_async(dispatch_get_main_queue(), ^{
 					finishAnnotations(symbols, staticDescriptions, variableAddresses);
 					completionHandler();
@@ -1665,17 +1678,17 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		{
 			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
 				ZGMachBinaryAnnotationInfo retrievedAnnotationInfo = [self machBinaryAnnotationInfoForProcess:process];
-				
+
 				dispatch_async(dispatch_get_main_queue(), ^{
 					NSArray *staticDescriptions = nil;
 					NSArray<NSNumber *> *variableAddresses = relativizeVariables(retrievedAnnotationInfo.machBinaries, retrievedAnnotationInfo.machFilePathDictionary, &staticDescriptions);
-					
+
 					dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
 						NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
-						
+
 						dispatch_async(dispatch_get_main_queue(), ^{
 							finishAnnotations(symbols, staticDescriptions, variableAddresses);
-							
+
 							completionHandler();
 						});
 					});
@@ -1685,10 +1698,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	else
 	{
-		
+
 		NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
 		NSArray<ZGMachBinary *> *machBinaries = nil;
-		
+
 		if (annotationInfo.machBinaries != nil && annotationInfo.machFilePathDictionary != nil)
 		{
 			machBinaries = annotationInfo.machBinaries;
@@ -1700,11 +1713,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			machBinaries = retrievedAnnotationInfo.machBinaries;
 			machFilePathDictionary = retrievedAnnotationInfo.machFilePathDictionary;
 		}
-		
+
 		NSArray *staticDescriptions = nil;
-		
+
 		NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
-		
+
 		NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
 		finishAnnotations(symbols, staticDescriptions, variableAddresses);
 		completionHandler();
@@ -1717,15 +1730,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	NSMutableArray<NSNumber *> *currentVariableSizes = [[NSMutableArray alloc] init];
 	NSMutableArray<ZGVariable *> *validVariables = [[NSMutableArray alloc] init];
-	
+
 	ZGDocumentWindowController *windowController = _windowController;
-	
+
 	// Make sure the size changes are possible. Only change the ones that seem possible.
 	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop)
 	 {
 		 ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 void *buffer = NULL;
-		 
+
 		 if (ZGReadBytes(windowController.currentProcess.processTask, variable.address, &buffer, &size))
 		 {
 			 if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
@@ -1733,23 +1746,23 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				 [validVariables addObject:variable];
 				 [currentVariableSizes addObject:@(variable.size)];
 			 }
-			 
+
 			 ZGFreeBytes(buffer, size);
 		 }
 	 }];
-	
+
 	if (validVariables.count > 0)
 	{
 		windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoSizeChange");
 		[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self]
 		 editVariables:validVariables
 		 requestedSizes:currentVariableSizes];
-		
+
 		[validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop)
 		 {
 			 variable.size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 }];
-		
+
 		[windowController.variablesTableView reloadData];
 	}
 	else
