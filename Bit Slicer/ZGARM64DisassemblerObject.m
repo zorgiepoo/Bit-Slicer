@@ -65,6 +65,11 @@
  *      
  * 5. Clean up Capstone resources
  *    cs_free(disassembledInstructions, numberOfInstructionsDisassembled)
+ *
+ * Capstone Configuration:
+ * - CS_OPT_DETAIL: Enabled for comprehensive instruction information
+ * - CS_OPT_SKIPDATA: Enabled to handle non-instruction data
+ * - CS_OPT_UNSIGNED: Enabled to display immediate values in unsigned form
  */
 
 #import "ZGARM64DisassemblerObject.h"
@@ -161,6 +166,12 @@
 		// Enable SKIPDATA option to handle non-instruction data
 		// Even with a fixed instruction size, we can encounter data we will want to ignore (like .byte / db)
 		cs_option(_object, CS_OPT_SKIPDATA, CS_OPT_ON);
+
+		// Enable detailed mode for more comprehensive instruction information
+		cs_option(_object, CS_OPT_DETAIL, CS_OPT_ON);
+
+		// Display immediate values in unsigned form (more common for ARM64)
+		cs_option(_object, CS_OPT_UNSIGNED, CS_OPT_ON);
 
 		// Copy the machine code bytes to our buffer
 		memcpy(_bytes, bytes, size);
@@ -353,9 +364,6 @@
 {
 	int64_t immediateOperand = 0;
 
-	// Enable detailed mode to access operand information
-	cs_option(_object, CS_OPT_DETAIL, CS_OPT_ON);
-
 	// Disassemble only the first instruction
 	cs_insn *disassembledInstructions = NULL;
 	size_t numberOfInstructionsDisassembled = cs_disasm(_object, _bytes, _size, _startAddress, 1, &disassembledInstructions);
@@ -379,11 +387,79 @@
 		cs_free(disassembledInstructions, numberOfInstructionsDisassembled);
 	}
 
-	// Disable detailed mode to restore normal operation
-	cs_option(_object, CS_OPT_DETAIL, CS_OPT_OFF);
-
 	// Return the immediate operand as a hexadecimal string
 	return [NSString stringWithFormat:@"0x%llX", (uint64_t)immediateOperand];
+}
+
+/**
+ * Disassembles the last instruction within a given maximum size.
+ *
+ * This method is useful when you need to find the last complete instruction
+ * within a memory region of a certain size, for example when analyzing
+ * function epilogues or when stepping backwards through code.
+ *
+ * @param maxSize The maximum size in bytes to consider
+ * @return The last complete instruction found within the size limit, or nil if none found
+ */
+- (nullable ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize
+{
+    // Ensure we don't exceed the available bytes
+    ZGMemorySize sizeToUse = MIN(maxSize, _size);
+
+    if (sizeToUse < 4) {
+        // ARM64 instructions are always 4 bytes, so we need at least 4 bytes
+        return nil;
+    }
+
+    // For ARM64, instructions are fixed size (4 bytes), so the last instruction
+    // is simply at (sizeToUse - 4) if sizeToUse is a multiple of 4
+    ZGMemorySize lastInstructionOffset = sizeToUse - 4;
+
+    // Disassemble only the last instruction
+    cs_insn *disassembledInstructions = NULL;
+    size_t numberOfInstructionsDisassembled = cs_disasm(_object, 
+                                                       (uint8_t *)_bytes + lastInstructionOffset, 
+                                                       4, // Always 4 bytes for ARM64
+                                                       _startAddress + lastInstructionOffset, 
+                                                       1, 
+                                                       &disassembledInstructions);
+
+    ZGInstruction *lastInstruction = nil;
+
+    if (numberOfInstructionsDisassembled > 0)
+    {
+        // Extract instruction details
+        ZGMemoryAddress address = disassembledInstructions[0].address;
+        ZGMemorySize size = disassembledInstructions[0].size;
+        unsigned int mnemonicID = disassembledInstructions[0].id;
+
+        // Calculate pointer to the instruction bytes in our buffer
+        void *instructionBytes = (uint8_t *)_bytes + (address - _startAddress);
+
+        // Create human-readable instruction text
+        NSString *text = [NSString stringWithFormat:@"%s %s", 
+                          disassembledInstructions[0].mnemonic, 
+                          disassembledInstructions[0].op_str];
+
+        // Create a variable to hold the instruction bytes
+        ZGVariable *variable =
+        [[ZGVariable alloc]
+         initWithValue:instructionBytes
+         size:size
+         address:address
+         type:ZGByteArray
+         qualifier:0
+         pointerSize:8
+         description:nil
+         enabled:NO];
+
+        // Create a new instruction object
+        lastInstruction = [[ZGInstruction alloc] initWithVariable:variable text:text mnemonic:(int64_t)mnemonicID];
+
+        cs_free(disassembledInstructions, numberOfInstructionsDisassembled);
+    }
+
+    return lastInstruction;
 }
 
 @end

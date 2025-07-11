@@ -59,6 +59,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGARM64DisassemblerObject : NSObject <ZGDisassemblerObject>
+// This class implements all methods of the ZGDisassemblerObject protocol, including:
+// - readInstructions
+// - readBranchOperand
+// - readLastInstructionWithMaxSize:
 
 /**
  * Initializes an ARM64 disassembler object with the specified machine code bytes.
