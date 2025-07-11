@@ -1183,13 +1183,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint * __autoreleasing *)returnedBreakPoint
 {
 	/*
-	 * Bits and Bytes Search Example:
+	 * Bits and Bytes Search Examples:
 	 * ------------------------------
 	 * When searching for specific bit patterns or byte values in memory, watchpoints can be used
 	 * to detect when these patterns change. For example:
 	 *
-	 * Monitoring a 32-bit integer (4 bytes):
-	 *
+	 * 1. Basic Example - Monitoring a 32-bit integer (4 bytes):
+	 * ---------------------------------------------------------
 	 *   Memory:   Byte 0   Byte 1   Byte 2   Byte 3
 	 *            +--------+--------+--------+--------+
 	 *   Before:  |  0x42  |  0x13  |  0x37  |  0x80  |  (Value: 0x80371342)
@@ -1208,6 +1208,64 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	 *
 	 * The watchpoint will trigger when any of the 4 bytes changes, allowing detection
 	 * of both coarse (byte-level) and fine (bit-level) changes in memory.
+	 *
+	 * 2. ARM64 Example - Monitoring a 64-bit value:
+	 * --------------------------------------------
+	 * ARM64 uses different debug registers than x86/x64:
+	 * - WVR (Watchpoint Value Register): Holds the base address to monitor
+	 * - WCR (Watchpoint Control Register): Controls watchpoint behavior
+	 *
+	 * WCR bit layout includes:
+	 * - Bits 0: Enable bit
+	 * - Bits 1-2: Privilege level
+	 * - Bit 3: Load/read enable
+	 * - Bit 4: Store/write enable
+	 * - Bits 5-12: Byte Address Select (BAS) field
+	 *
+	 * Example monitoring a 64-bit double at address 0x2000:
+	 *
+	 *   Memory:  0x2000   0x2001   0x2002   0x2003   0x2004   0x2005   0x2006   0x2007
+	 *           +--------+--------+--------+--------+--------+--------+--------+--------+
+	 *   Before: |  0x3F  |  0xF0  |  0x00  |  0x00  |  0x00  |  0x00  |  0x00  |  0x00  | (Value: 1.0)
+	 *           +--------+--------+--------+--------+--------+--------+--------+--------+
+	 *
+	 *   After:  |  0x40  |  0x00  |  0x00  |  0x00  |  0x00  |  0x00  |  0x00  |  0x00  | (Value: 2.0)
+	 *           +--------+--------+--------+--------+--------+--------+--------+--------+
+	 *             ↑        ↑
+	 *           Bytes changed
+	 *
+	 * ARM64 Configuration:
+	 * - WVR[n] = 0x2000 (base address)
+	 * - WCR[n] = 0x000000FF (BAS for all 8 bytes) | 0x18 (read/write) | 0x4 (user mode) | 0x1 (enable)
+	 *
+	 * 3. Complex Example - Monitoring a C struct:
+	 * ------------------------------------------
+	 * Consider monitoring a C struct representing a game character:
+	 *
+	 * struct Character {
+	 *     uint32_t health;     // 4 bytes
+	 *     uint16_t armor;      // 2 bytes
+	 *     uint16_t level;      // 2 bytes
+	 *     float position[3];   // 12 bytes (x,y,z)
+	 * };                       // Total: 20 bytes
+	 *
+	 * Memory layout at address 0x5000:
+	 *
+	 *   Offset:  +0       +4       +6       +8       +12      +16
+	 *           +--------+--------+--------+--------+--------+--------+
+	 *   Fields: | health | armor  | level  | position.x | position.y | position.z |
+	 *           +--------+--------+--------+--------+--------+--------+
+	 *           |<-4 bytes->|<-2B->|<-2B->|<---4 bytes--->|<---4 bytes--->|<---4 bytes--->|
+	 *
+	 * Since this struct is larger than 8 bytes (maximum watchpoint size), we need multiple
+	 * watchpoints to monitor the entire structure. We could set up:
+	 *
+	 * - Watchpoint 1: Address 0x5000, size 8 bytes (covers health, armor, level)
+	 * - Watchpoint 2: Address 0x5008, size 8 bytes (covers position.x and position.y)
+	 * - Watchpoint 3: Address 0x5010, size 4 bytes (covers position.z)
+	 *
+	 * When any field changes, the appropriate watchpoint will trigger, allowing us to
+	 * determine which part of the structure was modified.
 	 */
 	@synchronized(self)
 	{
