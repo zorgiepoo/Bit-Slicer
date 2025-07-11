@@ -28,6 +28,47 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * ZGVariableController
+ * --------------------
+ * This class manages the lifecycle of variables in Bit Slicer, handling operations such as:
+ * - Creating, modifying, and deleting variables
+ * - Freezing and unfreezing variables
+ * - Copying and pasting variables
+ * - Changing variable values, types, and descriptions
+ * - Managing variable addresses and labels
+ * - Annotating variables with information about their memory locations
+ * - Managing undo/redo operations for variable changes
+ *
+ * Variable Lifecycle Overview:
+ * +------------------------+     +------------------------+     +------------------------+
+ * |      Creation          |     |      Modification      |     |      Deletion         |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - addVariable:         |     | - changeVariable:      |     | - removeVariablesAt   |
+ * | - addVariables:at      | --> | - editVariables:       | --> |   RowIndexes:         |
+ * |   RowIndexes:          |     | - freezeVariables      |     | - clear               |
+ * | - pasteVariables       |     | - nopVariables:        |     | - clearSearch         |
+ * +------------------------+     +------------------------+     +------------------------+
+ *
+ * Memory Operations:
+ * +------------------------+     +------------------------+     +------------------------+
+ * |      Reading           |     |      Writing           |     |      Freezing         |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - prepareValueFor*     |     | - changeVariable:      |     | - freezeOrUnfreeze    |
+ * |   (various methods)    | --> |   newValue:            | --> |   VariablesAtRow     |
+ * | - validateSizeChanges  |     | - nopVariables:        |     |   Indexes:            |
+ * |   ForVariables:        |     |   withNewValues:       |     | - updateFrozenActivity|
+ * +------------------------+     +------------------------+     +------------------------+
+ *
+ * Annotation Process:
+ * +------------------------+     +------------------------+     +------------------------+
+ * |  Collect Information   |     |  Process Information   |     |  Apply Annotations    |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - machBinaryAnnotation |     | - relativizeVariables  |     | - finishAnnotating    |
+ * |   InfoForProcess:      | --> | - retrieveSymbolsFor   | --> |   Variables:          |
+ * | - determineVariable    |     |   Addresses:           |     | - annotateVariables   |
+ * |   AddressAndIndirect   |     | - createBaseFormula    |     |   WithLabels:         |
+ * +------------------------+     +------------------------+     +------------------------+
  */
 
 #import "ZGVariableController.h"
@@ -86,7 +127,24 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 }
 
 #pragma mark Freezing variables
-
+/**
+ * Manages the system activity for frozen variables
+ *
+ * This method checks if there are any frozen and enabled variables in the document.
+ * If there are, it creates a system activity to prevent the system from sleeping,
+ * which ensures that frozen variables continue to be written to memory.
+ * If there are no frozen variables, it ends the activity to allow normal system behavior.
+ *
+ * System Activity Flow:
+ * +------------------------+     +------------------------+
+ * | Check for Frozen Vars  |     | Update System Activity |
+ * |------------------------|     |------------------------|
+ * | - Query variables      |     | - Begin activity if    |
+ * |   collection           | --> |   needed               |
+ * | - Check isFrozen and   |     | - End activity if no   |
+ * |   enabled properties   |     |   frozen variables     |
+ * +------------------------+     +------------------------+
+ */
 - (void)updateFrozenActivity
 {
 	BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
@@ -102,6 +160,25 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 }
 
+/**
+ * Toggles the frozen state of variables at the specified row indexes
+ *
+ * When a variable is frozen, its value is locked and continuously written back to memory,
+ * preventing other processes from changing it. This method handles both freezing and unfreezing
+ * variables, as well as setting up the appropriate undo operation.
+ *
+ * Freeze/Unfreeze Process:
+ * +------------------------+     +------------------------+     +------------------------+
+ * | Toggle Frozen State    |     | Update UI & Activity   |     | Setup Undo Operation  |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - For each variable:   |     | - Update frozen        |     | - Determine action    |
+ * |   - Toggle isFrozen    | --> |   activity status      | --> |   name based on state |
+ * |   - Store current      |     | - Reload table data    |     | - Register inverse    |
+ * |     value if freezing  |     |                        |     |   operation           |
+ * +------------------------+     +------------------------+     +------------------------+
+ *
+ * @param rowIndexes The indexes of the rows containing the variables to freeze or unfreeze
+ */
 - (void)freezeOrUnfreezeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
 {
 	for (ZGVariable *variable in [_documentData.variables objectsAtIndexes:rowIndexes])
@@ -953,6 +1030,28 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 }
 
+/**
+ * Changes the value of a variable
+ *
+ * This method handles changing the value of a variable, including preparing the value based on the
+ * variable type, writing it to memory (or storing it for frozen variables), and setting up undo operations.
+ * It supports all variable types (numeric, string, byte array) and handles byte order swapping if needed.
+ *
+ * Variable Value Change Process:
+ * +------------------------+     +------------------------+     +------------------------+
+ * | Prepare Value          |     | Apply Value            |     | Record Undo           |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - Evaluate expression  |     | - Swap byte order      |     | - Store old value     |
+ * | - Convert to proper    | --> | - For frozen vars:     | --> | - Set up undo         |
+ * |   type based on        |     |   store value          |     |   operation           |
+ * |   variable type        |     | - For normal vars:     |     | - Clean up memory     |
+ * |                        |     |   write to memory      |     |                        |
+ * +------------------------+     +------------------------+     +------------------------+
+ *
+ * @param variable The variable to change
+ * @param stringObject The new value as a string
+ * @param recordUndoFlag Whether to record this change for undo operations
+ */
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
 {	
 	const void *newValue = NULL;
@@ -1886,6 +1985,31 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	completionHandler();
 }
 
+/**
+ * Annotates variables with information about their memory locations
+ *
+ * This method enriches variables with information about where they are located in memory,
+ * including binary paths, segment names, symbols, and protection information. It can operate
+ * synchronously or asynchronously, and can optionally include symbol information.
+ *
+ * Annotation Process:
+ * +------------------------+     +------------------------+     +------------------------+
+ * | Gather Information     |     | Process Information    |     | Apply Annotations     |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - Get binary info      |     | - Relativize variables |     | - Add symbols         |
+ * | - Get file paths       | --> | - Retrieve symbols     | --> | - Add descriptions    |
+ * | - Async or sync        |     | - Process in           |     | - Add protection info |
+ * |   operation            |     |   background if async  |     | - Update UI           |
+ * +------------------------+     +------------------------+     +------------------------+
+ *
+ * @param variables The variables to annotate
+ * @param annotationInfo Optional pre-fetched annotation info (can be empty)
+ * @param process The process containing the variables
+ * @param variableController The variable controller managing the variables
+ * @param requiresSymbols Whether to include symbol information in the annotations
+ * @param async Whether to perform the annotation asynchronously
+ * @param completionHandler Block to call when annotation is complete
+ */
 + (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process variableController:(ZGVariableController *)variableController symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	// Get annotation info if not provided
@@ -1994,6 +2118,26 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[_windowController.variablesTableView reloadData];
 }
 
+/**
+ * Edits the sizes of variables
+ *
+ * This method changes the sizes of variables, validating that the requested sizes are possible,
+ * setting up undo operations, and applying the changes. It's primarily used for byte arrays
+ * where the size can vary.
+ *
+ * Size Change Process:
+ * +------------------------+     +------------------------+     +------------------------+
+ * | Validate Size Changes  |     | Setup Undo Operation   |     | Apply Size Changes    |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - Check if requested   |     | - Record current sizes |     | - Update variable     |
+ * |   sizes are possible   | --> | - Create undo action   | --> |   size properties     |
+ * | - Filter out invalid   |     |   with inverse         |     | - Update UI           |
+ * |   size changes         |     |   operation            |     | - Show error if needed|
+ * +------------------------+     +------------------------+     +------------------------+
+ *
+ * @param variables The variables whose sizes should be changed
+ * @param requestedSizes The requested new sizes for the variables
+ */
 - (void)editVariables:(NSArray<ZGVariable *> *)variables requestedSizes:(NSArray<NSNumber *> *)requestedSizes
 {
 	// Validate size changes
