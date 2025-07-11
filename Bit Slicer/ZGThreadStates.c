@@ -389,6 +389,39 @@ ZGMemoryAddress ZGBasePointerFromGeneralThreadState(zg_thread_state_t *threadSta
 }
 
 /**
+ * Gets the stack pointer value from a thread state.
+ *
+ * The stack pointer indicates the current top of the stack and is essential for
+ * stack analysis and debugging.
+ * This function extracts:
+ * - sp register for ARM64
+ * - rsp register for x86_64
+ * - esp register for x86
+ *
+ * Example:
+ * -------
+ * ```
+ * // Get stack pointer for stack analysis
+ * ZGMemoryAddress stackPointer = ZGStackPointerFromGeneralThreadState(&threadState, processType);
+ * ```
+ *
+ * @param threadState Pointer to the thread state
+ * @param type The process type (32-bit or 64-bit)
+ * @return The stack pointer address
+ */
+ZGMemoryAddress ZGStackPointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGProcessType type)
+{
+#if TARGET_CPU_ARM64
+	(void)type;
+	ZGMemoryAddress stackPointer = arm_thread_state64_get_sp(*threadState);
+	return stackPointer;
+#else
+	ZGMemoryAddress stackPointer = (ZG_PROCESS_TYPE_IS_X86_64(type)) ? threadState->uts.ts64.__rsp : threadState->uts.ts32.__esp;
+	return stackPointer;
+#endif
+}
+
+/**
  * Retrieves the debug thread state for a given thread.
  *
  * The debug state contains hardware breakpoint registers:

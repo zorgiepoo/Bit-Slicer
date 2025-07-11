@@ -157,6 +157,16 @@ void ZGSetInstructionPointerFromGeneralThreadState(zg_thread_state_t *threadStat
  */
 ZGMemoryAddress ZGBasePointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGProcessType type);
 
+/**
+ * Gets the stack pointer value from a thread state.
+ * The stack pointer indicates the current top of the stack.
+ *
+ * @param threadState Pointer to the thread state
+ * @param type The process type (32-bit or 64-bit)
+ * @return The stack pointer address
+ */
+ZGMemoryAddress ZGStackPointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGProcessType type);
+
 /*
  * Debug Thread State Functions
  * ---------------------------

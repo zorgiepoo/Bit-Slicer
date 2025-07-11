@@ -49,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) ZGMemoryAddress instructionPointer;
 @property (nonatomic, readonly) ZGMemoryAddress basePointer;
+@property (nonatomic, readonly) ZGMemoryAddress stackPointer;
 
 - (void)changeInstructionPointer:(ZGMemoryAddress)newInstructionPointer;
 
