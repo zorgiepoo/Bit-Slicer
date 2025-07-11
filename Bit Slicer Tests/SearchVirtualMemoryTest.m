@@ -1209,4 +1209,518 @@
 	XCTAssertEqual(notEqualResultsWildcardsNarrowed.count, 1U);
 }
 
+/**
+ * Tests searching for values with progressive narrowing across multiple search operations.
+ *
+ * This test:
+ * 1. Allocates memory and writes test data to it
+ * 2. Performs a series of increasingly specific searches
+ * 3. Tests the ability to narrow results through multiple operations
+ * 4. Verifies the final results match expectations
+ *
+ * Progressive narrowing workflow:
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │                  Progressive Search Narrowing                    │
+ * ├─────────────────────────────────────────────────────────────────┤
+ * │                                                                  │
+ * │  Initial Memory State:                                           │
+ * │  - Multiple int32 values throughout memory                       │
+ * │  - Values with specific patterns for testing                     │
+ * │                                                                  │
+ * │  Search Progression:                                             │
+ * │  1. Find all values > 1000                                       │
+ * │  2. Narrow to values < 5000                                      │
+ * │  3. Narrow to values divisible by 100                            │
+ * │  4. Narrow to values where last two digits are 00                │
+ * │  5. Modify one value and narrow to changed values                │
+ * │                                                                  │
+ * │  Each step reduces the result set further, demonstrating         │
+ * │  the power of progressive narrowing to find specific values.     │
+ * │                                                                  │
+ * └─────────────────────────────────────────────────────────────────┘
+ */
+- (void)testProgressiveNarrowing
+{
+    ZGMemoryAddress address = [self allocateDataIntoProcess];
+
+    // Write a series of test values to memory
+    int32_t testValues[] = {
+        500, 1200, 1500, 2000, 2300, 2500, 3000, 3600, 4000, 4500, 5200, 6000
+    };
+
+    const int valueCount = sizeof(testValues) / sizeof(testValues[0]);
+    const ZGMemorySize stride = 16; // Space values out to avoid accidental matches
+
+    for (int i = 0; i < valueCount; i++) {
+        if (!ZGWriteBytes(_processTask, address + (i * stride), &testValues[i], sizeof(int32_t))) {
+            XCTFail(@"Failed to write test value %d", i);
+        }
+    }
+
+    // Step 1: Find all values > 1000
+    int32_t lowerBound = 1000;
+    ZGSearchData *searchData = [self searchDataFromBytes:&lowerBound size:sizeof(lowerBound) dataType:ZGInt32 address:address alignment:sizeof(int32_t)];
+
+    ZGSearchResults *results1 = ZGSearchForData(_processTask, searchData, nil, ZGInt32, ZGSigned, ZGGreaterThan);
+    XCTAssertGreaterThan(results1.count, 0);
+    NSLog(@"Step 1: Found %llu values > 1000", results1.count);
+
+    // Step 2: Narrow to values < 5000
+    int32_t upperBound = 5000;
+    ZGSearchData *searchData2 = [self searchDataFromBytes:&upperBound size:sizeof(upperBound) dataType:ZGInt32 address:address alignment:sizeof(int32_t)];
+
+    ZGSearchResults *emptyResults = [[ZGSearchResults alloc] initWithResultSets:@[] resultType:ZGSearchResultTypeDirect dataType:ZGInt32 stride:sizeof(ZGMemoryAddress) unalignedAccess:NO];
+
+    ZGSearchResults *results2 = ZGNarrowSearchForData(_processTask, NO, searchData2, nil, ZGInt32, ZGSigned, ZGLessThan, emptyResults, results1);
+    XCTAssertGreaterThan(results2.count, 0);
+    XCTAssertLessThan(results2.count, results1.count);
+    NSLog(@"Step 2: Narrowed to %llu values < 5000", results2.count);
+
+    // Step 3: Narrow to values divisible by 100 (values ending in 00)
+    // We'll do this by checking if the remainder when divided by 100 is 0
+
+    // First, collect all the addresses and values from results2
+    NSMutableArray *addressesAndValues = [NSMutableArray array];
+    [results2 enumerateWithCount:results2.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+
+        int32_t *valuePtr = NULL;
+        ZGMemorySize size = sizeof(int32_t);
+        if (!ZGReadBytes(_processTask, resultAddress, (void **)&valuePtr, &size)) {
+            XCTFail(@"Failed to read value at address %llX", resultAddress);
+            return;
+        }
+
+        int32_t value = *valuePtr;
+        [addressesAndValues addObject:@{
+            @"address": @(resultAddress),
+            @"value": @(value)
+        }];
+
+        ZGFreeBytes(valuePtr, size);
+    }];
+
+    // Filter for values divisible by 100
+    NSMutableArray *divisibleBy100 = [NSMutableArray array];
+    for (NSDictionary *item in addressesAndValues) {
+        int32_t value = [item[@"value"] intValue];
+        if (value % 100 == 0) {
+            [divisibleBy100 addObject:item];
+        }
+    }
+
+    // Create a new search data for one of the divisible-by-100 values
+    XCTAssertGreaterThan(divisibleBy100.count, 0);
+    int32_t divisibleValue = [divisibleBy100[0][@"value"] intValue];
+    ZGSearchData *searchData3 = [self searchDataFromBytes:&divisibleValue size:sizeof(divisibleValue) dataType:ZGInt32 address:address alignment:sizeof(int32_t)];
+
+    // Search for this exact value to get a starting point for our next narrowing
+    ZGSearchResults *exactValueResults = ZGSearchForData(_processTask, searchData3, nil, ZGInt32, ZGSigned, ZGEquals);
+    XCTAssertGreaterThan(exactValueResults.count, 0);
+
+    // Now narrow to values divisible by 100 by checking each result
+    NSMutableArray *divisibleAddresses = [NSMutableArray array];
+    for (NSDictionary *item in divisibleBy100) {
+        ZGMemoryAddress addr = [item[@"address"] unsignedLongLongValue];
+        [divisibleAddresses addObject:[NSData dataWithBytes:&addr length:sizeof(addr)]];
+    }
+
+    // Create a search result with just the divisible-by-100 addresses
+    ZGSearchResults *results3 = [[ZGSearchResults alloc] initWithResultSets:divisibleAddresses resultType:ZGSearchResultTypeDirect dataType:ZGInt32 stride:sizeof(ZGMemoryAddress) unalignedAccess:NO];
+
+    XCTAssertGreaterThan(results3.count, 0);
+    XCTAssertLessThan(results3.count, results2.count);
+    NSLog(@"Step 3: Narrowed to %llu values divisible by 100", results3.count);
+
+    // Step 4: Modify one of the values and narrow to changed values
+    // Choose the first divisible-by-100 value
+    ZGMemoryAddress targetAddress = [divisibleBy100[0][@"address"] unsignedLongLongValue];
+    int32_t originalValue = [divisibleBy100[0][@"value"] intValue];
+    int32_t modifiedValue = originalValue + 50; // Change it to no longer be divisible by 100
+
+    // Store the original data before modification
+    searchData3.savedData = [ZGStoredData storedDataFromProcessTask:_processTask beginAddress:address endAddress:address + (valueCount * stride) protectionMode:ZGProtectionAll includeSharedMemory:NO];
+    XCTAssertNotNil(searchData3.savedData);
+
+    // Modify the value
+    if (!ZGWriteBytes(_processTask, targetAddress, &modifiedValue, sizeof(modifiedValue))) {
+        XCTFail(@"Failed to write modified value");
+    }
+
+    // Search for values that have changed
+    searchData3.shouldCompareStoredValues = YES;
+    ZGSearchResults *results4 = ZGNarrowSearchForData(_processTask, NO, searchData3, nil, ZGInt32, ZGSigned, ZGNotEqualsStored, emptyResults, results3);
+
+    XCTAssertEqual(results4.count, 1);
+    NSLog(@"Step 4: Narrowed to %llu changed values", results4.count);
+
+    // Verify the changed value is the one we modified
+    __block BOOL foundModifiedValue = NO;
+    [results4 enumerateWithCount:results4.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+
+        if (resultAddress == targetAddress) {
+            int32_t *valuePtr = NULL;
+            ZGMemorySize size = sizeof(int32_t);
+            if (!ZGReadBytes(_processTask, resultAddress, (void **)&valuePtr, &size)) {
+                XCTFail(@"Failed to read value at address %llX", resultAddress);
+                return;
+            }
+
+            int32_t value = *valuePtr;
+            XCTAssertEqual(value, modifiedValue);
+            foundModifiedValue = YES;
+
+            ZGFreeBytes(valuePtr, size);
+        }
+    }];
+
+    XCTAssertTrue(foundModifiedValue);
+}
+
+/**
+ * Tests searching for values with complex bit patterns and bit masking.
+ *
+ * This test:
+ * 1. Allocates memory and writes test data with specific bit patterns
+ * 2. Performs searches using bit masks to match specific bit patterns
+ * 3. Tests the ability to find values with particular bit characteristics
+ * 4. Verifies the search results match expectations
+ *
+ * Bit pattern search scenarios:
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │                     Bit Pattern Searching                        │
+ * ├─────────────────────────────────────────────────────────────────┤
+ * │                                                                  │
+ * │  Test Values with Specific Bit Patterns:                         │
+ * │  - Values with alternating bits (0101...)                        │
+ * │  - Values with specific bit flags set                            │
+ * │  - Values with bit patterns in specific positions                │
+ * │                                                                  │
+ * │  Search Techniques:                                              │
+ * │  1. Using byte array with wildcards to match bit patterns        │
+ * │  2. Using AND operations with bit masks                          │
+ * │  3. Finding values with specific bits set/unset                  │
+ * │                                                                  │
+ * │  Example Bit Patterns:                                           │
+ * │  ┌────────────────────────────────────────────────────┐         │
+ * │  │ Pattern 1: 0x55555555 (alternating 0/1 bits)       │         │
+ * │  │ Binary: 0101 0101 0101 0101 0101 0101 0101 0101    │         │
+ * │  ├────────────────────────────────────────────────────┤         │
+ * │  │ Pattern 2: 0xAAAAAAAA (alternating 1/0 bits)       │         │
+ * │  │ Binary: 1010 1010 1010 1010 1010 1010 1010 1010    │         │
+ * │  ├────────────────────────────────────────────────────┤         │
+ * │  │ Pattern 3: 0x0F0F0F0F (4 bits on, 4 bits off)      │         │
+ * │  │ Binary: 0000 1111 0000 1111 0000 1111 0000 1111    │         │
+ * │  └────────────────────────────────────────────────────┘         │
+ * │                                                                  │
+ * └─────────────────────────────────────────────────────────────────┘
+ */
+- (void)testBitPatternSearching
+{
+    ZGMemoryAddress address = [self allocateDataIntoProcess];
+
+    // Define test values with specific bit patterns
+    uint32_t bitPatterns[] = {
+        0x55555555, // Alternating 0/1 bits: 0101 0101 0101 0101 0101 0101 0101 0101
+        0xAAAAAAAA, // Alternating 1/0 bits: 1010 1010 1010 1010 1010 1010 1010 1010
+        0x0F0F0F0F, // 4 bits on, 4 bits off: 0000 1111 0000 1111 0000 1111 0000 1111
+        0xF0F0F0F0, // 4 bits off, 4 bits on: 1111 0000 1111 0000 1111 0000 1111 0000
+        0x00FF00FF, // 8 bits off, 8 bits on: 0000 0000 1111 1111 0000 0000 1111 1111
+        0xFF00FF00  // 8 bits on, 8 bits off: 1111 1111 0000 0000 1111 1111 0000 0000
+    };
+
+    const int patternCount = sizeof(bitPatterns) / sizeof(bitPatterns[0]);
+    const ZGMemorySize stride = 16; // Space values out to avoid accidental matches
+
+    // Write the bit patterns to memory
+    for (int i = 0; i < patternCount; i++) {
+        if (!ZGWriteBytes(_processTask, address + (i * stride), &bitPatterns[i], sizeof(uint32_t))) {
+            XCTFail(@"Failed to write bit pattern %d", i);
+        }
+    }
+
+    // Test 1: Search for alternating 0/1 bit pattern (0x55555555)
+    uint32_t pattern1 = 0x55555555;
+    ZGSearchData *searchData1 = [self searchDataFromBytes:&pattern1 size:sizeof(pattern1) dataType:ZGInt32 address:address alignment:sizeof(uint32_t)];
+
+    ZGSearchResults *results1 = ZGSearchForData(_processTask, searchData1, nil, ZGInt32, ZGUnsigned, ZGEquals);
+    XCTAssertGreaterThan(results1.count, 0);
+
+    // Verify we found the correct pattern
+    __block BOOL foundPattern1 = NO;
+    [results1 enumerateWithCount:results1.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+        if (resultAddress == address) { // First pattern is at the base address
+            foundPattern1 = YES;
+            *stop = YES;
+        }
+    }];
+
+    XCTAssertTrue(foundPattern1);
+
+    // Test 2: Search for values with the lower 16 bits all set (0x0000FFFF)
+    // This should match 0x00FF00FF from our patterns
+    uint32_t mask = 0x0000FFFF;
+    uint32_t expectedValue = 0x0000FFFF;
+
+    // First, find all values
+    ZGSearchData *searchData2 = [self searchDataFromBytes:&expectedValue size:sizeof(expectedValue) dataType:ZGInt32 address:address alignment:sizeof(uint32_t)];
+
+    // Create a byte array search with wildcards to match the pattern
+    // We want to match any value where the lower 16 bits are all 1s
+    // This would be "?? ?? FF FF" in hex
+    NSString *wildcardExpression = @"?? ?? FF FF";
+    unsigned char *byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(wildcardExpression);
+    XCTAssertNotNil((__bridge id)byteArrayFlags);
+
+    ZGSearchData *byteArraySearchData = [[ZGSearchData alloc] initWithSearchValue:ZGValueFromString(ZGProcessTypeX86_64, wildcardExpression, ZGByteArray, NULL) dataSize:4 dataAlignment:sizeof(uint32_t) pointerSize:8];
+    byteArraySearchData.beginAddress = address;
+    byteArraySearchData.endAddress = address + (patternCount * stride);
+    byteArraySearchData.byteArrayFlags = byteArrayFlags;
+
+    ZGSearchResults *results2 = ZGSearchForData(_processTask, byteArraySearchData, nil, ZGByteArray, 0, ZGEquals);
+    XCTAssertGreaterThan(results2.count, 0);
+
+    // Verify we found the pattern with lower 16 bits set (0x00FF00FF)
+    __block BOOL foundLower16BitsSet = NO;
+    [results2 enumerateWithCount:results2.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+
+        uint32_t *valuePtr = NULL;
+        ZGMemorySize size = sizeof(uint32_t);
+        if (!ZGReadBytes(_processTask, resultAddress, (void **)&valuePtr, &size)) {
+            XCTFail(@"Failed to read value at address %llX", resultAddress);
+            return;
+        }
+
+        uint32_t value = *valuePtr;
+        if ((value & mask) == expectedValue) {
+            foundLower16BitsSet = YES;
+            *stop = YES;
+        }
+
+        ZGFreeBytes(valuePtr, size);
+    }];
+
+    XCTAssertTrue(foundLower16BitsSet);
+
+    // Test 3: Search for values with alternating 4-bit patterns (0x0F0F0F0F or 0xF0F0F0F0)
+    // We'll use a byte array search with wildcards: "?F ?F ?F ?F" or "F? F? F? F?"
+
+    NSString *wildcardExpression3a = @"0F 0F 0F 0F";
+    unsigned char *byteArrayFlags3a = ZGAllocateFlagsForByteArrayWildcards(wildcardExpression3a);
+    XCTAssertNotNil((__bridge id)byteArrayFlags3a);
+
+    ZGSearchData *byteArraySearchData3a = [[ZGSearchData alloc] initWithSearchValue:ZGValueFromString(ZGProcessTypeX86_64, wildcardExpression3a, ZGByteArray, NULL) dataSize:4 dataAlignment:sizeof(uint32_t) pointerSize:8];
+    byteArraySearchData3a.beginAddress = address;
+    byteArraySearchData3a.endAddress = address + (patternCount * stride);
+    byteArraySearchData3a.byteArrayFlags = byteArrayFlags3a;
+
+    ZGSearchResults *results3a = ZGSearchForData(_processTask, byteArraySearchData3a, nil, ZGByteArray, 0, ZGEquals);
+    XCTAssertGreaterThan(results3a.count, 0);
+
+    NSString *wildcardExpression3b = @"F0 F0 F0 F0";
+    unsigned char *byteArrayFlags3b = ZGAllocateFlagsForByteArrayWildcards(wildcardExpression3b);
+    XCTAssertNotNil((__bridge id)byteArrayFlags3b);
+
+    ZGSearchData *byteArraySearchData3b = [[ZGSearchData alloc] initWithSearchValue:ZGValueFromString(ZGProcessTypeX86_64, wildcardExpression3b, ZGByteArray, NULL) dataSize:4 dataAlignment:sizeof(uint32_t) pointerSize:8];
+    byteArraySearchData3b.beginAddress = address;
+    byteArraySearchData3b.endAddress = address + (patternCount * stride);
+    byteArraySearchData3b.byteArrayFlags = byteArrayFlags3b;
+
+    ZGSearchResults *results3b = ZGSearchForData(_processTask, byteArraySearchData3b, nil, ZGByteArray, 0, ZGEquals);
+    XCTAssertGreaterThan(results3b.count, 0);
+
+    // Verify we found both 4-bit alternating patterns
+    __block BOOL found0F0F0F0F = NO;
+    __block BOOL foundF0F0F0F0 = NO;
+
+    [results3a enumerateWithCount:results3a.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+
+        uint32_t *valuePtr = NULL;
+        ZGMemorySize size = sizeof(uint32_t);
+        if (!ZGReadBytes(_processTask, resultAddress, (void **)&valuePtr, &size)) {
+            XCTFail(@"Failed to read value at address %llX", resultAddress);
+            return;
+        }
+
+        uint32_t value = *valuePtr;
+        if (value == 0x0F0F0F0F) {
+            found0F0F0F0F = YES;
+            *stop = YES;
+        }
+
+        ZGFreeBytes(valuePtr, size);
+    }];
+
+    [results3b enumerateWithCount:results3b.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+
+        uint32_t *valuePtr = NULL;
+        ZGMemorySize size = sizeof(uint32_t);
+        if (!ZGReadBytes(_processTask, resultAddress, (void **)&valuePtr, &size)) {
+            XCTFail(@"Failed to read value at address %llX", resultAddress);
+            return;
+        }
+
+        uint32_t value = *valuePtr;
+        if (value == 0xF0F0F0F0) {
+            foundF0F0F0F0 = YES;
+            *stop = YES;
+        }
+
+        ZGFreeBytes(valuePtr, size);
+    }];
+
+    XCTAssertTrue(found0F0F0F0F);
+    XCTAssertTrue(foundF0F0F0F0);
+}
+
+/**
+ * Tests searching for values that span memory protection boundaries.
+ *
+ * This test:
+ * 1. Allocates memory with different protection regions
+ * 2. Writes values that span across region boundaries
+ * 3. Performs searches for these cross-boundary values
+ * 4. Verifies the search results correctly handle region transitions
+ *
+ * Cross-boundary search scenarios:
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │                     Cross-Boundary Search                        │
+ * ├─────────────────────────────────────────────────────────────────┤
+ * │                                                                  │
+ * │  Memory Layout:                                                  │
+ * │  ┌────────────┬────────────┬────────────┬────────────┐          │
+ * │  │  Region 1  │  Region 2  │  Region 3  │  Region 4  │          │
+ * │  │  R/W Prot  │  All Prot  │  R/W Prot  │  All Prot  │          │
+ * │  └────────────┴────────────┴────────────┴────────────┘          │
+ * │                                                                  │
+ * │  Cross-Boundary Values:                                          │
+ * │  1. 64-bit integer spanning Region 1 and Region 2                │
+ * │  2. String spanning Region 2 and Region 3                        │
+ * │  3. Floating-point value spanning Region 3 and Region 4          │
+ * │                                                                  │
+ * │  Search Challenges:                                              │
+ * │  - Values split across different memory protection regions       │
+ * │  - Handling of region transitions during search                  │
+ * │  - Ensuring correct data interpretation across boundaries        │
+ * │                                                                  │
+ * └─────────────────────────────────────────────────────────────────┘
+ */
+- (void)testCrossBoundarySearching
+{
+    ZGMemoryAddress address = [self allocateDataIntoProcess];
+
+    // Calculate addresses at region boundaries
+    ZGMemoryAddress region1Start = address;
+    ZGMemoryAddress region2Start = address + _pageSize;
+    ZGMemoryAddress region3Start = address + _pageSize * 2;
+    ZGMemoryAddress region4Start = address + _pageSize * 3;
+
+    // 1. Write a 64-bit integer that spans Region 1 and Region 2
+    int64_t crossBoundaryInt64 = 0x1122334455667788;
+    ZGMemoryAddress int64Address = region2Start - sizeof(int64_t) / 2;  // Place integer so it crosses the boundary
+
+    if (!ZGWriteBytes(_processTask, int64Address, &crossBoundaryInt64, sizeof(crossBoundaryInt64))) {
+        XCTFail(@"Failed to write cross-boundary int64");
+    }
+
+    // 2. Write a string that spans Region 2 and Region 3
+    const char *crossBoundaryString = "This string spans across two memory regions for testing boundary handling";
+    ZGMemorySize stringLength = strlen(crossBoundaryString) + 1;
+    ZGMemoryAddress stringAddress = region3Start - stringLength / 2;  // Place string so it crosses the boundary
+
+    if (!ZGWriteBytes(_processTask, stringAddress, crossBoundaryString, stringLength)) {
+        XCTFail(@"Failed to write cross-boundary string");
+    }
+
+    // 3. Write a double that spans Region 3 and Region 4
+    double crossBoundaryDouble = 3.14159265358979;
+    ZGMemoryAddress doubleAddress = region4Start - sizeof(double) / 2;  // Place double so it crosses the boundary
+
+    if (!ZGWriteBytes(_processTask, doubleAddress, &crossBoundaryDouble, sizeof(crossBoundaryDouble))) {
+        XCTFail(@"Failed to write cross-boundary double");
+    }
+
+    // Test 1: Search for the cross-boundary 64-bit integer
+    ZGSearchData *int64SearchData = [self searchDataFromBytes:&crossBoundaryInt64 size:sizeof(crossBoundaryInt64) dataType:ZGInt64 address:address alignment:1];  // Use alignment 1 to find misaligned values
+
+    ZGSearchResults *int64Results = ZGSearchForData(_processTask, int64SearchData, nil, ZGInt64, ZGSigned, ZGEquals);
+
+    // Verify int64 result
+    __block BOOL foundInt64 = NO;
+    [int64Results enumerateWithCount:int64Results.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+        if (resultAddress == int64Address) {
+            foundInt64 = YES;
+            *stop = YES;
+        }
+    }];
+
+    XCTAssertTrue(foundInt64);
+
+    // Test 2: Search for the cross-boundary string
+    ZGSearchData *stringSearchData = [[ZGSearchData alloc] initWithSearchValue:(void *)crossBoundaryString dataSize:stringLength dataAlignment:1 pointerSize:8];
+    stringSearchData.beginAddress = address;
+    stringSearchData.endAddress = address + _data.length;
+
+    ZGSearchResults *stringResults = ZGSearchForData(_processTask, stringSearchData, nil, ZGString8, 0, ZGEquals);
+
+    // Verify string result
+    __block BOOL foundString = NO;
+    [stringResults enumerateWithCount:stringResults.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+        if (resultAddress == stringAddress) {
+            foundString = YES;
+            *stop = YES;
+        }
+    }];
+
+    XCTAssertTrue(foundString);
+
+    // Test 3: Search for the cross-boundary double
+    ZGSearchData *doubleSearchData = [self searchDataFromBytes:&crossBoundaryDouble size:sizeof(crossBoundaryDouble) dataType:ZGDouble address:address alignment:1];  // Use alignment 1 to find misaligned values
+    doubleSearchData.epsilon = 0.0000001;  // Use a small epsilon for floating-point comparison
+
+    ZGSearchResults *doubleResults = ZGSearchForData(_processTask, doubleSearchData, nil, ZGDouble, 0, ZGEquals);
+
+    // Verify double result
+    __block BOOL foundDouble = NO;
+    [doubleResults enumerateWithCount:doubleResults.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+        if (resultAddress == doubleAddress) {
+            foundDouble = YES;
+            *stop = YES;
+        }
+    }];
+
+    XCTAssertTrue(foundDouble);
+
+    // Test 4: Modify a cross-boundary value and search for the changed value
+    double modifiedDouble = 2.71828182845904;
+    if (!ZGWriteBytes(_processTask, doubleAddress, &modifiedDouble, sizeof(modifiedDouble))) {
+        XCTFail(@"Failed to write modified cross-boundary double");
+    }
+
+    ZGSearchData *modifiedDoubleSearchData = [self searchDataFromBytes:&modifiedDouble size:sizeof(modifiedDouble) dataType:ZGDouble address:address alignment:1];
+    modifiedDoubleSearchData.epsilon = 0.0000001;
+
+    ZGSearchResults *modifiedDoubleResults = ZGSearchForData(_processTask, modifiedDoubleSearchData, nil, ZGDouble, 0, ZGEquals);
+
+    // Verify modified double result
+    __block BOOL foundModifiedDouble = NO;
+    [modifiedDoubleResults enumerateWithCount:modifiedDoubleResults.count removeResults:NO usingBlock:^(const void *resultAddressData, BOOL *stop) {
+        ZGMemoryAddress resultAddress = *(const ZGMemoryAddress *)resultAddressData;
+        if (resultAddress == doubleAddress) {
+            foundModifiedDouble = YES;
+            *stop = YES;
+        }
+    }];
+
+    XCTAssertTrue(foundModifiedDouble);
+}
+
 @end
