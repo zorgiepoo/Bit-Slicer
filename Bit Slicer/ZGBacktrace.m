@@ -30,6 +30,89 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * ZGBacktrace - Stack Trace Generation
+ * ===================================
+ *
+ * This module generates stack traces (backtraces) for debugging purposes,
+ * showing the call chain that led to the current execution point.
+ *
+ * Backtrace Generation Flow:
+ * -------------------------
+ *
+ *                                 +----------------+
+ *                                 | Thread Stopped |
+ *                                 | at Breakpoint  |
+ *                                 +--------+-------+
+ *                                          |
+ *                                          | (Get registers)
+ *                                          v
+ *  +----------------+            +-------------------+
+ *  | ZGThreadStates |----------->| Base Pointer (BP) |
+ *  | (get registers) |            | Instruction Ptr  |
+ *  +----------------+            +-------------------+
+ *                                          |
+ *                                          | (Start backtrace)
+ *                                          v
+ *                                 +-------------------+
+ *                                 | Find Current      |
+ *                                 | Instruction       |
+ *                                 +-------------------+
+ *                                          |
+ *                                          | (Add to backtrace)
+ *                                          v
+ *                                 +-------------------+
+ *                                 | Stack Frame       |
+ *                                 | Traversal Loop    |
+ *                                 +-------------------+
+ *                                          |
+ *                                          | (For each frame)
+ *                                          v
+ *  +----------------+            +-------------------+
+ *  | Read Memory at |<-----------| Read Return Addr  |
+ *  | BP + ptr_size  |            | from Stack        |
+ *  +----------------+            +-------------------+
+ *          |                              |
+ *          |                              | (Find corresponding instruction)
+ *          |                              v
+ *          |                     +-------------------+
+ *          |                     | Find Instruction  |
+ *          |                     | for Return Addr   |
+ *          |                     +-------------------+
+ *          |                              |
+ *          |                              | (Add to backtrace)
+ *          v                              v
+ *  +----------------+            +-------------------+
+ *  | Read Memory at |----------->| Read Next BP      |
+ *  | BP             |            | from Stack        |
+ *  +----------------+            +-------------------+
+ *                                          |
+ *                                          | (Continue until BP is 0 or limit reached)
+ *                                          v
+ *                                 +-------------------+
+ *                                 | Complete          |
+ *                                 | Backtrace         |
+ *                                 +-------------------+
+ *
+ * Stack Frame Structure (x86/x64):
+ * ------------------------------
+ *
+ * High Address
+ *    |
+ *    | Function parameters
+ *    |
+ *    | Return address
+ *    |
+ *    | Saved base pointer (BP) <-- Current BP points here
+ *    |
+ *    | Local variables
+ *    |
+ * Low Address
+ *
+ * Note: ARM64 uses a different approach with frame pointer (FP)
+ * and link register (LR) instead of the traditional x86 approach.
+ */
+
 #import "ZGBacktrace.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
@@ -54,13 +137,13 @@
 {
 	NSMutableArray<ZGInstruction *> *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray<NSNumber *> *newBasePointers = [[NSMutableArray alloc] init];
-	
+
 	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints processType:process.type machBinaries:machBinaries];
 	if (currentInstruction != nil)
 	{
 		[newInstructions addObject:currentInstruction];
 		[newBasePointers addObject:@(basePointer)];
-		
+
 		// Rosetta processes don't use the base pointer register we retrieved, don't even try
 		while (!process.translated && basePointer > 0 && (maxNumberOfInstructionsRetrieved == 0 || newInstructions.count < maxNumberOfInstructionsRetrieved))
 		{
@@ -71,7 +154,7 @@
 			{
 				break;
 			}
-			
+
 			ZGMemoryAddress returnAddress;
 			switch (returnAddressSize)
 			{
@@ -85,17 +168,17 @@
 				default:
 					returnAddress = 0;
 			}
-			
+
 			ZGFreeBytes(returnAddressBytes, returnAddressSize);
-			
+
 			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints processType:process.type machBinaries:machBinaries];
 			if (instruction == nil)
 			{
 				break;
 			}
-			
+
 			[newInstructions addObject:instruction];
-			
+
 			// Read base pointer
 			void *basePointerBytes = NULL;
 			ZGMemorySize basePointerSize = process.pointerSize;
@@ -103,7 +186,7 @@
 			{
 				break;
 			}
-			
+
 			switch (basePointerSize)
 			{
 				case sizeof(ZGMemoryAddress):
@@ -115,13 +198,13 @@
 				default:
 					basePointer = 0;
 			}
-			
+
 			[newBasePointers addObject:@(basePointer)];
-			
+
 			ZGFreeBytes(basePointerBytes, basePointerSize);
 		}
 	}
-	
+
 	return [[ZGBacktrace alloc] initWithInstructions:newInstructions basePointers:newBasePointers];
 }
 

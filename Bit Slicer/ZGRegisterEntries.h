@@ -30,6 +30,81 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * ZGRegisterEntries - Register Collection Management
+ * ================================================
+ *
+ * This module provides a way to extract and manage collections of CPU registers
+ * from thread states, converting them to a format suitable for display and manipulation.
+ *
+ * Register Entry Structure:
+ * -----------------------
+ *
+ *  +-------------------------------------+
+ *  |          ZGRegisterEntry            |
+ *  |-------------------------------------|
+ *  | - name[16]  : Register name (rax)   |
+ *  | - value[64] : Register value data   |
+ *  | - size      : Size in bytes         |
+ *  | - offset    : Offset in thread state|
+ *  | - type      : GP or Vector          |
+ *  +-------------------------------------+
+ *
+ * Register Extraction Flow:
+ * -----------------------
+ *
+ *                                 +----------------+
+ *                                 | Thread State   |
+ *                                 | (Raw Registers)|
+ *                                 +--------+-------+
+ *                                          |
+ *                                          | (Extract)
+ *                                          v
+ *  +----------------+            +-------------------+
+ *  | Architecture   |----------->| getRegisterEntries|
+ *  | Specific Logic |            | Methods           |
+ *  +----------------+            +-------------------+
+ *          |                              |
+ *          | (Determine                   | (Fill array of)
+ *          |  register set)               v
+ *          v                     +-------------------+
+ *  +----------------+            | ZGRegisterEntry[] |
+ *  | x86/x64 Regs   |            | (Register Array)  |
+ *  | or ARM64 Regs  |            +-------------------+
+ *  +----------------+                     |
+ *                                         | (Convert to)
+ *                                         v
+ *                                +-------------------+
+ *                                | ZGVariable Array  |
+ *                                | (For UI/Scripting)|
+ *                                +-------------------+
+ *                                         |
+ *                                         | (Wrap in)
+ *                                         v
+ *                                +-------------------+
+ *                                | ZGRegister Objects|
+ *                                | (For UI Display)  |
+ *                                +-------------------+
+ *
+ * Architecture-Specific Register Sets:
+ * ----------------------------------
+ *
+ * x86 (32-bit):                  | x86_64 (64-bit):               | ARM64:
+ * ------------------------------- | ------------------------------ | ------------------------------
+ * General Purpose:               | General Purpose:                | General Purpose:
+ * - eax, ebx, ecx, edx           | - rax, rbx, rcx, rdx           | - x0-x28: General registers
+ * - esi, edi                     | - rsi, rdi                      | - x29: Frame pointer (FP)
+ * - ebp: Base pointer            | - rbp: Base pointer             | - x30: Link register (LR)
+ * - esp: Stack pointer           | - rsp: Stack pointer            | - sp: Stack pointer
+ * - eip: Instruction pointer     | - rip: Instruction pointer      | - pc: Program counter
+ * - eflags: Flags register       | - rflags: Flags register        | - cpsr: Status register
+ *                                |                                 |
+ * Vector/SIMD:                   | Vector/SIMD:                    | Vector/SIMD:
+ * - xmm0-xmm7: SSE registers     | - xmm0-xmm15: SSE registers     | - v0-v31: NEON registers
+ * - st0-st7: FPU registers       | - ymm0-ymm15: AVX registers     |   (128-bit)
+ *                                | - st0-st7: FPU registers        |
+ */
+
 #import <Foundation/Foundation.h>
 #import "ZGRegister.h"
 #import "ZGThreadStates.h"

@@ -30,6 +30,57 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * ZGRegister - CPU Register Management
+ * ===================================
+ *
+ * This module provides an abstraction for CPU registers in the debugger.
+ * It encapsulates register values and their metadata, supporting both
+ * general purpose and vector (SIMD) registers.
+ *
+ * Register Hierarchy and Relationships:
+ * -----------------------------------
+ *
+ *                   +----------------+
+ *                   | ZGThreadStates |
+ *                   +--------+-------+
+ *                            |
+ *                            | (provides raw register data)
+ *                            v
+ *  +----------------+    +-------------------+    +------------------+
+ *  | ZGRegisterEntry|<---| ZGRegisterEntries |    | ZGRegistersState |
+ *  | (struct)       |    | (collection)      |    | (thread context) |
+ *  +-------+--------+    +-------------------+    +------------------+
+ *          |                      ^                        ^
+ *          | (converted to)       |                        |
+ *          v                      |                        |
+ *  +----------------+             |                        |
+ *  | ZGVariable     |-------------+                        |
+ *  | (data value)   |                                      |
+ *  +-------+--------+                                      |
+ *          |                                               |
+ *          | (wrapped by)                                  |
+ *          v                                               |
+ *  +----------------+                                      |
+ *  | ZGRegister     |--------------------------------------+
+ *  | (UI object)    |           (references)
+ *  +----------------+
+ *
+ * Register Types:
+ * -------------
+ * - General Purpose: Program counter, stack pointer, etc.
+ * - Vector: SIMD registers (AVX, NEON)
+ *
+ * Register Flow During Debugging:
+ * -----------------------------
+ * 1. Thread is suspended (e.g., at breakpoint)
+ * 2. ZGThreadStates retrieves raw register values
+ * 3. ZGRegisterEntries converts to named entries
+ * 4. ZGRegistersState maintains the context
+ * 5. ZGRegister objects provide access to individual registers
+ * 6. Modified registers are written back via ZGThreadStates
+ */
+
 #import <Foundation/Foundation.h>
 #import "ZGVirtualMemory.h"
 

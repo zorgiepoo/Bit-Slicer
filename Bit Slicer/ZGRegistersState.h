@@ -30,6 +30,82 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * ZGRegistersState - Thread Register State Management
+ * =================================================
+ *
+ * This module encapsulates the complete register state of a thread,
+ * including both general purpose and vector registers.
+ *
+ * Component Interactions:
+ * ---------------------
+ *
+ *                                 +----------------+
+ *                                 | Breakpoint Hit |
+ *                                 | or Debug Event |
+ *                                 +--------+-------+
+ *                                          |
+ *                                          | (Suspend Thread)
+ *                                          v
+ *  +----------------+            +-------------------+
+ *  | ZGThreadStates |----------->| Raw Thread State  |
+ *  | (low-level API)|            | (CPU Registers)   |
+ *  +----------------+            +-------------------+
+ *          ^                              |
+ *          |                              | (Encapsulate)
+ *          |                              v
+ *          |                     +-------------------+
+ *          |                     | ZGRegistersState  |
+ *          |                     | (OO Container)    |
+ *          |                     +-------------------+
+ *          |                              |
+ *          |                              | (Use in)
+ *          |                              v
+ *          |                     +-------------------+
+ *          |                     | Debug Operations: |
+ *          |                     | - Backtrace       |
+ *          |                     | - Register View   |
+ *          |                     | - Modify Regs     |
+ *          |                     +-------------------+
+ *          |                              |
+ *          |                              | (Apply Changes)
+ *          +--------------<---------------+
+ *
+ * Register State Components:
+ * ------------------------
+ *
+ *  +-------------------------------------+
+ *  |          ZGRegistersState           |
+ *  |-------------------------------------|
+ *  | +-------------------------------+   |
+ *  | | General Purpose Thread State  |   |
+ *  | |-------------------------------|   |
+ *  | | - Program Counter (PC/IP)     |   |
+ *  | | - Stack Pointer (SP)          |   |
+ *  | | - Base/Frame Pointer (BP/FP)  |   |
+ *  | | - General Registers           |   |
+ *  | | - Flags Register              |   |
+ *  | +-------------------------------+   |
+ *  |                                     |
+ *  | +-------------------------------+   |
+ *  | | Vector Thread State           |   |
+ *  | |-------------------------------|   |
+ *  | | - SIMD Registers (AVX/NEON)   |   |
+ *  | | - Floating Point Registers    |   |
+ *  | +-------------------------------+   |
+ *  +-------------------------------------+
+ *
+ * Cross-Component Workflow:
+ * -----------------------
+ * 1. Breakpoint triggers -> Thread suspended
+ * 2. ZGThreadStates retrieves raw register values
+ * 3. ZGRegistersState encapsulates these values
+ * 4. ZGBacktrace uses register values to generate stack trace
+ * 5. ZGRegister objects provide UI access to register values
+ * 6. Modified registers are written back via ZGThreadStates
+ * 7. Thread resumes execution with updated state
+ */
+
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGThreadStates.h"

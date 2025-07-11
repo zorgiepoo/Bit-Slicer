@@ -30,6 +30,90 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * ZGBreakPoint - Breakpoint Management
+ * ==================================
+ *
+ * This module defines breakpoints for the debugger, supporting instruction
+ * breakpoints, data watchpoints, and single-step breakpoints.
+ *
+ * Breakpoint Types:
+ * ---------------
+ * - Instruction Breakpoints: Triggered when execution reaches a specific address
+ * - Data Watchpoints: Triggered when memory at a specific address is accessed
+ * - Single-Step Breakpoints: Triggered after executing a single instruction
+ *
+ * Breakpoint Lifecycle:
+ * -------------------
+ *
+ *                                 +----------------+
+ *                                 | Create         |
+ *                                 | Breakpoint     |
+ *                                 +--------+-------+
+ *                                          |
+ *                                          | (Install)
+ *                                          v
+ *  +----------------+            +-------------------+
+ *  | Hardware BP:   |            | Software BP:      |
+ *  | Set Debug Regs |<-----------| Replace Instr     |
+ *  | (watchpoints)  |    |       | with Trap         |
+ *  +----------------+    |       +-------------------+
+ *          ^             |                ^
+ *          |             |                |
+ *          +-------------+----------------+
+ *                        |
+ *                        | (Breakpoint Hit)
+ *                        v
+ *               +-------------------+
+ *               | Exception Handler |
+ *               | Catches Trap      |
+ *               +-------------------+
+ *                        |
+ *                        | (Process Exception)
+ *                        v
+ *  +----------------+   +-------------------+   +------------------+
+ *  | Get Thread     |-->| Notify Delegate  |-->| Get/Set Registers |
+ *  | State          |   | (User Code)      |   | (Modify State)    |
+ *  +----------------+   +-------------------+   +------------------+
+ *                                |
+ *                                | (Resume Execution)
+ *                                v
+ *                       +-------------------+
+ *                       | Restore Original  |
+ *                       | Instruction       |
+ *                       +-------------------+
+ *                                |
+ *                                | (Single-Step)
+ *                                v
+ *                       +-------------------+
+ *                       | Set Trap Flag     |
+ *                       | Execute 1 Instr   |
+ *                       +-------------------+
+ *                                |
+ *                                | (After Single-Step)
+ *                                v
+ *                       +-------------------+
+ *                       | Reinstall         |
+ *                       | Breakpoint        |
+ *                       +-------------------+
+ *                                |
+ *                                | (Continue or Remove)
+ *                                v
+ *                       +-------------------+
+ *                       | Resume Normal     |
+ *                       | Execution         |
+ *                       +-------------------+
+ *
+ * Interaction with Thread States:
+ * -----------------------------
+ * When a breakpoint is hit, the thread state is captured and can be
+ * examined or modified before execution resumes. This allows for:
+ * - Inspecting register values
+ * - Modifying register values
+ * - Generating backtraces
+ * - Conditional breakpoints based on register state
+ */
+
 #import <Foundation/Foundation.h>
 #import "pythonlib.h"
 #import "ZGMemoryTypes.h"
