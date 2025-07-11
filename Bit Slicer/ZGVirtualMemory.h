@@ -57,6 +57,113 @@
  * Each process has its own virtual memory space, which is mapped to physical
  * memory by the kernel. The functions in this file allow for cross-process
  * memory operations.
+ *
+ * Memory Debugging Example:
+ * -----------------------
+ * The following diagram shows how to use these functions for memory debugging:
+ *
+ * 1. Attach to a process:
+ * ```
+ * ZGMemoryMap task;
+ * if (ZGTaskForPID(1234, &task)) {
+ *     // Process attached successfully
+ * }
+ * ```
+ *
+ * 2. Read memory from the process:
+ * ```
+ * ZGMemoryAddress address = 0x10000;
+ * ZGMemorySize size = 100;
+ * void *data;
+ * if (ZGReadBytes(task, address, &data, &size)) {
+ *     // Use data...
+ *     ZGFreeBytes(data, size);
+ * }
+ * ```
+ *
+ * 3. Write memory to the process:
+ * ```
+ * int value = 42;
+ * if (ZGWriteBytesIgnoringProtection(task, address, &value, sizeof(value))) {
+ *     // Memory written successfully
+ * }
+ * ```
+ *
+ * 4. Memory debugging process diagram:
+ * ```
+ * +----------------+        +----------------+        +----------------+
+ * |  Your Process  |        |  Target Process|        |  Your Process  |
+ * |                |        |                |        |                |
+ * | 1. ZGTaskForPID| -----> | Process        | -----> | 2. ZGReadBytes |
+ * |                |        | Memory         |        |                |
+ * +----------------+        +----------------+        +----------------+
+ *         |                                                   |
+ *         v                                                   v
+ * +----------------+                                  +----------------+
+ * |  Your Process  |                                  |  Your Process  |
+ * |                |                                  |                |
+ * | 3. Process Data| <--------------------------------| 4. Display Data|
+ * |                |                                  |                |
+ * +----------------+                                  +----------------+
+ *         |
+ *         v
+ * +----------------+        +----------------+
+ * |  Your Process  |        |  Target Process|
+ * |                |        |                |
+ * | 5. ZGWriteBytes| -----> | 6. Modified    |
+ * |                |        |    Memory      |
+ * +----------------+        +----------------+
+ * ```
+ *
+ * Code Injection Example:
+ * ---------------------
+ * The following diagram shows how to use these functions for code injection:
+ *
+ * 1. Allocate memory in the target process:
+ * ```
+ * ZGMemoryAddress address = 0;
+ * ZGMemorySize size = 1024;
+ * if (ZGAllocateMemory(task, &address, size)) {
+ *     // Memory allocated successfully
+ * }
+ * ```
+ *
+ * 2. Write code to the allocated memory:
+ * ```
+ * // Suspend the process while modifying its memory
+ * ZGSuspendTask(task);
+ *
+ * // Write the code to the allocated memory
+ * if (ZGWriteBytesIgnoringProtection(task, address, codeBytes, codeSize)) {
+ *     // Code written successfully
+ * }
+ *
+ * // Make the memory executable
+ * ZGProtect(task, address, codeSize, VM_PROT_READ | VM_PROT_EXECUTE);
+ *
+ * // Resume the process
+ * ZGResumeTask(task);
+ * ```
+ *
+ * 3. Code injection process diagram:
+ * ```
+ * Original Program Flow:
+ * +----------------+        +----------------+        +----------------+
+ * | Instruction 1  | -----> | Instruction 2  | -----> | Instruction 3  |
+ * +----------------+        +----------------+        +----------------+
+ *
+ * After Code Injection:
+ * +----------------+        +----------------+        +----------------+
+ * | Instruction 1  | -----> |    Jump to     |        | Instruction 3  |
+ * +----------------+        | Injected Code  |        +----------------+
+ *                           +----------------+               ^
+ *                                   |                        |
+ *                                   v                        |
+ * +----------------+        +----------------+        +----------------+
+ * | Injected Code  | -----> | Your Custom    | -----> |    Jump to     |
+ * | Entry Point    |        | Instructions   |        | Instruction 3  |
+ * +----------------+        +----------------+        +----------------+
+ * ```
  */
 
 #ifndef ZG_VIRTUAL_MEMORY_H
