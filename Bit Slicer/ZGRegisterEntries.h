@@ -103,6 +103,78 @@
  * - xmm0-xmm7: SSE registers     | - xmm0-xmm15: SSE registers     | - v0-v31: NEON registers
  * - st0-st7: FPU registers       | - ymm0-ymm15: AVX registers     |   (128-bit)
  *                                | - st0-st7: FPU registers        |
+ *
+ * Memory Layout Examples:
+ * ---------------------
+ *
+ * ZGRegisterEntry Memory Layout:
+ * +-----------------------------------------------------------------------+
+ * | Offset | Size | Field    | Description                                |
+ * |--------|------|----------|-------------------------------------------|
+ * | 0x00   | 16   | name     | Null-terminated register name string       |
+ * | 0x10   | 64   | value    | Raw register value data                    |
+ * | 0x50   | 8    | size     | Size of the register value in bytes        |
+ * | 0x58   | 8    | offset   | Offset in the thread state structure       |
+ * | 0x60   | 1    | type     | Register type (GP=0, Vector=1)             |
+ * | 0x61   | 7    | padding  | Alignment padding                          |
+ * +-----------------------------------------------------------------------+
+ * Total size: 104 bytes (0x68)
+ *
+ * Example x86_64 Register Entries Array in Memory:
+ * +-----------------------------------------------------------------------+
+ * | Address      | Register | Value                | Size | Notes         |
+ * |--------------|----------|----------------------|------|---------------|
+ * | entries+0x000| rax      | 0x0000000000000001   | 8    | Return value  |
+ * | entries+0x068| rbx      | 0x00007fff5fc01000   | 8    | Preserved     |
+ * | entries+0x0D0| rcx      | 0x0000000000000000   | 8    | 4th argument  |
+ * | entries+0x138| rdx      | 0x0000000000000000   | 8    | 3rd argument  |
+ * | entries+0x1A0| rdi      | 0x00007fff5fc02000   | 8    | 1st argument  |
+ * | entries+0x208| rsi      | 0x00007fff5fc03000   | 8    | 2nd argument  |
+ * | entries+0x270| rbp      | 0x00007fff5fc04000   | 8    | Frame pointer |
+ * | entries+0x2D8| rsp      | 0x00007fff5fc03f00   | 8    | Stack pointer |
+ * | entries+0x340| rip      | 0x00007fff5fc05000   | 8    | Instr pointer |
+ * | ...          | ...      | ...                  | ...  | ...           |
+ * | entries+0x4D0| xmm0     | [16 bytes of data]   | 16   | Vector reg    |
+ * | ...          | ...      | ...                  | ...  | ...           |
+ * +-----------------------------------------------------------------------+
+ *
+ * Example ARM64 Register Entries Array in Memory:
+ * +-----------------------------------------------------------------------+
+ * | Address      | Register | Value                | Size | Notes         |
+ * |--------------|----------|----------------------|------|---------------|
+ * | entries+0x000| x0       | 0x0000000000000001   | 8    | Return value  |
+ * | entries+0x068| x1       | 0x0000000016fe0000   | 8    | 1st argument  |
+ * | entries+0x0D0| x2       | 0x0000000000000010   | 8    | 2nd argument  |
+ * | entries+0x138| x3       | 0x0000000000000000   | 8    | 3rd argument  |
+ * | ...          | ...      | ...                  | ...  | ...           |
+ * | entries+0x7A0| x29      | 0x0000000016fe1000   | 8    | Frame pointer |
+ * | entries+0x808| x30      | 0x0000000016fd0004   | 8    | Link register |
+ * | entries+0x870| sp       | 0x0000000016fdff00   | 8    | Stack pointer |
+ * | entries+0x8D8| pc       | 0x0000000016fd0000   | 8    | Program cntr  |
+ * | entries+0x940| cpsr     | 0x0000000000000000   | 8    | Status reg    |
+ * | ...          | ...      | ...                  | ...  | ...           |
+ * | entries+0x9A8| v0       | [16 bytes of data]   | 16   | Vector reg    |
+ * | ...          | ...      | ...                  | ...  | ...           |
+ * +-----------------------------------------------------------------------+
+ *
+ * Example Register Value Memory Layout (x86_64 rax):
+ * +-----------------------------------------------------------------------+
+ * | Offset | Bytes                          | Description                 |
+ * |--------|--------------------------------|-----------------------------|
+ * | 0x00   | 01 00 00 00 00 00 00 00        | Value: 0x0000000000000001   |
+ * | 0x08   | 00 00 00 00 00 00 00 00        | Padding/unused              |
+ * | ...    | ...                            | ...                         |
+ * +-----------------------------------------------------------------------+
+ *
+ * Example Register Value Memory Layout (ARM64 v0):
+ * +-----------------------------------------------------------------------+
+ * | Offset | Bytes                          | Description                 |
+ * |--------|--------------------------------|-----------------------------|
+ * | 0x00   | 00 01 02 03 04 05 06 07        | First 8 bytes               |
+ * | 0x08   | 08 09 0A 0B 0C 0D 0E 0F        | Second 8 bytes              |
+ * | 0x10   | 00 00 00 00 00 00 00 00        | Padding/unused              |
+ * | ...    | ...                            | ...                         |
+ * +-----------------------------------------------------------------------+
  */
 
 #import <Foundation/Foundation.h>

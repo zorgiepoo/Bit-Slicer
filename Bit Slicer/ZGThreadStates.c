@@ -87,6 +87,130 @@
  * For SIMD operations, vector registers are managed through:
  * - ZGGetVectorThreadState()
  * - ZGSetVectorThreadState()
+ *
+ * Memory Layout Examples:
+ * ---------------------
+ *
+ * x86_64 Thread State Memory Layout:
+ * --------------------------------
+ *
+ * General Purpose Thread State (x86_64):
+ * +-----------------------------------------------------------------------+
+ * | Offset | Size | Register | Description                                |
+ * |--------|------|----------|-------------------------------------------|
+ * | 0x00   | 8    | rax      | Accumulator                               |
+ * | 0x08   | 8    | rbx      | Base                                      |
+ * | 0x10   | 8    | rcx      | Counter                                   |
+ * | 0x18   | 8    | rdx      | Data                                      |
+ * | 0x20   | 8    | rdi      | Destination Index                         |
+ * | 0x28   | 8    | rsi      | Source Index                              |
+ * | 0x30   | 8    | rbp      | Base Pointer (frame pointer)              |
+ * | 0x38   | 8    | rsp      | Stack Pointer                             |
+ * | 0x40   | 8    | r8       | General Purpose                           |
+ * | 0x48   | 8    | r9       | General Purpose                           |
+ * | 0x50   | 8    | r10      | General Purpose                           |
+ * | 0x58   | 8    | r11      | General Purpose                           |
+ * | 0x60   | 8    | r12      | General Purpose                           |
+ * | 0x68   | 8    | r13      | General Purpose                           |
+ * | 0x70   | 8    | r14      | General Purpose                           |
+ * | 0x78   | 8    | r15      | General Purpose                           |
+ * | 0x80   | 8    | rip      | Instruction Pointer                       |
+ * | 0x88   | 8    | rflags   | Flags                                     |
+ * | 0x90   | 8    | cs       | Code Segment                              |
+ * | 0x98   | 8    | fs       | FS Segment                                |
+ * | 0xA0   | 8    | gs       | GS Segment                                |
+ * +-----------------------------------------------------------------------+
+ *
+ * Debug Thread State (x86_64):
+ * +-----------------------------------------------------------------------+
+ * | Offset | Size | Register | Description                                |
+ * |--------|------|----------|-------------------------------------------|
+ * | 0x00   | 8    | dr0      | Debug Register 0 (breakpoint address)      |
+ * | 0x08   | 8    | dr1      | Debug Register 1 (breakpoint address)      |
+ * | 0x10   | 8    | dr2      | Debug Register 2 (breakpoint address)      |
+ * | 0x18   | 8    | dr3      | Debug Register 3 (breakpoint address)      |
+ * | 0x20   | 8    | dr4      | Debug Register 4 (reserved)                |
+ * | 0x28   | 8    | dr5      | Debug Register 5 (reserved)                |
+ * | 0x30   | 8    | dr6      | Debug Register 6 (debug status)            |
+ * | 0x38   | 8    | dr7      | Debug Register 7 (debug control)           |
+ * +-----------------------------------------------------------------------+
+ *
+ * Example x86_64 Memory Snapshot (General Purpose Registers):
+ * +-----------------------------------------------------------------------+
+ * | Address      | Value                | Register | Notes                |
+ * |--------------|----------------------|----------|----------------------|
+ * | 0x7fff5fc00000 | 0x0000000000000001 | rax      | Return value        |
+ * | 0x7fff5fc00008 | 0x00007fff5fc01000 | rbx      | Preserved register  |
+ * | 0x7fff5fc00010 | 0x0000000000000000 | rcx      | 4th argument        |
+ * | 0x7fff5fc00018 | 0x0000000000000000 | rdx      | 3rd argument        |
+ * | 0x7fff5fc00020 | 0x00007fff5fc02000 | rdi      | 1st argument        |
+ * | 0x7fff5fc00028 | 0x00007fff5fc03000 | rsi      | 2nd argument        |
+ * | 0x7fff5fc00030 | 0x00007fff5fc04000 | rbp      | Frame pointer       |
+ * | 0x7fff5fc00038 | 0x00007fff5fc03f00 | rsp      | Stack pointer       |
+ * | ...           | ...                | ...      | ...                 |
+ * | 0x7fff5fc00080 | 0x00007fff5fc05000 | rip      | Next instruction    |
+ * +-----------------------------------------------------------------------+
+ *
+ * ARM64 Thread State Memory Layout:
+ * ------------------------------
+ *
+ * General Purpose Thread State (ARM64):
+ * +-----------------------------------------------------------------------+
+ * | Offset | Size | Register | Description                                |
+ * |--------|------|----------|-------------------------------------------|
+ * | 0x00   | 8    | x0       | Function argument/return value             |
+ * | 0x08   | 8    | x1       | Function argument                          |
+ * | 0x10   | 8    | x2       | Function argument                          |
+ * | 0x18   | 8    | x3       | Function argument                          |
+ * | 0x20   | 8    | x4       | Function argument                          |
+ * | 0x28   | 8    | x5       | Function argument                          |
+ * | 0x30   | 8    | x6       | Function argument                          |
+ * | 0x38   | 8    | x7       | Function argument                          |
+ * | 0x40   | 8    | x8       | Indirect result location                   |
+ * | 0x48   | 8    | x9-x15   | Temporary registers                        |
+ * | 0x80   | 8    | x16-x17  | Intra-procedure-call scratch registers     |
+ * | 0x90   | 8    | x18      | Platform register (reserved)               |
+ * | 0x98   | 8    | x19-x28  | Callee-saved registers                     |
+ * | 0xE8   | 8    | x29 (fp) | Frame pointer                              |
+ * | 0xF0   | 8    | x30 (lr) | Link register (return address)             |
+ * | 0xF8   | 8    | sp       | Stack pointer                              |
+ * | 0x100  | 8    | pc       | Program counter                            |
+ * | 0x108  | 8    | cpsr     | Current program status register            |
+ * | 0x110  | 8    | pad      | Padding                                    |
+ * +-----------------------------------------------------------------------+
+ *
+ * Debug Thread State (ARM64):
+ * +-----------------------------------------------------------------------+
+ * | Offset | Size | Register | Description                                |
+ * |--------|------|----------|-------------------------------------------|
+ * | 0x00   | 8    | bcr[0]   | Breakpoint Control Register 0              |
+ * | 0x08   | 8    | bvr[0]   | Breakpoint Value Register 0                |
+ * | ...    | ...  | ...      | ...                                        |
+ * | 0x78   | 8    | bcr[15]  | Breakpoint Control Register 15             |
+ * | 0x80   | 8    | bvr[15]  | Breakpoint Value Register 15               |
+ * | 0x88   | 8    | wcr[0]   | Watchpoint Control Register 0              |
+ * | 0x90   | 8    | wvr[0]   | Watchpoint Value Register 0                |
+ * | ...    | ...  | ...      | ...                                        |
+ * | 0xC8   | 8    | wcr[15]  | Watchpoint Control Register 15             |
+ * | 0xD0   | 8    | wvr[15]  | Watchpoint Value Register 15               |
+ * | 0xD8   | 8    | mdscr_el1| Debug Status and Control Register          |
+ * +-----------------------------------------------------------------------+
+ *
+ * Example ARM64 Memory Snapshot (General Purpose Registers):
+ * +-----------------------------------------------------------------------+
+ * | Address      | Value                | Register | Notes                |
+ * |--------------|----------------------|----------|----------------------|
+ * | 0x16fdff000  | 0x0000000000000001  | x0       | Return value         |
+ * | 0x16fdff008  | 0x0000000016fe0000  | x1       | Function argument    |
+ * | 0x16fdff010  | 0x0000000000000010  | x2       | Function argument    |
+ * | 0x16fdff018  | 0x0000000000000000  | x3       | Function argument    |
+ * | ...          | ...                 | ...      | ...                  |
+ * | 0x16fdff0e8  | 0x0000000016fe1000  | x29 (fp) | Frame pointer        |
+ * | 0x16fdff0f0  | 0x0000000016fd0004  | x30 (lr) | Return address       |
+ * | 0x16fdff0f8  | 0x0000000016fdff00  | sp       | Stack pointer        |
+ * | 0x16fdff100  | 0x0000000016fd0000  | pc       | Current instruction  |
+ * | 0x16fdff108  | 0x0000000000000000  | cpsr     | Status register      |
+ * +-----------------------------------------------------------------------+
  */
 
 #include "ZGThreadStates.h"
