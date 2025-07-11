@@ -307,7 +307,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)copyVariables
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	[[self class] copyVariablesToPasteboard:[windowController selectedVariables]]
+	[[self class] copyVariablesToPasteboard:[windowController selectedVariables]];
 }
 
 - (void)pasteVariables
