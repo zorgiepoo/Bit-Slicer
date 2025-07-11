@@ -270,7 +270,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[[self class] copyVariableRawAddress:variable];
 }
 
-+ (BOOL)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables
++ (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables
 {
 	[NSPasteboard.generalPasteboard
 	 declareTypes:@[NSPasteboardTypeString, ZGVariablePboardType]
@@ -297,22 +297,17 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[NSPasteboard.generalPasteboard
 		 setData:data
 		 forType:ZGVariablePboardType];
-		return YES;
 	}
 	else
 	{
 		NSLog(@"Error: failed to copy variables to pasteboard: %@", archiveError);
-		return NO;
 	}
 }
 
 - (void)copyVariables
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	if (![[self class] copyVariablesToPasteboard:[windowController selectedVariables]])
-	{
-		ZGRunAlertPanelWithOKButton(@"Copy Failed", @"Failed to copy variables to pasteboard. There may be an issue with the data format.");
-	}
+	[[self class] copyVariablesToPasteboard:[windowController selectedVariables]]
 }
 
 - (void)pasteVariables
@@ -337,7 +332,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		else
 		{
 			NSLog(@"Error: failed to unarchive variables from pasteboard for pasting with error %@", unarchiveError);
-			ZGRunAlertPanelWithOKButton(@"Paste Failed", @"Failed to paste variables from pasteboard. The data may be corrupted or in an incompatible format.");
 		}
 	}
 }
@@ -569,7 +563,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 	[self disableHarmfulVariables:variables];
 
-	_documentData.variables = [temporaryArray copy];
+	_documentData.variables = [NSArray arrayWithArray:temporaryArray];
 
 	[windowController.tableController updateWatchVariablesTimer];
 	[windowController.variablesTableView reloadData];
@@ -711,14 +705,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	for (NSUInteger variableIndex = 0; variableIndex < variables.count; variableIndex++)
 	{
 		ZGVariable *variable = [variables objectAtIndex:variableIndex];
-		NSString *oldValue = variable.stringValue;
 		[self changeVariable:variable newValue:[newValues objectAtIndex:variableIndex] shouldRecordUndo:NO];
-
-		// Check if the value was actually changed
-		if ([oldValue isEqualToString:variable.stringValue])
-		{
-			completeSuccess = NO;
-		}
 	}
 
 	ZGDocumentWindowController *windowController = _windowController;
