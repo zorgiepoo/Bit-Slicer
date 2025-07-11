@@ -58,19 +58,19 @@
 @implementation ZGMemoryViewerController
 {
 	NSMutableArray<ZGBreakPoint *> * _Nonnull _haltedBreakPoints;
-	
+
 	ZGTextViewLayoutController * _Nullable _textViewLayoutController;
-	
+
 	ZGStatusBarRepresenter * _Nullable _statusBarRepresenter;
 	ZGLineCountingRepresenter * _Nullable _lineCountingRepresenter;
 	DataInspectorRepresenter * _Nullable _dataInspectorRepresenter;
-	
+
 	BOOL _showsDataInspector;
-	
+
 	NSData * _Nullable _lastUpdatedData;
 	HFRange _lastUpdatedRange;
 	NSInteger _lastUpdateCount;
-	
+
 	IBOutlet HFTextView *_textView;
 }
 
@@ -139,15 +139,15 @@
 - (void)restoreStateWithCoder:(NSCoder *)coder
 {
 	[super restoreStateWithCoder:coder];
-	
+
 	NSString *memoryViewerAddressField = [coder decodeObjectOfClass:[NSString class] forKey:ZGMemoryViewerAddressField];
 	if (memoryViewerAddressField != nil)
 	{
 		self.addressTextField.stringValue = memoryViewerAddressField;
 	}
-	
+
 	self.desiredProcessInternalName = [coder decodeObjectOfClass:[NSString class] forKey:ZGMemoryViewerProcessInternalName];
-	
+
 	[self updateRunningProcesses];
 	[self setAndPostLastChosenInternalProcessName];
 	[self changeMemoryViewWithSelectionLength:0];
@@ -161,12 +161,12 @@
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	
+
 	_textViewLayoutController = [[ZGTextViewLayoutController alloc] init];
 
 	// So, I've no idea what HFTextView does by default, remove any type of representer that it might have and that we want to add
 	NSMutableArray<HFRepresenter *> *representersToRemove = [[NSMutableArray alloc] init];
-	
+
 	for (HFRepresenter *representer in _textView.layoutRepresenter.representers)
 	{
 		if ([representer isKindOfClass:HFStatusBarRepresenter.class] || [representer isKindOfClass:HFLineCountingRepresenter.class] || [representer isKindOfClass:HFVerticalScrollerRepresenter.class] || [representer isKindOfClass:[DataInspectorRepresenter class]])
@@ -174,41 +174,41 @@
 			[representersToRemove addObject:representer];
 		}
 	}
-	
+
 	for (HFRepresenter *representer in representersToRemove)
 	{
 		[_textView.layoutRepresenter removeRepresenter:representer];
 	}
-	
+
 	// Add custom status bar
 	_statusBarRepresenter = [[ZGStatusBarRepresenter alloc] init];
 	_statusBarRepresenter.statusMode = HFStatusModeHexadecimal;
-	
+
 	[_textView.controller addRepresenter:ZGUnwrapNullableObject(_statusBarRepresenter)];
 	[[_textView layoutRepresenter] addRepresenter:ZGUnwrapNullableObject(_statusBarRepresenter)];
-	
+
 	// Add custom line counter
 	_lineCountingRepresenter = [[ZGLineCountingRepresenter alloc] init];
 	_lineCountingRepresenter.minimumDigitCount = DEFAULT_MINIMUM_LINE_DIGIT_COUNT;
 	_lineCountingRepresenter.lineNumberFormat = HFLineNumberFormatHexadecimal;
-	
+
 	[_textView.controller addRepresenter:ZGUnwrapNullableObject(_lineCountingRepresenter)];
 	[_textView.layoutRepresenter addRepresenter:ZGUnwrapNullableObject(_lineCountingRepresenter)];
-	
+
 	// Add custom scroller
 	ZGVerticalScrollerRepresenter *verticalScrollerRepresenter = [[ZGVerticalScrollerRepresenter alloc] init];
-	
+
 	[_textView.controller addRepresenter:verticalScrollerRepresenter];
 	[_textView.layoutRepresenter addRepresenter:verticalScrollerRepresenter];
-	
+
 	_textView.controller.undoManager = [[NSUndoManager alloc] init];
-	
+
 	_textView.delegate = self;
-	
+
 	[[self window] setFrameAutosaveName:NSStringFromClass([self class])];
-	
+
 	[self initiateDataInspector];
-	
+
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZGMemoryViewerShowsDataInspector])
 	{
 		[self toggleDataInspector:nil];
@@ -220,10 +220,19 @@
 	[self updateRunningProcesses];
 }
 
+/**
+ * Updates the window and optionally reads memory from the current process
+ *
+ * This method is called when the window is first shown or restored. It updates
+ * the window's UI elements and optionally reads memory from the current process
+ * to display in the hex editor view.
+ *
+ * @param shouldReadMemory Whether to read memory from the current process
+ */
 - (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory
 {
 	[super updateWindow];
-	
+
 	if (shouldReadMemory)
 	{
 		[self changeMemoryViewWithSelectionLength:0];
@@ -245,7 +254,7 @@
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
 {
 	NSMenuItem *menuItem = [(NSObject *)userInterfaceItem isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
-	
+
 	if (userInterfaceItem.action == @selector(toggleDataInspector:))
 	{
 		[menuItem setState:_showsDataInspector];
@@ -256,13 +265,13 @@
 		{
 			return NO;
 		}
-		
+
 		if ([self selectedAddressRange].location < _currentMemoryAddress)
 		{
 			return NO;
 		}
 	}
-	
+
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
@@ -271,19 +280,28 @@
 - (void)initiateDataInspector
 {
 	_dataInspectorRepresenter = [[DataInspectorRepresenter alloc] init];
-	
+
 	[_dataInspectorRepresenter resizeTableViewAfterChangingRowCount];
 	[_textViewLayoutController relayoutAndResizeWindow:ZGUnwrapNullableObject(self.window) preservingFrameWithTextView:_textView];
-	
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorChangedRowCount:) name:DataInspectorDidChangeRowCount object:_dataInspectorRepresenter];
-	
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorDeletedAllRows:) name:DataInspectorDidDeleteAllRows object:_dataInspectorRepresenter];
 }
 
+/**
+ * Toggles the visibility of the data inspector panel
+ *
+ * The data inspector provides additional information about the selected memory,
+ * showing different interpretations of the data (hex, decimal, float, etc.).
+ * This method shows or hides the inspector panel and saves the state in user defaults.
+ *
+ * @param sender The object that triggered this action (unused)
+ */
 - (IBAction)toggleDataInspector:(id)__unused sender
 {
 	DataInspectorRepresenter *dataInspectorRepresenter = ZGUnwrapNullableObject(_dataInspectorRepresenter);
-	
+
 	if (_showsDataInspector)
 	{
 		[_textView.layoutRepresenter removeRepresenter:dataInspectorRepresenter];
@@ -294,16 +312,16 @@
 		[_textView.controller addRepresenter:dataInspectorRepresenter];
 		[_textView.layoutRepresenter addRepresenter:dataInspectorRepresenter];
 	}
-	
+
 	_showsDataInspector = !_showsDataInspector;
-	
+
 	[[NSUserDefaults standardUserDefaults] setBool:_showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
 
 - (void)dataInspectorDeletedAllRows:(NSNotification *)notification
 {
 	[_textViewLayoutController dataInspectorDeletedAllRows:ZGUnwrapNullableObject(notification.object) window:ZGUnwrapNullableObject(self.window) textView:_textView];
-	
+
 	_showsDataInspector = NO;
 	[[NSUserDefaults standardUserDefaults] setBool:_showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
@@ -331,58 +349,70 @@
 
 #pragma mark Reading from Memory
 
+/**
+ * Updates the memory viewer to display memory at the specified address
+ *
+ * This method is the core function for displaying memory in the hex editor view.
+ * It reads memory from the current process at the specified address, handles
+ * memory region selection, and updates the UI components to display the memory
+ * content properly. It also manages navigation history and selection state.
+ *
+ * @param desiredMemoryAddress The memory address to display
+ * @param selectionLength The number of bytes to select starting at the memory address
+ * @param shouldChangeFirstResponder Whether to change the first responder to the hex view
+ */
 - (void)updateMemoryViewerAtAddress:(ZGMemoryAddress)desiredMemoryAddress withSelectionLength:(ZGMemorySize)selectionLength andChangeFirstResponder:(BOOL)shouldChangeFirstResponder
 {
 	_lastUpdateCount++;
-	
+
 	_lastUpdatedData = nil;
-	
+
 	void (^cleanupOnSuccess)(BOOL) = ^(BOOL success) {
 		[self invalidateRestorableState];
-		
+
 		if (!success)
 		{
 			[self clearData];
 			// Make sure status bar text is updated on failure
 			[self->_statusBarRepresenter updateString];
 		}
-		
+
 		// Revert back to overwrite mode
 		self->_textView.controller.editable = YES;
 		//[self->_textView.controller setInOverwriteMode:YES];
 		self->_textView.controller.editMode = HFOverwriteMode;
-		
+
 		[self->_textView.controller.undoManager removeAllActions];
-		
+
 		self->_lastUpdateCount--;
 	};
-	
+
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
 	_textView.controller.editable = NO;
 	//[_textView.controller setInOverwriteMode:NO];
 	self->_textView.controller.editMode = HFReadOnlyMode;
-	
+
 	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
 	{
 		cleanupOnSuccess(NO);
 		return;
 	}
-	
+
 	NSArray<ZGRegion *> *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
 	if (memoryRegions.count == 0)
 	{
 		cleanupOnSuccess(NO);
 		return;
 	}
-	
+
 	ZGRegion *chosenRegion = nil;
 	if (desiredMemoryAddress != 0)
 	{
 		chosenRegion = [memoryRegions zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
 			return (BOOL)((region.protection & VM_PROT_READ) != 0 && (desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size));
 		}];
-		
+
 		if (chosenRegion != nil)
 		{
 			chosenRegion = [[ZGRegion submapRegionsFromProcessTask:self.currentProcess.processTask region:chosenRegion] zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
@@ -390,7 +420,7 @@
 			}];
 		}
 	}
-	
+
 	if (chosenRegion == nil)
 	{
 		for (ZGRegion *region in memoryRegions)
@@ -401,22 +431,22 @@
 				break;
 			}
 		}
-		
+
 		if (chosenRegion == nil)
 		{
 			cleanupOnSuccess(NO);
 			return;
 		}
-		
+
 		desiredMemoryAddress = 0;
 		selectionLength = 0;
 	}
-	
+
 	ZGMemoryAddress oldMemoryAddress = _currentMemoryAddress;
-	
+
 	_currentMemoryAddress = chosenRegion.address;
 	_currentMemorySize = chosenRegion.size;
-	
+
 	const NSUInteger MEMORY_VIEW_THRESHOLD = 26843545;
 	// Bound the upper and lower half by a threshold so that we will never view too much data that we won't be able to handle, in the rarer cases
 	if (desiredMemoryAddress > 0)
@@ -427,7 +457,7 @@
 			_currentMemorySize -= newMemoryAddress - _currentMemoryAddress;
 			_currentMemoryAddress = newMemoryAddress;
 		}
-		
+
 		if (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD < _currentMemoryAddress + _currentMemorySize)
 		{
 			_currentMemorySize -= _currentMemoryAddress + _currentMemorySize - (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD);
@@ -440,22 +470,22 @@
 			_currentMemorySize = MEMORY_VIEW_THRESHOLD * 2;
 		}
 	}
-	
+
 	ZGMemoryAddress memoryAddress = _currentMemoryAddress;
 	ZGMemorySize memorySize = _currentMemorySize;
-	
+
 	void *bytes = NULL;
-	
+
 	if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize))
 	{
 		if (_textView.data && ![_textView.data isEqualToData:[NSData data]])
 		{
 			HFFPRange displayedLineRange = _textView.controller.displayedLineRange;
 			HFRange selectionRange = [(HFRangeWrapper *)_textView.controller.selectedContentsRanges[0] HFRange];
-			
+
 			ZGMemoryAddress navigationAddress;
 			ZGMemorySize navigationLength;
-			
+
 			if (selectionRange.length > 0 && selectionRange.location >= displayedLineRange.location * _textView.controller.bytesPerLine && selectionRange.location + selectionRange.length <= (displayedLineRange.location + displayedLineRange.length) * _textView.controller.bytesPerLine)
 			{
 				// Selection is completely within the user's sight
@@ -468,36 +498,36 @@
 				navigationAddress = oldMemoryAddress + (ZGMemorySize)((displayedLineRange.location + displayedLineRange.length / 2) * _textView.controller.bytesPerLine);
 				navigationLength = 0;
 			}
-			
+
 			[(ZGMemoryViewerController *)[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:navigationLength andChangeFirstResponder:shouldChangeFirstResponder];
 		}
-		
+
 		// Replace all the contents of the self.textView
 		_textView.data = [NSData dataWithBytes:bytes length:(NSUInteger)memorySize];
 		_currentMemoryAddress = memoryAddress;
 		_currentMemorySize = memorySize;
-		
+
 		_statusBarRepresenter.beginningMemoryAddress = _currentMemoryAddress;
 		// Select the first byte of data
 		_statusBarRepresenter.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(0, 0)]];
 		// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
 		[_statusBarRepresenter updateString];
-		
+
 		_lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase10(memoryAddress + memorySize);
 		_lineCountingRepresenter.beginningMemoryAddress = _currentMemoryAddress;
 		// This will force the line numbers to update
 		[(NSView *)_lineCountingRepresenter.view setNeedsDisplay:YES];
 		// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
 		[_textView.layoutRepresenter performLayout];
-		
+
 		ZGFreeBytes(bytes, memorySize);
-		
+
 		if (desiredMemoryAddress == 0)
 		{
 			desiredMemoryAddress = memoryAddress;
 			self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", desiredMemoryAddress];
 		}
-		
+
 		if (shouldChangeFirstResponder)
 		{
 			// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
@@ -510,14 +540,14 @@
 				}
 			}
 		}
-		
+
 		[_textViewLayoutController relayoutAndResizeWindow:ZGUnwrapNullableObject(self.window) preservingBytesPerLineWithTextView:_textView];
-		
+
 		[self jumpToMemoryAddress:desiredMemoryAddress withSelectionLength:selectionLength];
-		
+
 		[self updateNavigationButtons];
 	}
-	
+
 	cleanupOnSuccess(YES);
 }
 
@@ -541,7 +571,7 @@
 	{
 		calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
 	}
-	
+
 	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:selectionLength andChangeFirstResponder:!foundSymbol];
 }
 
@@ -567,11 +597,11 @@
 		const unsigned char *oldBytes = _lastUpdatedData.bytes;
 		unsigned char *newBytes = malloc(length);
 		[_textView.controller.byteArray copyBytes:newBytes range:_lastUpdatedRange];
-		
+
 		BOOL foundDifference = NO;
 		ZGMemorySize beginDifferenceIndex = 0;
 		ZGMemorySize endDifferenceIndex = 0;
-		
+
 		// Find the smallest difference to overwrite
 		for (ZGMemorySize byteIndex = 0; byteIndex < length; byteIndex++)
 		{
@@ -582,11 +612,11 @@
 					beginDifferenceIndex = byteIndex;
 				}
 				endDifferenceIndex = byteIndex + 1;
-				
+
 				foundDifference = YES;
 			}
 		}
-		
+
 		if (foundDifference)
 		{
 			[self
@@ -595,9 +625,9 @@
 			 address:beginDifferenceIndex + _lastUpdatedRange.location + _currentMemoryAddress
 			 size:endDifferenceIndex - beginDifferenceIndex];
 		}
-		
+
 		free(newBytes);
-		
+
 		// Give user a moment to be able to make changes before we can re-enable live-updating
 		_lastUpdateCount--;
 		[self performSelector:@selector(revertUpdateCount) withObject:nil afterDelay:1.5];
@@ -605,7 +635,7 @@
 	else if (properties & HFControllerSelectedRanges && _currentMemorySize > 0)
 	{
 		HFRange selectedAddressRange = [self selectedAddressRange];
-		
+
 		id <ZGMemorySelectionDelegate> delegate = self.delegate;
 		[delegate memorySelectionDidChange:NSMakeRange(selectedAddressRange.location, selectedAddressRange.length) process:self.currentProcess];
 	}
@@ -616,9 +646,9 @@
 	if (_currentMemorySize > 0 && !_dataInspectorRepresenter.zg_editing)
 	{
 		HFFPRange displayedLineRange = _textView.controller.displayedLineRange;
-		
+
 		ZGMemoryAddress readAddress = (ZGMemoryAddress)(displayedLineRange.location * _textView.controller.bytesPerLine) + _currentMemoryAddress;
-		
+
 		if (readAddress >= _currentMemoryAddress && readAddress < _currentMemoryAddress + _currentMemorySize)
 		{
 			// Try to read two extra lines, to make sure we at least get the upper and lower fractional parts.
@@ -628,22 +658,22 @@
 			{
 				readSize = (_currentMemoryAddress + _currentMemorySize) - readAddress;
 			}
-			
+
 			void *bytes = NULL;
 			if (ZGReadBytes(self.currentProcess.processTask, readAddress, &bytes, &readSize) && readSize > 0)
 			{
 				NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)readSize];
 				HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:data];
 				HFByteArray *newByteArray = _textView.controller.byteArray;
-				
+
 				unsigned long long overwriteLocation = (ZGMemoryAddress)(displayedLineRange.location * _textView.controller.bytesPerLine);
 				HFRange replaceRange = HFRangeMake(overwriteLocation, readSize);
-				
+
 				[newByteArray insertByteSlice:byteSlice inRange:replaceRange];
-				
+
 				_lastUpdatedData = data;
 				_lastUpdatedRange = replaceRange;
-				
+
 				_lastUpdateCount++;
 				// Check if we're allowed to live-update
 				if (_lastUpdateCount > 0)
@@ -651,34 +681,54 @@
 					[_textView.controller setByteArray:newByteArray];
 				}
 				_lastUpdateCount--;
-				
+
 				ZGFreeBytes(bytes, readSize);
 			}
 		}
 	}
 }
 
-// memoryAddress is assumed to be within bounds of current memory region being viewed
+/**
+ * Jumps to a specific memory address within the current memory region
+ *
+ * This method scrolls the memory viewer to center the specified address in the view
+ * and optionally selects a range of bytes starting at that address. The address must
+ * be within the bounds of the currently viewed memory region.
+ *
+ * @param memoryAddress The memory address to jump to
+ * @param selectionLength The number of bytes to select starting at the memory address (0 for no selection)
+ */
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength
 {
 	unsigned long long offset = (memoryAddress - _currentMemoryAddress);
-	
+
 	unsigned long long offsetLine = offset / [_textView.controller bytesPerLine];
-	
+
 	HFFPRange displayedLineRange = _textView.controller.displayedLineRange;
-	
+
 	// the line we want to jump to should be in the middle of the view
 	[_textView.controller scrollByLines:offsetLine - displayedLineRange.location - displayedLineRange.length / 2.0L];
-	
+
 	if (selectionLength > 0)
 	{
 		// Select a few bytes from the offset
 		_textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN(selectionLength, _currentMemoryAddress + _currentMemorySize - memoryAddress))]];
-		
+
 		[_textView.controller pulseSelection];
 	}
 }
 
+/**
+ * Jumps to a specific memory address in a specified process
+ *
+ * This method changes the current process if needed, then navigates to the specified
+ * memory address and optionally selects a range of bytes. It's used when the memory
+ * viewer needs to show memory from a different process than the currently selected one.
+ *
+ * @param memoryAddress The memory address to jump to
+ * @param selectionLength The number of bytes to select starting at the memory address
+ * @param requestedProcess The process containing the memory address to view
+ */
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess
 {
 	NSMenuItem *targetMenuItem = nil;
@@ -691,7 +741,7 @@
 			break;
 		}
 	}
-	
+
 	if (targetMenuItem != nil)
 	{
 		[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
@@ -707,14 +757,14 @@
 {
 	HFRange selectedAddressRange = [self selectedAddressRange];
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:selectedAddressRange.length address:selectedAddressRange.location type:ZGByteArray qualifier:ZGUnsigned pointerSize:self.currentProcess.pointerSize];
-	
+
 	return variable;
 }
 
 - (IBAction)copyAddress:(id)__unused sender
 {
 	ZGVariable *variable = [self _variableFromSelectedAddressRange];
-	
+
 	[ZGVariableController annotateVariables:@[variable] process:self.currentProcess variableController:nil symbols:NO async:NO completionHandler:^{
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self];
 		[[NSPasteboard generalPasteboard] setString:variable.addressFormula forType:NSPasteboardTypeString];
@@ -724,7 +774,7 @@
 - (IBAction)copyRawAddress:(id)__unused sender
 {
 	ZGVariable *variable = [self _variableFromSelectedAddressRange];
-	
+
 	[ZGVariableController copyVariableRawAddress:variable];
 }
 
