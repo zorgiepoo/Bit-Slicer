@@ -124,7 +124,7 @@
 	IBOutlet NSBox *_searchAddressVerticalDivider;
 	IBOutlet NSPopUpButton *_searchAddressOffsetComparisonPopUpButton;
 	IBOutlet NSMenuItem *_searchAddressOffsetComparisonSameMenuItem;
-	IBOutlet AGScopeBar *_scopeBar;
+	AGScopeBar *_scopeBar;
 	IBOutlet NSView *_scopeBarFlagsView;
 	IBOutlet NSView *_scopeBarAddressSearchOptionsView;
 	IBOutlet NSToolbar *_toolbar;
@@ -137,6 +137,8 @@
 	{
 		self.lastChosenInternalProcessName = lastChosenInternalProcessName;
 		_preferringNewTab = preferringNewTab;
+		
+		_scopeBar = [[AGScopeBar alloc] init];
 		
 		_debuggerController = debuggerController;
 		_breakPointController = breakPointController;
@@ -301,6 +303,18 @@
 #pragma clang diagnostic ignored "-Wpartial-availability"
 		self.window.tabbingMode = NSWindowTabbingModePreferred;
 #pragma clang diagnostic pop
+	}
+	
+	{
+		NSTitlebarAccessoryViewController *titleAccessoryViewController = [[NSTitlebarAccessoryViewController alloc] init];
+		titleAccessoryViewController.layoutAttribute = NSLayoutAttributeBottom;
+		
+		[titleAccessoryViewController.view addSubview:_scopeBar];
+		_scopeBar.frame = titleAccessoryViewController.view.bounds;
+		_scopeBar.translatesAutoresizingMaskIntoConstraints = true;
+		_scopeBar.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+		
+		[self.window addTitlebarAccessoryViewController:titleAccessoryViewController];
 	}
 	
 	_documentData = [(ZGDocument *)self.document data];
