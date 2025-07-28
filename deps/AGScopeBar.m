@@ -30,7 +30,7 @@
 //
 
 // NOTE: This class has been modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
-// replacing deprecated Gestalt() usage, fixing nullability warnings, and adding dark mode support
+// replacing deprecated Gestalt() usage, fixing nullability warnings, adding dark mode support, and vertical centered layout fixes for macOS 26+
 
 #import "AGScopeBar.h"
 
@@ -614,7 +614,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	if (self.accessoryView) {
 		NSRect frame = self.accessoryView.frame;
 		frame.origin.x = round(NSMaxX(self.bounds) - (frame.size.width + SCOPE_BAR_HORZ_INSET));
-		frame.origin.y = round(((SCOPE_BAR_HEIGHT - frame.size.height) / 2.0));
+		frame.origin.y = round(((self.frame.size.height - frame.size.height) / 2.0));
 		self.accessoryView.frame = frame;
 		self.accessoryView.autoresizingMask = NSViewMinXMargin;
 		[self addSubview:self.accessoryView];
@@ -994,7 +994,14 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 			
 			NSRect frame = mLabelField.frame;
 			frame.origin.x = 0;
-			frame.origin.y = 6;//floor((self.scopeBar.frame.size.height - frame.size.height) / 2.0);
+			
+			// Not sure why this offset change is needed
+			if (@available(macOS 16, *)) {
+				frame.origin.y = ((self.scopeBar.frame.size.height - frame.size.height) / 2.0);
+			} else {
+				frame.origin.y = 6;
+			}
+			
 			mLabelField.frame = frame;
 			
 			xOffset += mLabelField.frame.size.width;
