@@ -29,7 +29,7 @@
                 <outlet property="progressIndicator" destination="SfW-co-kf4" id="T8e-Oe-5Fc"/>
                 <outlet property="runningApplicationsPopUpButton" destination="1ts-DF-nZQ" id="rls-ER-d1b"/>
                 <outlet property="searchValueTextField" destination="fWp-wN-0NK" id="7YG-6o-O1p"/>
-                <outlet property="storeValuesButton" destination="evf-rf-Ae5" id="hg1-ot-trk"/>
+                <outlet property="storeValuesToolbarItem" destination="sEk-qL-hC6" id="g9c-V8-Xxn"/>
                 <outlet property="variablesTableView" destination="HbN-z0-Vcf" id="a1I-Pk-xWi"/>
                 <outlet property="window" destination="d6e-L4-aaf" id="NIk-dD-o77"/>
             </connections>
@@ -745,6 +745,7 @@
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Icp-Tb-DVJ">
                             <rect key="frame" x="0.0" y="14" width="84" height="24"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="message"/>
@@ -756,9 +757,6 @@
                                     </items>
                                 </menu>
                             </popUpButtonCell>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="Kiy-8R-fMo"/>
-                            </constraints>
                             <connections>
                                 <action selector="functionTypePopUpButtonRequest:" target="-2" id="TRH-OK-9d0"/>
                             </connections>
@@ -766,19 +764,10 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="cbr-z0-cak"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="AUv-ym-Pvh"/>
-                    <toolbarItem implicitItemIdentifier="A2B7475C-29AA-4716-9400-D2EF29F1ED5A" label="Store Values" paletteLabel="Store Values" image="container" sizingBehavior="auto" id="q4V-IG-gxK">
-                        <nil key="toolTip"/>
-                        <button key="view" verticalHuggingPriority="750" id="evf-rf-Ae5">
-                            <rect key="frame" x="22" y="14" width="30" height="23"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="container" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="alb-bt-VIc">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <connections>
-                                <action selector="storeAllValues:" target="-1" id="QCM-aY-2Be"/>
-                            </connections>
-                        </button>
+                    <toolbarItem implicitItemIdentifier="3AA9F85D-6EB6-40EF-8A55-7B78A1C5F61E" label="Store Values" paletteLabel="Store Values" tag="-1" image="tray" catalog="system" bordered="YES" sizingBehavior="auto" id="sEk-qL-hC6" userLabel="Store Values">
+                        <connections>
+                            <action selector="storeAllValues:" target="-1" id="WwG-PD-Z3V"/>
+                        </connections>
                     </toolbarItem>
                     <searchToolbarItem implicitItemIdentifier="554D818A-DEF7-4FAE-AE49-CB909FC54200" label="Search" paletteLabel="Search" bordered="YES" visibilityPriority="1001" id="tHJ-Bh-ZVW">
                         <nil key="toolTip"/>
@@ -800,8 +789,8 @@
                     <toolbarItem reference="70m-RL-vim"/>
                     <toolbarItem reference="D2T-dX-W9r"/>
                     <toolbarItem reference="moB-Wu-fvx"/>
-                    <toolbarItem reference="q4V-IG-gxK"/>
                     <toolbarItem reference="cbr-z0-cak"/>
+                    <toolbarItem reference="sEk-qL-hC6"/>
                     <searchToolbarItem reference="tHJ-Bh-ZVW"/>
                 </defaultToolbarItems>
             </toolbar>
@@ -918,6 +907,6 @@
     </objects>
     <resources>
         <image name="NSActionTemplate" width="20" height="20"/>
-        <image name="container" width="38" height="38"/>
+        <image name="tray" catalog="system" width="18" height="13"/>
     </resources>
 </document>

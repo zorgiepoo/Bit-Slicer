@@ -184,7 +184,7 @@
 	
 	[windowController.progressIndicator setHidden:NO];
 	
-	windowController.storeValuesButton.enabled = NO;
+	windowController.storeValuesToolbarItem.enabled = NO;
 	windowController.runningApplicationsPopUpButton.enabled = NO;
 	windowController.dataTypesPopUpButton.enabled = NO;
 	windowController.functionPopUpButton.enabled = NO;
@@ -199,7 +199,7 @@
 	
 	[windowController.progressIndicator setHidden:YES];
 	
-	windowController.storeValuesButton.enabled = YES;
+	windowController.storeValuesToolbarItem.enabled = YES;
 	
 	windowController.dataTypesPopUpButton.enabled = YES;
 	
@@ -1430,15 +1430,15 @@
 	
 	if (_searchData.savedData == nil)
 	{
-		windowController.storeValuesButton.image = [NSImage imageNamed:@"container"];
+		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"tray" accessibilityDescription:nil];
 	}
 	else if (storingValuesAfterSearches)
 	{
-		windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled_record"];
+		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"tray.badge.fill" accessibilityDescription:nil];
 	}
 	else
 	{
-		windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
+		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"tray.fill" accessibilityDescription:nil];
 	}
 }
 

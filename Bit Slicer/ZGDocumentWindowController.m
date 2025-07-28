@@ -321,11 +321,7 @@
 	[self setupScopeBar];
 	ZGAdjustLocalizableWidthsForWindowAndTableColumns(ZGUnwrapNullableObject(self.window), @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
 	
-	[_storeValuesButton.image setTemplate:YES];
-	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
-	[[NSImage imageNamed:@"container_filled_record"] setTemplate:YES];
-	
-	_storeValuesButton.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
+	_storeValuesToolbarItem.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
 	
 	[_generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 
@@ -391,7 +387,7 @@
 
 	[_variablesTableView reloadData];
 
-	_storeValuesButton.enabled = newProcess.valid;
+	_storeValuesToolbarItem.enabled = newProcess.valid;
 
 	if (oldProcess.valid && !newProcess.valid)
 	{
