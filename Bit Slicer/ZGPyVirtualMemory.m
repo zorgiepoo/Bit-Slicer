@@ -320,7 +320,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 		ZGMemorySize size = sizeof(type); \
 		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size)) \
 		{ \
-			retValue =  Py_BuildValue(typeFormat, (typePromotion)*(type *)bytes); \
+			retValue = Py_BuildValue(typeFormat, (typePromotion)*(type *)bytes); \
 			ZGFreeBytes(bytes, size); \
 		} \
 		else \
@@ -331,7 +331,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 	return retValue; \
 }
 
-VirtualMemory_read(int8_t, int8_t, "b", readInt8)
+VirtualMemory_read(int8_t, int16_t, "h", readInt8)
 VirtualMemory_read(uint8_t, uint8_t, "B", readUInt8)
 VirtualMemory_read(int16_t, int16_t, "h", readInt16)
 VirtualMemory_read(uint16_t, uint16_t, "H", readUInt16)
@@ -428,13 +428,14 @@ static PyObject *VirtualMemory_readString16(VirtualMemory *self, PyObject *args)
 	return VirtualMemory_readString(self, args, ZGString16, "readString16", "utf-16");
 }
 
-#define VirtualMemory_write(type, typeFormat, functionName) \
+#define VirtualMemory_write(type, typeDemotion, typeFormat, functionName) \
 static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *args) \
 { \
 	ZGMemoryAddress memoryAddress = 0x0; \
-	type value = 0; \
-	if (PyArg_ParseTuple(args, "K"typeFormat":"#functionName, &memoryAddress, &value)) \
+	typeDemotion demotedValue = 0; \
+	if (PyArg_ParseTuple(args, "K"typeFormat":"#functionName, &memoryAddress, &demotedValue)) \
 	{ \
+		type value = (type)demotedValue; \
 		if (!ZGWriteBytes(self->processTask, memoryAddress, &value, sizeof(type))) \
 		{ \
 			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", #functionName, sizeof(type), memoryAddress] UTF8String]); \
@@ -448,16 +449,16 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 	return Py_BuildValue("i", 1); \
 }
 
-VirtualMemory_write(int8_t, "b", writeInt8)
-VirtualMemory_write(uint8_t, "B", writeUInt8)
-VirtualMemory_write(int16_t, "h", writeInt16)
-VirtualMemory_write(uint16_t, "H", writeUInt16)
-VirtualMemory_write(int32_t, "i", writeInt32)
-VirtualMemory_write(uint32_t, "I", writeUInt32)
-VirtualMemory_write(int64_t, "L", writeInt64)
-VirtualMemory_write(uint64_t, "K", writeUInt64)
-VirtualMemory_write(float, "f", writeFloat)
-VirtualMemory_write(double, "d", writeDouble)
+VirtualMemory_write(int8_t, int16_t, "h", writeInt8)
+VirtualMemory_write(uint8_t, uint8_t, "B", writeUInt8)
+VirtualMemory_write(int16_t, int16_t, "h", writeInt16)
+VirtualMemory_write(uint16_t, uint16_t, "H", writeUInt16)
+VirtualMemory_write(int32_t, int32_t, "i", writeInt32)
+VirtualMemory_write(uint32_t, uint32_t, "I", writeUInt32)
+VirtualMemory_write(int64_t, int64_t, "L", writeInt64)
+VirtualMemory_write(uint64_t, uint64_t, "K", writeUInt64)
+VirtualMemory_write(float, float, "f", writeFloat)
+VirtualMemory_write(double, double, "d", writeDouble)
 
 static PyObject *VirtualMemory_writePointer(VirtualMemory *self, PyObject *args)
 {
