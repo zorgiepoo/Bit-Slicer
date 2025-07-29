@@ -2467,7 +2467,6 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/DDMathParser",
 					"$(PROJECT_DIR)/deps/HexFiend",
 				);
@@ -2564,7 +2563,6 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/DDMathParser",
 					"$(PROJECT_DIR)/deps/HexFiend",
 				);
@@ -2659,9 +2657,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-					"$(SRCROOT)",
-					"$(SRCROOT)/deps",
-					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/Sparkle",
 					"$(PROJECT_DIR)/deps/python",
 					"$(PROJECT_DIR)/deps/ShortcutRecorder",
@@ -2700,8 +2695,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)",
-					"$(SRCROOT)/deps",
 					"$(PROJECT_DIR)/deps/udis86/udis86",
 					"$(PROJECT_DIR)/deps/keystone",
 				);
@@ -2727,6 +2720,13 @@
 					"-Wno-declaration-after-statement",
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-disabled-macro-expansion",
+					"-Wno-non-modular-include-in-module",
+					"-Wno-incomplete-umbrella",
+					"-Wno-documentation-unknown-command",
+					"-Wno-documentation",
+					"-Wno-switch-default",
+					"-Wno-reserved-identifier",
+					"-Wno-c23-extensions",
 				);
 			};
 			name = Debug;
@@ -2772,9 +2772,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-					"$(SRCROOT)",
-					"$(SRCROOT)/deps",
-					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/Sparkle",
 					"$(PROJECT_DIR)/deps/python",
 					"$(PROJECT_DIR)/deps/ShortcutRecorder",
@@ -2811,8 +2808,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)",
-					"$(SRCROOT)/deps",
 					"$(PROJECT_DIR)/deps/udis86/udis86",
 					"$(PROJECT_DIR)/deps/keystone",
 				);
@@ -2837,6 +2832,13 @@
 					"-Wno-declaration-after-statement",
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-disabled-macro-expansion",
+					"-Wno-non-modular-include-in-module",
+					"-Wno-incomplete-umbrella",
+					"-Wno-documentation-unknown-command",
+					"-Wno-documentation",
+					"-Wno-switch-default",
+					"-Wno-reserved-identifier",
+					"-Wno-c23-extensions",
 				);
 			};
 			name = Release;

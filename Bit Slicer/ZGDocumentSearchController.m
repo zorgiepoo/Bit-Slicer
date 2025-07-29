@@ -471,11 +471,11 @@
 					}
 					else if (offset > 0x0)
 					{
-						addressFormula = [NSString stringWithFormat:@"[%@] + 0x%X", addressFormula, offset];
+						addressFormula = [NSString stringWithFormat:@"[%@] + 0x%X", addressFormula, (uint32_t)offset];
 					}
 					else
 					{
-						addressFormula = [NSString stringWithFormat:@"[%@] - 0x%X", addressFormula, -offset];
+						addressFormula = [NSString stringWithFormat:@"[%@] - 0x%X", addressFormula, (uint32_t)(-offset)];
 					}
 				}
 				

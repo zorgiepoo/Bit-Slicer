@@ -116,6 +116,8 @@ declareDebugPrototypeMethod(variableAddress)
 
 static PyMethodDef Debugger_methods[] =
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-function-type-strict"
 	declareDebugMethod(log)
 	declareDebugMethod(notify)
 	declareDebugMethod(prompt)
@@ -148,6 +150,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(updateVariable)
 	declareDebugMethod(variableAddress)
 	{NULL, NULL, 0, NULL}
+#pragma clang diagnostic pop
 };
 
 static PyTypeObject DebuggerType =
@@ -534,7 +537,7 @@ static PyObject *Debugger_unregisterHotkey(DebuggerClass *self, PyObject *args)
 	
 	if (unregisteredHotKey == nil)
 	{
-		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.unregisterHotKey failed to unregister hot key with ID %d", hotKeyID] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.unregisterHotKey failed to unregister hot key with ID %u", hotKeyID] UTF8String]);
 		return NULL;
 	}
 	
@@ -719,7 +722,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 		
 		if (!success)
 		{
-			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"debug.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
+			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"debug.writeBytes failed to write %zd byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
 		}
 		
 		PyBuffer_Release(&buffer);

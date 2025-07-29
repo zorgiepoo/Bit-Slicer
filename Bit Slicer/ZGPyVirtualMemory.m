@@ -120,6 +120,8 @@ declareVMPrototypeMethod(deallocate)
 
 static PyMethodDef VirtualMemory_methods[] =
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-function-type-strict"
 	declareVMMethod(readInt8)
 	declareVMMethod(readUInt8)
 	declareVMMethod(readInt16)
@@ -164,6 +166,7 @@ static PyMethodDef VirtualMemory_methods[] =
 	
 	declareVMMethod(base)
 	{NULL, NULL, 0, NULL}
+#pragma clang diagnostic pop
 };
 
 static PyTypeObject VirtualMemoryType =
@@ -501,7 +504,7 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 		
 		if (buffer.len > 0 && !ZGWriteBytes(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len))
 		{
-			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"vm.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
+			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"vm.writeBytes failed to write %zd byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
 			
 			PyBuffer_Release(&buffer);
 			return NULL;
@@ -534,7 +537,7 @@ static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuff
 		{
 			if (!ZGWriteBytes(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len) || !ZGWriteBytes(self->processTask, memoryAddress + (ZGMemorySize)buffer.len, nullBuffer, (ZGMemorySize)nullSize))
 			{
-				PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", functionName, buffer.len, memoryAddress] UTF8String]);
+				PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to write %zd byte(s) at 0x%llX", functionName, buffer.len, memoryAddress] UTF8String]);
 				
 				PyBuffer_Release(&buffer);
 				return NULL;
