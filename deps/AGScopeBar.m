@@ -30,7 +30,8 @@
 //
 
 // NOTE: This class has been modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
-// replacing deprecated Gestalt() usage, fixing nullability warnings, adding dark mode support, and vertical centered layout fixes for macOS 26+
+// replacing deprecated Gestalt() usage, fixing nullability warnings, adding dark mode support, vertical centered layout fixes for macOS 26+,
+// and not drawing background colors for macOS 26+
 
 #import "AGScopeBar.h"
 
@@ -137,11 +138,19 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		invertColors = NO;
 #endif
 		
-		mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:colorValue(0.89, invertColors) alpha:1.0];
-		mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:colorValue(0.87, invertColors) alpha:1.0];
-		mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
-		mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
-		mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:colorValue(0.6, invertColors) alpha:1.0];
+		if (@available(macOS 16, *)) {
+			mScopeBarAppearance.backgroundTopColor              = nil;
+			mScopeBarAppearance.backgroundBottomColor           = nil;
+			mScopeBarAppearance.inactiveBackgroundTopColor      = nil;
+			mScopeBarAppearance.inactiveBackgroundBottomColor   = nil;
+			mScopeBarAppearance.borderBottomColor               = nil;
+		} else {
+			mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:colorValue(0.89, invertColors) alpha:1.0];
+			mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:colorValue(0.87, invertColors) alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
+			mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:colorValue(0.6, invertColors) alpha:1.0];
+		}
 		
 		mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:colorValue(0.52, invertColors) alpha:1.0];
 		mScopeBarAppearance.separatorWidth                  = 1.0;
@@ -463,21 +472,24 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	
 	// Draw gradient background
 	NSGradient * gradient = nil;
-	if (isWindowActive) {
-		gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.backgroundBottomColor
-												  endingColor:self.scopeBarAppearance.backgroundTopColor] autorelease];
-	} else {
-		gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.inactiveBackgroundBottomColor
-												  endingColor:self.scopeBarAppearance.inactiveBackgroundTopColor] autorelease];
-	}
 	
-	[gradient drawInRect:self.bounds angle:90.0];
-	
-	// Draw border
-	if (self.scopeBarAppearance.borderBottomColor) {
-		NSRect lineRect = NSMakeRect(0, 0, self.bounds.size.width, 1);
-		[self.scopeBarAppearance.borderBottomColor set];
-		NSRectFill(lineRect);
+	if (self.scopeBarAppearance.backgroundBottomColor != nil) {
+		if (isWindowActive) {
+			gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.backgroundBottomColor
+													  endingColor:self.scopeBarAppearance.backgroundTopColor] autorelease];
+		} else {
+			gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.inactiveBackgroundBottomColor
+													  endingColor:self.scopeBarAppearance.inactiveBackgroundTopColor] autorelease];
+		}
+		
+		[gradient drawInRect:self.bounds angle:90.0];
+		
+		// Draw border
+		if (self.scopeBarAppearance.borderBottomColor) {
+			NSRect lineRect = NSMakeRect(0, 0, self.bounds.size.width, 1);
+			[self.scopeBarAppearance.borderBottomColor set];
+			NSRectFill(lineRect);
+		}
 	}
 	
 	// Draw separators
