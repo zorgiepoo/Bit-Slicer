@@ -2727,6 +2727,13 @@
 					"-Wno-declaration-after-statement",
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-disabled-macro-expansion",
+					"-Wno-non-modular-include-in-module",
+					"-Wno-incomplete-umbrella",
+					"-Wno-documentation-unknown-command",
+					"-Wno-documentation",
+					"-Wno-switch-default",
+					"-Wno-reserved-identifier",
+					"-Wno-c23-extensions",
 				);
 			};
 			name = Debug;
@@ -2837,6 +2844,13 @@
 					"-Wno-declaration-after-statement",
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-disabled-macro-expansion",
+					"-Wno-non-modular-include-in-module",
+					"-Wno-incomplete-umbrella",
+					"-Wno-documentation-unknown-command",
+					"-Wno-documentation",
+					"-Wno-switch-default",
+					"-Wno-reserved-identifier",
+					"-Wno-c23-extensions",
 				);
 			};
 			name = Release;
