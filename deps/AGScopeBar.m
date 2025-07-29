@@ -31,7 +31,7 @@
 
 // NOTE: This class has been modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
 // replacing deprecated Gestalt() usage, fixing nullability warnings, adding dark mode support, vertical centered layout fixes for macOS 26+,
-// and not drawing background colors for macOS 26+
+// and not drawing background colors
 
 #import "AGScopeBar.h"
 
@@ -138,18 +138,22 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		invertColors = NO;
 #endif
 		
-		if (@available(macOS 16, *)) {
-			mScopeBarAppearance.backgroundTopColor              = nil;
-			mScopeBarAppearance.backgroundBottomColor           = nil;
-			mScopeBarAppearance.inactiveBackgroundTopColor      = nil;
-			mScopeBarAppearance.inactiveBackgroundBottomColor   = nil;
-			mScopeBarAppearance.borderBottomColor               = nil;
-		} else {
+		/*
+		{
 			mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:colorValue(0.89, invertColors) alpha:1.0];
 			mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:colorValue(0.87, invertColors) alpha:1.0];
 			mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
 			mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
 			mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:colorValue(0.6, invertColors) alpha:1.0];
+		}
+		 */
+		// Draw no background color
+		{
+			mScopeBarAppearance.backgroundTopColor              = nil;
+			mScopeBarAppearance.backgroundBottomColor           = nil;
+			mScopeBarAppearance.inactiveBackgroundTopColor      = nil;
+			mScopeBarAppearance.inactiveBackgroundBottomColor   = nil;
+			mScopeBarAppearance.borderBottomColor               = nil;
 		}
 		
 		mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:colorValue(0.52, invertColors) alpha:1.0];
