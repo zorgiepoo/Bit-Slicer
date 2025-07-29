@@ -276,7 +276,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 				NSString *nopLine = @"nop\n";
 				NSString *nopsString = [@"" stringByPaddingToLength:numberOfNoppedInstructions * nopLine.length withString:nopLine startingAtIndex:0];
 				
-				NSData *inputData = [[NSString stringWithFormat:@"BITS %lu\norg %lld\n%@%@\n", ZG_PROCESS_POINTER_SIZE_BITS(processType), alignedInstructionPointer, nopsString, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
+				NSData *inputData = [[NSString stringWithFormat:@"BITS %lu\norg %llu\n%@%@\n", ZG_PROCESS_POINTER_SIZE_BITS(processType), alignedInstructionPointer, nopsString, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
 				
 				[[inputPipe fileHandleForWriting] writeData:inputData];
 				[[inputPipe fileHandleForWriting] closeFile];
@@ -641,7 +641,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			jumpToIslandData =
 			[[self class]
-			 assembleInstructionText:[NSString stringWithFormat:@"b %lld", allocatedAddress]
+			 assembleInstructionText:[NSString stringWithFormat:@"b %llu", allocatedAddress]
 			 atInstructionPointer:firstInstruction.variable.address
 			 processType:processType
 			 error:error];
@@ -650,7 +650,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			jumpToIslandData =
 			[[self class]
-			 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", allocatedAddress] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax\npop rax", allocatedAddress]
+			 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %llu", allocatedAddress] : [NSString stringWithFormat:@"push rax\nmov rax, %llu\njmp rax\npop rax", allocatedAddress]
 			 atInstructionPointer:firstInstruction.variable.address
 			 processType:processType
 			 error:error];
@@ -686,7 +686,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			jumpFromIslandData =
 			[[self class]
-			 assembleInstructionText:[NSString stringWithFormat:@"b %lld", firstInstruction.variable.address + hookedInstructionsLength]
+			 assembleInstructionText:[NSString stringWithFormat:@"b %llu", firstInstruction.variable.address + hookedInstructionsLength]
 			 atInstructionPointer:allocatedAddress + newInstructionsData.length
 			 processType:processType
 			 error:error];
@@ -695,7 +695,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			jumpFromIslandData =
 			[[self class]
-			 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - POP_REGISTER_INSTRUCTION_LENGTH]
+			 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %llu", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %llu\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - POP_REGISTER_INSTRUCTION_LENGTH]
 			 atInstructionPointer:allocatedAddress + newInstructionsData.length
 			 processType:processType
 			 error:error];

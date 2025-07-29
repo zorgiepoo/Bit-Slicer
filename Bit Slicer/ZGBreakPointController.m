@@ -422,12 +422,12 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 	if (!ZGSetDebugThreadState(&debugState, breakPoint.thread, debugStateCount))
 	{
-		ZG_LOG(@"Failure in setting registers debug state for thread %d, %s", breakPoint.thread, __PRETTY_FUNCTION__);
+		ZG_LOG(@"Failure in setting registers debug state for thread %u, %s", breakPoint.thread, __PRETTY_FUNCTION__);
 	}
 #else
 	if (!ZGSetGeneralThreadState(&threadState, breakPoint.thread, threadStateCount))
 	{
-		ZG_LOG(@"Failure in setting registers thread state for thread %d, %s", breakPoint.thread, __PRETTY_FUNCTION__);
+		ZG_LOG(@"Failure in setting registers thread state for thread %u, %s", breakPoint.thread, __PRETTY_FUNCTION__);
 	}
 #endif
 	
@@ -679,12 +679,12 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 		if (!ZGSetDebugThreadState(&debugState, thread, debugStateCount))
 		{
-			ZG_LOG(@"Failure in setting registers debug state for catching instruction breakpoint for thread %d, %s", thread, __PRETTY_FUNCTION__);
+			ZG_LOG(@"Failure in setting registers debug state for catching instruction breakpoint for thread %u, %s", thread, __PRETTY_FUNCTION__);
 		}
 #else
 		if (!ZGSetGeneralThreadState(&threadState, thread, threadStateCount))
 		{
-			ZG_LOG(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d, %s", thread, __PRETTY_FUNCTION__);
+			ZG_LOG(@"Failure in setting registers thread state for catching instruction breakpoint for thread %u, %s", thread, __PRETTY_FUNCTION__);
 		}
 #endif
 	}
@@ -972,7 +972,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		mach_msg_type_number_t stateCount;
 		if (!ZGGetDebugThreadState(&debugState, threadList[threadIndex], &stateCount))
 		{
-			ZG_LOG(@"ERROR: ZGGetDebugThreadState failed on adding watchpoint for thread %d, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
+			ZG_LOG(@"ERROR: ZGGetDebugThreadState failed on adding watchpoint for thread %u, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
 			continue;
 		}
 		
@@ -995,7 +995,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 		if (!foundRegisterIndex)
 		{
-			ZG_LOG(@"Failed to find available debug register for thread %d, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
+			ZG_LOG(@"Failed to find available debug register for thread %u, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
 			continue;
 		}
 		
@@ -1034,7 +1034,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 		if (!ZGSetDebugThreadState(&debugState, threadList[threadIndex], stateCount))
 		{
-			ZG_LOG(@"Failure in setting registers thread state for adding watchpoint for thread %d", threadList[threadIndex]);
+			ZG_LOG(@"Failure in setting registers thread state for adding watchpoint for thread %u", threadList[threadIndex]);
 			continue;
 		}
 		

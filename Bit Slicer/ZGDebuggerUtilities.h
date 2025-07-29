@@ -98,7 +98,7 @@ process:(ZGProcess *)process
 processType:(ZGProcessType)processType
 breakPointController:(ZGBreakPointController *)breakPointController
 owner:(id)owner
-undoManager:(NSUndoManager *)undoManager
+undoManager:(nullable NSUndoManager *)undoManager
 error:(NSError * __autoreleasing *)error;
 
 @end

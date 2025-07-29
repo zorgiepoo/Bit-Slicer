@@ -325,7 +325,7 @@
 	
 	if (!ZGSetVectorThreadState(&vectorState, _breakPoint.thread, vectorStateCount, processType))
 	{
-		NSLog(@"Failure in setting registers thread state for writing register value (floating point): %d", _breakPoint.thread);
+		NSLog(@"Failure in setting registers thread state for writing register value (floating point): %u", _breakPoint.thread);
 		return NO;
 	}
 	
@@ -406,7 +406,7 @@
 	
 	if (!ZGSetGeneralThreadState(&threadState, _breakPoint.thread, threadStateCount))
 	{
-		NSLog(@"Failure in setting registers thread state for writing register value (general purpose): %d", _breakPoint.thread);
+		NSLog(@"Failure in setting registers thread state for writing register value (general purpose): %u", _breakPoint.thread);
 		return NO;
 	}
 	

@@ -79,7 +79,7 @@ do { \
 	// Add general purpose registers
 	for (size_t registerIndex = 0; registerIndex < sizeof(threadState.__x) / sizeof(*threadState.__x); registerIndex++)
 	{
-		const char *registerName = [[NSString stringWithFormat:@"x%ld", registerIndex] UTF8String];
+		const char *registerName = [[NSString stringWithFormat:@"x%zu", registerIndex] UTF8String];
 		if (registerName == NULL) continue;
 		
 		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
@@ -203,7 +203,7 @@ do { \
 	// Add vector registers
 	for (size_t registerIndex = 0; registerIndex < sizeof(vectorState.__v) / sizeof(*vectorState.__v); registerIndex++)
 	{
-		const char *registerName = [[NSString stringWithFormat:@"v%ld", registerIndex] UTF8String];
+		const char *registerName = [[NSString stringWithFormat:@"v%zu", registerIndex] UTF8String];
 		if (registerName == NULL) continue;
 		
 		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
