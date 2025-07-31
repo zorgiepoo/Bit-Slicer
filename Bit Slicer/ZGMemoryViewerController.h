@@ -28,6 +28,29 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * ZGMemoryViewerController
+ * -----------------------
+ * This class provides a user interface for viewing and navigating memory in a process.
+ * It displays memory contents in a hex editor view, allows navigation to specific
+ * addresses, and provides tools for inspecting and analyzing memory data.
+ *
+ * Key responsibilities:
+ * - Displaying memory contents in a hex editor view
+ * - Navigating to specific memory addresses
+ * - Handling user interactions with memory view
+ * - Updating the view when memory changes
+ * - Providing data inspection tools
+ *
+ * Memory Viewer Architecture:
+ * +------------------------+     +------------------------+     +------------------------+
+ * |  Memory Navigation     |     |  Memory Display        |     |  User Interaction     |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - Address navigation   |     | - Hex editor view      |     | - Selection handling  |
+ * | - Process selection    | --> | - Line counting        | --> | - Copy/paste          |
+ * | - Memory region        |     | - Status bar           |     | - Data inspection     |
+ * |   browsing             |     | - Data formatting      |     | - Context menus       |
+ * +------------------------+     +------------------------+     +------------------------+
  */
 
 #import <Cocoa/Cocoa.h>

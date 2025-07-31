@@ -28,6 +28,28 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * ZGAppController
+ * --------------
+ * This class serves as the main application controller for Bit Slicer, coordinating
+ * between various components and managing the application lifecycle. It handles:
+ *
+ * - Application initialization and termination
+ * - Window management and restoration
+ * - Menu actions and user interface coordination
+ * - Process selection and memory viewing
+ * - User notifications
+ *
+ * Application Component Relationships:
+ * +------------------------+     +------------------------+     +------------------------+
+ * |    ZGAppController     |     |  Document Controllers  |     |  Specialized Windows  |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - Initializes core     |     | - ZGDocumentController |     | - ZGMemoryViewer      |
+ * |   components           | --> | - ZGDocumentWindow     | --> | - ZGDebugger          |
+ * | - Manages app lifecycle|     |   Controller           |     | - ZGLogger            |
+ * | - Coordinates between  |     | - Manages document     |     | - ZGPreferences       |
+ * |   components           |     |   windows              |     | - ZGAbout             |
+ * +------------------------+     +------------------------+     +------------------------+
  */
 
 #import <Cocoa/Cocoa.h>
@@ -80,15 +102,15 @@
 	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
 	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
 	ZGAboutWindowController * _Nullable _aboutWindowController;
-	
+
 	NSString * _Nullable _lastChosenInternalProcessName;
 	NSMutableDictionary<NSNumber *, NSValue *> * _Nullable _memorySelectionRanges;
-	
+
 	BOOL _creatingNewTab;
 	IBOutlet NSMenu * _Nonnull _fileMenu;
 	IBOutlet NSMenuItem * _Nonnull _newDocumentMenuItem;
 	IBOutlet NSMenuItem * _Nonnull _showFontsMenuItem;
-	
+
 	IBOutlet NSMenuItem * _Nonnull _checkForUpdatesMenuItem;
 }
 
@@ -105,16 +127,25 @@
 	});
 }
 
+/**
+ * Initializes the application controller and all core components
+ *
+ * This method creates and configures all the main controllers and components
+ * needed by the application, establishing their relationships and dependencies.
+ * The initialization sequence is important as some components depend on others.
+ *
+ * @return The initialized application controller
+ */
 - (id)init
 {
 	self = [super init];
-	
+
 	if (self != nil)
 	{
 		_appUpdaterController = [[ZGAppUpdaterController alloc] init];
-		
+
 		_processTaskManager = [[ZGProcessTaskManager alloc] init];
-		
+
 		if (@available(macOS 10.11, *))
 		{
 			if ([[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
@@ -126,11 +157,11 @@
 		_hotKeyCenter = [[ZGHotKeyCenter alloc] init];
 
 		_loggerWindowController = [[ZGLoggerWindowController alloc] init];
-		
+
 		_scriptingInterpreter = [ZGScriptingInterpreter createInterpreterOnce];
-		
+
 		_breakPointController = [ZGBreakPointController createBreakPointControllerOnceWithScriptingInterpreter:_scriptingInterpreter];
-		
+
 		_debuggerController =
 		[[ZGDebuggerController alloc]
 		 initWithProcessTaskManager:_processTaskManager
@@ -140,22 +171,22 @@
 		 hotKeyCenter:_hotKeyCenter
 		 loggerWindowController:_loggerWindowController
 		 delegate:self];
-		
+
 		_memoryViewer =
 		[[ZGMemoryViewerController alloc]
 		 initWithProcessTaskManager:_processTaskManager
 		 rootlessConfiguration:_rootlessConfiguration
 		 haltedBreakPoints:_debuggerController.haltedBreakPoints
 		 delegate:self];
-		
+
 		__weak ZGAppController *weakSelf = self;
 		_documentController = [[ZGDocumentController alloc] initWithMakeDocumentWindowController:^ZGDocumentWindowController *{
 			ZGAppController *selfReference = weakSelf;
 			assert(selfReference != nil);
-			
+
 			BOOL creatingNewTab = selfReference->_creatingNewTab;
 			selfReference->_creatingNewTab = NO;
-			
+
 			return
 			[[ZGDocumentWindowController alloc]
 			 initWithProcessTaskManager:selfReference->_processTaskManager
@@ -169,28 +200,41 @@
 			 preferringNewTab:creatingNewTab
 			 delegate:selfReference];
 		}];
-		
+
 		[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 	}
-	
+
 	return self;
 }
 
+/**
+ * Handles application termination requests
+ *
+ * This method is called when the user attempts to quit the application. It:
+ * 1. Creates a termination state object to track cleanup progress
+ * 2. Notifies the breakpoint controller about termination
+ * 3. Cleans up the debugger and memory viewer
+ * 4. Cleans up all document windows
+ * 5. Returns whether the app can terminate immediately or should wait
+ *
+ * @param sender The application requesting termination
+ * @return NSTerminateNow if all cleanup is complete, NSTerminateLater if cleanup is still in progress
+ */
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender
 {
 	ZGAppTerminationState *appTerminationState = [[ZGAppTerminationState alloc] init];
-	
+
 	_breakPointController.appTerminationState = appTerminationState;
-	
+
 	[_debuggerController cleanup];
 	[_memoryViewer cleanup];
-	
+
 	for (ZGDocument *document in _documentController.documents)
 	{
 		ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
 		[documentWindowController cleanupWithAppTerminationState:appTerminationState];
 	}
-	
+
 	return appTerminationState.isDead ? NSTerminateNow : NSTerminateLater;
 }
 
@@ -203,16 +247,16 @@
 	{
 		// New Tab should use cmd t so make show font use cmd shift t
 		[_showFontsMenuItem setKeyEquivalent:@"T"];
-		
+
 		NSMenuItem *newTabMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"New Tab", nil) action:@selector(createNewTabbedWindow:) keyEquivalent:@"t"];
-		
+
 		[newTabMenuItem setKeyEquivalentModifierMask:NSEventModifierFlagCommand];
 		[newTabMenuItem setTarget:self];
-		
+
 		NSInteger insertionIndex = [_fileMenu indexOfItem:_newDocumentMenuItem] + 1;
 		[_fileMenu insertItem:newTabMenuItem atIndex:insertionIndex];
 	}
-	
+
 	[_appUpdaterController configureCheckForUpdatesMenuItem:_checkForUpdatesMenuItem];
 }
 
@@ -224,14 +268,35 @@
 
 #pragma mark Restoration
 
+/**
+ * Restores a window when the application is relaunched
+ *
+ * This class method is called by the system during application launch to restore
+ * windows that were open when the application was last quit. It maps window identifiers
+ * to the appropriate window controllers and restores their state.
+ *
+ * Window Restoration Process:
+ * +------------------------+     +------------------------+     +------------------------+
+ * | Identify Window Type   |     | Get Window Controller  |     | Complete Restoration  |
+ * |------------------------|     |------------------------|     |------------------------|
+ * | - Check identifier     |     | - Memory Viewer        |     | - Set restoration     |
+ * |   against known types  | --> | - Debugger             | --> |   properties          |
+ * | - Map to controller    |     | - Logger               |     | - Call completion     |
+ * |   type                 |     |                        |     |   handler             |
+ * +------------------------+     +------------------------+     +------------------------+
+ *
+ * @param identifier The window's unique identifier
+ * @param state The encoded state information (unused)
+ * @param completionHandler Block to call with the restored window or error
+ */
 + (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)__unused state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
 	ZGAppController *appController = (ZGAppController *)[(NSApplication *)[NSApplication sharedApplication] delegate];
-	
+
 	assert([appController isKindOfClass:[ZGAppController class]]);
-	
+
 	NSWindowController *restoredWindowController = nil;
-	
+
 	if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
 	{
 		restoredWindowController = appController->_memoryViewer;
@@ -244,11 +309,11 @@
 	{
 		restoredWindowController = appController->_loggerWindowController;
 	}
-	
+
 	if (restoredWindowController != nil)
 	{
 		[appController setRestorationForWindowController:restoredWindowController	withWindowIdentifier:identifier];
-		
+
 		completionHandler(restoredWindowController.window, nil);
 	}
 	else
@@ -266,24 +331,35 @@
 - (BOOL)setRestorationForWindowController:(NSWindowController *)windowController withWindowIdentifier:(NSString *)windowIdentifier
 {
 	BOOL firstTimeLoading = (windowController.window.restorationClass == nil);
-	
+
 	if (firstTimeLoading)
 	{
 		windowController.window.restorationClass = [self class];
 		windowController.window.identifier = windowIdentifier;
 	}
-	
+
 	return firstTimeLoading;
 }
 
 #pragma mark Menu Actions
 
+/**
+ * Shows a memory-related window controller and configures it for restoration
+ *
+ * This method is a helper for displaying memory-related windows (like the memory viewer
+ * or debugger). It shows the window, sets up window restoration, and updates the window
+ * content if needed.
+ *
+ * @param memoryWindowController The window controller to show
+ * @param windowIdentifier A unique identifier for window restoration
+ * @param canReadMemory Whether the window should read memory when first shown
+ */
 - (void)showMemoryWindowController:(ZGMemoryNavigationWindowController *)memoryWindowController withWindowIdentifier:(NSString *)windowIdentifier andCanReadMemory:(BOOL)canReadMemory
 {
 	[memoryWindowController showWindow:nil];
-	
+
 	BOOL firstTimeLoading = [self setRestorationForWindowController:memoryWindowController withWindowIdentifier:windowIdentifier];
-	
+
 	[memoryWindowController updateWindowAndReadMemory:canReadMemory && firstTimeLoading];
 }
 
@@ -300,7 +376,7 @@
 - (IBAction)openLogger:(id)__unused sender
 {
 	[_loggerWindowController showWindow:nil];
-	
+
 	[self setRestorationForWindowController:_loggerWindowController withWindowIdentifier:ZGLoggerIdentifier];
 }
 
@@ -310,7 +386,7 @@
 	{
 		_preferencesController = [[ZGPreferencesController alloc] initWithHotKeyCenter:_hotKeyCenter debuggerController:_debuggerController appUpdaterController:_appUpdaterController];
 	}
-	
+
 	[_preferencesController showWindow:nil];
 }
 
@@ -340,12 +416,12 @@
 - (void)memoryWindowController:(ZGMemoryWindowController *)memoryWindowController didChangeProcessInternalName:(NSString *)newChosenInternalProcessName
 {
 	_lastChosenInternalProcessName = [newChosenInternalProcessName copy];
-	
+
 	if (_debuggerController != memoryWindowController)
 	{
 		_debuggerController.lastChosenInternalProcessName = newChosenInternalProcessName;
 	}
-	
+
 	if (_memoryViewer != memoryWindowController)
 	{
 		_memoryViewer.lastChosenInternalProcessName = newChosenInternalProcessName;
@@ -367,7 +443,7 @@
 	{
 		return NSMakeRange(0, 0);
 	}
-	
+
 	return _memorySelectionRanges[@(process.processID)].rangeValue;
 }
 
