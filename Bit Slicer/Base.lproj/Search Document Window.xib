@@ -229,22 +229,22 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="362" y="330" width="770" height="240"/>
+            <rect key="contentRect" x="362" y="330" width="875" height="240"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1470" height="922"/>
-            <value key="minSize" type="size" width="875" height="240"/>
+            <value key="minSize" type="size" width="875" height="248"/>
             <view key="contentView" id="aTX-qN-msi">
-                <rect key="frame" x="0.0" y="0.0" width="770" height="240"/>
+                <rect key="frame" x="0.0" y="0.0" width="875" height="240"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iy4-iu-99I">
-                        <rect key="frame" x="0.0" y="22" width="770" height="218"/>
+                        <rect key="frame" x="0.0" y="22" width="875" height="218"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
-                            <rect key="frame" x="0.0" y="0.0" width="770" height="218"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <rect key="frame" x="0.0" y="0.0" width="875" height="218"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf" customClass="ZGTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="770" height="201"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="875" height="201"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -274,7 +274,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="value" width="177" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
+                                        <tableColumn identifier="value" width="282" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Value">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -335,7 +335,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" wantsLayer="YES" id="FQj-2P-but">
-                            <rect key="frame" x="0.0" y="0.0" width="770" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="875" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -349,7 +349,7 @@
                         </textFieldCell>
                     </textField>
                     <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dg-I8-jgu">
-                        <rect key="frame" x="18" y="3" width="734" height="14"/>
+                        <rect key="frame" x="18" y="3" width="839" height="14"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="displaying_or_found_x_variables" id="6Kr-rx-QwW">
                             <font key="font" metaFont="smallSystem"/>
@@ -642,7 +642,7 @@
                         </textFieldCell>
                     </textField>
                     <progressIndicator hidden="YES" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="SfW-co-kf4">
-                        <rect key="frame" x="734" y="2" width="16" height="16"/>
+                        <rect key="frame" x="839" y="2" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zKb-Ip-63U">
