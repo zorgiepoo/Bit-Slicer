@@ -805,21 +805,37 @@
 	
 	[_functionPopUpButton removeAllItems];
 	
-	[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"equalsOperatorTitle") atIndex:0];
-	[[_functionPopUpButton itemAtIndex:0] setTag:ZGEquals];
+	{
+		NSMenuItem *menuItem = [_functionPopUpButton.menu addItemWithTitle:@"" action:nil keyEquivalent:@""];
+		menuItem.image = [NSImage imageWithSystemSymbolName:@"equal" accessibilityDescription:@""];
+		
+		menuItem.tag = ZGEquals;
+	}
 	
 	if (_documentData.searchType == ZGSearchTypeValue)
 	{
-		[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") atIndex:1];
-		[[_functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
+		{
+			NSMenuItem *menuItem = [_functionPopUpButton.menu addItemWithTitle:@"" action:nil keyEquivalent:@""];
+			menuItem.image = [NSImage imageWithSystemSymbolName:@"notequal" accessibilityDescription:@""];
+			
+			menuItem.tag = ZGNotEquals;
+		}
 		
 		if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
 		{
-			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:2];
-			[[_functionPopUpButton itemAtIndex:2] setTag:ZGLessThan];
+			{
+				NSMenuItem *menuItem = [_functionPopUpButton.menu addItemWithTitle:@"" action:nil keyEquivalent:@""];
+				menuItem.image = [NSImage imageWithSystemSymbolName:@"lessthan" accessibilityDescription:@""];
+				
+				menuItem.tag = ZGLessThan;
+			}
 			
-			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:3];
-			[[_functionPopUpButton itemAtIndex:3] setTag:ZGGreaterThan];
+			{
+				NSMenuItem *menuItem = [_functionPopUpButton.menu addItemWithTitle:@"" action:nil keyEquivalent:@""];
+				menuItem.image = [NSImage imageWithSystemSymbolName:@"greaterthan" accessibilityDescription:@""];
+				
+				menuItem.tag = ZGGreaterThan;
+			}
 		}
 	}
 	
