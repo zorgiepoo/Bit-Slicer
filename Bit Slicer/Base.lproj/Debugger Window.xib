@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24127" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24127"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -91,7 +91,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="113" y="199" width="839" height="510"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="922"/>
             <value key="minSize" type="size" width="700" height="414"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="839" height="510"/>
@@ -106,7 +106,7 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <clipView key="contentView" focusRingType="none" id="QCs-yF-iGW">
                                     <rect key="frame" x="0.0" y="0.0" width="840" height="287"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
                                             <rect key="frame" x="0.0" y="0.0" width="840" height="270"/>
@@ -233,12 +233,12 @@
                     </textField>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" explicitIdentifier="ZGDebuggerToolbar2" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
+            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" explicitIdentifier="ZGDebuggerToolbar2" showsBaselineSeparator="NO" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back/Forward" paletteLabel="Back/Forward" sizingBehavior="auto" id="saO-Gp-UGR">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="vkH-Yd-fy0">
-                            <rect key="frame" x="9" y="14" width="61" height="23"/>
+                            <rect key="frame" x="14" y="14" width="51" height="24"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="4Gz-L1-umm">
                                 <font key="font" metaFont="system"/>
@@ -259,10 +259,10 @@
                     <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="V6x-9g-MBo">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fpR-fU-ajG">
-                            <rect key="frame" x="-3" y="-4" width="167" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="84" height="24"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vAn-gJ-wjp" id="ohg-Gh-2fU">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="menu"/>
+                                <font key="font" metaFont="message"/>
                                 <menu key="menu" title="OtherViews" id="Quq-lP-8lz">
                                     <items>
                                         <menuItem title="Item_1" state="on" id="vAn-gJ-wjp">
@@ -272,8 +272,8 @@
                                 </menu>
                             </popUpButtonCell>
                             <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="bEq-IZ-Wag"/>
-                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="ngH-El-940"/>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="170" id="bEq-IZ-Wag"/>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="190" id="ngH-El-940"/>
                             </constraints>
                             <connections>
                                 <action selector="runningApplicationsPopUpButton:" target="-2" id="44z-bJ-smY"/>
@@ -297,7 +297,7 @@
                     <toolbarItem implicitItemIdentifier="F91B22CB-7E27-4BA1-A2E8-AD190222BAAF" label="Step" paletteLabel="Step" sizingBehavior="auto" id="yIQ-3L-cfP">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="hed-Ji-GwK">
-                            <rect key="frame" x="0.0" y="14" width="112" height="23"/>
+                            <rect key="frame" x="0.0" y="14" width="98" height="24"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="AnD-9c-1f5">
                                 <font key="font" metaFont="system"/>
@@ -321,7 +321,7 @@
                     <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address/Symbol" paletteLabel="Address/Symbol" sizingBehavior="auto" id="u3o-PN-adL">
                         <nil key="toolTip"/>
                         <textField key="view" focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ztk-ei-XwG">
-                            <rect key="frame" x="0.0" y="0.0" width="171" height="22"/>
+                            <rect key="frame" x="0.0" y="14" width="171" height="24"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="49z-Sq-ig3"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="175" id="UDK-Sx-ERW"/>

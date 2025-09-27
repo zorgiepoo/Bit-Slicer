@@ -241,7 +241,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
                             <rect key="frame" x="0.0" y="0.0" width="875" height="218"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf" customClass="ZGTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="875" height="201"/>
@@ -339,7 +339,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
-                    <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dLn-LQ-VPC">
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dLn-LQ-VPC">
                         <rect key="frame" x="52" y="0.0" width="4" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="right" id="Ukg-I3-8ZY">
@@ -348,7 +348,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dg-I8-jgu">
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dg-I8-jgu">
                         <rect key="frame" x="18" y="3" width="839" height="14"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="displaying_or_found_x_variables" id="6Kr-rx-QwW">
@@ -663,7 +663,7 @@
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
-                            <rect key="frame" x="0.0" y="0.0" width="160" height="24"/>
+                            <rect key="frame" x="0.0" y="14" width="84" height="24"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="message"/>
@@ -679,8 +679,8 @@
                                 </connections>
                             </popUpButtonCell>
                             <constraints>
-                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="0SL-Gj-qtF"/>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="cvc-cY-mNk"/>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="190" id="0SL-Gj-qtF"/>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="170" id="cvc-cY-mNk"/>
                             </constraints>
                         </popUpButton>
                     </toolbarItem>
@@ -766,7 +766,7 @@
                     </toolbarItem>
                     <searchToolbarItem implicitItemIdentifier="554D818A-DEF7-4FAE-AE49-CB909FC54200" label="Search" paletteLabel="Search" bordered="YES" visibilityPriority="1001" id="tHJ-Bh-ZVW">
                         <nil key="toolTip"/>
-                        <searchField key="view" focusRingType="none" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fWp-wN-0NK">
+                        <searchField key="view" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fWp-wN-0NK">
                             <rect key="frame" x="0.0" y="0.0" width="150" height="24"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="sym-2t-U8x"/>
@@ -799,7 +799,7 @@
             <rect key="frame" x="0.0" y="0.0" width="174" height="25"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hY6-jr-dYH">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hY6-jr-dYH">
                     <rect key="frame" x="94" y="2" width="80" height="22"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="80" id="RaC-dq-GA3"/>
@@ -814,7 +814,7 @@
                         <outlet property="nextKeyView" destination="so8-Ni-dAC" id="qQT-S1-Jrv"/>
                     </connections>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U3S-5O-0jn">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U3S-5O-0jn">
                     <rect key="frame" x="18" y="6" width="70" height="14"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Flags:" id="AOM-F4-uKc">
                         <font key="font" metaFont="smallSystem"/>
@@ -856,7 +856,7 @@
                         <action selector="searchAddressOffsetComparisonDidChange:" target="-2" id="4As-cG-UXd"/>
                     </connections>
                 </popUpButton>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gI5-SN-blY">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gI5-SN-blY">
                     <rect key="frame" x="191" y="4" width="66" height="14"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Max Levels:" id="UOD-vt-IHJ">
                         <font key="font" metaFont="smallSystem"/>
@@ -864,7 +864,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="krU-4S-mNx">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="krU-4S-mNx">
                     <rect key="frame" x="263" y="0.0" width="23" height="22"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="23" id="bNg-ef-d6p"/>
@@ -892,7 +892,7 @@
                         <action selector="searchAddressMaxLevelsDidChange:" target="-2" id="Sm4-FS-ohR"/>
                     </connections>
                 </stepper>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="so8-Ni-dAC">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="so8-Ni-dAC">
                     <rect key="frame" x="95" y="0.0" width="81" height="22"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="D7k-tc-Tsa">
                         <font key="font" metaFont="smallSystem"/>

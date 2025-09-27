@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19158" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24127" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19158"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24127"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,7 +22,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="668" y="321" width="577" height="422"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="922"/>
             <value key="minSize" type="size" width="577" height="422"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="577" height="422"/>
@@ -37,12 +37,12 @@
                     </customView>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="A3F7BBA1-DD73-4795-995D-C645138A3DBB" explicitIdentifier="ZGMemoryViewerToolbarIdentifier" displayMode="iconOnly" sizeMode="regular" id="6tO-t8-wkk" customClass="ZGNoSmallSizeToolbar">
+            <toolbar key="toolbar" implicitIdentifier="A3F7BBA1-DD73-4795-995D-C645138A3DBB" explicitIdentifier="ZGMemoryViewerToolbarIdentifier" showsBaselineSeparator="NO" displayMode="iconOnly" sizeMode="regular" id="6tO-t8-wkk" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="A7558654-1EA6-4021-982D-10521377C75E" label="Back/Forward" paletteLabel="Back/Forward" sizingBehavior="auto" id="Z6W-2O-OWd">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="w6k-bm-Myo">
-                            <rect key="frame" x="9" y="14" width="61" height="23"/>
+                            <rect key="frame" x="14" y="14" width="51" height="24"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="KIW-ls-ljL">
                                 <font key="font" metaFont="system"/>
@@ -63,14 +63,10 @@
                     <toolbarItem implicitItemIdentifier="7AD14AA0-A832-40BF-890E-22C1420E5869" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="2oH-t9-bYi">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fPm-5I-zjY">
-                            <rect key="frame" x="-3" y="-4" width="167" height="25"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="afV-Tx-EmX"/>
-                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="jBR-jV-p5j"/>
-                            </constraints>
+                            <rect key="frame" x="0.0" y="14" width="84" height="24"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="O54-Nm-FQR" id="6D0-9L-tIs">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="menu"/>
+                                <font key="font" metaFont="message"/>
                                 <menu key="menu" title="OtherViews" id="a0O-5N-OUy">
                                     <items>
                                         <menuItem title="Item_1" state="on" id="O54-Nm-FQR">
@@ -79,6 +75,10 @@
                                     </items>
                                 </menu>
                             </popUpButtonCell>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="170" id="afV-Tx-EmX"/>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="190" id="jBR-jV-p5j"/>
+                            </constraints>
                             <connections>
                                 <action selector="runningApplicationsPopUpButton:" target="-2" id="ikj-x5-Zyv"/>
                             </connections>
@@ -86,8 +86,8 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="4317D272-6BC6-4B90-B1BD-AEEBC90B4775" label="Address" paletteLabel="Address" sizingBehavior="auto" id="dKv-kA-cOR">
                         <nil key="toolTip"/>
-                        <textField key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DkB-mV-Rmo">
-                            <rect key="frame" x="0.0" y="0.0" width="175" height="22"/>
+                        <textField key="view" focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DkB-mV-Rmo">
+                            <rect key="frame" x="0.0" y="14" width="175" height="24"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Kud-I6-eIQ"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="175" id="M4D-hv-7AE"/>
@@ -119,7 +119,7 @@
         </window>
     </objects>
     <resources>
-        <image name="NSLeftFacingTriangleTemplate" width="10" height="14"/>
-        <image name="NSRightFacingTriangleTemplate" width="10" height="14"/>
+        <image name="NSLeftFacingTriangleTemplate" width="12" height="17"/>
+        <image name="NSRightFacingTriangleTemplate" width="12" height="17"/>
     </resources>
 </document>
