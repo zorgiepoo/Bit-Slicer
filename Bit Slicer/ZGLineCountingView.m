@@ -100,4 +100,10 @@
     return string;
 }
 
+- (BOOL)clipsToBounds
+{
+    // Fixes a bug where line counting view could render lines outside of its bounds, into the status bar, when no data inspector is visible
+    return YES;
+}
+
 @end
