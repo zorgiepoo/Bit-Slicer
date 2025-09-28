@@ -70,10 +70,7 @@
 
 - (void)windowDidLoad
 {
-	if (@available(macOS 11.0, *))
-	{
-		self.window.toolbarStyle = NSWindowToolbarStylePreference;
-	}
+	self.window.toolbarStyle = NSWindowToolbarStylePreference;
 	
 	[self.window.toolbar setSelectedItemIdentifier:ZGSoftwareUpdatePreferenceIdentifier];
 	

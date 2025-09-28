@@ -98,10 +98,7 @@
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		if (@available(macOS 10.11, *))
-		{
-			[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGRemoveRootlessProcessesKey: @YES}];
-		}
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGRemoveRootlessProcessesKey: @YES}];
 	});
 }
 
@@ -115,12 +112,9 @@
 		
 		_processTaskManager = [[ZGProcessTaskManager alloc] init];
 		
-		if (@available(macOS 10.11, *))
+		if ([[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
 		{
-			if ([[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
-			{
-				_rootlessConfiguration = [[ZGRootlessConfiguration alloc] init];
-			}
+			_rootlessConfiguration = [[ZGRootlessConfiguration alloc] init];
 		}
 
 		_hotKeyCenter = [[ZGHotKeyCenter alloc] init];
@@ -198,8 +192,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused notification
 {
-	// Add New Tab menu item only if we are on 10.12 or later
-	if (@available(macOS 10.12, *))
+	// Add New Tab menu item
 	{
 		// New Tab should use cmd t so make show font use cmd shift t
 		[_showFontsMenuItem setKeyEquivalent:@"T"];

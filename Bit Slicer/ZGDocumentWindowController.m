@@ -168,11 +168,8 @@
 	// On 10.12, when search document windows are restored, the separator is thicker
 	// I don't know why this happens, but one workaround is just resetting the baseline separator property
 	// to NO and then back to YES
-	if (@available(macOS 10.12, *))
-	{
-		_toolbar.showsBaselineSeparator = NO;
-		_toolbar.showsBaselineSeparator = YES;
-	}
+	_toolbar.showsBaselineSeparator = NO;
+	_toolbar.showsBaselineSeparator = YES;
 }
 
 - (void)setupScopeBar

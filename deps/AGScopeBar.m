@@ -1012,6 +1012,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 			frame.origin.x = 0;
 			
 			// Not sure why this offset change is needed
+			// Note: macOS 16 is same as macOS 26 (but works when built from older SDKs)
 			if (@available(macOS 16, *)) {
 				frame.origin.y = ((self.scopeBar.frame.size.height - frame.size.height) / 2.0);
 			} else {
