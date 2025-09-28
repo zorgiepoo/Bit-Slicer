@@ -1430,15 +1430,15 @@
 	
 	if (_searchData.savedData == nil)
 	{
-		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"tray" accessibilityDescription:nil];
+		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"app" accessibilityDescription:nil];
 	}
 	else if (storingValuesAfterSearches)
 	{
-		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"tray.badge.fill" accessibilityDescription:nil];
+		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"app.badge.fill" accessibilityDescription:nil];
 	}
 	else
 	{
-		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"tray.fill" accessibilityDescription:nil];
+		windowController.storeValuesToolbarItem.image = [NSImage imageWithSystemSymbolName:@"app.fill" accessibilityDescription:nil];
 	}
 }
 

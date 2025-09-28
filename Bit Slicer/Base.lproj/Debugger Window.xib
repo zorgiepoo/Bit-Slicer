@@ -280,12 +280,12 @@
                             </connections>
                         </popUpButton>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" image="continue" sizingBehavior="auto" id="KQE-fj-qqG">
+                    <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" sizingBehavior="auto" id="KQE-fj-qqG">
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="2Xc-JX-DhY">
-                            <rect key="frame" x="13" y="14" width="30" height="23"/>
+                            <rect key="frame" x="22" y="14" width="12" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="continue" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pHW-hV-Whn">
+                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pHW-hV-Whn">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
@@ -302,13 +302,13 @@
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="AnD-9c-1f5">
                                 <font key="font" metaFont="system"/>
                                 <segments>
-                                    <segment image="stepin" width="32">
+                                    <segment width="32">
                                         <nil key="label"/>
                                     </segment>
-                                    <segment image="stepover" width="32" tag="1">
+                                    <segment width="32" tag="1">
                                         <nil key="label"/>
                                     </segment>
-                                    <segment image="stepout" width="32">
+                                    <segment width="32">
                                         <nil key="label"/>
                                     </segment>
                                 </segments>
@@ -361,9 +361,5 @@
     <resources>
         <image name="NSLeftFacingTriangleTemplate" width="12" height="17"/>
         <image name="NSRightFacingTriangleTemplate" width="12" height="17"/>
-        <image name="continue" width="38" height="38"/>
-        <image name="stepin" width="38" height="38"/>
-        <image name="stepout" width="38" height="38"/>
-        <image name="stepover" width="38" height="38"/>
     </resources>
 </document>
