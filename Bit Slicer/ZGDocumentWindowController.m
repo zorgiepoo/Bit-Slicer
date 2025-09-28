@@ -303,11 +303,9 @@
 	}
 	
 	{
-		NSTitlebarAccessoryViewController *titleAccessoryViewController = [[NSTitlebarAccessoryViewController alloc] init];
+		NSTitlebarAccessoryViewController *titleAccessoryViewController = [[NSTitlebarAccessoryViewController alloc] initWithNibName:nil bundle:nil];
 		titleAccessoryViewController.layoutAttribute = NSLayoutAttributeBottom;
-		
-		[titleAccessoryViewController.view addSubview:_scopeBar];
-		_scopeBar.frame = titleAccessoryViewController.view.bounds;
+		titleAccessoryViewController.view = _scopeBar;
 		_scopeBar.translatesAutoresizingMaskIntoConstraints = true;
 		_scopeBar.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
 		
