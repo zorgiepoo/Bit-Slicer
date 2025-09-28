@@ -8,6 +8,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGPreferencesController">
             <connections>
+                <outlet property="_scriptsToolbarItem" destination="kPj-yB-vNE" id="kcz-k6-V07"/>
                 <outlet property="window" destination="1" id="26"/>
             </connections>
         </customObject>
@@ -38,7 +39,7 @@
                             <action selector="changePreferencesView:" target="-2" id="YXV-iP-083"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="8A223B1E-6293-4DB6-A461-07E053A19CE7" explicitItemIdentifier="ZGScriptPreferenceIdentifier" label="Scripts" paletteLabel="Scripts" tag="2" image="text.document" catalog="system" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="kPj-yB-vNE">
+                    <toolbarItem implicitItemIdentifier="8A223B1E-6293-4DB6-A461-07E053A19CE7" explicitItemIdentifier="ZGScriptPreferenceIdentifier" label="Scripts" paletteLabel="Scripts" tag="2" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="kPj-yB-vNE">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="38w-gw-FXJ"/>
@@ -60,6 +61,5 @@
     <resources>
         <image name="character.textbox" catalog="system" width="19" height="14"/>
         <image name="network" catalog="system" width="15" height="15"/>
-        <image name="text.document" catalog="system" width="14" height="16"/>
     </resources>
 </document>
