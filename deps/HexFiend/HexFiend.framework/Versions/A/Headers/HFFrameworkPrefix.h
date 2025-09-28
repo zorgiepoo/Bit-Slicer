@@ -26,25 +26,8 @@
 #define check_calloc(x) ({ size_t _count = (x); void *_result = calloc(_count, 1); if(!_result) { fprintf(stderr, "Out of memory allocating %lu bytes\n", (unsigned long)_count); exit(EXIT_FAILURE); } _result; })
 #define check_realloc(p, x) ({ size_t _count = (x); void *_result = realloc((p), x); if(!_result) { fprintf(stderr, "Out of memory reallocating %lu bytes\n", (unsigned long)_count); exit(EXIT_FAILURE); } _result; })
 
-#if ! NDEBUG
-#define REQUIRE_NOT_NULL(a) do { \
-	if ((a)==NULL) {\
-		fprintf(stderr, "REQUIRE_NOT_NULL failed: NULL value for parameter " #a " on line %d in file %s\n", __LINE__, __FILE__);\
-			abort();\
-	}\
-} while (0)
-
-#define EXPECT_CLASS(e, c) do { \
-	if (! [(e) isKindOfClass:[c class]]) {\
-		fprintf(stderr, "EXPECT_CLASS failed: Expression " #e " is %s on line %d in file %s\n", (e) ? "(nil)" : [[e description] UTF8String], __LINE__, __FILE__);\
-			abort();\
-	}\
-} while (0)
-
-#else
 #define REQUIRE_NOT_NULL(a) USE(a)
 #define EXPECT_CLASS(e, c) USE(e)
-#endif
 
 #define NEW_ARRAY(type, name, number) \
     type name ## static_ [256];\

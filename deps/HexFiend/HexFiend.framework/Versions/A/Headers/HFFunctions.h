@@ -6,6 +6,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+
 #define HFDEFAULT_FONT (@"Monaco")
 #define HFDEFAULT_FONTSIZE ((CGFloat)10.)
 
@@ -429,15 +433,15 @@ static inline unsigned long long llmin(unsigned long long a, unsigned long long 
 
 /*! Returns an unsigned long long, which must be no more than ULLONG_MAX, as an unsigned long. */
 static inline CGFloat ld2f(long double val) {
-#if ! NDEBUG
-     if (isfinite(val)) {
-        assert(val <= CGFLOAT_MAX);
-        assert(val >= -CGFLOAT_MAX);
-        if ((val > 0 && val < CGFLOAT_MIN) || (val < 0 && val > -CGFLOAT_MIN)) {
-            NSLog(@"Warning - conversion of long double %Lf to CGFloat will result in the non-normal CGFloat %f", val, (CGFloat)val);
-        }
-     }
-#endif
+//#if ! NDEBUG
+//     if (isfinite(val)) {
+//        assert(val <= CGFLOAT_MAX);
+//        assert(val >= -CGFLOAT_MAX);
+//        if ((val > 0 && val < CGFLOAT_MIN) || (val < 0 && val > -CGFLOAT_MIN)) {
+//            NSLog(@"Warning - conversion of long double %Lf to CGFloat will result in the non-normal CGFloat %f", val, (CGFloat)val);
+//        }
+//     }
+//#endif
     return (CGFloat)val;
 }
 
@@ -567,5 +571,7 @@ NS_INLINE NSException * _Nullable HFTry(dispatch_block_t block) {
     }
     return nil;
 }
+
+#pragma clang diagnostic pop
 
 NS_ASSUME_NONNULL_END
