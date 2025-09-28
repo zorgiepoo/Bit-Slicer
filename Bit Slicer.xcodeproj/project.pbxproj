@@ -2631,6 +2631,7 @@
 					"-Wno-switch-default",
 					"-Wno-reserved-identifier",
 					"-Wno-c23-extensions",
+					"-Wno-missing-include-dirs",
 				);
 			};
 			name = Debug;
@@ -2743,6 +2744,7 @@
 					"-Wno-switch-default",
 					"-Wno-reserved-identifier",
 					"-Wno-c23-extensions",
+					"-Wno-missing-include-dirs",
 				);
 			};
 			name = Release;
