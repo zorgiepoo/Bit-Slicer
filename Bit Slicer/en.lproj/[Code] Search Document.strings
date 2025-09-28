@@ -46,6 +46,18 @@
 /* Scope Bar accessory for Round Error label when doing = or != float/double value search; also used for error reporting */
 "searchRoundErrorLabel" = "Round Error";
 
+/* Equals Operator Title */
+"equalsOperatorTitle" = "equals";
+
+/* Not Equals Operator Title */
+"notEqualsOperatorTitle" = "is not";
+
+/* Greater Than Operator Title */
+"greaterThanOperatorTitle" = "is greater than";
+
+/* Less Than Operator Title */
+"lessThanOperatorTitle" = "is less than";
+
 /* Undo Data Type Change Action */
 "undoDataTypeChangeAction" = "Data Type Change";
 
