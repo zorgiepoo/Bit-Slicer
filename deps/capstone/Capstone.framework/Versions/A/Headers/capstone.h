@@ -1,6 +1,10 @@
 #ifndef CAPSTONE_ENGINE_H
 #define CAPSTONE_ENGINE_H
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshift-sign-overflow"
+#pragma clang diagnostic ignored "-Wduplicate-enum"
+
 /* Capstone Disassembly Engine */
 /* By Nguyen Anh Quynh <aquynh@gmail.com>, 2013-2016 */
 
@@ -762,5 +766,7 @@ cs_err CAPSTONE_API cs_regs_access(csh handle, const cs_insn *insn,
 #ifdef __cplusplus
 }
 #endif
+
+#pragma clang diagnostic pop
 
 #endif

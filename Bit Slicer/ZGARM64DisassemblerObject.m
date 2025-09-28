@@ -35,8 +35,6 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
-#pragma clang diagnostic ignored "-Wduplicate-enum"
-#pragma clang diagnostic ignored "-Wshift-sign-overflow"
 #pragma clang diagnostic ignored "-Wnon-modular-include-in-module"
 #pragma clang diagnostic ignored "-Wobjc-messaging-id"
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
