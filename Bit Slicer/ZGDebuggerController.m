@@ -258,7 +258,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	
 	_mappedFilePath = [coder decodeObjectOfClass:[NSString class] forKey:ZGDebuggerMappedFilePath];
 	
-	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGDebuggerProcessInternalName];
+	self.desiredProcessInternalName = [coder decodeObjectOfClass:[NSString class] forKey:ZGDebuggerProcessInternalName];
 	[self updateRunningProcesses];
 	[self setAndPostLastChosenInternalProcessName];
 	[self readMemory:nil];
