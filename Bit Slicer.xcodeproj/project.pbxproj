@@ -23,10 +23,6 @@
 		7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		721B3C4D2AED913200F85660 /* ZGSearchProtectionMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */; };
 		721B3C4E2AED91DC00F85660 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1163417D2EF6D009E002A /* NSStringAdditions.m */; };
-		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
-		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
-		722CAA5B19AD4AED009C6AAE /* scripts.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5719AD4AED009C6AAE /* scripts.png */; };
-		722CAA5C19AD4AED009C6AAE /* scripts@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5819AD4AED009C6AAE /* scripts@2x.png */; };
 		722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */; };
 		722CAAE119BBB5A1009C6AAE /* SearchVirtualMemoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */; };
 		722CAAE219BBD7EE009C6AAE /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
@@ -49,12 +45,6 @@
 		7235B7B324D7D9C30029580A /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7235B7B424D7D9EA0029580A /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7235B7B524D7D9F40029580A /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; };
-		723FC6E824F4BEB10083F568 /* stepover@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E424F4BEB00083F568 /* stepover@2x.pdf */; };
-		723FC6E924F4BEB10083F568 /* stepin@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E524F4BEB00083F568 /* stepin@2x.pdf */; };
-		723FC6EA24F4BEB10083F568 /* stepout@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E624F4BEB00083F568 /* stepout@2x.pdf */; };
-		723FC6EB24F4BEB10083F568 /* continue@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E724F4BEB00083F568 /* continue@2x.pdf */; };
-		723FC6EE24F4BEE90083F568 /* container@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6EC24F4BEE80083F568 /* container@2x.pdf */; };
-		723FC6EF24F4BEE90083F568 /* container_filled@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6ED24F4BEE90083F568 /* container_filled@2x.pdf */; };
 		72431BA919BFFB6100418893 /* ZGDataValueExtracting.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGDataValueExtracting.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -78,8 +68,6 @@
 		724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4C19A8EDD700E72C9D /* [Code] Logger Window.stringsdict */; };
 		724A9F5119A8F54600E72C9D /* [Code] Search Document.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4F19A8F54600E72C9D /* [Code] Search Document.stringsdict */; };
 		7257EFF31B87EF220045991F /* OSCSingleThreadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 7257EFF21B87EF220045991F /* OSCSingleThreadQueue.m */; };
-		7259370A291B7A1B0002502B /* container_filled_record@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 72593709291B7A1B0002502B /* container_filled_record@2x.pdf */; };
-		7259370C291B7ABA0002502B /* container_filled_record.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7259370B291B7ABA0002502B /* container_filled_record.pdf */; };
 		725DEC881A24F7610095C9B3 /* [Code] Script Manager.strings in Resources */ = {isa = PBXBuildFile; fileRef = 725DEC861A24F7610095C9B3 /* [Code] Script Manager.strings */; };
 		726B7CA61A23E849004354BC /* Script Prompt Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */; };
 		726B7CA91A23F0EE004354BC /* ZGScriptPromptWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */; };
@@ -171,8 +159,6 @@
 		777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 777DA25118CE97BE0092DEC9 /* ZGAppTerminationState.m */; };
 		777DA25518CEA0390092DEC9 /* ZGAppPathUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 777DA25418CEA0390092DEC9 /* ZGAppPathUtilities.m */; };
 		7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
-		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
-		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
 		779C6CC318E7309B0076D647 /* ZGDebuggerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */; };
 		779D56C018F0775500FD5408 /* ZGMemoryProtectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D56BE18F0775500FD5408 /* ZGMemoryProtectionWindowController.m */; };
 		779D56C518F1284200FD5408 /* ZGMemoryDumpRangeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D56C318F1284100FD5408 /* ZGMemoryDumpRangeWindowController.m */; };
@@ -184,10 +170,6 @@
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
 		77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B917D580AD00998F28 /* ZGPyMainModule.m */; };
 		77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */; };
-		77DA9D0B1800639E00549A37 /* continue.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D071800639E00549A37 /* continue.pdf */; };
-		77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D081800639E00549A37 /* stepin.pdf */; };
-		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
-		77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D0A1800639E00549A37 /* stepover.pdf */; };
 		77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160E17D2EED6009E002A /* ZGSearchData.m */; };
 		77E1340219312B1F00B5B799 /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
 		77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161117D2EEE1009E002A /* ZGSearchProgress.m */; };
@@ -337,10 +319,6 @@
 		72130FFA2BF00FBD00691AED /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Edit Variable Address.strings"; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
-		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
-		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
-		722CAA5719AD4AED009C6AAE /* scripts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = scripts.png; path = "Bit Slicer/preficons/scripts.png"; sourceTree = "<group>"; };
-		722CAA5819AD4AED009C6AAE /* scripts@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "scripts@2x.png"; path = "Bit Slicer/preficons/scripts@2x.png"; sourceTree = "<group>"; };
 		722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VariableDisplayTest.m; sourceTree = "<group>"; usesTabs = 1; };
 		722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchVirtualMemoryTest.m; sourceTree = "<group>"; usesTabs = 1; };
 		722EE74D1B18D8B000934EF3 /* ZGChosenProcessDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGChosenProcessDelegate.h; path = "Bit Slicer/ZGChosenProcessDelegate.h"; sourceTree = "<group>"; };
@@ -375,12 +353,6 @@
 		7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder/ShortcutRecorder.framework; sourceTree = "<group>"; };
 		7235B7B124D7D9B10029580A /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser/DDMathParser.framework; sourceTree = "<group>"; };
 		7235B7B724D7DD8C0029580A /* pythonlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pythonlib.h; path = "Bit Slicer/pythonlib.h"; sourceTree = "<group>"; };
-		723FC6E424F4BEB00083F568 /* stepover@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepover@2x.pdf"; path = "Bit Slicer/debuggericons/stepover@2x.pdf"; sourceTree = "<group>"; };
-		723FC6E524F4BEB00083F568 /* stepin@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepin@2x.pdf"; path = "Bit Slicer/debuggericons/stepin@2x.pdf"; sourceTree = "<group>"; };
-		723FC6E624F4BEB00083F568 /* stepout@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepout@2x.pdf"; path = "Bit Slicer/debuggericons/stepout@2x.pdf"; sourceTree = "<group>"; };
-		723FC6E724F4BEB00083F568 /* continue@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "continue@2x.pdf"; path = "Bit Slicer/debuggericons/continue@2x.pdf"; sourceTree = "<group>"; };
-		723FC6EC24F4BEE80083F568 /* container@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "container@2x.pdf"; path = "Bit Slicer/docicons/container@2x.pdf"; sourceTree = "<group>"; };
-		723FC6ED24F4BEE90083F568 /* container_filled@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "container_filled@2x.pdf"; path = "Bit Slicer/docicons/container_filled@2x.pdf"; sourceTree = "<group>"; };
 		72456B5A204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Preferences.strings"; sourceTree = "<group>"; };
 		72456B5D204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Search Document.strings"; sourceTree = "<group>"; };
 		72456B5E204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Dump All Memory.strings"; sourceTree = "<group>"; };
@@ -455,8 +427,6 @@
 		724A9F5019A8F54600E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Search Document.stringsdict"; sourceTree = "<group>"; };
 		7257EFF11B87EF220045991F /* OSCSingleThreadQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSCSingleThreadQueue.h; path = deps/OSCSingleThreadQueue.h; sourceTree = "<group>"; };
 		7257EFF21B87EF220045991F /* OSCSingleThreadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSCSingleThreadQueue.m; path = deps/OSCSingleThreadQueue.m; sourceTree = "<group>"; };
-		72593709291B7A1B0002502B /* container_filled_record@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "container_filled_record@2x.pdf"; path = "Bit Slicer/docicons/container_filled_record@2x.pdf"; sourceTree = "<group>"; };
-		7259370B291B7ABA0002502B /* container_filled_record.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled_record.pdf; path = "Bit Slicer/docicons/container_filled_record.pdf"; sourceTree = "<group>"; };
 		725DEC851A24EE6F0095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Script Prompt Dialog.strings"; sourceTree = "<group>"; };
 		725DEC871A24F7610095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
 		726B7CA51A23E849004354BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Script Prompt Dialog.xib"; sourceTree = "<group>"; };
@@ -681,8 +651,6 @@
 		777DA25418CEA0390092DEC9 /* ZGAppPathUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGAppPathUtilities.m; path = "Bit Slicer/ZGAppPathUtilities.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7789C379189A570F00F1FDAF /* ZGMachBinaryInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMachBinaryInfo.h; path = "Bit Slicer/ZGMachBinaryInfo.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinaryInfo.m; path = "Bit Slicer/ZGMachBinaryInfo.m"; sourceTree = "<group>"; usesTabs = 1; };
-		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
-		77988F1B185804AC00476A37 /* container_filled.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled.pdf; path = "Bit Slicer/docicons/container_filled.pdf"; sourceTree = "<group>"; };
 		779C6CC118E7309B0076D647 /* ZGDebuggerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDebuggerUtilities.h; path = "Bit Slicer/ZGDebuggerUtilities.h"; sourceTree = "<group>"; usesTabs = 1; };
 		779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDebuggerUtilities.m; path = "Bit Slicer/ZGDebuggerUtilities.m"; sourceTree = "<group>"; usesTabs = 1; };
 		779D56BD18F0775500FD5408 /* ZGMemoryProtectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryProtectionWindowController.h; path = "Bit Slicer/ZGMemoryProtectionWindowController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -702,10 +670,6 @@
 		77CE28BB17D580D400998F28 /* ZGPyMainModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyMainModule.h; path = "Bit Slicer/ZGPyMainModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77CECE1418B8861C006D45E9 /* ZGRegistersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegistersViewController.h; path = "Bit Slicer/ZGRegistersViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegistersViewController.m; path = "Bit Slicer/ZGRegistersViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
-		77DA9D071800639E00549A37 /* continue.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = continue.pdf; path = "Bit Slicer/debuggericons/continue.pdf"; sourceTree = "<group>"; };
-		77DA9D081800639E00549A37 /* stepin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepin.pdf; path = "Bit Slicer/debuggericons/stepin.pdf"; sourceTree = "<group>"; };
-		77DA9D091800639E00549A37 /* stepout.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepout.pdf; path = "Bit Slicer/debuggericons/stepout.pdf"; sourceTree = "<group>"; };
-		77DA9D0A1800639E00549A37 /* stepover.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepover.pdf; path = "Bit Slicer/debuggericons/stepover.pdf"; sourceTree = "<group>"; };
 		77E2BBA418FD88A700E41FA0 /* Bit Slicer Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bit Slicer Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		77E2BBA918FD88A700E41FA0 /* Bit Slicer Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Bit Slicer Tests-Info.plist"; sourceTree = "<group>"; };
 		77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LinearExpressionParsingTest.m; sourceTree = "<group>"; usesTabs = 1; };
@@ -901,9 +865,6 @@
 			isa = PBXGroup;
 			children = (
 				7235B7A524D7C1050029580A /* yasm */,
-				77DA9D0F180063A600549A37 /* Debugger Icons */,
-				77988F18185803DA00476A37 /* Document Icons */,
-				722CAA5D19AD4AF2009C6AAE /* Preference Icons */,
 				77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */,
 				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
 				77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */,
@@ -944,17 +905,6 @@
 				72E07FDA2AA563AF00BBEED1 /* LEB128Type.m */,
 			);
 			name = "Data Inspector";
-			sourceTree = "<group>";
-		};
-		722CAA5D19AD4AF2009C6AAE /* Preference Icons */ = {
-			isa = PBXGroup;
-			children = (
-				722CAA5519AD4AED009C6AAE /* hotkey.png */,
-				722CAA5619AD4AED009C6AAE /* hotkey@2x.png */,
-				722CAA5719AD4AED009C6AAE /* scripts.png */,
-				722CAA5819AD4AED009C6AAE /* scripts@2x.png */,
-			);
-			name = "Preference Icons";
 			sourceTree = "<group>";
 		};
 		7235B79E24D7BE9C0029580A /* udis86 */ = {
@@ -1226,19 +1176,6 @@
 			name = Symbolication;
 			sourceTree = "<group>";
 		};
-		77988F18185803DA00476A37 /* Document Icons */ = {
-			isa = PBXGroup;
-			children = (
-				77988F19185803E800476A37 /* container.pdf */,
-				723FC6EC24F4BEE80083F568 /* container@2x.pdf */,
-				77988F1B185804AC00476A37 /* container_filled.pdf */,
-				723FC6ED24F4BEE90083F568 /* container_filled@2x.pdf */,
-				7259370B291B7ABA0002502B /* container_filled_record.pdf */,
-				72593709291B7A1B0002502B /* container_filled_record@2x.pdf */,
-			);
-			name = "Document Icons";
-			sourceTree = "<group>";
-		};
 		77C19AB31916D4440028F7F1 /* Changing Memory Protection */ = {
 			isa = PBXGroup;
 			children = (
@@ -1267,21 +1204,6 @@
 				77F115D817D2ED9D009E002A /* ZGLineCountingView.m */,
 			);
 			name = "Memory Viewer";
-			sourceTree = "<group>";
-		};
-		77DA9D0F180063A600549A37 /* Debugger Icons */ = {
-			isa = PBXGroup;
-			children = (
-				77DA9D071800639E00549A37 /* continue.pdf */,
-				723FC6E724F4BEB00083F568 /* continue@2x.pdf */,
-				77DA9D081800639E00549A37 /* stepin.pdf */,
-				723FC6E524F4BEB00083F568 /* stepin@2x.pdf */,
-				77DA9D091800639E00549A37 /* stepout.pdf */,
-				723FC6E624F4BEB00083F568 /* stepout@2x.pdf */,
-				77DA9D0A1800639E00549A37 /* stepover.pdf */,
-				723FC6E424F4BEB00083F568 /* stepover@2x.pdf */,
-			);
-			name = "Debugger Icons";
 			sourceTree = "<group>";
 		};
 		77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */ = {
@@ -1603,14 +1525,11 @@
 				724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */,
 				72130FCC2BE83BF400691AED /* Edit Label Dialog.xib in Resources */,
 				726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */,
-				722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
 				72130FF82BF00FAB00691AED /* [Code] Edit Variable Address.strings in Resources */,
 				7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */,
 				724A9F2519A1657500E72C9D /* [Code] Memory Viewer Status Bar.strings in Resources */,
 				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
-				77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */,
-				7259370A291B7A1B0002502B /* container_filled_record@2x.pdf in Resources */,
 				726CA2C819606E1D00A6AD40 /* Edit Value Dialog.xib in Resources */,
 				724A9F1F19A1657500E72C9D /* [Code] Debugger.strings in Resources */,
 				726CA2A919606D0000A6AD40 /* Code Injection Window.xib in Resources */,
@@ -1618,50 +1537,35 @@
 				724A9F2619A1657500E72C9D /* [Code] Memory Viewer.strings in Resources */,
 				72DBC91F1B7690BA0092ED75 /* [Code] About Window.strings in Resources */,
 				7284245719A96B470081C673 /* Localizable.strings in Resources */,
-				723FC6EF24F4BEE90083F568 /* container_filled@2x.pdf in Resources */,
 				72DBC8EA1B75A7430092ED75 /* About Window.xib in Resources */,
-				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
-				723FC6EE24F4BEE90083F568 /* container@2x.pdf in Resources */,
-				723FC6E924F4BEB10083F568 /* stepin@2x.pdf in Resources */,
 				726CA2AF19606D1200A6AD40 /* Memory Viewer Window.xib in Resources */,
-				722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */,
 				726CA2B619606DD200A6AD40 /* Change Memory Protection Dialog.xib in Resources */,
 				724A9F3919A813D600E72C9D /* [Code] Edit Variable Value.strings in Resources */,
 				72130FD52BE84B4B00691AED /* [Code] Edit Variable Label.strings in Resources */,
 				724A9F2919A1657500E72C9D /* [Code] Variable Actions.strings in Resources */,
 				724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */,
 				726CA2BF19606DF200A6AD40 /* Software Update View.xib in Resources */,
-				723FC6EB24F4BEB10083F568 /* continue@2x.pdf in Resources */,
-				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
 				726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
 				726B7CA61A23E849004354BC /* Script Prompt Dialog.xib in Resources */,
 				726CA2A619606CDD00A6AD40 /* Preferences Window.xib in Resources */,
-				722CAA5B19AD4AED009C6AAE /* scripts.png in Resources */,
 				724A9F2319A1657500E72C9D /* [Code] Memory Navigation.strings in Resources */,
 				726CA2AC19606D0700A6AD40 /* Debugger Window.xib in Resources */,
-				77988F1C185804AC00476A37 /* container_filled.pdf in Resources */,
-				77988F1A185803E800476A37 /* container.pdf in Resources */,
 				726CA2BC19606DDD00A6AD40 /* Dump Memory Range Dialog.xib in Resources */,
 				724A9F3F19A823C300E72C9D /* [Code] Search Document.strings in Resources */,
 				726CA2B319606DB300A6AD40 /* Breakpoint Condition View.xib in Resources */,
 				726CA2C519606E0100A6AD40 /* Scripts View.xib in Resources */,
-				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
 				726CA2C219606DFC00A6AD40 /* Shortcuts View.xib in Resources */,
-				7259370C291B7ABA0002502B /* container_filled_record.pdf in Resources */,
 				724A9F4819A8792000E72C9D /* [Code] Memory Window.strings in Resources */,
 				724A9F4519A863A800E72C9D /* [Code] Watch Variable.strings in Resources */,
-				723FC6EA24F4BEB10083F568 /* stepout@2x.pdf in Resources */,
 				724A9F4219A85D3F00E72C9D /* [Code] Search Table.strings in Resources */,
 				726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */,
 				724A9F2719A1657500E72C9D /* [Code] Preferences.strings in Resources */,
-				722CAA5C19AD4AED009C6AAE /* scripts@2x.png in Resources */,
 				726CA2A019606CA600A6AD40 /* MainMenu.xib in Resources */,
 				724A9F2019A1657500E72C9D /* [Code] Dump All Memory.strings in Resources */,
 				724A9F3C19A8173900E72C9D /* [Code] Edit Variable Size.strings in Resources */,
 				724A9F2219A1657500E72C9D /* [Code] Logger Window.strings in Resources */,
 				726CA2CE19606E2600A6AD40 /* Edit Size Dialog.xib in Resources */,
-				723FC6E824F4BEB10083F568 /* stepover@2x.pdf in Resources */,
 				72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */,
 				725DEC881A24F7610095C9B3 /* [Code] Script Manager.strings in Resources */,
 				724A9F2419A1657500E72C9D /* [Code] Memory Protection.strings in Resources */,
@@ -2871,7 +2775,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14.6;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
@@ -2905,7 +2809,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14.6;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;

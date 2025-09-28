@@ -124,7 +124,7 @@
 	IBOutlet NSBox *_searchAddressVerticalDivider;
 	IBOutlet NSPopUpButton *_searchAddressOffsetComparisonPopUpButton;
 	IBOutlet NSMenuItem *_searchAddressOffsetComparisonSameMenuItem;
-	IBOutlet AGScopeBar *_scopeBar;
+	AGScopeBar *_scopeBar;
 	IBOutlet NSView *_scopeBarFlagsView;
 	IBOutlet NSView *_scopeBarAddressSearchOptionsView;
 	IBOutlet NSToolbar *_toolbar;
@@ -137,6 +137,8 @@
 	{
 		self.lastChosenInternalProcessName = lastChosenInternalProcessName;
 		_preferringNewTab = preferringNewTab;
+		
+		_scopeBar = [[AGScopeBar alloc] init];
 		
 		_debuggerController = debuggerController;
 		_breakPointController = breakPointController;
@@ -166,11 +168,8 @@
 	// On 10.12, when search document windows are restored, the separator is thicker
 	// I don't know why this happens, but one workaround is just resetting the baseline separator property
 	// to NO and then back to YES
-	if (@available(macOS 10.12, *))
-	{
-		_toolbar.showsBaselineSeparator = NO;
-		_toolbar.showsBaselineSeparator = YES;
-	}
+	_toolbar.showsBaselineSeparator = NO;
+	_toolbar.showsBaselineSeparator = YES;
 }
 
 - (void)setupScopeBar
@@ -303,6 +302,16 @@
 #pragma clang diagnostic pop
 	}
 	
+	{
+		NSTitlebarAccessoryViewController *titleAccessoryViewController = [[NSTitlebarAccessoryViewController alloc] initWithNibName:nil bundle:nil];
+		titleAccessoryViewController.layoutAttribute = NSLayoutAttributeBottom;
+		titleAccessoryViewController.view = _scopeBar;
+		_scopeBar.translatesAutoresizingMaskIntoConstraints = true;
+		_scopeBar.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+		
+		[self.window addTitlebarAccessoryViewController:titleAccessoryViewController];
+	}
+	
 	_documentData = [(ZGDocument *)self.document data];
 	_searchData = [(ZGDocument *)self.document searchData];
 	
@@ -321,11 +330,7 @@
 	[self setupScopeBar];
 	ZGAdjustLocalizableWidthsForWindowAndTableColumns(ZGUnwrapNullableObject(self.window), @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
 	
-	[_storeValuesButton.image setTemplate:YES];
-	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
-	[[NSImage imageNamed:@"container_filled_record"] setTemplate:YES];
-	
-	_storeValuesButton.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
+	_storeValuesToolbarItem.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
 	
 	[_generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 
@@ -391,7 +396,7 @@
 
 	[_variablesTableView reloadData];
 
-	_storeValuesButton.enabled = newProcess.valid;
+	_storeValuesToolbarItem.enabled = newProcess.valid;
 
 	if (oldProcess.valid && !newProcess.valid)
 	{
@@ -717,6 +722,22 @@
 	}
 }
 
+- (void)addFunctionWithSymbolName:(NSString *)symbolName fallbackTitle:(NSString *)fallbackTitle tag:(ZGFunctionType)tag
+{
+	NSMenuItem *menuItem = [_functionPopUpButton.menu addItemWithTitle:@"" action:nil keyEquivalent:@""];
+	
+	if (@available(macOS 15, *))
+	{
+		menuItem.image = [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:@""];
+	}
+	else
+	{
+		menuItem.title = fallbackTitle;
+	}
+	
+	menuItem.tag = tag;
+}
+
 - (void)updateOptions
 {
 	ZGVariableType dataType = [self selectedDataType];
@@ -795,21 +816,17 @@
 	
 	[_functionPopUpButton removeAllItems];
 	
-	[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"equalsOperatorTitle") atIndex:0];
-	[[_functionPopUpButton itemAtIndex:0] setTag:ZGEquals];
+	[self addFunctionWithSymbolName:@"equal" fallbackTitle:ZGLocalizableSearchDocumentString(@"equalsOperatorTitle") tag:ZGEquals];
 	
 	if (_documentData.searchType == ZGSearchTypeValue)
 	{
-		[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") atIndex:1];
-		[[_functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
+		[self addFunctionWithSymbolName:@"notequal" fallbackTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") tag:ZGNotEquals];
 		
 		if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
 		{
-			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:2];
-			[[_functionPopUpButton itemAtIndex:2] setTag:ZGLessThan];
+			[self addFunctionWithSymbolName:@"lessthan" fallbackTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") tag:ZGLessThan];
 			
-			[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:3];
-			[[_functionPopUpButton itemAtIndex:3] setTag:ZGGreaterThan];
+			[self addFunctionWithSymbolName:@"greaterthan" fallbackTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") tag:ZGGreaterThan];
 		}
 	}
 	

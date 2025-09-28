@@ -335,12 +335,38 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 	// When opening a file using NSWorkspace, make sure the request doesn't inherit any of our Python related env variables we have set up in ZGScriptingInterpreter
 	if (editorApplication.length == 0)
 	{
-		if (@available(macOS 10.15, *))
+		NSWorkspaceOpenConfiguration *configuration = NSWorkspaceOpenConfiguration.configuration;
+		configuration.environment = @{@"PYTHONHOME": @"", @"PYTHONPATH": @"", @"PYTHONDONTWRITEBYTECODE" : @""};
+		
+		[[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:script.path isDirectory:NO] configuration:configuration completionHandler:^(NSRunningApplication * _Nullable __unused app, NSError * _Nullable error) {
+			if (error != nil)
+			{
+				NSLog(@"Error: failed to open python application: %@", error.localizedDescription);
+			}
+		}];
+	}
+	else
+	{
+		NSURL *fileURL = [NSURL fileURLWithPath:script.path isDirectory:NO];
+		
+		NSArray<NSURL *> *editorURLs = CFBridgingRelease(LSCopyApplicationURLsForURL((__bridge CFURLRef)fileURL, kLSRolesEditor));
+		
+		NSURL *applicationEditorURL = nil;
+		for (NSURL *editorURL in editorURLs)
 		{
-			NSWorkspaceOpenConfiguration *configuration = NSWorkspaceOpenConfiguration.configuration;
-			configuration.environment = @{@"PYTHONHOME": @"", @"PYTHONPATH": @"", @"PYTHONDONTWRITEBYTECODE" : @""};
-			
-			[[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:script.path isDirectory:NO] configuration:configuration completionHandler:^(NSRunningApplication * _Nullable __unused app, NSError * _Nullable error) {
+			if ([editorURL.URLByDeletingPathExtension.lastPathComponent isEqualToString:editorApplication])
+			{
+				applicationEditorURL = editorURL;
+				break;
+			}
+		}
+		
+		NSWorkspaceOpenConfiguration *configuration = NSWorkspaceOpenConfiguration.configuration;
+		configuration.environment = @{@"PYTHONHOME": @"", @"PYTHONPATH": @"", @"PYTHONDONTWRITEBYTECODE" : @""};
+		
+		if (applicationEditorURL != nil)
+		{
+			[[NSWorkspace sharedWorkspace] openURLs:@[fileURL] withApplicationAtURL:applicationEditorURL configuration:configuration completionHandler:^(NSRunningApplication * _Nullable __unused app, NSError * _Nullable error) {
 				if (error != nil)
 				{
 					NSLog(@"Error: failed to open python application: %@", error.localizedDescription);
@@ -349,61 +375,14 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		}
 		else
 		{
-			if (![[NSWorkspace sharedWorkspace] openFile:script.path])
-			{
-				NSLog(@"Error: failed to openFile: python script (legacy path)");
-			}
-		}
-	}
-	else
-	{
-		if (@available(macOS 10.15, *))
-		{
-			NSURL *fileURL = [NSURL fileURLWithPath:script.path isDirectory:NO];
+			NSLog(@"Error: failed to find associated Python editor for %@", editorApplication);
 			
-			NSArray<NSURL *> *editorURLs = CFBridgingRelease(LSCopyApplicationURLsForURL((__bridge CFURLRef)fileURL, kLSRolesEditor));
-			
-			NSURL *applicationEditorURL = nil;
-			for (NSURL *editorURL in editorURLs)
-			{
-				if ([editorURL.URLByDeletingPathExtension.lastPathComponent isEqualToString:editorApplication])
+			[[NSWorkspace sharedWorkspace] openURL:fileURL configuration:configuration completionHandler:^(NSRunningApplication * _Nullable __unused app, NSError * _Nullable error) {
+				if (error != nil)
 				{
-					applicationEditorURL = editorURL;
-					break;
+					NSLog(@"Error: failed to open python application: %@", error.localizedDescription);
 				}
-			}
-			
-			NSWorkspaceOpenConfiguration *configuration = NSWorkspaceOpenConfiguration.configuration;
-			configuration.environment = @{@"PYTHONHOME": @"", @"PYTHONPATH": @"", @"PYTHONDONTWRITEBYTECODE" : @""};
-			
-			if (applicationEditorURL != nil)
-			{
-				[[NSWorkspace sharedWorkspace] openURLs:@[fileURL] withApplicationAtURL:applicationEditorURL configuration:configuration completionHandler:^(NSRunningApplication * _Nullable __unused app, NSError * _Nullable error) {
-					if (error != nil)
-					{
-						NSLog(@"Error: failed to open python application: %@", error.localizedDescription);
-					}
-				}];
-			}
-			else
-			{
-				NSLog(@"Error: failed to find associated Python editor for %@", editorApplication);
-				
-				[[NSWorkspace sharedWorkspace] openURL:fileURL configuration:configuration completionHandler:^(NSRunningApplication * _Nullable __unused app, NSError * _Nullable error) {
-					if (error != nil)
-					{
-						NSLog(@"Error: failed to open python application: %@", error.localizedDescription);
-					}
-				}];
-			}
-		}
-		else
-		{
-			if (![[NSWorkspace sharedWorkspace] openFile:script.path withApplication:editorApplication])
-			{
-				NSLog(@"Error: failed to open python file with %@ (legacy path). Falling back to -openFile:", editorApplication);
-				[[NSWorkspace sharedWorkspace] openFile:script.path];
-			}
+			}];
 		}
 	}
 }

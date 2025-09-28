@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) IBOutlet ZGTableView *variablesTableView;
 @property (nonatomic) IBOutlet NSProgressIndicator *progressIndicator;
 @property (nonatomic) IBOutlet NSPopUpButton *dataTypesPopUpButton;
-@property (nonatomic) IBOutlet NSButton *storeValuesButton;
+@property (nonatomic) IBOutlet NSToolbarItem *storeValuesToolbarItem;
 @property (nonatomic) IBOutlet NSSearchField *searchValueTextField;
 @property (nonatomic) IBOutlet NSPopUpButton *functionPopUpButton;
 @property (nonatomic) NSPopUpButton *searchTypePopUpButton;

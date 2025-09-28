@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22503" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24127" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22503"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24127"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGPreferencesController">
             <connections>
+                <outlet property="_scriptsToolbarItem" destination="kPj-yB-vNE" id="kcz-k6-V07"/>
                 <outlet property="window" destination="1" id="26"/>
             </connections>
         </customObject>
@@ -17,28 +18,28 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="524" y="518" width="322" height="156"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="922"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="322" height="156"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="D7D08D1A-8E44-4FDF-8409-E9CF29EA45F5" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconAndLabel" sizeMode="regular" id="6st-Zj-6LU">
+            <toolbar key="toolbar" implicitIdentifier="D7D08D1A-8E44-4FDF-8409-E9CF29EA45F5" autosavesConfiguration="NO" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="6st-Zj-6LU">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="WM0-nF-4pf"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="VRz-v5-SJk"/>
-                    <toolbarItem implicitItemIdentifier="839E6014-BACC-4321-8E43-E69F15A411EC" explicitItemIdentifier="ZGSoftwareUpdateIdentifier" label="Updates" paletteLabel="Updates" image="NSNetwork" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="f0w-AB-SR1">
+                    <toolbarItem implicitItemIdentifier="839E6014-BACC-4321-8E43-E69F15A411EC" explicitItemIdentifier="ZGSoftwareUpdateIdentifier" label="Updates" paletteLabel="Updates" image="network" catalog="system" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="f0w-AB-SR1">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="7Bn-K1-KRP"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="EE190157-26A8-430B-93AF-571C57ED8B5C" explicitItemIdentifier="ZGDebuggerHotKeysIdentifier" label="Shortcuts" paletteLabel="Shortcuts" tag="1" image="hotkey" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="kgo-oj-XB3">
+                    <toolbarItem implicitItemIdentifier="EE190157-26A8-430B-93AF-571C57ED8B5C" explicitItemIdentifier="ZGDebuggerHotKeysIdentifier" label="Shortcuts" paletteLabel="Shortcuts" tag="1" image="character.textbox" catalog="system" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="kgo-oj-XB3">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="YXV-iP-083"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="8A223B1E-6293-4DB6-A461-07E053A19CE7" explicitItemIdentifier="ZGScriptPreferenceIdentifier" label="Scripts" paletteLabel="Scripts" tag="2" image="scripts" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="kPj-yB-vNE">
+                    <toolbarItem implicitItemIdentifier="8A223B1E-6293-4DB6-A461-07E053A19CE7" explicitItemIdentifier="ZGScriptPreferenceIdentifier" label="Scripts" paletteLabel="Scripts" tag="2" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="kPj-yB-vNE">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="38w-gw-FXJ"/>
@@ -58,8 +59,7 @@
         </window>
     </objects>
     <resources>
-        <image name="NSNetwork" width="32" height="32"/>
-        <image name="hotkey" width="32" height="32"/>
-        <image name="scripts" width="32" height="32"/>
+        <image name="character.textbox" catalog="system" width="19" height="14"/>
+        <image name="network" catalog="system" width="15" height="15"/>
     </resources>
 </document>

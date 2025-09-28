@@ -42,8 +42,6 @@
 #define ZGDebuggerHotKeysPreferenceIdentifier @"ZGDebuggerHotKeysIdentifier"
 #define ZGScriptPreferenceIdentifier @"ZGScriptPreferenceIdentifier"
 
-#define ZGSoftwareUpdateIconPath @"/System/Library/CoreServices/Software Update.app/Contents/Resources/SoftwareUpdate.icns"
-
 #define ZGPreferencesLocalizationTable @"[Code] Preferences"
 
 @implementation ZGPreferencesController
@@ -53,6 +51,7 @@
 	ZGDebuggerController * _Nonnull _debuggerController;
 	
 	NSViewController * _Nullable _preferencesViewController;
+	IBOutlet NSToolbarItem * _Nonnull _scriptsToolbarItem;
 }
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController
@@ -71,22 +70,17 @@
 
 - (void)windowDidLoad
 {
-	if (@available(macOS 11.0, *))
-	{
-		self.window.toolbarStyle = NSWindowToolbarStylePreference;
-	}
+	self.window.toolbarStyle = NSWindowToolbarStylePreference;
 	
 	[self.window.toolbar setSelectedItemIdentifier:ZGSoftwareUpdatePreferenceIdentifier];
 	
-	for (NSToolbarItem *toolbarItem in self.window.toolbar.items)
+	if (@available(macOS 15, *))
 	{
-		if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdatePreferenceIdentifier])
-		{
-			if ([[NSFileManager defaultManager] fileExistsAtPath:ZGSoftwareUpdateIconPath])
-			{
-				toolbarItem.image = [[NSImage alloc] initWithContentsOfFile:ZGSoftwareUpdateIconPath];
-			}
-		}
+		_scriptsToolbarItem.image = [NSImage imageWithSystemSymbolName:@"text.document" accessibilityDescription:nil];
+	}
+	else
+	{
+		_scriptsToolbarItem.image = [NSImage imageWithSystemSymbolName:@"text.alignleft" accessibilityDescription:nil];
 	}
 	
 	[self setUpdatePreferencesView];

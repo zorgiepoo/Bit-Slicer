@@ -282,10 +282,18 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	
 	[_statusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	
-	[_continueButton.image setTemplate:YES];
-	[[_stepExecutionSegmentedControl imageForSegment:ZGStepIntoExecution] setTemplate:YES];
-	[[_stepExecutionSegmentedControl imageForSegment:ZGStepOverExecution] setTemplate:YES];
-	[[_stepExecutionSegmentedControl imageForSegment:ZGStepOutExecution] setTemplate:YES];
+	if (@available(macOS 15, *))
+	{
+		_continueButton.image = [NSImage imageWithSystemSymbolName:@"arrow.trianglehead.clockwise.rotate.90" accessibilityDescription:nil];
+	}
+	else
+	{
+		_continueButton.image = [NSImage imageWithSystemSymbolName:@"arrow.clockwise" accessibilityDescription:nil];
+	}
+	
+	[_stepExecutionSegmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.turn.right.down" accessibilityDescription:nil] forSegment:ZGStepIntoExecution];
+	[_stepExecutionSegmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.turn.down.right" accessibilityDescription:nil] forSegment:ZGStepOverExecution];
+	[_stepExecutionSegmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.turn.left.up" accessibilityDescription:nil] forSegment:ZGStepOutExecution];
 	
 	_continueButton.toolTip = ZGLocalizedStringFromDebuggerTable(@"continueButtonToolTip");
 	

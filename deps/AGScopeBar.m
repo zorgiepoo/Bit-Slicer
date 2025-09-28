@@ -30,7 +30,8 @@
 //
 
 // NOTE: This class has been modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
-// replacing deprecated Gestalt() usage, fixing nullability warnings, and adding dark mode support
+// replacing deprecated Gestalt() usage, fixing nullability warnings, adding dark mode support, vertical centered layout fixes for macOS 26+,
+// and not drawing background colors
 
 #import "AGScopeBar.h"
 
@@ -137,11 +138,23 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		invertColors = NO;
 #endif
 		
-		mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:colorValue(0.89, invertColors) alpha:1.0];
-		mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:colorValue(0.87, invertColors) alpha:1.0];
-		mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
-		mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
-		mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:colorValue(0.6, invertColors) alpha:1.0];
+		/*
+		{
+			mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:colorValue(0.89, invertColors) alpha:1.0];
+			mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:colorValue(0.87, invertColors) alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
+			mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:colorValue(0.6, invertColors) alpha:1.0];
+		}
+		 */
+		// Draw no background color
+		{
+			mScopeBarAppearance.backgroundTopColor              = nil;
+			mScopeBarAppearance.backgroundBottomColor           = nil;
+			mScopeBarAppearance.inactiveBackgroundTopColor      = nil;
+			mScopeBarAppearance.inactiveBackgroundBottomColor   = nil;
+			mScopeBarAppearance.borderBottomColor               = nil;
+		}
 		
 		mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:colorValue(0.52, invertColors) alpha:1.0];
 		mScopeBarAppearance.separatorWidth                  = 1.0;
@@ -463,21 +476,24 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	
 	// Draw gradient background
 	NSGradient * gradient = nil;
-	if (isWindowActive) {
-		gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.backgroundBottomColor
-												  endingColor:self.scopeBarAppearance.backgroundTopColor] autorelease];
-	} else {
-		gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.inactiveBackgroundBottomColor
-												  endingColor:self.scopeBarAppearance.inactiveBackgroundTopColor] autorelease];
-	}
 	
-	[gradient drawInRect:self.bounds angle:90.0];
-	
-	// Draw border
-	if (self.scopeBarAppearance.borderBottomColor) {
-		NSRect lineRect = NSMakeRect(0, 0, self.bounds.size.width, 1);
-		[self.scopeBarAppearance.borderBottomColor set];
-		NSRectFill(lineRect);
+	if (self.scopeBarAppearance.backgroundBottomColor != nil) {
+		if (isWindowActive) {
+			gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.backgroundBottomColor
+													  endingColor:self.scopeBarAppearance.backgroundTopColor] autorelease];
+		} else {
+			gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.inactiveBackgroundBottomColor
+													  endingColor:self.scopeBarAppearance.inactiveBackgroundTopColor] autorelease];
+		}
+		
+		[gradient drawInRect:self.bounds angle:90.0];
+		
+		// Draw border
+		if (self.scopeBarAppearance.borderBottomColor) {
+			NSRect lineRect = NSMakeRect(0, 0, self.bounds.size.width, 1);
+			[self.scopeBarAppearance.borderBottomColor set];
+			NSRectFill(lineRect);
+		}
 	}
 	
 	// Draw separators
@@ -614,7 +630,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	if (self.accessoryView) {
 		NSRect frame = self.accessoryView.frame;
 		frame.origin.x = round(NSMaxX(self.bounds) - (frame.size.width + SCOPE_BAR_HORZ_INSET));
-		frame.origin.y = round(((SCOPE_BAR_HEIGHT - frame.size.height) / 2.0));
+		frame.origin.y = round(((self.frame.size.height - frame.size.height) / 2.0));
 		self.accessoryView.frame = frame;
 		self.accessoryView.autoresizingMask = NSViewMinXMargin;
 		[self addSubview:self.accessoryView];
@@ -994,7 +1010,15 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 			
 			NSRect frame = mLabelField.frame;
 			frame.origin.x = 0;
-			frame.origin.y = 6;//floor((self.scopeBar.frame.size.height - frame.size.height) / 2.0);
+			
+			// Not sure why this offset change is needed
+			// Note: macOS 16 is same as macOS 26 (but works when built from older SDKs)
+			if (@available(macOS 16, *)) {
+				frame.origin.y = ((self.scopeBar.frame.size.height - frame.size.height) / 2.0);
+			} else {
+				frame.origin.y = 6;
+			}
+			
 			mLabelField.frame = frame;
 			
 			xOffset += mLabelField.frame.size.width;
