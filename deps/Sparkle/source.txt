@@ -1,6 +1,6 @@
 Source: https://github.com/sparkle-project/Sparkle
 Branch: 2.x
-Commit: 2.7.0-beta.1
+Commit: 3c83ebb5cf19e8efae8a40fe8edaac377743d96c
 
 Instructions:
 In ConfigCommon.xcconfig set deployment target and disable:
@@ -10,3 +10,4 @@ SPARKLE_BUILD_LEGACY_SUUPDATER
 SPARKLE_BUILD_LEGACY_DSA_SUPPORT (and remove -DSPARKLE_BUILD_LEGACY_DSA_SUPPORT)
 SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
 SPARKLE_BUILD_PACKAGE_SUPPORT (and remove -DSPARKLE_BUILD_PACKAGE_SUPPORT)
+Bump MACOSX_DEPLOYMENT_TARGET to 11.5
