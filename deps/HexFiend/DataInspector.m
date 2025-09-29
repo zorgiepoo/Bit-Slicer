@@ -16,6 +16,7 @@
 #pragma clang diagnostic ignored "-Wcast-align"
 #pragma clang diagnostic ignored "-Wdouble-promotion"
 #pragma clang diagnostic ignored "-Wcast-qual"
+#pragma clang diagnostic ignored "-Wformat"
 
 #import "DataInspector.h"
 #import "LEB128Type.h"

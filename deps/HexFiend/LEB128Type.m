@@ -5,6 +5,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wimplicit-atomic-properties"
 #pragma clang diagnostic ignored "-Wformat-non-iso"
+#pragma clang diagnostic ignored "-Wformat"
 
 @implementation LEB128Result
 

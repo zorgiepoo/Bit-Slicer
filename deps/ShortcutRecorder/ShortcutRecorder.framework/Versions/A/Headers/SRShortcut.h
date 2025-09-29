@@ -9,6 +9,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-messaging-id"
+
 /*!
  @enum SRShortcutKey
 
@@ -255,5 +258,7 @@ BOOL SRKeyCodeWithFlagsEqualToKeyEquivalentWithFlags(SRKeyCode aKeyCode,
                                                      NSEventModifierFlags aKeyCodeFlags,
                                                      NSString * _Nullable aKeyEquivalent,
                                                      NSEventModifierFlags aKeyEquivalentModifierFlags) __attribute__((deprecated("Deprecated in 3.0", "SRShortcut/isEqualToKeyEquivalent:withModifierFlags:")));
+
+#pragma clang diagnostic pop
 
 NS_ASSUME_NONNULL_END

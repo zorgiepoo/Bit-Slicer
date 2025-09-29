@@ -6,6 +6,9 @@
 #import <Cocoa/Cocoa.h>
 #import <ShortcutRecorder/SRCommon.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -137,3 +140,5 @@ NS_SWIFT_NAME(ASCIISymbolicKeyCodeTransformer)
 @end
 
 NS_ASSUME_NONNULL_END
+
+#pragma clang diagnostic pop
