@@ -6,17 +6,13 @@
 	<dict>
 		<key>Resources/Info.plist</key>
 		<data>
-		kGe72XWpi5fZNKWVUUMXT3Zg7sE=
+		2KXKZXcFwOwJr1duHB+tjB1UsjM=
 		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
 		<key>Headers/DDExpression.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			JwSgos/gPSCVaZjKh6dxBrRf69w=
-			</data>
 			<key>hash2</key>
 			<data>
 			6bfu3Wf+Kzl04dQK0DxkOow6mzMxszGZsuSRbPmDn6Q=
@@ -24,10 +20,6 @@
 		</dict>
 		<key>Headers/DDExpressionRewriter.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			ucBwKcwVI9s4I7oQ6PGIcO+TyYo=
-			</data>
 			<key>hash2</key>
 			<data>
 			Lf7lNkUPrcTEcFlU0qrQfgPH02MurJUg2Dhp5cVHy6M=
@@ -35,10 +27,6 @@
 		</dict>
 		<key>Headers/DDMathEvaluator+Private.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			VemTu6JVtLWdQHeXYYL6KjDMwss=
-			</data>
 			<key>hash2</key>
 			<data>
 			TaD2rMC5MVt1JiOO0zlRVQg1/0097A5D6gAN64f/F2E=
@@ -46,10 +34,6 @@
 		</dict>
 		<key>Headers/DDMathEvaluator.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			wMcYdZsAQtjRNshq1cxXTbGXTkI=
-			</data>
 			<key>hash2</key>
 			<data>
 			wSwKyAb5klOt9dE+P0wBmxv+i/pPU3F6mmxwvC1Lquw=
@@ -57,10 +41,6 @@
 		</dict>
 		<key>Headers/DDMathOperator.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			pt7Cu0PHorJLLgIogd060ZQLrVY=
-			</data>
 			<key>hash2</key>
 			<data>
 			dvGrW497lPqzkioAKzaAkRSn7Cz3B02VIiHRUonE/UE=
@@ -68,10 +48,6 @@
 		</dict>
 		<key>Headers/DDMathOperator_Internal.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			eAFFGUxW8kQLmMRmALc6dVTCg20=
-			</data>
 			<key>hash2</key>
 			<data>
 			GzJm1etMsi7pIP3JFvgz/bRuDiIjNxjzqSMDSgmzg00=
@@ -79,10 +55,6 @@
 		</dict>
 		<key>Headers/DDMathParser.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			cTN5m1/AWAd7bISPdVjfoHgPtGE=
-			</data>
 			<key>hash2</key>
 			<data>
 			u6N57ggIXN/mweP1/no+C8Hhwo2AADQc8loBbSA2YCE=
@@ -90,10 +62,6 @@
 		</dict>
 		<key>Headers/DDMathParserMacros.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			bds/3TAMXToVt8hh0OEPRUiQHSg=
-			</data>
 			<key>hash2</key>
 			<data>
 			X8IJMWUOhDHXoILH3NxVaye69uiVuK7effZpwMJo/54=
@@ -101,10 +69,6 @@
 		</dict>
 		<key>Headers/DDMathStringToken.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			TDoEe4kNI0a2UgjdqGMrInsAr58=
-			</data>
 			<key>hash2</key>
 			<data>
 			hJiqpJFnFMMys2js4LJx+Ae6ozr+56x9c/RYwh2/CyA=
@@ -112,10 +76,6 @@
 		</dict>
 		<key>Headers/DDMathStringTokenizer.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			s5UWov0ylWNIZ0vKBppXvK9VuME=
-			</data>
 			<key>hash2</key>
 			<data>
 			2oLc8Gk3HavIReyK6CHgUJFsPqS0nB0cmYMZAU/9b6Q=
@@ -123,10 +83,6 @@
 		</dict>
 		<key>Headers/DDParser.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			jbWGhtC75LJPV0PhAPT9UlqIJ98=
-			</data>
 			<key>hash2</key>
 			<data>
 			DyKmE+JZMzPbBV1TC5PHT7lLWx9ugkcBpSIaoGgsZIU=
@@ -134,10 +90,6 @@
 		</dict>
 		<key>Headers/DDParserTypes.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			dPyXb2IBqXTj8qfZkBZn4MhFRdA=
-			</data>
 			<key>hash2</key>
 			<data>
 			SbRaE6KFvjhv+/cnfb6Rd9SGJP/WcLRARRwZpxpktGk=
@@ -145,10 +97,6 @@
 		</dict>
 		<key>Headers/DDTypes.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			hsOtYrxj4gpWCR310xj2apYcbrU=
-			</data>
 			<key>hash2</key>
 			<data>
 			wr13mMjyatnVt5iJ3N+/gyzCw4aju7O3OeaY7Tp6W3Q=
@@ -156,10 +104,6 @@
 		</dict>
 		<key>Headers/NSString+DDMathParsing.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			b4frX/xFddIfOE0oIQfaj6P23PQ=
-			</data>
 			<key>hash2</key>
 			<data>
 			gbZ4SoOU4iIUBFB/mYFQmvGPzKd/cfW8HeBd8hUvwOk=
@@ -167,21 +111,13 @@
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			azwJpSR0rLefBwQdVuvG9oXwYPg=
-			</data>
 			<key>hash2</key>
 			<data>
-			Q/pjhqNwNkQqeciBu6orvG0C63f7vByvCvx+T22D5fM=
+			gmVWX1QHbLVrNEeIlAgvPW6BgkqUHXwvWA6yhXXExZ8=
 			</data>
 		</dict>
 		<key>PrivateHeaders/_DDDecimalFunctions.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			yTIaQxjeUyP4G2Sr0E5ocrlqQks=
-			</data>
 			<key>hash2</key>
 			<data>
 			B4k1NpGvNM4fnlNw/0eDDzviIS77vskTE4Tv+jVmLDk=
@@ -189,10 +125,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDFunctionEvaluator.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			tHK3lEUGjWsSFyAPo5K4STx/uDo=
-			</data>
 			<key>hash2</key>
 			<data>
 			wbkwNotyM0Ql39tJNSFinfxh1oIkk8womqJSHnvMJYs=
@@ -200,10 +132,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDFunctionExpression.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			BpeVMyUq+q/cgDNLw5yvB18zEVc=
-			</data>
 			<key>hash2</key>
 			<data>
 			+gsltBu1tQxuxSpVNFQ4v6PmZWZzFVFFMGEhi+fHfHc=
@@ -211,10 +139,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDFunctionTerm.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			xH5YfgRGbn6HD+HztCutkqejnUM=
-			</data>
 			<key>hash2</key>
 			<data>
 			YFyhueMUPOgrzhvonXbzWXchP5mNE3MnsAcGW7XWlWg=
@@ -222,10 +146,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDGroupTerm.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			TTPjPGjqsVO+i/CEqKs2ypdjuVk=
-			</data>
 			<key>hash2</key>
 			<data>
 			XnNHDSP2pc7y6HNf8cbvLDwxaxc6QhDy1fUA6qmUuis=
@@ -233,10 +153,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDNumberExpression.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			ATd/UVMO+MgrCxkvoJWkl9TKak0=
-			</data>
 			<key>hash2</key>
 			<data>
 			Pi8k5+avk6CBV2zdICzHxKKLzO1KJBCk6ZNwZbdpJBA=
@@ -244,10 +160,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDNumberTerm.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			Se/zo7Un3aLs+4gPvXIpZeBKIQ0=
-			</data>
 			<key>hash2</key>
 			<data>
 			7DxywRCtdgEjic7nieuTpcTrD9InE9WtPUmzBSAl/Lc=
@@ -255,10 +167,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDOperatorTerm.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			3ej6ujWZr1/h6XmhuwqZ4k1/75g=
-			</data>
 			<key>hash2</key>
 			<data>
 			qAqqmlJy3J8MQgRIvEUYt8uc0XOtD79kX1BNXzDCfKs=
@@ -266,10 +174,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDParserTerm.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			D4KzQmwLl/TuWJjD5w6O5IhJMEM=
-			</data>
 			<key>hash2</key>
 			<data>
 			dJGpT9sQkpRnvqKhhFSGASVrtjQYr3a6iHjELNaH12s=
@@ -277,10 +181,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDPrecisionFunctionEvaluator.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			Fg8GrmHBpJq4ovHNuVpJHUdCQYk=
-			</data>
 			<key>hash2</key>
 			<data>
 			i8aWLyar5bUr8r+z4wUzCZvu6VOhaQjS5kjeqVMDFsI=
@@ -288,10 +188,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDRewriteRule.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			68NP+Ur9tobrSbJuLXJDY4cQKFk=
-			</data>
 			<key>hash2</key>
 			<data>
 			LJihlVlnvrbzMh7gGnUgQhIBoX9x5eJHWAPX/98bz3Q=
@@ -299,10 +195,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDVariableExpression.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			2xjg/Q5VqKDb278f9SgAv6DHaM8=
-			</data>
 			<key>hash2</key>
 			<data>
 			q+cg4D44DilogsmjYTCs7HCbRqU/4Zze7vmdj5SIsmQ=
@@ -310,10 +202,6 @@
 		</dict>
 		<key>PrivateHeaders/_DDVariableTerm.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			tpplmrzBtt99DXtYehFRI9Udg9w=
-			</data>
 			<key>hash2</key>
 			<data>
 			5p7PmrbGK9R4abHUQi8bikWDTlMQR/9o9JPGXa37Q7s=
@@ -321,13 +209,9 @@
 		</dict>
 		<key>Resources/Info.plist</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			kGe72XWpi5fZNKWVUUMXT3Zg7sE=
-			</data>
 			<key>hash2</key>
 			<data>
-			20Wf94ZOOWSxyCEZ8D/eV3v/WvZq0k5DEUNNpjQ7ZDo=
+			R+hXsbF/AZ8MZ2OK6GAFuW0U9rh4Qlb/Hx1203X3QuY=
 			</data>
 		</dict>
 	</dict>

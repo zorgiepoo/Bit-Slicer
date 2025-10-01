@@ -1,0 +1,584 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/msp/Library/Developer/Xcode/DerivedData/DDMathParser-ekhfudluanvtuzhkfbwspmkzsltd/Build/Products/Release/DDMathParser.framework/Versions/A/DDMathParser'
+relocations:
+  - { offset: 0x33, size: 0x8, addend: 0x0, symName: _DDMathParserVersionString, symObjAddr: 0x0, symBinAddr: 0x2A3F8, symSize: 0x0 }
+  - { offset: 0x67, size: 0x8, addend: 0x0, symName: _DDMathParserVersionNumber, symObjAddr: 0x38, symBinAddr: 0x2A430, symSize: 0x0 }
+  - { offset: 0xB0, size: 0x8, addend: 0x0, symName: _DDOperatorInvalid, symObjAddr: 0x488, symBinAddr: 0x30040, symSize: 0x0 }
+  - { offset: 0x128, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalOr, symObjAddr: 0x490, symBinAddr: 0x30048, symSize: 0x0 }
+  - { offset: 0x13D, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalAnd, symObjAddr: 0x498, symBinAddr: 0x30050, symSize: 0x0 }
+  - { offset: 0x152, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalNot, symObjAddr: 0x4A0, symBinAddr: 0x30058, symSize: 0x0 }
+  - { offset: 0x167, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalEqual, symObjAddr: 0x4A8, symBinAddr: 0x30060, symSize: 0x0 }
+  - { offset: 0x17C, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalNotEqual, symObjAddr: 0x4B0, symBinAddr: 0x30068, symSize: 0x0 }
+  - { offset: 0x191, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalLessThan, symObjAddr: 0x4B8, symBinAddr: 0x30070, symSize: 0x0 }
+  - { offset: 0x1A6, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalGreaterThan, symObjAddr: 0x4C0, symBinAddr: 0x30078, symSize: 0x0 }
+  - { offset: 0x1BB, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalLessThanOrEqual, symObjAddr: 0x4C8, symBinAddr: 0x30080, symSize: 0x0 }
+  - { offset: 0x1D0, size: 0x8, addend: 0x0, symName: _DDOperatorLogicalGreaterThanOrEqual, symObjAddr: 0x4D0, symBinAddr: 0x30088, symSize: 0x0 }
+  - { offset: 0x1E5, size: 0x8, addend: 0x0, symName: _DDOperatorBitwiseOr, symObjAddr: 0x4D8, symBinAddr: 0x30090, symSize: 0x0 }
+  - { offset: 0x1FA, size: 0x8, addend: 0x0, symName: _DDOperatorBitwiseXor, symObjAddr: 0x4E0, symBinAddr: 0x30098, symSize: 0x0 }
+  - { offset: 0x20F, size: 0x8, addend: 0x0, symName: _DDOperatorBitwiseAnd, symObjAddr: 0x4E8, symBinAddr: 0x300A0, symSize: 0x0 }
+  - { offset: 0x224, size: 0x8, addend: 0x0, symName: _DDOperatorLeftShift, symObjAddr: 0x4F0, symBinAddr: 0x300A8, symSize: 0x0 }
+  - { offset: 0x239, size: 0x8, addend: 0x0, symName: _DDOperatorRightShift, symObjAddr: 0x4F8, symBinAddr: 0x300B0, symSize: 0x0 }
+  - { offset: 0x24E, size: 0x8, addend: 0x0, symName: _DDOperatorMinus, symObjAddr: 0x500, symBinAddr: 0x300B8, symSize: 0x0 }
+  - { offset: 0x263, size: 0x8, addend: 0x0, symName: _DDOperatorAdd, symObjAddr: 0x508, symBinAddr: 0x300C0, symSize: 0x0 }
+  - { offset: 0x278, size: 0x8, addend: 0x0, symName: _DDOperatorDivide, symObjAddr: 0x510, symBinAddr: 0x300C8, symSize: 0x0 }
+  - { offset: 0x28D, size: 0x8, addend: 0x0, symName: _DDOperatorMultiply, symObjAddr: 0x518, symBinAddr: 0x300D0, symSize: 0x0 }
+  - { offset: 0x2A2, size: 0x8, addend: 0x0, symName: _DDOperatorModulo, symObjAddr: 0x520, symBinAddr: 0x300D8, symSize: 0x0 }
+  - { offset: 0x2B7, size: 0x8, addend: 0x0, symName: _DDOperatorBitwiseNot, symObjAddr: 0x528, symBinAddr: 0x300E0, symSize: 0x0 }
+  - { offset: 0x2CC, size: 0x8, addend: 0x0, symName: _DDOperatorFactorial, symObjAddr: 0x530, symBinAddr: 0x300E8, symSize: 0x0 }
+  - { offset: 0x2E1, size: 0x8, addend: 0x0, symName: _DDOperatorDegree, symObjAddr: 0x538, symBinAddr: 0x300F0, symSize: 0x0 }
+  - { offset: 0x2F6, size: 0x8, addend: 0x0, symName: _DDOperatorPercent, symObjAddr: 0x540, symBinAddr: 0x300F8, symSize: 0x0 }
+  - { offset: 0x30B, size: 0x8, addend: 0x0, symName: _DDOperatorPower, symObjAddr: 0x548, symBinAddr: 0x30100, symSize: 0x0 }
+  - { offset: 0x320, size: 0x8, addend: 0x0, symName: _DDOperatorParenthesisOpen, symObjAddr: 0x550, symBinAddr: 0x30108, symSize: 0x0 }
+  - { offset: 0x335, size: 0x8, addend: 0x0, symName: _DDOperatorParenthesisClose, symObjAddr: 0x558, symBinAddr: 0x30110, symSize: 0x0 }
+  - { offset: 0x34A, size: 0x8, addend: 0x0, symName: _DDOperatorComma, symObjAddr: 0x560, symBinAddr: 0x30118, symSize: 0x0 }
+  - { offset: 0x35F, size: 0x8, addend: 0x0, symName: _DDOperatorUnaryMinus, symObjAddr: 0x568, symBinAddr: 0x30120, symSize: 0x0 }
+  - { offset: 0x374, size: 0x8, addend: 0x0, symName: _DDOperatorUnaryPlus, symObjAddr: 0x570, symBinAddr: 0x30128, symSize: 0x0 }
+  - { offset: 0x3A4, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer operatorCharacters]', symObjAddr: 0x0, symBinAddr: 0xF50, symSize: 0xC0 }
+  - { offset: 0x3B1, size: 0x8, addend: 0x0, symName: '+[DDMathStringTokenizer _singleCharacterFunctionCharacterSet]', symObjAddr: 0xC0, symBinAddr: 0x1010, symSize: 0x30 }
+  - { offset: 0x3DA, size: 0x8, addend: 0x0, symName: __singleCharacterFunctionCharacterSet.onceToken, symObjAddr: 0x9368, symBinAddr: 0x36B90, symSize: 0x0 }
+  - { offset: 0x3EF, size: 0x8, addend: 0x0, symName: __singleCharacterFunctionCharacterSet._singleCharFunctionSet, symObjAddr: 0x9370, symBinAddr: 0x36B98, symSize: 0x0 }
+  - { offset: 0x736, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer operatorCharacters]', symObjAddr: 0x0, symBinAddr: 0xF50, symSize: 0xC0 }
+  - { offset: 0x82D, size: 0x8, addend: 0x0, symName: '+[DDMathStringTokenizer _singleCharacterFunctionCharacterSet].cold.1', symObjAddr: 0x1EAC, symBinAddr: 0x26E20, symSize: 0x14 }
+  - { offset: 0x848, size: 0x8, addend: 0x0, symName: '+[DDMathStringTokenizer _singleCharacterFunctionCharacterSet].cold.1', symObjAddr: 0x1EAC, symBinAddr: 0x26E20, symSize: 0x14 }
+  - { offset: 0x859, size: 0x8, addend: 0x0, symName: '___61+[DDMathStringTokenizer _singleCharacterFunctionCharacterSet]_block_invoke', symObjAddr: 0xF0, symBinAddr: 0x1040, symSize: 0x68 }
+  - { offset: 0x89B, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer initWithString:operatorSet:error:]', symObjAddr: 0x158, symBinAddr: 0x10A8, symSize: 0x208 }
+  - { offset: 0x969, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer dealloc]', symObjAddr: 0x360, symBinAddr: 0x12B0, symSize: 0x60 }
+  - { offset: 0x9C0, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _processToken:withError:]', symObjAddr: 0x3C0, symBinAddr: 0x1310, symSize: 0xA0 }
+  - { offset: 0xA12, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _processUnknownOperatorToken:withError:]', symObjAddr: 0x460, symBinAddr: 0x13B0, symSize: 0x5B4 }
+  - { offset: 0xB0F, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _processImplicitMultiplicationWithToken:]', symObjAddr: 0xA14, symBinAddr: 0x1964, symSize: 0x10C }
+  - { offset: 0xB9B, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _processArgumentlessFunctionWithToken:]', symObjAddr: 0xB20, symBinAddr: 0x1A70, symSize: 0x128 }
+  - { offset: 0xC19, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer didParseToken:]', symObjAddr: 0xC48, symBinAddr: 0x1B98, symSize: 0x4 }
+  - { offset: 0xC50, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer appendToken:]', symObjAddr: 0xC4C, symBinAddr: 0x1B9C, symSize: 0x50 }
+  - { offset: 0xC8F, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer allObjects]', symObjAddr: 0xC9C, symBinAddr: 0x1BEC, symSize: 0x68 }
+  - { offset: 0xCD4, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer nextObject]', symObjAddr: 0xD04, symBinAddr: 0x1C54, symSize: 0x38 }
+  - { offset: 0xD19, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer peekNextObject]', symObjAddr: 0xD3C, symBinAddr: 0x1C8C, symSize: 0x64 }
+  - { offset: 0xD4E, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer reset]', symObjAddr: 0xDA0, symBinAddr: 0x1CF0, symSize: 0x1C }
+  - { offset: 0xD7D, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _peekNextCharacter]', symObjAddr: 0xDBC, symBinAddr: 0x1D0C, symSize: 0x10 }
+  - { offset: 0xDB0, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _nextCharacter]', symObjAddr: 0xDCC, symBinAddr: 0x1D1C, symSize: 0x10 }
+  - { offset: 0xDE3, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _peek:]', symObjAddr: 0xDDC, symBinAddr: 0x1D2C, symSize: 0x30 }
+  - { offset: 0xE26, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _next:]', symObjAddr: 0xE0C, symBinAddr: 0x1D5C, symSize: 0x38 }
+  - { offset: 0xE7B, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _nextTokenWithError:]', symObjAddr: 0xE44, symBinAddr: 0x1D94, symSize: 0x16C }
+  - { offset: 0xEE0, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _parseNumberWithError:]', symObjAddr: 0xFB0, symBinAddr: 0x1F00, symSize: 0x31C }
+  - { offset: 0xFAB, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _parseHexNumberWithError:]', symObjAddr: 0x12CC, symBinAddr: 0x221C, symSize: 0x268 }
+  - { offset: 0x105E, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _parseFunctionWithError:]', symObjAddr: 0x1534, symBinAddr: 0x2484, symSize: 0x290 }
+  - { offset: 0x1107, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _parseVariableWithError:]', symObjAddr: 0x17C4, symBinAddr: 0x2714, symSize: 0x184 }
+  - { offset: 0x116C, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _parseStringVariableWithError:]', symObjAddr: 0x1948, symBinAddr: 0x2898, symSize: 0x22C }
+  - { offset: 0x1207, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer _parseOperatorWithError:]', symObjAddr: 0x1B74, symBinAddr: 0x2AC4, symSize: 0x26C }
+  - { offset: 0x12CA, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer operatorSet]', symObjAddr: 0x1DE0, symBinAddr: 0x2D30, symSize: 0x10 }
+  - { offset: 0x12FE, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer .cxx_destruct]', symObjAddr: 0x1DF0, symBinAddr: 0x2D40, symSize: 0x54 }
+  - { offset: 0x132E, size: 0x8, addend: 0x0, symName: '+[DDMathStringTokenizer(Deprecated) tokenizerWithString:error:]', symObjAddr: 0x1E44, symBinAddr: 0x2D94, symSize: 0x5C }
+  - { offset: 0x1383, size: 0x8, addend: 0x0, symName: '-[DDMathStringTokenizer(Deprecated) initWithString:error:]', symObjAddr: 0x1EA0, symBinAddr: 0x2DF0, symSize: 0xC }
+  - { offset: 0x1859, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken initWithToken:type:]', symObjAddr: 0x0, symBinAddr: 0x2DFC, symSize: 0x210 }
+  - { offset: 0x1BD6, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken initWithToken:type:]', symObjAddr: 0x0, symBinAddr: 0x2DFC, symSize: 0x210 }
+  - { offset: 0x1C83, size: 0x8, addend: 0x0, symName: '+[DDMathStringToken mathStringTokenWithToken:type:]', symObjAddr: 0x210, symBinAddr: 0x300C, symSize: 0x58 }
+  - { offset: 0x1CD5, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken description]', symObjAddr: 0x268, symBinAddr: 0x3064, symSize: 0x60 }
+  - { offset: 0x1D18, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken debugDescription]', symObjAddr: 0x2C8, symBinAddr: 0x30C4, symSize: 0x1B0 }
+  - { offset: 0x1DB2, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken operatorType]', symObjAddr: 0x478, symBinAddr: 0x3274, symSize: 0x40 }
+  - { offset: 0x1DE6, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken operatorPrecedence]', symObjAddr: 0x4B8, symBinAddr: 0x32B4, symSize: 0x18 }
+  - { offset: 0x1E1A, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken operatorArity]', symObjAddr: 0x4D0, symBinAddr: 0x32CC, symSize: 0x18 }
+  - { offset: 0x1E4E, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken operatorFunction]', symObjAddr: 0x4E8, symBinAddr: 0x32E4, symSize: 0x34 }
+  - { offset: 0x1E82, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken operatorAssociativity]', symObjAddr: 0x51C, symBinAddr: 0x3318, symSize: 0x18 }
+  - { offset: 0x1EB6, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken resolveToOperatorFunction:]', symObjAddr: 0x534, symBinAddr: 0x3330, symSize: 0x50 }
+  - { offset: 0x1EF5, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken token]', symObjAddr: 0x584, symBinAddr: 0x3380, symSize: 0x8 }
+  - { offset: 0x1F29, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken tokenType]', symObjAddr: 0x58C, symBinAddr: 0x3388, symSize: 0x8 }
+  - { offset: 0x1F5D, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken numberValue]', symObjAddr: 0x594, symBinAddr: 0x3390, symSize: 0x8 }
+  - { offset: 0x1F91, size: 0x8, addend: 0x0, symName: '-[DDMathStringToken .cxx_destruct]', symObjAddr: 0x59C, symBinAddr: 0x3398, symSize: 0x3C }
+  - { offset: 0x205E, size: 0x8, addend: 0x0, symName: '+[DDParser parserWithString:error:]', symObjAddr: 0x0, symBinAddr: 0x33D4, symSize: 0x58 }
+  - { offset: 0x220F, size: 0x8, addend: 0x0, symName: '+[DDParser parserWithString:error:]', symObjAddr: 0x0, symBinAddr: 0x33D4, symSize: 0x58 }
+  - { offset: 0x2261, size: 0x8, addend: 0x0, symName: '-[DDParser initWithString:error:]', symObjAddr: 0x58, symBinAddr: 0x342C, symSize: 0x80 }
+  - { offset: 0x22C2, size: 0x8, addend: 0x0, symName: '+[DDParser parserWithTokenizer:error:]', symObjAddr: 0xD8, symBinAddr: 0x34AC, symSize: 0x58 }
+  - { offset: 0x2314, size: 0x8, addend: 0x0, symName: '-[DDParser initWithTokenizer:error:]', symObjAddr: 0x130, symBinAddr: 0x3504, symSize: 0xBC }
+  - { offset: 0x2362, size: 0x8, addend: 0x0, symName: '-[DDParser associativityForOperatorFunction:]', symObjAddr: 0x1EC, symBinAddr: 0x35C0, symSize: 0x40 }
+  - { offset: 0x23B4, size: 0x8, addend: 0x0, symName: '-[DDParser parsedExpressionWithError:]', symObjAddr: 0x22C, symBinAddr: 0x3600, symSize: 0x8C }
+  - { offset: 0x2415, size: 0x8, addend: 0x0, symName: '-[DDParser operatorSet]', symObjAddr: 0x2B8, symBinAddr: 0x368C, symSize: 0x8 }
+  - { offset: 0x2449, size: 0x8, addend: 0x0, symName: '-[DDParser .cxx_destruct]', symObjAddr: 0x2C0, symBinAddr: 0x3694, symSize: 0x30 }
+  - { offset: 0x2895, size: 0x8, addend: 0x0, symName: '+[DDMathOperator infoForOperatorFunction:]', symObjAddr: 0x0, symBinAddr: 0x36C4, symSize: 0x70 }
+  - { offset: 0x28A2, size: 0x8, addend: 0x0, symName: '+[DDMathOperator _defaultOperators]', symObjAddr: 0xE0, symBinAddr: 0x37A4, symSize: 0x30 }
+  - { offset: 0x28CB, size: 0x8, addend: 0x0, symName: __defaultOperators.defaultOperators, symObjAddr: 0x9BD8, symBinAddr: 0x36BA0, symSize: 0x0 }
+  - { offset: 0x28E0, size: 0x8, addend: 0x0, symName: __defaultOperators.onceToken, symObjAddr: 0x9BE0, symBinAddr: 0x36BA8, symSize: 0x0 }
+  - { offset: 0x299B, size: 0x8, addend: 0x0, symName: '-[DDMathOperator description]', symObjAddr: 0xCE8, symBinAddr: 0x43AC, symSize: 0xD8 }
+  - { offset: 0x29C4, size: 0x8, addend: 0x0, symName: _description.ArityDesc, symObjAddr: 0x1FF8, symBinAddr: 0x301B8, symSize: 0x0 }
+  - { offset: 0x29D9, size: 0x8, addend: 0x0, symName: _description.AssocDesc, symObjAddr: 0x2010, symBinAddr: 0x301D0, symSize: 0x0 }
+  - { offset: 0x2A3A, size: 0x8, addend: 0x0, symName: '+[DDMathOperatorSet defaultOperatorSet]', symObjAddr: 0xE28, symBinAddr: 0x44EC, symSize: 0x30 }
+  - { offset: 0x2A63, size: 0x8, addend: 0x0, symName: _defaultOperatorSet.defaultSet, symObjAddr: 0x9BE8, symBinAddr: 0x36BB0, symSize: 0x0 }
+  - { offset: 0x2A78, size: 0x8, addend: 0x0, symName: _defaultOperatorSet.onceToken, symObjAddr: 0x9BF0, symBinAddr: 0x36BB8, symSize: 0x0 }
+  - { offset: 0x2D01, size: 0x8, addend: 0x0, symName: '+[DDMathOperator infoForOperatorFunction:]', symObjAddr: 0x0, symBinAddr: 0x36C4, symSize: 0x70 }
+  - { offset: 0x2D40, size: 0x8, addend: 0x0, symName: '+[DDMathOperator infosForOperatorToken:]', symObjAddr: 0x70, symBinAddr: 0x3734, symSize: 0x70 }
+  - { offset: 0x2E16, size: 0x8, addend: 0x0, symName: '+[DDMathOperator _defaultOperators].cold.1', symObjAddr: 0x1D30, symBinAddr: 0x26E34, symSize: 0x14 }
+  - { offset: 0x2E31, size: 0x8, addend: 0x0, symName: '+[DDMathOperator _defaultOperators].cold.1', symObjAddr: 0x1D30, symBinAddr: 0x26E34, symSize: 0x14 }
+  - { offset: 0x2E42, size: 0x8, addend: 0x0, symName: '___35+[DDMathOperator _defaultOperators]_block_invoke', symObjAddr: 0x110, symBinAddr: 0x37D4, symSize: 0x7E4 }
+  - { offset: 0x2EC0, size: 0x8, addend: 0x0, symName: '+[DDMathOperator _isValidToken:]', symObjAddr: 0x8F4, symBinAddr: 0x3FB8, symSize: 0xC4 }
+  - { offset: 0x2F1D, size: 0x8, addend: 0x0, symName: '-[DDMathOperator initWithOperatorFunction:tokens:arity:associativity:]', symObjAddr: 0x9B8, symBinAddr: 0x407C, symSize: 0x1D0 }
+  - { offset: 0x2FAA, size: 0x8, addend: 0x0, symName: '-[DDMathOperator initWithOperatorFunction:tokens:arity:precedence:associativity:]', symObjAddr: 0xB88, symBinAddr: 0x424C, symSize: 0xC0 }
+  - { offset: 0x3029, size: 0x8, addend: 0x0, symName: '-[DDMathOperator addTokens:]', symObjAddr: 0xC48, symBinAddr: 0x430C, symSize: 0x70 }
+  - { offset: 0x3068, size: 0x8, addend: 0x0, symName: '-[DDMathOperator copyWithZone:]', symObjAddr: 0xCB8, symBinAddr: 0x437C, symSize: 0x30 }
+  - { offset: 0x30A7, size: 0x8, addend: 0x0, symName: '-[DDMathOperator function]', symObjAddr: 0xDC0, symBinAddr: 0x4484, symSize: 0x8 }
+  - { offset: 0x30DB, size: 0x8, addend: 0x0, symName: '-[DDMathOperator tokens]', symObjAddr: 0xDC8, symBinAddr: 0x448C, symSize: 0x8 }
+  - { offset: 0x310F, size: 0x8, addend: 0x0, symName: '-[DDMathOperator arity]', symObjAddr: 0xDD0, symBinAddr: 0x4494, symSize: 0x8 }
+  - { offset: 0x3143, size: 0x8, addend: 0x0, symName: '-[DDMathOperator associativity]', symObjAddr: 0xDD8, symBinAddr: 0x449C, symSize: 0x8 }
+  - { offset: 0x3177, size: 0x8, addend: 0x0, symName: '-[DDMathOperator setAssociativity:]', symObjAddr: 0xDE0, symBinAddr: 0x44A4, symSize: 0x8 }
+  - { offset: 0x31B0, size: 0x8, addend: 0x0, symName: '-[DDMathOperator precedence]', symObjAddr: 0xDE8, symBinAddr: 0x44AC, symSize: 0x8 }
+  - { offset: 0x31E4, size: 0x8, addend: 0x0, symName: '-[DDMathOperator setPrecedence:]', symObjAddr: 0xDF0, symBinAddr: 0x44B4, symSize: 0x8 }
+  - { offset: 0x321D, size: 0x8, addend: 0x0, symName: '-[DDMathOperator .cxx_destruct]', symObjAddr: 0xDF8, symBinAddr: 0x44BC, symSize: 0x30 }
+  - { offset: 0x324D, size: 0x8, addend: 0x0, symName: '+[DDMathOperatorSet defaultOperatorSet].cold.1', symObjAddr: 0x1D44, symBinAddr: 0x26E48, symSize: 0x14 }
+  - { offset: 0x3268, size: 0x8, addend: 0x0, symName: '+[DDMathOperatorSet defaultOperatorSet].cold.1', symObjAddr: 0x1D44, symBinAddr: 0x26E48, symSize: 0x14 }
+  - { offset: 0x3279, size: 0x8, addend: 0x0, symName: '___39+[DDMathOperatorSet defaultOperatorSet]_block_invoke', symObjAddr: 0xE58, symBinAddr: 0x451C, symSize: 0x2C }
+  - { offset: 0x329E, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet init]', symObjAddr: 0xE84, symBinAddr: 0x4548, symSize: 0x50 }
+  - { offset: 0x32D2, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet initWithOperators:]', symObjAddr: 0xED4, symBinAddr: 0x4598, symSize: 0x350 }
+  - { offset: 0x3373, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet copyWithZone:]', symObjAddr: 0x1224, symBinAddr: 0x48E8, symSize: 0x74 }
+  - { offset: 0x33C4, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet operators]', symObjAddr: 0x1298, symBinAddr: 0x495C, symSize: 0x40 }
+  - { offset: 0x33F9, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet setInterpretsPercentSignAsModulo:]', symObjAddr: 0x12D8, symBinAddr: 0x499C, symSize: 0x238 }
+  - { offset: 0x3484, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet addTokens:forOperatorFunction:]', symObjAddr: 0x1510, symBinAddr: 0x4BD4, symSize: 0xE8 }
+  - { offset: 0x34F5, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet addOperator:withPrecedenceHigherThanOperator:]', symObjAddr: 0x15F8, symBinAddr: 0x4CBC, symSize: 0x5C }
+  - { offset: 0x3546, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet addOperator:withPrecedenceSameAsOperator:]', symObjAddr: 0x1654, symBinAddr: 0x4D18, symSize: 0x5C }
+  - { offset: 0x3597, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet addOperator:withPrecedenceLowerThanOperator:]', symObjAddr: 0x16B0, symBinAddr: 0x4D74, symSize: 0x5C }
+  - { offset: 0x35E8, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet operatorForFunction:]', symObjAddr: 0x170C, symBinAddr: 0x4DD0, symSize: 0x8 }
+  - { offset: 0x362B, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet operatorsForToken:]', symObjAddr: 0x1714, symBinAddr: 0x4DD8, symSize: 0x74 }
+  - { offset: 0x3680, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet _processNewOperator:relativity:]', symObjAddr: 0x1788, symBinAddr: 0x4E4C, symSize: 0x550 }
+  - { offset: 0x37AF, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet countByEnumeratingWithState:objects:count:]', symObjAddr: 0x1CD8, symBinAddr: 0x539C, symSize: 0x8 }
+  - { offset: 0x380E, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet interpretsPercentSignAsModulo]', symObjAddr: 0x1CE0, symBinAddr: 0x53A4, symSize: 0x8 }
+  - { offset: 0x3842, size: 0x8, addend: 0x0, symName: '-[DDMathOperatorSet .cxx_destruct]', symObjAddr: 0x1CE8, symBinAddr: 0x53AC, symSize: 0x48 }
+  - { offset: 0x3DB0, size: 0x8, addend: 0x0, symName: '+[_DDParserTerm rootTermWithTokenizer:error:]', symObjAddr: 0x0, symBinAddr: 0x53F4, symSize: 0xF8 }
+  - { offset: 0x411F, size: 0x8, addend: 0x0, symName: '+[_DDParserTerm rootTermWithTokenizer:error:]', symObjAddr: 0x0, symBinAddr: 0x53F4, symSize: 0xF8 }
+  - { offset: 0x4199, size: 0x8, addend: 0x0, symName: '+[_DDParserTerm termWithTokenizer:error:]', symObjAddr: 0xF8, symBinAddr: 0x54EC, symSize: 0x1F8 }
+  - { offset: 0x420B, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm _initWithToken:error:]', symObjAddr: 0x2F0, symBinAddr: 0x56E4, symSize: 0x7C }
+  - { offset: 0x4259, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm _initWithTokenizer:error:]', symObjAddr: 0x36C, symBinAddr: 0x5760, symSize: 0x5C }
+  - { offset: 0x42AB, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm resolveWithParser:error:]', symObjAddr: 0x3C8, symBinAddr: 0x57BC, symSize: 0x8 }
+  - { offset: 0x42F1, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm expressionWithError:]', symObjAddr: 0x3D0, symBinAddr: 0x57C4, symSize: 0x74 }
+  - { offset: 0x436A, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm isResolved]', symObjAddr: 0x444, symBinAddr: 0x5838, symSize: 0x8 }
+  - { offset: 0x439E, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm setResolved:]', symObjAddr: 0x44C, symBinAddr: 0x5840, symSize: 0x8 }
+  - { offset: 0x43D5, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm type]', symObjAddr: 0x454, symBinAddr: 0x5848, symSize: 0x8 }
+  - { offset: 0x4409, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm token]', symObjAddr: 0x45C, symBinAddr: 0x5850, symSize: 0x8 }
+  - { offset: 0x443D, size: 0x8, addend: 0x0, symName: '-[_DDParserTerm .cxx_destruct]', symObjAddr: 0x464, symBinAddr: 0x5858, symSize: 0xC }
+  - { offset: 0x4694, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _setSubterms:]', symObjAddr: 0x0, symBinAddr: 0x5864, symSize: 0x38 }
+  - { offset: 0x4A7D, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _setSubterms:]', symObjAddr: 0x0, symBinAddr: 0x5864, symSize: 0x38 }
+  - { offset: 0x4ABC, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _initWithSubterms:error:]', symObjAddr: 0x38, symBinAddr: 0x589C, symSize: 0x6C }
+  - { offset: 0x4B0A, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _initWithTokenizer:error:]', symObjAddr: 0xA4, symBinAddr: 0x5908, symSize: 0x274 }
+  - { offset: 0x4B9D, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm type]', symObjAddr: 0x318, symBinAddr: 0x5B7C, symSize: 0x8 }
+  - { offset: 0x4BCD, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm description]', symObjAddr: 0x320, symBinAddr: 0x5B84, symSize: 0xAC }
+  - { offset: 0x4C1F, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm resolveWithParser:error:]', symObjAddr: 0x3CC, symBinAddr: 0x5C30, symSize: 0x2D0 }
+  - { offset: 0x4CDD, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _indicesOfOperatorsWithHighestPrecedence]', symObjAddr: 0x69C, symBinAddr: 0x5F00, symSize: 0xF8 }
+  - { offset: 0x4D33, size: 0x8, addend: 0x0, symName: '___56-[_DDGroupTerm _indicesOfOperatorsWithHighestPrecedence]_block_invoke', symObjAddr: 0x794, symBinAddr: 0x5FF8, symSize: 0xB4 }
+  - { offset: 0x4DBC, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s40r, symObjAddr: 0x848, symBinAddr: 0x60AC, symSize: 0x34 }
+  - { offset: 0x4DE2, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s40r, symObjAddr: 0x87C, symBinAddr: 0x60E0, symSize: 0x2C }
+  - { offset: 0x4DFF, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _reduceTermsAroundOperatorAtIndex:withParser:error:]', symObjAddr: 0x8A8, symBinAddr: 0x610C, symSize: 0x1B8 }
+  - { offset: 0x4E6F, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _reduceBinaryOperatorAtIndex:withParser:error:]', symObjAddr: 0xA60, symBinAddr: 0x62C4, symSize: 0x59C }
+  - { offset: 0x4F55, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm _reduceUnaryOperatorAtIndex:withParser:error:]', symObjAddr: 0xFFC, symBinAddr: 0x6860, symSize: 0x374 }
+  - { offset: 0x500C, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm expressionWithError:]', symObjAddr: 0x1370, symBinAddr: 0x6BD4, symSize: 0x188 }
+  - { offset: 0x506C, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm subterms]', symObjAddr: 0x14F8, symBinAddr: 0x6D5C, symSize: 0x10 }
+  - { offset: 0x50A0, size: 0x8, addend: 0x0, symName: '-[_DDGroupTerm .cxx_destruct]', symObjAddr: 0x1508, symBinAddr: 0x6D6C, symSize: 0x14 }
+  - { offset: 0x552E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm _initWithFunction:subterms:error:]', symObjAddr: 0x0, symBinAddr: 0x6D80, symSize: 0x98 }
+  - { offset: 0x58ED, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm _initWithFunction:subterms:error:]', symObjAddr: 0x0, symBinAddr: 0x6D80, symSize: 0x98 }
+  - { offset: 0x5992, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm _initWithTokenizer:error:]', symObjAddr: 0x98, symBinAddr: 0x6E18, symSize: 0x454 }
+  - { offset: 0x5AB7, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm type]', symObjAddr: 0x4EC, symBinAddr: 0x726C, symSize: 0x8 }
+  - { offset: 0x5AE7, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm description]', symObjAddr: 0x4F4, symBinAddr: 0x7274, symSize: 0xBC }
+  - { offset: 0x5B39, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm resolveWithParser:error:]', symObjAddr: 0x5B0, symBinAddr: 0x7330, symSize: 0x15C }
+  - { offset: 0x5BA0, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm expressionWithError:]', symObjAddr: 0x70C, symBinAddr: 0x748C, symSize: 0x194 }
+  - { offset: 0x5C1C, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm functionName]', symObjAddr: 0x8A0, symBinAddr: 0x7620, symSize: 0x10 }
+  - { offset: 0x5C50, size: 0x8, addend: 0x0, symName: '-[_DDFunctionTerm .cxx_destruct]', symObjAddr: 0x8B0, symBinAddr: 0x7630, symSize: 0x14 }
+  - { offset: 0x5E92, size: 0x8, addend: 0x0, symName: '-[_DDNumberTerm type]', symObjAddr: 0x0, symBinAddr: 0x7644, symSize: 0x8 }
+  - { offset: 0x61E9, size: 0x8, addend: 0x0, symName: '-[_DDNumberTerm type]', symObjAddr: 0x0, symBinAddr: 0x7644, symSize: 0x8 }
+  - { offset: 0x6219, size: 0x8, addend: 0x0, symName: '-[_DDNumberTerm resolveWithParser:error:]', symObjAddr: 0x8, symBinAddr: 0x764C, symSize: 0x1C }
+  - { offset: 0x6263, size: 0x8, addend: 0x0, symName: '-[_DDNumberTerm description]', symObjAddr: 0x24, symBinAddr: 0x7668, symSize: 0x44 }
+  - { offset: 0x6297, size: 0x8, addend: 0x0, symName: '-[_DDNumberTerm expressionWithError:]', symObjAddr: 0x68, symBinAddr: 0x76AC, symSize: 0x74 }
+  - { offset: 0x64C5, size: 0x8, addend: 0x0, symName: '-[_DDVariableTerm type]', symObjAddr: 0x0, symBinAddr: 0x7720, symSize: 0x8 }
+  - { offset: 0x681C, size: 0x8, addend: 0x0, symName: '-[_DDVariableTerm type]', symObjAddr: 0x0, symBinAddr: 0x7720, symSize: 0x8 }
+  - { offset: 0x684C, size: 0x8, addend: 0x0, symName: '-[_DDVariableTerm resolveWithParser:error:]', symObjAddr: 0x8, symBinAddr: 0x7728, symSize: 0x1C }
+  - { offset: 0x6896, size: 0x8, addend: 0x0, symName: '-[_DDVariableTerm description]', symObjAddr: 0x24, symBinAddr: 0x7744, symSize: 0x84 }
+  - { offset: 0x68CA, size: 0x8, addend: 0x0, symName: '-[_DDVariableTerm expressionWithError:]', symObjAddr: 0xA8, symBinAddr: 0x77C8, symSize: 0x74 }
+  - { offset: 0x6AF8, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm type]', symObjAddr: 0x0, symBinAddr: 0x783C, symSize: 0x8 }
+  - { offset: 0x6E7F, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm type]', symObjAddr: 0x0, symBinAddr: 0x783C, symSize: 0x8 }
+  - { offset: 0x6EAF, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm operatorType]', symObjAddr: 0x8, symBinAddr: 0x7844, symSize: 0x44 }
+  - { offset: 0x6EE3, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm operatorPrecedence]', symObjAddr: 0x4C, symBinAddr: 0x7888, symSize: 0x3C }
+  - { offset: 0x6F17, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm operatorArity]', symObjAddr: 0x88, symBinAddr: 0x78C4, symSize: 0x3C }
+  - { offset: 0x6F4B, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm operatorFunction]', symObjAddr: 0xC4, symBinAddr: 0x7900, symSize: 0x44 }
+  - { offset: 0x6F7F, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm resolveWithParser:error:]', symObjAddr: 0x108, symBinAddr: 0x7944, symSize: 0x270 }
+  - { offset: 0x6FCD, size: 0x8, addend: 0x0, symName: '-[_DDOperatorTerm description]', symObjAddr: 0x378, symBinAddr: 0x7BB4, symSize: 0x44 }
+  - { offset: 0x719E, size: 0x8, addend: 0x0, symName: '-[NSString(DDMathParsing) ddNumberByEvaluatingString]', symObjAddr: 0x0, symBinAddr: 0x7BF8, symSize: 0x8 }
+  - { offset: 0x71AB, size: 0x8, addend: 0x0, symName: '-[NSString(DDMathParsing) ddNumberByEvaluatingString]', symObjAddr: 0x0, symBinAddr: 0x7BF8, symSize: 0x8 }
+  - { offset: 0x71DD, size: 0x8, addend: 0x0, symName: '-[NSString(DDMathParsing) ddNumberByEvaluatingStringWithSubstitutions:]', symObjAddr: 0x8, symBinAddr: 0x7C00, symSize: 0x64 }
+  - { offset: 0x72B8, size: 0x8, addend: 0x0, symName: '-[NSString(DDMathParsing) ddNumberByEvaluatingStringWithSubstitutions:error:]', symObjAddr: 0x6C, symBinAddr: 0x7C64, symSize: 0x80 }
+  - { offset: 0x75D6, size: 0x8, addend: 0x0, symName: _DDMathParserErrorDomain, symObjAddr: 0xC8, symBinAddr: 0x30230, symSize: 0x0 }
+  - { offset: 0x764E, size: 0x8, addend: 0x0, symName: _DDUnknownFunctionKey, symObjAddr: 0xD0, symBinAddr: 0x30238, symSize: 0x0 }
+  - { offset: 0x7663, size: 0x8, addend: 0x0, symName: _DDUnknownVariableKey, symObjAddr: 0xD8, symBinAddr: 0x30240, symSize: 0x0 }
+  - { offset: 0x7693, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator defaultMathEvaluator]', symObjAddr: 0x0, symBinAddr: 0x7CE4, symSize: 0x30 }
+  - { offset: 0x76A0, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator defaultMathEvaluator]', symObjAddr: 0x0, symBinAddr: 0x7CE4, symSize: 0x30 }
+  - { offset: 0x76C9, size: 0x8, addend: 0x0, symName: _defaultMathEvaluator._defaultEvaluator, symObjAddr: 0x8A20, symBinAddr: 0x36BC0, symSize: 0x0 }
+  - { offset: 0x76DE, size: 0x8, addend: 0x0, symName: _defaultMathEvaluator.onceToken, symObjAddr: 0x8A28, symBinAddr: 0x36BC8, symSize: 0x0 }
+  - { offset: 0x7CE9, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator _standardAliases]', symObjAddr: 0x1008, symBinAddr: 0x8CEC, symSize: 0x30 }
+  - { offset: 0x7D12, size: 0x8, addend: 0x0, symName: __standardAliases.onceToken, symObjAddr: 0x8A30, symBinAddr: 0x36BD0, symSize: 0x0 }
+  - { offset: 0x7D27, size: 0x8, addend: 0x0, symName: __standardAliases.standardAliases, symObjAddr: 0x8A38, symBinAddr: 0x36BD8, symSize: 0x0 }
+  - { offset: 0x7E01, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator defaultMathEvaluator].cold.1', symObjAddr: 0x12D4, symBinAddr: 0x26E5C, symSize: 0x14 }
+  - { offset: 0x7E1C, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator defaultMathEvaluator].cold.1', symObjAddr: 0x12D4, symBinAddr: 0x26E5C, symSize: 0x14 }
+  - { offset: 0x7E2D, size: 0x8, addend: 0x0, symName: '___39+[DDMathEvaluator defaultMathEvaluator]_block_invoke', symObjAddr: 0x30, symBinAddr: 0x7D14, symSize: 0x2C }
+  - { offset: 0x7E52, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator init]', symObjAddr: 0x5C, symBinAddr: 0x7D40, symSize: 0x1BC }
+  - { offset: 0x7ED3, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator setUsesHighPrecisionEvaluation:]', symObjAddr: 0x218, symBinAddr: 0x7EFC, symSize: 0x64 }
+  - { offset: 0x7F12, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator registerFunction:forName:]', symObjAddr: 0x27C, symBinAddr: 0x7F60, symSize: 0xD4 }
+  - { offset: 0x7F64, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator resolveFunction:variables:error:]', symObjAddr: 0x350, symBinAddr: 0x8034, symSize: 0x2C4 }
+  - { offset: 0x805A, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator variableWithName:]', symObjAddr: 0x614, symBinAddr: 0x82F8, symSize: 0x2C }
+  - { offset: 0x80B7, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator addAlias:forFunctionName:]', symObjAddr: 0x640, symBinAddr: 0x8324, symSize: 0x138 }
+  - { offset: 0x8118, size: 0x8, addend: 0x0, symName: '___44-[DDMathEvaluator addAlias:forFunctionName:]_block_invoke', symObjAddr: 0x778, symBinAddr: 0x845C, symSize: 0xDC }
+  - { offset: 0x81BC, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s, symObjAddr: 0x854, symBinAddr: 0x8538, symSize: 0x8 }
+  - { offset: 0x81E0, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s, symObjAddr: 0x85C, symBinAddr: 0x8540, symSize: 0x8 }
+  - { offset: 0x81FD, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator removeAlias:]', symObjAddr: 0x864, symBinAddr: 0x8548, symSize: 0x40 }
+  - { offset: 0x823C, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator evaluateString:withSubstitutions:]', symObjAddr: 0x8A4, symBinAddr: 0x8588, symSize: 0x64 }
+  - { offset: 0x82C8, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator evaluateString:withSubstitutions:error:]', symObjAddr: 0x908, symBinAddr: 0x85EC, symSize: 0x13C }
+  - { offset: 0x8356, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator evaluateExpression:withSubstitutions:error:]', symObjAddr: 0xA44, symBinAddr: 0x8728, symSize: 0xE0 }
+  - { offset: 0x83B7, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator _evaluateVariableExpression:withSubstitutions:error:]', symObjAddr: 0xB24, symBinAddr: 0x8808, symSize: 0x218 }
+  - { offset: 0x8436, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator _evaluateFunctionExpression:withSubstitutions:error:]', symObjAddr: 0xD3C, symBinAddr: 0x8A20, symSize: 0x1CC }
+  - { offset: 0x84B5, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator _evaluateValue:withSubstitutions:error:]', symObjAddr: 0xF08, symBinAddr: 0x8BEC, symSize: 0x100 }
+  - { offset: 0x8516, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator _standardAliases].cold.1', symObjAddr: 0x12E8, symBinAddr: 0x26E70, symSize: 0x14 }
+  - { offset: 0x8531, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator _standardAliases].cold.1', symObjAddr: 0x12E8, symBinAddr: 0x26E70, symSize: 0x14 }
+  - { offset: 0x8542, size: 0x8, addend: 0x0, symName: '___35+[DDMathEvaluator _standardAliases]_block_invoke', symObjAddr: 0x1038, symBinAddr: 0x8D1C, symSize: 0x18 }
+  - { offset: 0x8567, size: 0x8, addend: 0x0, symName: '+[DDMathEvaluator sharedMathEvaluator]', symObjAddr: 0x1050, symBinAddr: 0x8D34, symSize: 0x4 }
+  - { offset: 0x859A, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator expressionByRewritingExpression:]', symObjAddr: 0x1054, symBinAddr: 0x8D38, symSize: 0x78 }
+  - { offset: 0x85DF, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator addRewriteRule:forExpressionsMatchingTemplate:condition:]', symObjAddr: 0x10CC, symBinAddr: 0x8DB0, symSize: 0x94 }
+  - { offset: 0x863C, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator unregisterFunctionWithName:]', symObjAddr: 0x1160, symBinAddr: 0x8E44, symSize: 0x8 }
+  - { offset: 0x867B, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator registeredFunctions]', symObjAddr: 0x1168, symBinAddr: 0x8E4C, symSize: 0xBC }
+  - { offset: 0x86C0, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator usesHighPrecisionEvaluation]', symObjAddr: 0x1224, symBinAddr: 0x8F08, symSize: 0x8 }
+  - { offset: 0x86F4, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator resolvesFunctionsAsVariables]', symObjAddr: 0x122C, symBinAddr: 0x8F10, symSize: 0x8 }
+  - { offset: 0x8728, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator setResolvesFunctionsAsVariables:]', symObjAddr: 0x1234, symBinAddr: 0x8F18, symSize: 0x8 }
+  - { offset: 0x875F, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator operatorSet]', symObjAddr: 0x123C, symBinAddr: 0x8F20, symSize: 0x8 }
+  - { offset: 0x8793, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator setOperatorSet:]', symObjAddr: 0x1244, symBinAddr: 0x8F28, symSize: 0xC }
+  - { offset: 0x87D0, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator angleMeasurementMode]', symObjAddr: 0x1250, symBinAddr: 0x8F34, symSize: 0x8 }
+  - { offset: 0x8804, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator setAngleMeasurementMode:]', symObjAddr: 0x1258, symBinAddr: 0x8F3C, symSize: 0x8 }
+  - { offset: 0x883D, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator functionResolver]', symObjAddr: 0x1260, symBinAddr: 0x8F44, symSize: 0x8 }
+  - { offset: 0x8871, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator setFunctionResolver:]', symObjAddr: 0x1268, symBinAddr: 0x8F4C, symSize: 0x8 }
+  - { offset: 0x88AC, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator variableResolver]', symObjAddr: 0x1270, symBinAddr: 0x8F54, symSize: 0x8 }
+  - { offset: 0x88E0, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator setVariableResolver:]', symObjAddr: 0x1278, symBinAddr: 0x8F5C, symSize: 0x8 }
+  - { offset: 0x891B, size: 0x8, addend: 0x0, symName: '-[DDMathEvaluator .cxx_destruct]', symObjAddr: 0x1280, symBinAddr: 0x8F64, symSize: 0x54 }
+  - { offset: 0x8B5A, size: 0x8, addend: 0x0, symName: __DDDTOR, symObjAddr: 0x0, symBinAddr: 0x8FB8, symSize: 0x12C }
+  - { offset: 0x8BC5, size: 0x8, addend: 0x0, symName: '+[_DDFunctionEvaluator standardFunctions]', symObjAddr: 0x258, symBinAddr: 0x9210, symSize: 0x30 }
+  - { offset: 0x8BEE, size: 0x8, addend: 0x0, symName: _standardFunctions.functions, symObjAddr: 0x2B650, symBinAddr: 0x36BE0, symSize: 0x0 }
+  - { offset: 0x8C03, size: 0x8, addend: 0x0, symName: _standardFunctions.onceToken, symObjAddr: 0x2B658, symBinAddr: 0x36BE8, symSize: 0x0 }
+  - { offset: 0x9205, size: 0x8, addend: 0x0, symName: __DDDTOR, symObjAddr: 0x0, symBinAddr: 0x8FB8, symSize: 0x12C }
+  - { offset: 0x925B, size: 0x8, addend: 0x0, symName: __DDRTOD, symObjAddr: 0x12C, symBinAddr: 0x90E4, symSize: 0x12C }
+  - { offset: 0x9341, size: 0x8, addend: 0x0, symName: '+[_DDFunctionEvaluator standardFunctions].cold.1', symObjAddr: 0xDD10, symBinAddr: 0x26E84, symSize: 0x14 }
+  - { offset: 0x935C, size: 0x8, addend: 0x0, symName: '+[_DDFunctionEvaluator standardFunctions].cold.1', symObjAddr: 0xDD10, symBinAddr: 0x26E84, symSize: 0x14 }
+  - { offset: 0x936D, size: 0x8, addend: 0x0, symName: '___41+[_DDFunctionEvaluator standardFunctions]_block_invoke', symObjAddr: 0x288, symBinAddr: 0x9240, symSize: 0x148 }
+  - { offset: 0x94FA, size: 0x8, addend: 0x0, symName: '___41+[_DDFunctionEvaluator standardFunctions]_block_invoke_2', symObjAddr: 0x3D0, symBinAddr: 0x9388, symSize: 0x8 }
+  - { offset: 0x953F, size: 0x8, addend: 0x0, symName: '+[_DDFunctionEvaluator isStandardFunction:]', symObjAddr: 0x3D8, symBinAddr: 0x9390, symSize: 0x84 }
+  - { offset: 0x9582, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator initWithMathEvaluator:]', symObjAddr: 0x45C, symBinAddr: 0x9414, symSize: 0x6C }
+  - { offset: 0x95C5, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator evaluateFunction:variables:error:]', symObjAddr: 0x4C8, symBinAddr: 0x9480, symSize: 0x18C }
+  - { offset: 0x96C8, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator add:variables:error:]', symObjAddr: 0x654, symBinAddr: 0x960C, symSize: 0x2B4 }
+  - { offset: 0x977D, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator subtract:variables:error:]', symObjAddr: 0x908, symBinAddr: 0x98C0, symSize: 0x2B4 }
+  - { offset: 0x9832, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator multiply:variables:error:]', symObjAddr: 0xBBC, symBinAddr: 0x9B74, symSize: 0x2B4 }
+  - { offset: 0x98E7, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator divide:variables:error:]', symObjAddr: 0xE70, symBinAddr: 0x9E28, symSize: 0x2B4 }
+  - { offset: 0x999C, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator mod:variables:error:]', symObjAddr: 0x1124, symBinAddr: 0xA0DC, symSize: 0x2BC }
+  - { offset: 0x9A51, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator negate:variables:error:]', symObjAddr: 0x13E0, symBinAddr: 0xA398, symSize: 0x24C }
+  - { offset: 0x9AE8, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator factorial:variables:error:]', symObjAddr: 0x162C, symBinAddr: 0xA5E4, symSize: 0x2C8 }
+  - { offset: 0x9BCA, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator pow:variables:error:]', symObjAddr: 0x18F4, symBinAddr: 0xA8AC, symSize: 0x2BC }
+  - { offset: 0x9C7F, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator nthroot:variables:error:]', symObjAddr: 0x1BB0, symBinAddr: 0xAB68, symSize: 0x2C0 }
+  - { offset: 0x9D34, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator and:variables:error:]', symObjAddr: 0x1E70, symBinAddr: 0xAE28, symSize: 0x2AC }
+  - { offset: 0x9DE9, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator or:variables:error:]', symObjAddr: 0x211C, symBinAddr: 0xB0D4, symSize: 0x2AC }
+  - { offset: 0x9E9E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator not:variables:error:]', symObjAddr: 0x23C8, symBinAddr: 0xB380, symSize: 0x24C }
+  - { offset: 0x9F35, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator xor:variables:error:]', symObjAddr: 0x2614, symBinAddr: 0xB5CC, symSize: 0x2AC }
+  - { offset: 0x9FEB, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator rshift:variables:error:]', symObjAddr: 0x28C0, symBinAddr: 0xB878, symSize: 0x2AC }
+  - { offset: 0xA0A8, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator lshift:variables:error:]', symObjAddr: 0x2B6C, symBinAddr: 0xBB24, symSize: 0x2AC }
+  - { offset: 0xA165, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator average:variables:error:]', symObjAddr: 0x2E18, symBinAddr: 0xBDD0, symSize: 0x240 }
+  - { offset: 0xA212, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator sum:variables:error:]', symObjAddr: 0x3058, symBinAddr: 0xC010, symSize: 0x378 }
+  - { offset: 0xA309, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator count:variables:error:]', symObjAddr: 0x33D0, symBinAddr: 0xC388, symSize: 0x1C4 }
+  - { offset: 0xA37E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator min:variables:error:]', symObjAddr: 0x3594, symBinAddr: 0xC54C, symSize: 0x290 }
+  - { offset: 0xA44F, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator max:variables:error:]', symObjAddr: 0x3824, symBinAddr: 0xC7DC, symSize: 0x290 }
+  - { offset: 0xA520, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator median:variables:error:]', symObjAddr: 0x3AB4, symBinAddr: 0xCA6C, symSize: 0x384 }
+  - { offset: 0xA65B, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator stddev:variables:error:]', symObjAddr: 0x3E38, symBinAddr: 0xCDF0, symSize: 0x338 }
+  - { offset: 0xA754, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator sqrt:variables:error:]', symObjAddr: 0x4170, symBinAddr: 0xD128, symSize: 0x24C }
+  - { offset: 0xA7F1, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator random:variables:error:]', symObjAddr: 0x43BC, symBinAddr: 0xD374, symSize: 0x3E8 }
+  - { offset: 0xA8E8, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator log:variables:error:]', symObjAddr: 0x47A4, symBinAddr: 0xD75C, symSize: 0x24C }
+  - { offset: 0xA985, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator ln:variables:error:]', symObjAddr: 0x49F0, symBinAddr: 0xD9A8, symSize: 0x250 }
+  - { offset: 0xAA12, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator log2:variables:error:]', symObjAddr: 0x4C40, symBinAddr: 0xDBF8, symSize: 0x24C }
+  - { offset: 0xAAAF, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator exp:variables:error:]', symObjAddr: 0x4E8C, symBinAddr: 0xDE44, symSize: 0x24C }
+  - { offset: 0xAB4C, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator ceil:variables:error:]', symObjAddr: 0x50D8, symBinAddr: 0xE090, symSize: 0x24C }
+  - { offset: 0xABE9, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator abs:variables:error:]', symObjAddr: 0x5324, symBinAddr: 0xE2DC, symSize: 0x250 }
+  - { offset: 0xAC86, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator floor:variables:error:]', symObjAddr: 0x5574, symBinAddr: 0xE52C, symSize: 0x24C }
+  - { offset: 0xAD23, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator percent:variables:error:]', symObjAddr: 0x57C0, symBinAddr: 0xE778, symSize: 0x400 }
+  - { offset: 0xAE60, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator sin:variables:error:]', symObjAddr: 0x5BC0, symBinAddr: 0xEB78, symSize: 0x26C }
+  - { offset: 0xAF37, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator cos:variables:error:]', symObjAddr: 0x5E2C, symBinAddr: 0xEDE4, symSize: 0x26C }
+  - { offset: 0xB00E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator tan:variables:error:]', symObjAddr: 0x6098, symBinAddr: 0xF050, symSize: 0x26C }
+  - { offset: 0xB0E5, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator asin:variables:error:]', symObjAddr: 0x6304, symBinAddr: 0xF2BC, symSize: 0x26C }
+  - { offset: 0xB1AC, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator acos:variables:error:]', symObjAddr: 0x6570, symBinAddr: 0xF528, symSize: 0x26C }
+  - { offset: 0xB273, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator atan:variables:error:]', symObjAddr: 0x67DC, symBinAddr: 0xF794, symSize: 0x26C }
+  - { offset: 0xB33A, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator sinh:variables:error:]', symObjAddr: 0x6A48, symBinAddr: 0xFA00, symSize: 0x26C }
+  - { offset: 0xB411, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator cosh:variables:error:]', symObjAddr: 0x6CB4, symBinAddr: 0xFC6C, symSize: 0x26C }
+  - { offset: 0xB4E8, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator tanh:variables:error:]', symObjAddr: 0x6F20, symBinAddr: 0xFED8, symSize: 0x26C }
+  - { offset: 0xB5BF, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator asinh:variables:error:]', symObjAddr: 0x718C, symBinAddr: 0x10144, symSize: 0x26C }
+  - { offset: 0xB6A5, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator acosh:variables:error:]', symObjAddr: 0x73F8, symBinAddr: 0x103B0, symSize: 0x26C }
+  - { offset: 0xB78B, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator atanh:variables:error:]', symObjAddr: 0x7664, symBinAddr: 0x1061C, symSize: 0x26C }
+  - { offset: 0xB871, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator csc:variables:error:]', symObjAddr: 0x78D0, symBinAddr: 0x10888, symSize: 0x274 }
+  - { offset: 0xB948, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator sec:variables:error:]', symObjAddr: 0x7B44, symBinAddr: 0x10AFC, symSize: 0x274 }
+  - { offset: 0xBA1F, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator cotan:variables:error:]', symObjAddr: 0x7DB8, symBinAddr: 0x10D70, symSize: 0x274 }
+  - { offset: 0xBAF6, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator acsc:variables:error:]', symObjAddr: 0x802C, symBinAddr: 0x10FE4, symSize: 0x274 }
+  - { offset: 0xBBBD, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator asec:variables:error:]', symObjAddr: 0x82A0, symBinAddr: 0x11258, symSize: 0x274 }
+  - { offset: 0xBC84, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator acotan:variables:error:]', symObjAddr: 0x8514, symBinAddr: 0x114CC, symSize: 0x274 }
+  - { offset: 0xBD4B, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator csch:variables:error:]', symObjAddr: 0x8788, symBinAddr: 0x11740, symSize: 0x274 }
+  - { offset: 0xBE22, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator sech:variables:error:]', symObjAddr: 0x89FC, symBinAddr: 0x119B4, symSize: 0x274 }
+  - { offset: 0xBEF9, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator cotanh:variables:error:]', symObjAddr: 0x8C70, symBinAddr: 0x11C28, symSize: 0x274 }
+  - { offset: 0xBFD0, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator acsch:variables:error:]', symObjAddr: 0x8EE4, symBinAddr: 0x11E9C, symSize: 0x274 }
+  - { offset: 0xC097, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator asech:variables:error:]', symObjAddr: 0x9158, symBinAddr: 0x12110, symSize: 0x274 }
+  - { offset: 0xC15E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator acotanh:variables:error:]', symObjAddr: 0x93CC, symBinAddr: 0x12384, symSize: 0x274 }
+  - { offset: 0xC232, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator versin:variables:error:]', symObjAddr: 0x9640, symBinAddr: 0x125F8, symSize: 0x274 }
+  - { offset: 0xC309, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator vercosin:variables:error:]', symObjAddr: 0x98B4, symBinAddr: 0x1286C, symSize: 0x274 }
+  - { offset: 0xC3E0, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator coversin:variables:error:]', symObjAddr: 0x9B28, symBinAddr: 0x12AE0, symSize: 0x274 }
+  - { offset: 0xC4B7, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator covercosin:variables:error:]', symObjAddr: 0x9D9C, symBinAddr: 0x12D54, symSize: 0x274 }
+  - { offset: 0xC58E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator haversin:variables:error:]', symObjAddr: 0xA010, symBinAddr: 0x12FC8, symSize: 0x27C }
+  - { offset: 0xC665, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator havercosin:variables:error:]', symObjAddr: 0xA28C, symBinAddr: 0x13244, symSize: 0x27C }
+  - { offset: 0xC73C, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator hacoversin:variables:error:]', symObjAddr: 0xA508, symBinAddr: 0x134C0, symSize: 0x27C }
+  - { offset: 0xC813, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator hacovercosin:variables:error:]', symObjAddr: 0xA784, symBinAddr: 0x1373C, symSize: 0x27C }
+  - { offset: 0xC8EA, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator exsec:variables:error:]', symObjAddr: 0xAA00, symBinAddr: 0x139B8, symSize: 0x27C }
+  - { offset: 0xC9C1, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator excsc:variables:error:]', symObjAddr: 0xAC7C, symBinAddr: 0x13C34, symSize: 0x27C }
+  - { offset: 0xCA98, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator crd:variables:error:]', symObjAddr: 0xAEF8, symBinAddr: 0x13EB0, symSize: 0x278 }
+  - { offset: 0xCB6F, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator dtor:variables:error:]', symObjAddr: 0xB170, symBinAddr: 0x14128, symSize: 0x260 }
+  - { offset: 0xCC0C, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator rtod:variables:error:]', symObjAddr: 0xB3D0, symBinAddr: 0x14388, symSize: 0x260 }
+  - { offset: 0xCCA9, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator phi:variables:error:]', symObjAddr: 0xB630, symBinAddr: 0x145E8, symSize: 0x168 }
+  - { offset: 0xCD1E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator pi:variables:error:]', symObjAddr: 0xB798, symBinAddr: 0x14750, symSize: 0x168 }
+  - { offset: 0xCD93, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator pi_2:variables:error:]', symObjAddr: 0xB900, symBinAddr: 0x148B8, symSize: 0x168 }
+  - { offset: 0xCE08, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator pi_4:variables:error:]', symObjAddr: 0xBA68, symBinAddr: 0x14A20, symSize: 0x168 }
+  - { offset: 0xCE7D, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator tau:variables:error:]', symObjAddr: 0xBBD0, symBinAddr: 0x14B88, symSize: 0x168 }
+  - { offset: 0xCEF2, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator sqrt2:variables:error:]', symObjAddr: 0xBD38, symBinAddr: 0x14CF0, symSize: 0x168 }
+  - { offset: 0xCF67, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator e:variables:error:]', symObjAddr: 0xBEA0, symBinAddr: 0x14E58, symSize: 0x168 }
+  - { offset: 0xCFDC, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator log2e:variables:error:]', symObjAddr: 0xC008, symBinAddr: 0x14FC0, symSize: 0x168 }
+  - { offset: 0xD051, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator log10e:variables:error:]', symObjAddr: 0xC170, symBinAddr: 0x15128, symSize: 0x168 }
+  - { offset: 0xD0C6, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator ln2:variables:error:]', symObjAddr: 0xC2D8, symBinAddr: 0x15290, symSize: 0x168 }
+  - { offset: 0xD13B, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator ln10:variables:error:]', symObjAddr: 0xC440, symBinAddr: 0x153F8, symSize: 0x168 }
+  - { offset: 0xD1B0, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_and:variables:error:]', symObjAddr: 0xC5A8, symBinAddr: 0x15560, symSize: 0x2A8 }
+  - { offset: 0xD26D, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_or:variables:error:]', symObjAddr: 0xC850, symBinAddr: 0x15808, symSize: 0x2A8 }
+  - { offset: 0xD32A, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_not:variables:error:]', symObjAddr: 0xCAF8, symBinAddr: 0x15AB0, symSize: 0x24C }
+  - { offset: 0xD3C7, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_eq:variables:error:]', symObjAddr: 0xCD44, symBinAddr: 0x15CFC, symSize: 0x29C }
+  - { offset: 0xD494, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_neq:variables:error:]', symObjAddr: 0xCFE0, symBinAddr: 0x15F98, symSize: 0x29C }
+  - { offset: 0xD561, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_lt:variables:error:]', symObjAddr: 0xD27C, symBinAddr: 0x16234, symSize: 0x29C }
+  - { offset: 0xD62E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_gt:variables:error:]', symObjAddr: 0xD518, symBinAddr: 0x164D0, symSize: 0x29C }
+  - { offset: 0xD6FB, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_ltoe:variables:error:]', symObjAddr: 0xD7B4, symBinAddr: 0x1676C, symSize: 0x2A0 }
+  - { offset: 0xD7C8, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator l_gtoe:variables:error:]', symObjAddr: 0xDA54, symBinAddr: 0x16A0C, symSize: 0x29C }
+  - { offset: 0xD895, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator evaluator]', symObjAddr: 0xDCF0, symBinAddr: 0x16CA8, symSize: 0x18 }
+  - { offset: 0xD8C9, size: 0x8, addend: 0x0, symName: '-[_DDFunctionEvaluator .cxx_destruct]', symObjAddr: 0xDD08, symBinAddr: 0x16CC0, symSize: 0x8 }
+  - { offset: 0xDAB7, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator add:variables:error:]', symObjAddr: 0x0, symBinAddr: 0x16CC8, symSize: 0x2BC }
+  - { offset: 0xE088, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator add:variables:error:]', symObjAddr: 0x0, symBinAddr: 0x16CC8, symSize: 0x2BC }
+  - { offset: 0xE218, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator subtract:variables:error:]', symObjAddr: 0x2BC, symBinAddr: 0x16F84, symSize: 0x2BC }
+  - { offset: 0xE313, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator multiply:variables:error:]', symObjAddr: 0x578, symBinAddr: 0x17240, symSize: 0x2BC }
+  - { offset: 0xE40E, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator divide:variables:error:]', symObjAddr: 0x834, symBinAddr: 0x174FC, symSize: 0x2BC }
+  - { offset: 0xE509, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator mod:variables:error:]', symObjAddr: 0xAF0, symBinAddr: 0x177B8, symSize: 0x2BC }
+  - { offset: 0xE604, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator negate:variables:error:]', symObjAddr: 0xDAC, symBinAddr: 0x17A74, symSize: 0x24C }
+  - { offset: 0xE6DE, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator factorial:variables:error:]', symObjAddr: 0xFF8, symBinAddr: 0x17CC0, symSize: 0x370 }
+  - { offset: 0xE8EB, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator pow:variables:error:]', symObjAddr: 0x1368, symBinAddr: 0x18030, symSize: 0x2BC }
+  - { offset: 0xE9E6, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator nthroot:variables:error:]', symObjAddr: 0x1624, symBinAddr: 0x182EC, symSize: 0x2D8 }
+  - { offset: 0xEB08, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator rshift:variables:error:]', symObjAddr: 0x18FC, symBinAddr: 0x185C4, symSize: 0x2BC }
+  - { offset: 0xEC03, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator lshift:variables:error:]', symObjAddr: 0x1BB8, symBinAddr: 0x18880, symSize: 0x2BC }
+  - { offset: 0xECFE, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator average:variables:error:]', symObjAddr: 0x1E74, symBinAddr: 0x18B3C, symSize: 0x288 }
+  - { offset: 0xEE0A, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator sum:variables:error:]', symObjAddr: 0x20FC, symBinAddr: 0x18DC4, symSize: 0x2F4 }
+  - { offset: 0xEF23, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator count:variables:error:]', symObjAddr: 0x23F0, symBinAddr: 0x190B8, symSize: 0x1C4 }
+  - { offset: 0xEF94, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator median:variables:error:]', symObjAddr: 0x25B4, symBinAddr: 0x1927C, symSize: 0x3BC }
+  - { offset: 0xF0FB, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator stddev:variables:error:]', symObjAddr: 0x2970, symBinAddr: 0x19638, symSize: 0x418 }
+  - { offset: 0xF301, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator sqrt:variables:error:]', symObjAddr: 0x2D88, symBinAddr: 0x19A50, symSize: 0x250 }
+  - { offset: 0xF3D3, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator log:variables:error:]', symObjAddr: 0x2FD8, symBinAddr: 0x19CA0, symSize: 0x24C }
+  - { offset: 0xF480, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator ln:variables:error:]', symObjAddr: 0x3224, symBinAddr: 0x19EEC, symSize: 0x250 }
+  - { offset: 0xF51D, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator log2:variables:error:]', symObjAddr: 0x3474, symBinAddr: 0x1A13C, symSize: 0x24C }
+  - { offset: 0xF5CA, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator exp:variables:error:]', symObjAddr: 0x36C0, symBinAddr: 0x1A388, symSize: 0x24C }
+  - { offset: 0xF677, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator ceil:variables:error:]', symObjAddr: 0x390C, symBinAddr: 0x1A5D4, symSize: 0x258 }
+  - { offset: 0xF77E, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator abs:variables:error:]', symObjAddr: 0x3B64, symBinAddr: 0x1A82C, symSize: 0x268 }
+  - { offset: 0xF862, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator floor:variables:error:]', symObjAddr: 0x3DCC, symBinAddr: 0x1AA94, symSize: 0x258 }
+  - { offset: 0xF942, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator percent:variables:error:]', symObjAddr: 0x4024, symBinAddr: 0x1ACEC, symSize: 0x444 }
+  - { offset: 0xFAFE, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator sin:variables:error:]', symObjAddr: 0x4468, symBinAddr: 0x1B130, symSize: 0x278 }
+  - { offset: 0xFC2A, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator cos:variables:error:]', symObjAddr: 0x46E0, symBinAddr: 0x1B3A8, symSize: 0x278 }
+  - { offset: 0xFD3B, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator tan:variables:error:]', symObjAddr: 0x4958, symBinAddr: 0x1B620, symSize: 0x278 }
+  - { offset: 0xFE4C, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator asin:variables:error:]', symObjAddr: 0x4BD0, symBinAddr: 0x1B898, symSize: 0x270 }
+  - { offset: 0xFF68, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator acos:variables:error:]', symObjAddr: 0x4E40, symBinAddr: 0x1BB08, symSize: 0x270 }
+  - { offset: 0x10069, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator atan:variables:error:]', symObjAddr: 0x50B0, symBinAddr: 0x1BD78, symSize: 0x270 }
+  - { offset: 0x1016A, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator sinh:variables:error:]', symObjAddr: 0x5320, symBinAddr: 0x1BFE8, symSize: 0x278 }
+  - { offset: 0x1027B, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator cosh:variables:error:]', symObjAddr: 0x5598, symBinAddr: 0x1C260, symSize: 0x278 }
+  - { offset: 0x1038C, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator tanh:variables:error:]', symObjAddr: 0x5810, symBinAddr: 0x1C4D8, symSize: 0x278 }
+  - { offset: 0x1049D, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator asinh:variables:error:]', symObjAddr: 0x5A88, symBinAddr: 0x1C750, symSize: 0x270 }
+  - { offset: 0x1059E, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator acosh:variables:error:]', symObjAddr: 0x5CF8, symBinAddr: 0x1C9C0, symSize: 0x270 }
+  - { offset: 0x1069F, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator atanh:variables:error:]', symObjAddr: 0x5F68, symBinAddr: 0x1CC30, symSize: 0x270 }
+  - { offset: 0x107A0, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator csc:variables:error:]', symObjAddr: 0x61D8, symBinAddr: 0x1CEA0, symSize: 0x278 }
+  - { offset: 0x108B1, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator sec:variables:error:]', symObjAddr: 0x6450, symBinAddr: 0x1D118, symSize: 0x278 }
+  - { offset: 0x109C2, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator cotan:variables:error:]', symObjAddr: 0x66C8, symBinAddr: 0x1D390, symSize: 0x278 }
+  - { offset: 0x10AD3, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator acsc:variables:error:]', symObjAddr: 0x6940, symBinAddr: 0x1D608, symSize: 0x270 }
+  - { offset: 0x10BD4, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator asec:variables:error:]', symObjAddr: 0x6BB0, symBinAddr: 0x1D878, symSize: 0x270 }
+  - { offset: 0x10CD5, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator acotan:variables:error:]', symObjAddr: 0x6E20, symBinAddr: 0x1DAE8, symSize: 0x270 }
+  - { offset: 0x10DD6, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator csch:variables:error:]', symObjAddr: 0x7090, symBinAddr: 0x1DD58, symSize: 0x278 }
+  - { offset: 0x10EE7, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator sech:variables:error:]', symObjAddr: 0x7308, symBinAddr: 0x1DFD0, symSize: 0x278 }
+  - { offset: 0x10FF8, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator cotanh:variables:error:]', symObjAddr: 0x7580, symBinAddr: 0x1E248, symSize: 0x278 }
+  - { offset: 0x11109, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator acsch:variables:error:]', symObjAddr: 0x77F8, symBinAddr: 0x1E4C0, symSize: 0x270 }
+  - { offset: 0x1120A, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator asech:variables:error:]', symObjAddr: 0x7A68, symBinAddr: 0x1E730, symSize: 0x270 }
+  - { offset: 0x1130B, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator acotanh:variables:error:]', symObjAddr: 0x7CD8, symBinAddr: 0x1E9A0, symSize: 0x270 }
+  - { offset: 0x1140C, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator versin:variables:error:]', symObjAddr: 0x7F48, symBinAddr: 0x1EC10, symSize: 0x2A8 }
+  - { offset: 0x11544, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator vercosin:variables:error:]', symObjAddr: 0x81F0, symBinAddr: 0x1EEB8, symSize: 0x2A8 }
+  - { offset: 0x1167C, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator coversin:variables:error:]', symObjAddr: 0x8498, symBinAddr: 0x1F160, symSize: 0x2A8 }
+  - { offset: 0x117B4, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator covercosin:variables:error:]', symObjAddr: 0x8740, symBinAddr: 0x1F408, symSize: 0x2A8 }
+  - { offset: 0x118EC, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator haversin:variables:error:]', symObjAddr: 0x89E8, symBinAddr: 0x1F6B0, symSize: 0x26C }
+  - { offset: 0x119CE, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator havercosin:variables:error:]', symObjAddr: 0x8C54, symBinAddr: 0x1F91C, symSize: 0x26C }
+  - { offset: 0x11AB0, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator hacoversin:variables:error:]', symObjAddr: 0x8EC0, symBinAddr: 0x1FB88, symSize: 0x26C }
+  - { offset: 0x11B92, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator hacovercosin:variables:error:]', symObjAddr: 0x912C, symBinAddr: 0x1FDF4, symSize: 0x26C }
+  - { offset: 0x11C74, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator exsec:variables:error:]', symObjAddr: 0x9398, symBinAddr: 0x20060, symSize: 0x2B0 }
+  - { offset: 0x11DCE, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator excsc:variables:error:]', symObjAddr: 0x9648, symBinAddr: 0x20310, symSize: 0x2B0 }
+  - { offset: 0x11F1B, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator crd:variables:error:]', symObjAddr: 0x98F8, symBinAddr: 0x205C0, symSize: 0x2E0 }
+  - { offset: 0x12088, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator dtor:variables:error:]', symObjAddr: 0x9BD8, symBinAddr: 0x208A0, symSize: 0x2B0 }
+  - { offset: 0x121C1, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator rtod:variables:error:]', symObjAddr: 0x9E88, symBinAddr: 0x20B50, symSize: 0x2B0 }
+  - { offset: 0x122EF, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator phi:variables:error:]', symObjAddr: 0xA138, symBinAddr: 0x20E00, symSize: 0x194 }
+  - { offset: 0x12393, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator pi:variables:error:]', symObjAddr: 0xA2CC, symBinAddr: 0x20F94, symSize: 0x194 }
+  - { offset: 0x1242C, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator pi_2:variables:error:]', symObjAddr: 0xA460, symBinAddr: 0x21128, symSize: 0x194 }
+  - { offset: 0x124D0, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator pi_4:variables:error:]', symObjAddr: 0xA5F4, symBinAddr: 0x212BC, symSize: 0x194 }
+  - { offset: 0x12574, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator tau:variables:error:]', symObjAddr: 0xA788, symBinAddr: 0x21450, symSize: 0x1C0 }
+  - { offset: 0x12652, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator sqrt2:variables:error:]', symObjAddr: 0xA948, symBinAddr: 0x21610, symSize: 0x1A8 }
+  - { offset: 0x12705, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator e:variables:error:]', symObjAddr: 0xAAF0, symBinAddr: 0x217B8, symSize: 0x1A8 }
+  - { offset: 0x127B8, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator log2e:variables:error:]', symObjAddr: 0xAC98, symBinAddr: 0x21960, symSize: 0x1A8 }
+  - { offset: 0x1286B, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator log10e:variables:error:]', symObjAddr: 0xAE40, symBinAddr: 0x21B08, symSize: 0x1A8 }
+  - { offset: 0x1291E, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator ln2:variables:error:]', symObjAddr: 0xAFE8, symBinAddr: 0x21CB0, symSize: 0x1A8 }
+  - { offset: 0x129D1, size: 0x8, addend: 0x0, symName: '-[_DDPrecisionFunctionEvaluator ln10:variables:error:]', symObjAddr: 0xB190, symBinAddr: 0x21E58, symSize: 0x1A8 }
+  - { offset: 0x12C2F, size: 0x8, addend: 0x0, symName: _DDDecimalNAN, symObjAddr: 0x0, symBinAddr: 0x22000, symSize: 0x6C }
+  - { offset: 0x12C3C, size: 0x8, addend: 0x0, symName: _DDDecimalNAN, symObjAddr: 0x0, symBinAddr: 0x22000, symSize: 0x6C }
+  - { offset: 0x12C61, size: 0x8, addend: 0x0, symName: _DDDecimalNAN._nan, symObjAddr: 0xA9E0, symBinAddr: 0x36BF0, symSize: 0x0 }
+  - { offset: 0x12FCD, size: 0x8, addend: 0x0, symName: _DDDecimalEpsilon, symObjAddr: 0x6C, symBinAddr: 0x2206C, symSize: 0x74 }
+  - { offset: 0x12FF2, size: 0x8, addend: 0x0, symName: _DDDecimalEpsilon._epsilon, symObjAddr: 0xA9E8, symBinAddr: 0x36BF8, symSize: 0x0 }
+  - { offset: 0x12FFC, size: 0x8, addend: 0x0, symName: _DDDecimalNegativeOne, symObjAddr: 0xE0, symBinAddr: 0x220E0, symSize: 0x74 }
+  - { offset: 0x13021, size: 0x8, addend: 0x0, symName: _DDDecimalNegativeOne._minusOne, symObjAddr: 0xA9F0, symBinAddr: 0x36C00, symSize: 0x0 }
+  - { offset: 0x1302B, size: 0x8, addend: 0x0, symName: _DDDecimalOne, symObjAddr: 0x1A8, symBinAddr: 0x221A8, symSize: 0x74 }
+  - { offset: 0x13050, size: 0x8, addend: 0x0, symName: _DDDecimalOne._one, symObjAddr: 0xA9F8, symBinAddr: 0x36C08, symSize: 0x0 }
+  - { offset: 0x1305A, size: 0x8, addend: 0x0, symName: _DDDecimalTwo, symObjAddr: 0x21C, symBinAddr: 0x2221C, symSize: 0x74 }
+  - { offset: 0x1307F, size: 0x8, addend: 0x0, symName: _DDDecimalTwo._two, symObjAddr: 0xAA00, symBinAddr: 0x36C10, symSize: 0x0 }
+  - { offset: 0x13089, size: 0x8, addend: 0x0, symName: _DDDecimalPhi, symObjAddr: 0x290, symBinAddr: 0x22290, symSize: 0x70 }
+  - { offset: 0x130AE, size: 0x8, addend: 0x0, symName: _DDDecimalPhi._phi, symObjAddr: 0xAA08, symBinAddr: 0x36C18, symSize: 0x0 }
+  - { offset: 0x130B8, size: 0x8, addend: 0x0, symName: _DDDecimalPi, symObjAddr: 0x300, symBinAddr: 0x22300, symSize: 0x70 }
+  - { offset: 0x130DD, size: 0x8, addend: 0x0, symName: _DDDecimalPi._pi, symObjAddr: 0xAA10, symBinAddr: 0x36C20, symSize: 0x0 }
+  - { offset: 0x130E7, size: 0x8, addend: 0x0, symName: _DDDecimal2Pi, symObjAddr: 0x370, symBinAddr: 0x22370, symSize: 0xA4 }
+  - { offset: 0x1310C, size: 0x8, addend: 0x0, symName: _DDDecimal2Pi._2pi, symObjAddr: 0xAA18, symBinAddr: 0x36C28, symSize: 0x0 }
+  - { offset: 0x1319B, size: 0x8, addend: 0x0, symName: _DDDecimalPi_2, symObjAddr: 0x414, symBinAddr: 0x22414, symSize: 0x70 }
+  - { offset: 0x131C0, size: 0x8, addend: 0x0, symName: _DDDecimalPi_2._pi_2, symObjAddr: 0xAA20, symBinAddr: 0x36C30, symSize: 0x0 }
+  - { offset: 0x131CA, size: 0x8, addend: 0x0, symName: _DDDecimalPi_4, symObjAddr: 0x484, symBinAddr: 0x22484, symSize: 0x70 }
+  - { offset: 0x131EF, size: 0x8, addend: 0x0, symName: _DDDecimalPi_4._pi_4, symObjAddr: 0xAA28, symBinAddr: 0x36C38, symSize: 0x0 }
+  - { offset: 0x131F9, size: 0x8, addend: 0x0, symName: _DDDecimalSqrt2, symObjAddr: 0x4F4, symBinAddr: 0x224F4, symSize: 0x70 }
+  - { offset: 0x1321E, size: 0x8, addend: 0x0, symName: _DDDecimalSqrt2._sqrt2, symObjAddr: 0xAA30, symBinAddr: 0x36C40, symSize: 0x0 }
+  - { offset: 0x13228, size: 0x8, addend: 0x0, symName: _DDDecimalE, symObjAddr: 0x564, symBinAddr: 0x22564, symSize: 0x70 }
+  - { offset: 0x1324D, size: 0x8, addend: 0x0, symName: _DDDecimalE._e, symObjAddr: 0xAA38, symBinAddr: 0x36C48, symSize: 0x0 }
+  - { offset: 0x13257, size: 0x8, addend: 0x0, symName: _DDDecimalLog2e, symObjAddr: 0x5D4, symBinAddr: 0x225D4, symSize: 0x70 }
+  - { offset: 0x1327C, size: 0x8, addend: 0x0, symName: _DDDecimalLog2e._log2e, symObjAddr: 0xAA40, symBinAddr: 0x36C50, symSize: 0x0 }
+  - { offset: 0x13286, size: 0x8, addend: 0x0, symName: _DDDecimalLog10e, symObjAddr: 0x644, symBinAddr: 0x22644, symSize: 0x70 }
+  - { offset: 0x132AB, size: 0x8, addend: 0x0, symName: _DDDecimalLog10e._log10e, symObjAddr: 0xAA48, symBinAddr: 0x36C58, symSize: 0x0 }
+  - { offset: 0x132B5, size: 0x8, addend: 0x0, symName: _DDDecimalLn2, symObjAddr: 0x6B4, symBinAddr: 0x226B4, symSize: 0x70 }
+  - { offset: 0x132DA, size: 0x8, addend: 0x0, symName: _DDDecimalLn2._ln2, symObjAddr: 0xAA50, symBinAddr: 0x36C60, symSize: 0x0 }
+  - { offset: 0x132E4, size: 0x8, addend: 0x0, symName: _DDDecimalLn10, symObjAddr: 0x724, symBinAddr: 0x22724, symSize: 0x70 }
+  - { offset: 0x13309, size: 0x8, addend: 0x0, symName: _DDDecimalLn10._ln10, symObjAddr: 0xAA58, symBinAddr: 0x36C68, symSize: 0x0 }
+  - { offset: 0x13386, size: 0x8, addend: 0x0, symName: _DDDecimalZero, symObjAddr: 0x154, symBinAddr: 0x22154, symSize: 0x54 }
+  - { offset: 0x133E4, size: 0x8, addend: 0x0, symName: _DDDecimalFromInteger, symObjAddr: 0x794, symBinAddr: 0x22794, symSize: 0x60 }
+  - { offset: 0x1340D, size: 0x8, addend: 0x0, symName: _DDDecimalFromDouble, symObjAddr: 0x7F4, symBinAddr: 0x227F4, symSize: 0x54 }
+  - { offset: 0x13436, size: 0x8, addend: 0x0, symName: _DDUIntegerFromDecimal, symObjAddr: 0x848, symBinAddr: 0x22848, symSize: 0x64 }
+  - { offset: 0x1345F, size: 0x8, addend: 0x0, symName: _DDFloatFromDecimal, symObjAddr: 0x8AC, symBinAddr: 0x228AC, symSize: 0x6C }
+  - { offset: 0x13488, size: 0x8, addend: 0x0, symName: _DDDoubleFromDecimal, symObjAddr: 0x918, symBinAddr: 0x22918, symSize: 0x6C }
+  - { offset: 0x134B1, size: 0x8, addend: 0x0, symName: _DDDecimalIsNegative, symObjAddr: 0x984, symBinAddr: 0x22984, symSize: 0x40 }
+  - { offset: 0x13526, size: 0x8, addend: 0x0, symName: _DDDecimalIsInteger, symObjAddr: 0x9C4, symBinAddr: 0x229C4, symSize: 0x5C }
+  - { offset: 0x135A5, size: 0x8, addend: 0x0, symName: _DDDecimalNegate, symObjAddr: 0xA20, symBinAddr: 0x22A20, symSize: 0x40 }
+  - { offset: 0x13603, size: 0x8, addend: 0x0, symName: _DDDecimalInvert, symObjAddr: 0xA60, symBinAddr: 0x22A60, symSize: 0x40 }
+  - { offset: 0x1368F, size: 0x8, addend: 0x0, symName: _DDDecimalAdd, symObjAddr: 0xAA0, symBinAddr: 0x22AA0, symSize: 0x14 }
+  - { offset: 0x1371E, size: 0x8, addend: 0x0, symName: _DDDecimalSubtract, symObjAddr: 0xAB4, symBinAddr: 0x22AB4, symSize: 0x14 }
+  - { offset: 0x137AD, size: 0x8, addend: 0x0, symName: _DDDecimalMultiply, symObjAddr: 0xAC8, symBinAddr: 0x22AC8, symSize: 0x14 }
+  - { offset: 0x1381C, size: 0x8, addend: 0x0, symName: _DDDecimalDivide, symObjAddr: 0xADC, symBinAddr: 0x22ADC, symSize: 0x14 }
+  - { offset: 0x1388B, size: 0x8, addend: 0x0, symName: _DDDecimalAverage2, symObjAddr: 0xAF0, symBinAddr: 0x22AF0, symSize: 0x54 }
+  - { offset: 0x13941, size: 0x8, addend: 0x0, symName: _DDDecimalMod, symObjAddr: 0xB44, symBinAddr: 0x22B44, symSize: 0x78 }
+  - { offset: 0x13A0A, size: 0x8, addend: 0x0, symName: _DDDecimalMod2Pi, symObjAddr: 0xBBC, symBinAddr: 0x22BBC, symSize: 0xB0 }
+  - { offset: 0x13B18, size: 0x8, addend: 0x0, symName: _DDDecimalAbsoluteValue, symObjAddr: 0xC6C, symBinAddr: 0x22C6C, symSize: 0x80 }
+  - { offset: 0x13BF1, size: 0x8, addend: 0x0, symName: _DDDecimalIsProbablyEqual, symObjAddr: 0xCEC, symBinAddr: 0x22CEC, symSize: 0x84 }
+  - { offset: 0x13CB7, size: 0x8, addend: 0x0, symName: _DDDecimalSqrt, symObjAddr: 0xD70, symBinAddr: 0x22D70, symSize: 0x104 }
+  - { offset: 0x13DC0, size: 0x8, addend: 0x0, symName: _DDDecimalNthRoot, symObjAddr: 0xE74, symBinAddr: 0x22E74, symSize: 0x158 }
+  - { offset: 0x13FDB, size: 0x8, addend: 0x0, symName: _DDDecimalPower, symObjAddr: 0xFCC, symBinAddr: 0x22FCC, symSize: 0x130 }
+  - { offset: 0x141FA, size: 0x8, addend: 0x0, symName: _DDDecimalInverse, symObjAddr: 0x10FC, symBinAddr: 0x230FC, symSize: 0x54 }
+  - { offset: 0x14258, size: 0x8, addend: 0x0, symName: _DDDecimalFactorial, symObjAddr: 0x1150, symBinAddr: 0x23150, symSize: 0x168 }
+  - { offset: 0x144DB, size: 0x8, addend: 0x0, symName: _DDDecimalLeftShift, symObjAddr: 0x12B8, symBinAddr: 0x232B8, symSize: 0x140 }
+  - { offset: 0x146FF, size: 0x8, addend: 0x0, symName: _DDDecimalRightShift, symObjAddr: 0x13F8, symBinAddr: 0x233F8, symSize: 0x140 }
+  - { offset: 0x14923, size: 0x8, addend: 0x0, symName: _DDDecimalSin, symObjAddr: 0x1538, symBinAddr: 0x23538, symSize: 0xFC }
+  - { offset: 0x14A85, size: 0x8, addend: 0x0, symName: _DDDecimalCos, symObjAddr: 0x1634, symBinAddr: 0x23634, symSize: 0xF4 }
+  - { offset: 0x14BFB, size: 0x8, addend: 0x0, symName: _DDDecimalTan, symObjAddr: 0x1728, symBinAddr: 0x23728, symSize: 0x88 }
+  - { offset: 0x14D07, size: 0x8, addend: 0x0, symName: _DDDecimalCsc, symObjAddr: 0x17B0, symBinAddr: 0x237B0, symSize: 0x6C }
+  - { offset: 0x14DAB, size: 0x8, addend: 0x0, symName: _DDDecimalSec, symObjAddr: 0x181C, symBinAddr: 0x2381C, symSize: 0x6C }
+  - { offset: 0x14E4F, size: 0x8, addend: 0x0, symName: _DDDecimalCot, symObjAddr: 0x1888, symBinAddr: 0x23888, symSize: 0x6C }
+  - { offset: 0x14EF3, size: 0x8, addend: 0x0, symName: _DDDecimalAsin, symObjAddr: 0x18F4, symBinAddr: 0x238F4, symSize: 0x158 }
+  - { offset: 0x151A3, size: 0x8, addend: 0x0, symName: _DDDecimalAtan, symObjAddr: 0x1A4C, symBinAddr: 0x23A4C, symSize: 0x260 }
+  - { offset: 0x155AA, size: 0x8, addend: 0x0, symName: _DDDecimalAcos, symObjAddr: 0x1CAC, symBinAddr: 0x23CAC, symSize: 0x80 }
+  - { offset: 0x15637, size: 0x8, addend: 0x0, symName: _DDDecimalAcsc, symObjAddr: 0x1D2C, symBinAddr: 0x23D2C, symSize: 0x80 }
+  - { offset: 0x156C4, size: 0x8, addend: 0x0, symName: _DDDecimalAsec, symObjAddr: 0x1DAC, symBinAddr: 0x23DAC, symSize: 0x88 }
+  - { offset: 0x15768, size: 0x8, addend: 0x0, symName: _DDDecimalAcot, symObjAddr: 0x1E34, symBinAddr: 0x23E34, symSize: 0x80 }
+  - { offset: 0x157F5, size: 0x8, addend: 0x0, symName: _DDDecimalSinh, symObjAddr: 0x1EB4, symBinAddr: 0x23EB4, symSize: 0xA4 }
+  - { offset: 0x1592C, size: 0x8, addend: 0x0, symName: _DDDecimalCosh, symObjAddr: 0x1F58, symBinAddr: 0x23F58, symSize: 0x98 }
+  - { offset: 0x15A78, size: 0x8, addend: 0x0, symName: _DDDecimalTanh, symObjAddr: 0x1FF0, symBinAddr: 0x23FF0, symSize: 0x74 }
+  - { offset: 0x15B2A, size: 0x8, addend: 0x0, symName: _DDDecimalCsch, symObjAddr: 0x2064, symBinAddr: 0x24064, symSize: 0x6C }
+  - { offset: 0x15BCE, size: 0x8, addend: 0x0, symName: _DDDecimalSech, symObjAddr: 0x20D0, symBinAddr: 0x240D0, symSize: 0x6C }
+  - { offset: 0x15C72, size: 0x8, addend: 0x0, symName: _DDDecimalCoth, symObjAddr: 0x213C, symBinAddr: 0x2413C, symSize: 0x6C }
+  - { offset: 0x15D16, size: 0x8, addend: 0x0, symName: _DDDecimalAsinh, symObjAddr: 0x21A8, symBinAddr: 0x241A8, symSize: 0x160 }
+  - { offset: 0x15F83, size: 0x8, addend: 0x0, symName: _DDDecimalAcosh, symObjAddr: 0x2308, symBinAddr: 0x24308, symSize: 0x44 }
+  - { offset: 0x15FFE, size: 0x8, addend: 0x0, symName: _DDDecimalAtanh, symObjAddr: 0x234C, symBinAddr: 0x2434C, symSize: 0xDC }
+  - { offset: 0x16198, size: 0x8, addend: 0x0, symName: _DDDecimalAcsch, symObjAddr: 0x2428, symBinAddr: 0x24428, symSize: 0x88 }
+  - { offset: 0x1623C, size: 0x8, addend: 0x0, symName: _DDDecimalAsech, symObjAddr: 0x24B0, symBinAddr: 0x244B0, symSize: 0x88 }
+  - { offset: 0x162E0, size: 0x8, addend: 0x0, symName: _DDDecimalAcoth, symObjAddr: 0x2538, symBinAddr: 0x24538, symSize: 0x88 }
+  - { offset: 0x163AB, size: 0x8, addend: 0x0, symName: '+[DDExpression expressionFromString:error:]', symObjAddr: 0x0, symBinAddr: 0x245C0, symSize: 0x54 }
+  - { offset: 0x16648, size: 0x8, addend: 0x0, symName: '+[DDExpression expressionFromString:error:]', symObjAddr: 0x0, symBinAddr: 0x245C0, symSize: 0x54 }
+  - { offset: 0x166A5, size: 0x8, addend: 0x0, symName: '+[DDExpression numberExpressionWithNumber:]', symObjAddr: 0x54, symBinAddr: 0x24614, symSize: 0x4C }
+  - { offset: 0x166E4, size: 0x8, addend: 0x0, symName: '+[DDExpression functionExpressionWithFunction:arguments:error:]', symObjAddr: 0xA0, symBinAddr: 0x24660, symSize: 0x78 }
+  - { offset: 0x16741, size: 0x8, addend: 0x0, symName: '+[DDExpression variableExpressionWithVariable:]', symObjAddr: 0x118, symBinAddr: 0x246D8, symSize: 0x4C }
+  - { offset: 0x16780, size: 0x8, addend: 0x0, symName: '-[DDExpression copyWithZone:]', symObjAddr: 0x164, symBinAddr: 0x24724, symSize: 0x74 }
+  - { offset: 0x167F9, size: 0x8, addend: 0x0, symName: '-[DDExpression expressionType]', symObjAddr: 0x1D8, symBinAddr: 0x24798, symSize: 0x74 }
+  - { offset: 0x16842, size: 0x8, addend: 0x0, symName: '-[DDExpression evaluateWithSubstitutions:evaluator:error:]', symObjAddr: 0x24C, symBinAddr: 0x2480C, symSize: 0x14 }
+  - { offset: 0x168A1, size: 0x8, addend: 0x0, symName: '-[DDExpression simplifiedExpression]', symObjAddr: 0x260, symBinAddr: 0x24820, symSize: 0xB4 }
+  - { offset: 0x1690F, size: 0x8, addend: 0x0, symName: '-[DDExpression simplifiedExpressionWithEvaluator:error:]', symObjAddr: 0x314, symBinAddr: 0x248D4, symSize: 0x74 }
+  - { offset: 0x1696E, size: 0x8, addend: 0x0, symName: '-[DDExpression number]', symObjAddr: 0x388, symBinAddr: 0x24948, symSize: 0x34 }
+  - { offset: 0x1699E, size: 0x8, addend: 0x0, symName: '-[DDExpression function]', symObjAddr: 0x3BC, symBinAddr: 0x2497C, symSize: 0x34 }
+  - { offset: 0x169CE, size: 0x8, addend: 0x0, symName: '-[DDExpression arguments]', symObjAddr: 0x3F0, symBinAddr: 0x249B0, symSize: 0x34 }
+  - { offset: 0x169FE, size: 0x8, addend: 0x0, symName: '-[DDExpression variable]', symObjAddr: 0x424, symBinAddr: 0x249E4, symSize: 0x34 }
+  - { offset: 0x16A2E, size: 0x8, addend: 0x0, symName: '-[DDExpression hash]', symObjAddr: 0x458, symBinAddr: 0x24A18, symSize: 0xBC }
+  - { offset: 0x16A62, size: 0x8, addend: 0x0, symName: '-[DDExpression isEqual:]', symObjAddr: 0x514, symBinAddr: 0x24AD4, symSize: 0x1DC }
+  - { offset: 0x16AB0, size: 0x8, addend: 0x0, symName: '-[DDExpression initWithCoder:]', symObjAddr: 0x6F0, symBinAddr: 0x24CB0, symSize: 0x4 }
+  - { offset: 0x16AED, size: 0x8, addend: 0x0, symName: '-[DDExpression encodeWithCoder:]', symObjAddr: 0x6F4, symBinAddr: 0x24CB4, symSize: 0x4 }
+  - { offset: 0x16B24, size: 0x8, addend: 0x0, symName: '-[DDExpression _setParentExpression:]', symObjAddr: 0x6F8, symBinAddr: 0x24CB8, symSize: 0xC }
+  - { offset: 0x16B63, size: 0x8, addend: 0x0, symName: '-[DDExpression parentExpression]', symObjAddr: 0x704, symBinAddr: 0x24CC4, symSize: 0x18 }
+  - { offset: 0x16B97, size: 0x8, addend: 0x0, symName: '-[DDExpression .cxx_destruct]', symObjAddr: 0x71C, symBinAddr: 0x24CDC, symSize: 0x8 }
+  - { offset: 0x16F01, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression initWithFunction:arguments:error:]', symObjAddr: 0x0, symBinAddr: 0x24CE4, symSize: 0x30C }
+  - { offset: 0x171BB, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression initWithFunction:arguments:error:]', symObjAddr: 0x0, symBinAddr: 0x24CE4, symSize: 0x30C }
+  - { offset: 0x1724E, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression initWithCoder:]', symObjAddr: 0x30C, symBinAddr: 0x24FF0, symSize: 0x98 }
+  - { offset: 0x172AF, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression encodeWithCoder:]', symObjAddr: 0x3A4, symBinAddr: 0x25088, symSize: 0x94 }
+  - { offset: 0x172EE, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression copyWithZone:]', symObjAddr: 0x438, symBinAddr: 0x2511C, symSize: 0x190 }
+  - { offset: 0x17355, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression expressionType]', symObjAddr: 0x5C8, symBinAddr: 0x252AC, symSize: 0x8 }
+  - { offset: 0x17385, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression function]', symObjAddr: 0x5D0, symBinAddr: 0x252B4, symSize: 0x10 }
+  - { offset: 0x173B9, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression arguments]', symObjAddr: 0x5E0, symBinAddr: 0x252C4, symSize: 0x10 }
+  - { offset: 0x173ED, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression simplifiedExpressionWithEvaluator:error:]', symObjAddr: 0x5F0, symBinAddr: 0x252D4, symSize: 0x288 }
+  - { offset: 0x174A4, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression description]', symObjAddr: 0x878, symBinAddr: 0x2555C, symSize: 0xD4 }
+  - { offset: 0x174D8, size: 0x8, addend: 0x0, symName: '-[_DDFunctionExpression .cxx_destruct]', symObjAddr: 0x94C, symBinAddr: 0x25630, symSize: 0x40 }
+  - { offset: 0x17853, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression initWithNumber:]', symObjAddr: 0x0, symBinAddr: 0x25670, symSize: 0x80 }
+  - { offset: 0x17AFF, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression initWithNumber:]', symObjAddr: 0x0, symBinAddr: 0x25670, symSize: 0x80 }
+  - { offset: 0x17B42, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression initWithCoder:]', symObjAddr: 0x80, symBinAddr: 0x256F0, symSize: 0x58 }
+  - { offset: 0x17B85, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression encodeWithCoder:]', symObjAddr: 0xD8, symBinAddr: 0x25748, symSize: 0x5C }
+  - { offset: 0x17BC4, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression copyWithZone:]', symObjAddr: 0x134, symBinAddr: 0x257A4, symSize: 0x58 }
+  - { offset: 0x17C03, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression expressionType]', symObjAddr: 0x18C, symBinAddr: 0x257FC, symSize: 0x8 }
+  - { offset: 0x17C33, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression simplifiedExpressionWithEvaluator:error:]', symObjAddr: 0x194, symBinAddr: 0x25804, symSize: 0x4 }
+  - { offset: 0x17C7B, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression number]', symObjAddr: 0x198, symBinAddr: 0x25808, symSize: 0x10 }
+  - { offset: 0x17CAF, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression description]', symObjAddr: 0x1A8, symBinAddr: 0x25818, symSize: 0x44 }
+  - { offset: 0x17CE3, size: 0x8, addend: 0x0, symName: '-[_DDNumberExpression .cxx_destruct]', symObjAddr: 0x1EC, symBinAddr: 0x2585C, symSize: 0x14 }
+  - { offset: 0x18040, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression initWithVariable:]', symObjAddr: 0x0, symBinAddr: 0x25870, symSize: 0xE8 }
+  - { offset: 0x182EC, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression initWithVariable:]', symObjAddr: 0x0, symBinAddr: 0x25870, symSize: 0xE8 }
+  - { offset: 0x1832F, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression initWithCoder:]', symObjAddr: 0xE8, symBinAddr: 0x25958, symSize: 0x58 }
+  - { offset: 0x18372, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression encodeWithCoder:]', symObjAddr: 0x140, symBinAddr: 0x259B0, symSize: 0x5C }
+  - { offset: 0x183B1, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression copyWithZone:]', symObjAddr: 0x19C, symBinAddr: 0x25A0C, symSize: 0x58 }
+  - { offset: 0x183F0, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression expressionType]', symObjAddr: 0x1F4, symBinAddr: 0x25A64, symSize: 0x8 }
+  - { offset: 0x18420, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression variable]', symObjAddr: 0x1FC, symBinAddr: 0x25A6C, symSize: 0x10 }
+  - { offset: 0x18454, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression simplifiedExpressionWithEvaluator:error:]', symObjAddr: 0x20C, symBinAddr: 0x25A7C, symSize: 0x4 }
+  - { offset: 0x1849C, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression description]', symObjAddr: 0x210, symBinAddr: 0x25A80, symSize: 0x64 }
+  - { offset: 0x184D0, size: 0x8, addend: 0x0, symName: '-[_DDVariableExpression .cxx_destruct]', symObjAddr: 0x274, symBinAddr: 0x25AE4, symSize: 0x14 }
+  - { offset: 0x1882D, size: 0x8, addend: 0x0, symName: '+[DDExpressionRewriter defaultRewriter]', symObjAddr: 0x0, symBinAddr: 0x25AF8, symSize: 0x74 }
+  - { offset: 0x1883A, size: 0x8, addend: 0x0, symName: '+[DDExpressionRewriter defaultRewriter]', symObjAddr: 0x0, symBinAddr: 0x25AF8, symSize: 0x74 }
+  - { offset: 0x18863, size: 0x8, addend: 0x0, symName: _defaultRewriter.defaultRewriter, symObjAddr: 0x3DC8, symBinAddr: 0x36C70, symSize: 0x0 }
+  - { offset: 0x18878, size: 0x8, addend: 0x0, symName: _defaultRewriter.onceToken, symObjAddr: 0x3DD0, symBinAddr: 0x36C78, symSize: 0x0 }
+  - { offset: 0x18A2F, size: 0x8, addend: 0x0, symName: '___39+[DDExpressionRewriter defaultRewriter]_block_invoke', symObjAddr: 0x74, symBinAddr: 0x25B6C, symSize: 0x28 }
+  - { offset: 0x18A6B, size: 0x8, addend: 0x0, symName: '-[DDExpressionRewriter init]', symObjAddr: 0x9C, symBinAddr: 0x25B94, symSize: 0x354 }
+  - { offset: 0x18A9F, size: 0x8, addend: 0x0, symName: '-[DDExpressionRewriter _rewriteExpression:usingRule:evaluator:]', symObjAddr: 0x3F0, symBinAddr: 0x25EE8, symSize: 0x248 }
+  - { offset: 0x18B65, size: 0x8, addend: 0x0, symName: '-[DDExpressionRewriter expressionByRewritingExpression:withEvaluator:]', symObjAddr: 0x638, symBinAddr: 0x26130, symSize: 0x244 }
+  - { offset: 0x18C61, size: 0x8, addend: 0x0, symName: '-[DDExpressionRewriter addRewriteRule:forExpressionsMatchingTemplate:condition:]', symObjAddr: 0x87C, symBinAddr: 0x26374, symSize: 0x50 }
+  - { offset: 0x18CCD, size: 0x8, addend: 0x0, symName: '-[DDExpressionRewriter .cxx_destruct]', symObjAddr: 0x8CC, symBinAddr: 0x263C4, symSize: 0xC }
+  - { offset: 0x19087, size: 0x8, addend: 0x0, symName: '+[_DDRewriteRule rewriteRuleWithTemplate:replacementPattern:condition:]', symObjAddr: 0x0, symBinAddr: 0x263D0, symSize: 0x88 }
+  - { offset: 0x1932E, size: 0x8, addend: 0x0, symName: '+[_DDRewriteRule rewriteRuleWithTemplate:replacementPattern:condition:]', symObjAddr: 0x0, symBinAddr: 0x263D0, symSize: 0x88 }
+  - { offset: 0x1938F, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule initWithTemplate:replacementPattern:condition:]', symObjAddr: 0x88, symBinAddr: 0x26458, symSize: 0x1C4 }
+  - { offset: 0x19421, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule _ruleExpression:matchesExpression:withReplacements:]', symObjAddr: 0x24C, symBinAddr: 0x2661C, symSize: 0x2D4 }
+  - { offset: 0x19514, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule _expressionByApplyingReplacements:toPattern:]', symObjAddr: 0x520, symBinAddr: 0x268F0, symSize: 0x224 }
+  - { offset: 0x195BD, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule matchExpression:replacements:evaluator:]', symObjAddr: 0x744, symBinAddr: 0x26B14, symSize: 0xEC }
+  - { offset: 0x19668, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule ruleMatchesExpression:withEvaluator:]', symObjAddr: 0x830, symBinAddr: 0x26C00, symSize: 0x90 }
+  - { offset: 0x196BA, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule expressionByRewritingExpression:withEvaluator:]', symObjAddr: 0x8C0, symBinAddr: 0x26C90, symSize: 0xC4 }
+  - { offset: 0x1971B, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule description]', symObjAddr: 0x984, symBinAddr: 0x26D54, symSize: 0x90 }
+  - { offset: 0x1974F, size: 0x8, addend: 0x0, symName: '-[_DDRewriteRule .cxx_destruct]', symObjAddr: 0xA14, symBinAddr: 0x26DE4, symSize: 0x3C }
+...
