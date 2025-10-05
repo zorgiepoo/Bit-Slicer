@@ -51,7 +51,7 @@ static void ZGAdjustWindowAndTableColumnByWidthDelta(NSWindow * _Nullable window
 	}
 }
 
-void _ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary)
+NSString *_ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary)
 {
 	NSString *preferredLanguage =
 	[[NSLocale preferredLanguages] zgFirstObjectThatMatchesCondition:^BOOL(NSString *language) {
@@ -70,14 +70,16 @@ void _ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArra
 			}];
 		}
 	}
+	
+	return preferredLanguage;
 }
 
-void ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary)
+NSString * _Nullable ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary)
 {
-	_ZGAdjustLocalizableWidthsForWindowAndTableColumns(window, tableColumns, deltaWidthsDictionary);
+	return _ZGAdjustLocalizableWidthsForWindowAndTableColumns(window, tableColumns, deltaWidthsDictionary);
 }
 
-void ZGAdjustLocalizableWidthsForTableColumns(NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary)
+NSString * _Nullable ZGAdjustLocalizableWidthsForTableColumns(NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary)
 {
-	_ZGAdjustLocalizableWidthsForWindowAndTableColumns(nil, tableColumns, deltaWidthsDictionary);
+	return _ZGAdjustLocalizableWidthsForWindowAndTableColumns(nil, tableColumns, deltaWidthsDictionary);
 }

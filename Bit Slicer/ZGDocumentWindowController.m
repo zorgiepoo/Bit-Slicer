@@ -328,7 +328,17 @@
 	searchFieldCell.cancelButtonCell.action = @selector(clearSearchValues:);
 	
 	[self setupScopeBar];
-	ZGAdjustLocalizableWidthsForWindowAndTableColumns(ZGUnwrapNullableObject(self.window), @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
+	
+	NSWindow *window = self.window;
+	NSString *preferredLanguage = ZGAdjustLocalizableWidthsForWindowAndTableColumns(window, @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
+	
+	if ([preferredLanguage isEqualToString:@"ru"])
+	{
+		// Make window size large enough
+		NSSize minSize = window.minSize;
+		minSize.width += 42.0;
+		window.minSize = minSize;
+	}
 	
 	_storeValuesToolbarItem.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
 	
