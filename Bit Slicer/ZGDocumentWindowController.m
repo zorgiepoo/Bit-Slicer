@@ -330,14 +330,15 @@
 	[self setupScopeBar];
 	
 	NSWindow *window = self.window;
+	
 	NSString *preferredLanguage = ZGAdjustLocalizableWidthsForWindowAndTableColumns(window, @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
 	
 	if ([preferredLanguage isEqualToString:@"ru"])
 	{
 		// Make window size large enough
-		NSSize minSize = window.minSize;
-		minSize.width += 42.0;
-		window.minSize = minSize;
+		NSSize contentMinSize = window.contentMinSize;
+		contentMinSize.width += 42.0;
+		window.contentMinSize = contentMinSize;
 	}
 	
 	_storeValuesToolbarItem.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");

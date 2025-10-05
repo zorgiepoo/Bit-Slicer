@@ -41,13 +41,9 @@ static void ZGAdjustWindowAndTableColumnByWidthDelta(NSWindow * _Nullable window
 	
 	if (window != nil)
 	{
-		NSSize minSize = window.minSize;
-		minSize.width += widthDelta;
-		window.minSize = minSize;
-		
-		NSRect frame = window.frame;
-		frame.size = NSMakeSize(frame.size.width + widthDelta, frame.size.height);
-		[window setFrame:frame display:YES];
+		NSSize contentMinSize = window.contentMinSize;
+		contentMinSize.width += widthDelta;
+		window.contentMinSize = contentMinSize;
 	}
 }
 
