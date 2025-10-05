@@ -92,14 +92,16 @@
 			_activationPolicy = runningApplication.activationPolicy;
 			_icon = runningApplication.icon;
 			_name = runningApplication.localizedName;
-			_fileURL = runningApplication.bundleURL;
-			
-			NSString *bundleIdentifier = runningApplication.bundleIdentifier;
-			_isThirdParty = ![bundleIdentifier hasPrefix:@"com.apple."];
-			_isWebContent = ([_name isEqualToString:@"Safari Web Content"] || [_name isEqualToString:@"Google Chrome Helper"] || [_name isEqualToString:@"Firefox Web Content"]);
-			_hasHelpers = [bundleIdentifier isEqualToString:@"com.apple.Safari"] || [bundleIdentifier isEqualToString:@"com.google.Chrome"];
 			
 			NSURL *applicationBundleURL = runningApplication.bundleURL;
+			_fileURL = (applicationBundleURL != nil) ? applicationBundleURL : runningApplication.executableURL;
+			
+			NSString *bundleIdentifier = runningApplication.bundleIdentifier;
+			
+			_isThirdParty = ![bundleIdentifier hasPrefix:@"com.apple."];
+			_isWebContent = ([_name isEqualToString:@"Safari Web Content"] || [_name isEqualToString:@"Mail Web Content"] || [_name isEqualToString:@"Google Chrome Helper"] || [_name isEqualToString:@"Firefox Web Content"]);
+			_hasHelpers = [bundleIdentifier isEqualToString:@"com.apple.Safari"] || [bundleIdentifier isEqualToString:@"com.google.Chrome"];
+			
 			if (applicationBundleURL != nil)
 			{
 				NSBundle *applicationBundle = [NSBundle bundleWithURL:applicationBundleURL];

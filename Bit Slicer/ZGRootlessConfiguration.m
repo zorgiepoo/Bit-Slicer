@@ -105,6 +105,13 @@
 	NSArray<NSString *> *pathComponents = fileURL.pathComponents;
 	if (pathComponents.count > 1)
 	{
+		// Sometimes we may get processes with path like /com.apple.WebKit.WebContent from NSRunningApplication
+		// which is obviously not correct, but we'll filter them out here
+		if ([pathComponents.lastObject hasPrefix:@"com.apple."])
+		{
+			return YES;
+		}
+		
 		if ([[pathComponents subarrayWithRange:NSMakeRange(0, 2)] isEqualToArray:@"/System".pathComponents])
 		{
 			return YES;
@@ -155,7 +162,8 @@
 				return YES;
 			}
 			
-			if ([[[NSBundle bundleWithURL:rootMostBundleURL] bundleIdentifier] hasPrefix:@"com.apple."])
+			NSBundle *bundle = [NSBundle bundleWithURL:rootMostBundleURL];
+			if ([bundle.bundleIdentifier hasPrefix:@"com.apple."])
 			{
 				return YES;
 			}
