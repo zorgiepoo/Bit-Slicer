@@ -47,9 +47,6 @@
 
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
 
-#define ZGScriptNotificationTypeKey @"script_type"
-#define ZGScriptNotificationPromptHashKey @"ZGScriptNotificationPromptHashKey"
-
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *ZGScriptDefaultApplicationEditorKey;

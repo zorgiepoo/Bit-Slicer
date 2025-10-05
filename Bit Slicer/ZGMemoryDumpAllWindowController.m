@@ -107,7 +107,7 @@
 					{
 						if (dumpedAllData)
 						{
-							ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name], nil);
+							ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name]);
 						}
 						else
 						{

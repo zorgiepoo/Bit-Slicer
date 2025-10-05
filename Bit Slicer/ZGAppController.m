@@ -31,6 +31,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import <UserNotifications/UserNotifications.h>
 
 #import "ZGChosenProcessDelegate.h"
 #import "ZGMemorySelectionDelegate.h"
@@ -55,6 +56,7 @@
 #import "ZGProcess.h"
 #import "ZGAboutWindowController.h"
 #import "ZGNullability.h"
+#import "ZGDeliverUserNotifications.h"
 
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
@@ -62,7 +64,7 @@
 
 #define ZGRemoveRootlessProcessesKey @"ZGRemoveRootlessProcessesKey"
 
-@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, NSWindowRestoration, ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>
+@interface ZGAppController : NSObject <NSApplicationDelegate, UNUserNotificationCenterDelegate, NSWindowRestoration, ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>
 
 @end
 
@@ -164,7 +166,8 @@
 			 delegate:selfReference];
 		}];
 		
-		[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
+		[[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+		ZGInitializeDeliveredNotificationCategories();
 	}
 	
 	return self;
@@ -366,26 +369,26 @@
 
 #pragma mark User Notifications
 
-- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)__unused center shouldPresentNotification:(NSUserNotification *)notification
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler
 {
-	return [(NSNumber *)notification.userInfo[ZGScriptNotificationTypeKey] boolValue] || ![NSApp isActive];
-}
-
-- (void)userNotificationCenter:(NSUserNotificationCenter *)__unused center didActivateNotification:(NSUserNotification *)notification
-{
-	if (notification.activationType == NSUserNotificationActivationTypeReplied)
+	if ([response isKindOfClass:[UNTextInputNotificationResponse class]])
 	{
-		NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];
-		if (scriptPromptHash != nil)
+		UNTextInputNotificationResponse *textInputResponse = (UNTextInputNotificationResponse *)response;
+		NSString *userText = textInputResponse.userText;
+		
+		NSDictionary *userInfo = response.notification.request.content.userInfo;
+		NSNumber *scriptPromptHash = userInfo[ZGNotificationIdentifierUserInfoKey];
+		
+		for (ZGDocument *document in _documentController.documents)
 		{
-			for (ZGDocument *document in _documentController.documents)
-			{
-				ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
-				ZGScriptManager *scriptManager = documentWindowController.scriptManager;
-				[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
-			}
+			ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
+			ZGScriptManager *scriptManager = documentWindowController.scriptManager;
+			
+			[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:userText];
 		}
 	}
+	
+	completionHandler();
 }
 
 #pragma mark Links

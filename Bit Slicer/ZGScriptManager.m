@@ -55,6 +55,7 @@
 #import "ZGScriptPromptWindowController.h"
 #import "ZGNullability.h"
 
+#import <UserNotifications/UserNotifications.h>
 #import "pythonlib.h"
 
 #define ZGLocalizableScriptManagerString(string) NSLocalizedStringFromTable(string, @"[Code] Script Manager", nil)
@@ -409,7 +410,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		
 		if ((![NSApp isActive] || ![self->_loggerWindowController.window isVisible]))
 		{
-			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name], nil);
+			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name]);
 		}
 	});
 	
@@ -822,7 +823,8 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		ZGDocumentWindowController *windowController = _windowController;
 		if (windowController != nil)
 		{
-			ZGDeliverUserNotificationWithReply(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), windowController.currentProcess.name, scriptPrompt.message, scriptPrompt.answer, @{ZGScriptNotificationPromptHashKey : @(scriptPrompt.hash)});
+			NSNumber *scriptPromptHash = @(scriptPrompt.hash);
+			ZGDeliverUserNotificationWithReply(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), windowController.currentProcess.name, scriptPrompt.message, scriptPromptHash.stringValue, @{ZGNotificationIdentifierUserInfoKey : scriptPromptHash});
 			
 			[_scriptPromptWindowController attachToWindow:ZGUnwrapNullableObject(windowController.window) withScriptPrompt:scriptPrompt delegate:delegate];
 		}
@@ -837,23 +839,13 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 	}
 }
 
-- (void)removeUserNotifications:(NSArray<NSUserNotification *> *)userNotifications withScriptPrompt:(ZGScriptPrompt *)scriptPrompt
-{
-	for (NSUserNotification *userNotification in userNotifications)
-	{
-		NSNumber *scriptPromptHash = userNotification.userInfo[ZGScriptNotificationPromptHashKey];
-		if (scriptPromptHash != nil && [scriptPromptHash isEqualToNumber:@(scriptPrompt.hash)])
-		{
-			[[NSUserNotificationCenter defaultUserNotificationCenter] removeScheduledNotification:userNotification];
-		}
-	}
-}
-
 - (void)removeUserNotificationsForScriptPrompt:(ZGScriptPrompt *)scriptPrompt
 {
-	NSUserNotificationCenter *userNotificationCenter = [NSUserNotificationCenter defaultUserNotificationCenter];
-	[self removeUserNotifications:userNotificationCenter.scheduledNotifications withScriptPrompt:scriptPrompt];
-	[self removeUserNotifications:userNotificationCenter.deliveredNotifications withScriptPrompt:scriptPrompt];
+	UNUserNotificationCenter *notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
+	NSArray<NSString *> *notificationIdentifiers = @[[@(scriptPrompt.hash) stringValue]];
+	
+	[notificationCenter removeDeliveredNotificationsWithIdentifiers:notificationIdentifiers];
+	[notificationCenter removePendingNotificationRequestsWithIdentifiers:notificationIdentifiers];
 }
 
 - (void)handleScriptPrompt:(ZGScriptPrompt *)scriptPrompt withAnswer:(NSString *)answer sender:(id)sender

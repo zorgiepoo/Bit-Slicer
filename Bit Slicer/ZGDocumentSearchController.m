@@ -1333,7 +1333,7 @@
 				BOOL onlySingleNewNotableVariableFound;
 				if (!self->_searchProgress.shouldCancelSearch)
 				{
-					ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self->_searchProgress], nil);
+					ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self->_searchProgress]);
 					
 					// Update the search results and variables only if they have changed in any way
 					if ((notSearchedVariables.count + self->_temporarySearchResults.count != oldVariables.count + self->_searchResults.count) || (self->_temporarySearchResults.indirectMaxLevels != self->_searchResults.indirectMaxLevels))
