@@ -35,9 +35,11 @@
 
 #define ZGUserNotificationReplyCategory @"ZGUserNotificationReplyCategory"
 
+#define ZGLocalizedStringFromNotificationsTable(string) NSLocalizedStringFromTable((string), @"[Code] Notifications", nil)
+
 void ZGInitializeDeliveredNotificationCategories(void)
 {
-	UNTextInputNotificationAction *textInputNotificationAction = [UNTextInputNotificationAction actionWithIdentifier:@"REPLY_ACTION" title:@"Reply" options:0 textInputButtonTitle:@"Send" textInputPlaceholder:@""];
+	UNTextInputNotificationAction *textInputNotificationAction = [UNTextInputNotificationAction actionWithIdentifier:@"REPLY_ACTION" title:ZGLocalizedStringFromNotificationsTable(@"notificationReplyButtonTitle") options:0 textInputButtonTitle:ZGLocalizedStringFromNotificationsTable(@"notificationSendButtonTitle") textInputPlaceholder:@""];
 	
 	UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:ZGUserNotificationReplyCategory actions:@[textInputNotificationAction] intentIdentifiers:@[] options:0];
 	

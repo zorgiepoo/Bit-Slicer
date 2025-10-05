@@ -1,0 +1,6 @@
+
+/* Notification title for script prompt to allow entering text for a reply */
+"notificationReplyButtonTitle" = "Responder";
+
+/* Notification title for script prompt button to send the reply text */
+"notificationSendButtonTitle" = "Enviar";

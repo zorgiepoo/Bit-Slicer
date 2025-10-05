@@ -107,6 +107,7 @@
 		72ABCBEE24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72ABCBED24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m */; };
 		72ABCBF024E9DE9100EF63A9 /* libkeystone.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBEF24E9DE9000EF63A9 /* libkeystone.0.dylib */; };
 		72ABCBF124E9DEA100EF63A9 /* libkeystone.0.dylib in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBEF24E9DE9000EF63A9 /* libkeystone.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		72B5F56B2E92B89D0017B779 /* [Code] Notifications.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72B5F5692E92B89D0017B779 /* [Code] Notifications.strings */; };
 		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
 		72BD7EB01B84070F00B7E3CC /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
@@ -480,6 +481,9 @@
 		72ABCBFC24E9DF4A00EF63A9 /* evm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = evm.h; path = deps/keystone/keystone/evm.h; sourceTree = "<group>"; };
 		72ABCBFD24E9DF4A00EF63A9 /* arm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = arm.h; path = deps/keystone/keystone/arm.h; sourceTree = "<group>"; };
 		72ABCBFE24E9DF4A00EF63A9 /* x86.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = x86.h; path = deps/keystone/keystone/x86.h; sourceTree = "<group>"; };
+		72B5F56A2E92B89D0017B779 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Notifications.strings"; sourceTree = "<group>"; };
+		72B5F56C2E92B8A90017B779 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Notifications.strings"; sourceTree = "<group>"; };
+		72B5F56D2E92B8BE0017B779 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Notifications.strings"; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
@@ -972,6 +976,7 @@
 		72D271D1197C2A1400CC6914 /* Strings */ = {
 			isa = PBXGroup;
 			children = (
+				72B5F5692E92B89D0017B779 /* [Code] Notifications.strings */,
 				7284245519A96B470081C673 /* Localizable.strings */,
 				72DBC91D1B7690BA0092ED75 /* [Code] About Window.strings */,
 				724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */,
@@ -1527,6 +1532,7 @@
 				726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
 				72130FF82BF00FAB00691AED /* [Code] Edit Variable Address.strings in Resources */,
+				72B5F56B2E92B89D0017B779 /* [Code] Notifications.strings in Resources */,
 				7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */,
 				724A9F2519A1657500E72C9D /* [Code] Memory Viewer Status Bar.strings in Resources */,
 				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
@@ -2268,6 +2274,16 @@
 				72456B95204D2288006EFE08 /* es */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		72B5F5692E92B89D0017B779 /* [Code] Notifications.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				72B5F56A2E92B89D0017B779 /* en */,
+				72B5F56C2E92B8A90017B779 /* ru */,
+				72B5F56D2E92B8BE0017B779 /* es */,
+			);
+			name = "[Code] Notifications.strings";
 			sourceTree = "<group>";
 		};
 		72D051AB1960890800EC532A /* Data Inspector View.xib */ = {
