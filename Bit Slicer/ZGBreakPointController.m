@@ -937,16 +937,15 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	ZGVariable *variable = watchPoint.variable;
 	NSArray<ZGDebugThread *> *oldDebugThreads = watchPoint.debugThreads;
 	
-	ZGSuspendTask(processTask);
-	
 	thread_act_array_t threadList = NULL;
 	mach_msg_type_number_t threadListCount = 0;
 	if (task_threads(processTask, &threadList, &threadListCount) != KERN_SUCCESS)
 	{
 		ZG_LOG(@"ERROR: task_threads failed on adding watchpoint");
-		ZGResumeTask(processTask);
 		return NO;
 	}
+	
+	BOOL suspendedTask = NO;
 	
 	NSMutableArray<ZGDebugThread *> *newDebugThreads = [[NSMutableArray alloc] init];
 	
@@ -966,6 +965,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		{
 			[newDebugThreads addObject:existingThread];
 			continue;
+		}
+		
+		if (!suspendedTask)
+		{
+			ZGSuspendTask(processTask);
+			suspendedTask = YES;
 		}
 		
 		zg_debug_state_t debugState;
@@ -1046,7 +1051,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		ZG_LOG(@"Failed to deallocate thread list in %s...", __PRETTY_FUNCTION__);
 	}
 	
-	ZGResumeTask(processTask);
+	if (suspendedTask)
+	{
+		ZGResumeTask(processTask);
+	}
 	
 	watchPoint.debugThreads = newDebugThreads;
 	
