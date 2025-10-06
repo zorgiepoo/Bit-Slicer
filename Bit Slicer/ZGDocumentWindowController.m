@@ -295,11 +295,7 @@
 	
 	if (_preferringNewTab)
 	{
-		// This code should only trigger if we are running on 10.12 or later
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 		self.window.tabbingMode = NSWindowTabbingModePreferred;
-#pragma clang diagnostic pop
 	}
 	
 	{
