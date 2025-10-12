@@ -73,7 +73,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 	
 	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
-		if (breakPoint.type == ZGBreakPointInstruction && !breakPoint.emulated && breakPoint.task == processTask && breakPoint.variable.address >= address && breakPoint.variable.address + sizeof(gBreakpointOpcode) <= address + size)
+		if (breakPoint.type == ZGBreakPointInstruction && !breakPoint.emulated && !breakPoint.usesHardware && breakPoint.task == processTask && breakPoint.variable.address >= address && breakPoint.variable.address + sizeof(gBreakpointOpcode) <= address + size)
 		{
 			memcpy((uint8_t *)newBytes + (breakPoint.variable.address - address), breakPoint.variable.rawValue, sizeof(gBreakpointOpcode));
 		}
@@ -105,7 +105,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 			}
 		}
 		
-		if (targetBreakPoint == nil || targetBreakPoint.emulated)
+		if (targetBreakPoint == nil || targetBreakPoint.emulated || targetBreakPoint.usesHardware)
 		{
 			if (targetBreakPoint.emulated)
 			{
@@ -504,6 +504,7 @@ intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
 processType:(ZGProcessType)processType
+prefersHardwareBreakpoints:(BOOL)prefersHardwareBreakpoints
 breakPointController:(ZGBreakPointController *)breakPointController
 owner:(id)owner
 undoManager:(NSUndoManager *)undoManager
@@ -724,7 +725,7 @@ error:(NSError * __autoreleasing *)error
 			instructionBack = [[disassemblerObject readInstructions] firstObject];
 		}
 		
-		if (![codeInjectionHandler addBreakPointWithToIslandInstruction:firstInstruction fromIslandInstruction:instructionBack islandAddress:allocatedAddress process:process processType:processType breakPointController:breakPointController owner:owner undoManager:undoManager])
+		if (![codeInjectionHandler addBreakPointWithToIslandInstruction:firstInstruction fromIslandInstruction:instructionBack islandAddress:allocatedAddress process:process processType:processType prefersHardwareBreakpoints:prefersHardwareBreakpoints breakPointController:breakPointController owner:owner undoManager:undoManager])
 		{
 			ZG_LOG(@"Error: Failed to add breakpoints for code injection..");
 			return NO;

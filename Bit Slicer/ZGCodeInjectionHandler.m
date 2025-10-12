@@ -51,7 +51,7 @@
 	ZGProcess *_process;
 }
 
-- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner undoManager:(NSUndoManager *)undoManager
+- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType prefersHardwareBreakpoints:(BOOL)prefersHardwareBreakpoints breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner undoManager:(NSUndoManager *)undoManager
 {
 	_breakPointController = breakPointController;
 	_undoManager = undoManager;
@@ -60,6 +60,7 @@
 	_fromIslandInstruction = fromIslandInstruction;
 	_islandAddress = islandAddress;
 	_processType = processType;
+	_usesHardwareBreakpoints = prefersHardwareBreakpoints;
 	_process = process;
 	
 	return [self addCodeInjection];

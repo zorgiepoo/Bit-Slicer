@@ -22,6 +22,12 @@
 /* Labels 'Add Breakpoints' menu item in Debug menu when using debugger, when selected instruction does not have a breakpoint attached to it; also used for undo'ing an add breakpoints change in Edit menu */
 "addBreakpoints" = "Add Breakpoints";
 
+/* Labels 'Add Hardware Breakpoint' menu item in Debug menu when using debugger, when selected instruction does not have a breakpoint attached to it */
+"addHardwareBreakpoint" = "Add Hardware Breakpoint";
+
+/* Labels 'Add Hardware Breakpoints' menu item in Debug menu when using debugger, when selected instruction does not have a breakpoint attached to it */
+"addHardwareBreakpoints" = "Add Hardware Breakpoints";
+
 /* Labels 'Remove Breakpoint' menu item in Debug menu when using debugger, when selected instruction does have a breakpoint attached to it; also used for undo'ing an remove breakpoint change in Edit menu */
 "removeBreakpoint" = "Remove Breakpoint";
 

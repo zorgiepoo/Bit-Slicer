@@ -823,7 +823,8 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress sourceAddress = 0x0;
 	ZGMemoryAddress destinationAddress = 0x0;
 	Py_buffer newCode;
-	if (PyArg_ParseTuple(args, "KKs*:injectCode", &sourceAddress, &destinationAddress, &newCode))
+	int usesHardwareForBreakpointEmulation = 0;
+	if (PyArg_ParseTuple(args, "KKs*|p:injectCode", &sourceAddress, &destinationAddress, &newCode, &usesHardwareForBreakpointEmulation))
 	{
 		if (!PyBuffer_IsContiguous(&newCode, 'C') || newCode.len <= 0)
 		{
@@ -837,6 +838,12 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		
 		NSData *codeData = [NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len];
 		
+#if TARGET_CPU_ARM64
+		BOOL prefersHardwareBreakpoints = (usesHardwareForBreakpointEmulation != 0);
+#else
+		BOOL prefersHardwareBreakpoints = NO;
+#endif
+		
 		NSError *error = nil;
 		BOOL injectedCode =
 		[ZGDebuggerUtilities
@@ -848,6 +855,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		 hookingIntoOriginalInstructions:originalInstructions
 		 process:self->objcSelf->_process
 		 processType:self->processType
+		 prefersHardwareBreakpoints:prefersHardwareBreakpoints
 		 breakPointController:self->objcSelf->_breakPointController
 		 owner:self->breakPointDelegate
 		 undoManager:nil
@@ -1026,7 +1034,8 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress memoryAddress = 0;
 	PyObject *callback = NULL;
 	
-	if (!PyArg_ParseTuple(args, "KO:addBreakpoint", &memoryAddress, &callback))
+	int hardware = 0;
+	if (!PyArg_ParseTuple(args, "KO|p:addBreakpoint", &memoryAddress, &callback, &hardware))
 	{
 		return NULL;
 	}
@@ -1045,7 +1054,13 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:instruction inProcess:self->objcSelf->_process callback:callback delegate:self->breakPointDelegate])
+#if TARGET_CPU_ARM64
+	BOOL usesHardware = (hardware != 0);
+#else
+	BOOL usesHardware = NO;
+#endif
+	
+	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:instruction inProcess:self->objcSelf->_process usesHardware:usesHardware callback:callback delegate:self->breakPointDelegate])
 	{
 		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;

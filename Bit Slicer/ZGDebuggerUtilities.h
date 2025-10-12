@@ -96,6 +96,7 @@ intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
 processType:(ZGProcessType)processType
+prefersHardwareBreakpoints:(BOOL)prefersHardwareBreakpoints
 breakPointController:(ZGBreakPointController *)breakPointController
 owner:(id)owner
 undoManager:(nullable NSUndoManager *)undoManager

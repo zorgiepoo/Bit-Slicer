@@ -64,6 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic) ZGBreakPointType type;
 @property (atomic) BOOL needsToRestore;
 @property (nonatomic) BOOL hidden;
+@property (nonatomic) BOOL usesHardware;
 @property (atomic) BOOL dead;
 @property (nonatomic) ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary<NSNumber *, NSNumber *> *cacheDictionary;

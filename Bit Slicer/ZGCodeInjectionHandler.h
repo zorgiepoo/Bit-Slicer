@@ -47,8 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ZGMemoryAddress islandAddress;
 @property (nonatomic, readonly, nullable) ZGProcess *process;
 @property (nonatomic, readonly, weak) id owner;
+@property (nonatomic, readonly) BOOL usesHardwareBreakpoints;
 
-- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner undoManager:(nullable NSUndoManager *)undoManager;
+- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType prefersHardwareBreakpoints:(BOOL)prefersHardwareBreakpoints breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner undoManager:(nullable NSUndoManager *)undoManager;
 
 - (void)removeCodeInjection;
 

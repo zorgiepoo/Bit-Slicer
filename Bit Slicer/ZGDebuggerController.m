@@ -81,6 +81,8 @@ NSString *ZGPauseAndUnpauseHotKey = @"ZGPauseAndUnpauseHotKey";
 #define ZGDebuggerOffsetFromBase @"ZGDebuggerOffsetFromBase"
 #define ZGDebuggerMappedFilePath @"ZGDebuggerMappedFilePath"
 
+#define ZGBreakpointUsesHardwareTag 1
+
 typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	ZGStepIntoExecution,
@@ -1501,15 +1503,17 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	{
 		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 		
+		BOOL requestingHardwareBreakpoint = menuItem.isAlternate;
+		
 		if (selectedInstructions.count == 0)
 		{
-			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"addBreakpoint");
+			menuItem.title = !requestingHardwareBreakpoint ? ZGLocalizedStringFromDebuggerTable(@"addBreakpoint") : ZGLocalizedStringFromDebuggerTable(@"addHardwareBreakpoint");
 			return NO;
 		}
 		
 		if (![self disassemblerProcessTypeIsNative])
 		{
-			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"addBreakpoint");
+			menuItem.title = !requestingHardwareBreakpoint ? ZGLocalizedStringFromDebuggerTable(@"addBreakpoint") : ZGLocalizedStringFromDebuggerTable(@"addHardwareBreakpoint");
 			return NO;
 		}
 		
@@ -1532,7 +1536,20 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 			}
 		}
 		
-		NSString *localizableKey = [NSString stringWithFormat:@"%@Breakpoint%@", isBreakPoint ? @"remove" : @"add", selectedInstructions.count != 1 ? @"s" : @""];
+#if TARGET_CPU_ARM64
+		if (requestingHardwareBreakpoint && !isBreakPoint && selectedInstructions.count > 1)
+		{
+			shouldValidate = NO;
+		}
+#else
+		// Hardware breakpoints not supported for x86
+		if (requestingHardwareBreakpoint)
+		{
+			shouldValidate = NO;
+		}
+#endif
+		
+		NSString *localizableKey = [NSString stringWithFormat:@"%@%@Breakpoint%@", (isBreakPoint ? @"remove" : @"add"), (requestingHardwareBreakpoint && !isBreakPoint ? @"Hardware" : @""), (selectedInstructions.count != 1 ? @"s" : @"")];
 		menuItem.title = ZGLocalizedStringFromDebuggerTable(localizableKey);
 		
 		return shouldValidate;
@@ -1874,7 +1891,12 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 			
 			if ([(NSNumber *)object boolValue])
 			{
-				[self addBreakPointsToInstructions:targetInstructions];
+#if TARGET_CPU_ARM64
+				BOOL usesHardware = targetInstructions.count == 1 && ([NSEvent modifierFlags] & NSEventModifierFlagOption) != 0;
+#else
+				BOOL usesHardware = NO;
+#endif
+				[self addBreakPointsToInstructions:targetInstructions usesHardware:usesHardware];
 			}
 			else
 			{
@@ -2102,12 +2124,19 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 {
 	NSMutableArray<ZGInstruction *> *changedInstructions = [[NSMutableArray alloc] init];
 	
+	BOOL removedBreakPointsAllUseHardware = YES;
+	
 	for (ZGInstruction *instruction in instructions)
 	{
 		if ([self isBreakPointAtInstruction:instruction])
 		{
 			[changedInstructions addObject:instruction];
-			[_breakPointController removeBreakPointOnInstruction:instruction inProcess:self.currentProcess];
+			ZGBreakPoint *removedBreakPoint = [_breakPointController removeBreakPointOnInstruction:instruction inProcess:self.currentProcess];
+			
+			if (removedBreakPoint == nil || !removedBreakPoint.usesHardware)
+			{
+				removedBreakPointsAllUseHardware = NO;
+			}
 		}
 	}
 	
@@ -2116,9 +2145,10 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 		[self stopBreakPointActivity];
 	}
 	
-	NSString *localizableKey = [NSString stringWithFormat:@"addBreakpoint%@", changedInstructions.count != 1 ? @"s" : @""];
+	BOOL usesHardware = (changedInstructions.count > 0 && removedBreakPointsAllUseHardware);
+	NSString *localizableKey = [NSString stringWithFormat:@"add%@Breakpoint%@", usesHardware ? @"Hardware" : @"", changedInstructions.count != 1 ? @"s" : @""];
 	[self.undoManager setActionName:ZGLocalizedStringFromDebuggerTable(localizableKey)];
-	[(ZGDebuggerController *)[self.undoManager prepareWithInvocationTarget:self] addBreakPointsToInstructions:changedInstructions];
+	[(ZGDebuggerController *)[self.undoManager prepareWithInvocationTarget:self] addBreakPointsToInstructions:changedInstructions usesHardware:(changedInstructions.count > 0 && removedBreakPointsAllUseHardware)];
 	
 	[_instructionsTableView reloadData];
 }
@@ -2128,7 +2158,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	[_instructionsTableView reloadData];
 }
 
-- (void)addBreakPointsToInstructions:(NSArray<ZGInstruction *> *)instructions
+- (void)addBreakPointsToInstructions:(NSArray<ZGInstruction *> *)instructions usesHardware:(BOOL)usesHardware
 {
 	NSMutableArray<ZGInstruction *> *changedInstructions = [[NSMutableArray alloc] init];
 	
@@ -2150,7 +2180,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 				}
 			}
 			
-			if ([_breakPointController addBreakPointOnInstruction:instruction inProcess:self.currentProcess condition:compiledCondition delegate:self])
+			if ([_breakPointController addBreakPointOnInstruction:instruction inProcess:self.currentProcess usesHardware:usesHardware condition:compiledCondition delegate:self])
 			{
 				addedAtLeastOneBreakPoint = YES;
 			}
@@ -2172,7 +2202,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	}
 }
 
-- (IBAction)toggleBreakPoints:(id)__unused sender
+- (IBAction)toggleBreakPoints:(id)sender
 {
 	NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 	if ([self isBreakPointAtInstruction:[selectedInstructions objectAtIndex:0]])
@@ -2181,7 +2211,8 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	}
 	else
 	{
-		[self addBreakPointsToInstructions:selectedInstructions];
+		BOOL usesHardware = ([(NSControl *)sender tag] == ZGBreakpointUsesHardwareTag);
+		[self addBreakPointsToInstructions:selectedInstructions usesHardware:usesHardware];
 	}
 }
 
