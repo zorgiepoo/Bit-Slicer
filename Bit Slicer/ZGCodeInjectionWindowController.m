@@ -176,11 +176,7 @@
 	NSError *error = nil;
 	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_processType error:&error];
 	
-#if TARGET_CPU_ARM64
 	BOOL prefersHardwareBreakpointsForEmulation = ([NSEvent modifierFlags] & NSEventModifierFlagOption) != 0;
-#else
-	BOOL prefersHardwareBreakpointsForEmulation = NO;
-#endif
 	
 	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType prefersHardwareBreakpoints:prefersHardwareBreakpointsForEmulation breakPointController:_breakPointController owner:_owner undoManager:ZGUnwrapNullableObject(_undoManager) error:&error])
 	{

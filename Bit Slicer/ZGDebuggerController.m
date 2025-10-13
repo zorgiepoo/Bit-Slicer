@@ -1536,18 +1536,10 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 			}
 		}
 		
-#if TARGET_CPU_ARM64
 		if (requestingHardwareBreakpoint && !isBreakPoint && selectedInstructions.count > 1)
 		{
 			shouldValidate = NO;
 		}
-#else
-		// Hardware breakpoints not supported for x86
-		if (requestingHardwareBreakpoint)
-		{
-			shouldValidate = NO;
-		}
-#endif
 		
 		NSString *localizableKey = [NSString stringWithFormat:@"%@%@Breakpoint%@", (isBreakPoint ? @"remove" : @"add"), (requestingHardwareBreakpoint && !isBreakPoint ? @"Hardware" : @""), (selectedInstructions.count != 1 ? @"s" : @"")];
 		menuItem.title = ZGLocalizedStringFromDebuggerTable(localizableKey);
@@ -1891,11 +1883,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 			
 			if ([(NSNumber *)object boolValue])
 			{
-#if TARGET_CPU_ARM64
 				BOOL usesHardware = targetInstructions.count == 1 && ([NSEvent modifierFlags] & NSEventModifierFlagOption) != 0;
-#else
-				BOOL usesHardware = NO;
-#endif
 				[self addBreakPointsToInstructions:targetInstructions usesHardware:usesHardware];
 			}
 			else

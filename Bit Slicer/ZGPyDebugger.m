@@ -838,11 +838,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		
 		NSData *codeData = [NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len];
 		
-#if TARGET_CPU_ARM64
 		BOOL prefersHardwareBreakpoints = (usesHardwareForBreakpointEmulation != 0);
-#else
-		BOOL prefersHardwareBreakpoints = NO;
-#endif
 		
 		NSError *error = nil;
 		BOOL injectedCode =
@@ -1054,11 +1050,7 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-#if TARGET_CPU_ARM64
 	BOOL usesHardware = (hardware != 0);
-#else
-	BOOL usesHardware = NO;
-#endif
 	
 	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:instruction inProcess:self->objcSelf->_process usesHardware:usesHardware callback:callback delegate:self->breakPointDelegate])
 	{
