@@ -18,14 +18,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 xib files are considered to be code for Bit Slicer under the license above with the exception of xib files in linked frameworks, and "Data Inspector View.xib" which is derived from Hex Fiend.
 
-All the files in the following directories (in "Bit Slicer") are © Aureliano Candido and are not up for re-distribution or modification in binary form without prior written permission from the author:
+The "bitslicericon.icon" file (in "Bit Slicer") is designed by Matthew Skiles and is not up for re-distribution or modification without prior written permission from the author of Bit Slicer.
 
-* bitslicerdocicon.iconset/
-* debuggericons/
-* docicons/
-* preficons/
-
-All the files in the following directories (in "Bit Slicer") are © maxtron95 and are not up for re-distribution or modification in binary form without prior written permission from the author:
+All the files in the following directories (in "Bit Slicer") are designed by maxtron95 and are not up for re-distribution or modification in binary form without prior written permission from the artist:
 
 * bitslicericon.iconset/
 * bitslicericon.svg

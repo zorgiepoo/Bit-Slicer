@@ -98,6 +98,7 @@
 		7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7278DC031E4A967700C37150 /* Sparkle.framework */; };
 		7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7278DC031E4A967700C37150 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
+		72A360532E9DF9BF00E7C8AD /* bitslicericon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 72A360522E9DF9BF00E7C8AD /* bitslicericon.icon */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
 		72ABCBC524E8BA8200EF63A9 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
 		72ABCBC624E8BA8900EF63A9 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -461,6 +462,7 @@
 		7275F8A41BA4756100FD144C /* ZGNullability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNullability.m; path = "Bit Slicer/ZGNullability.m"; sourceTree = "<group>"; };
 		7278DC031E4A967700C37150 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle/Sparkle.framework; sourceTree = "<group>"; };
 		7284245619A96B470081C673 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		72A360522E9DF9BF00E7C8AD /* bitslicericon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = bitslicericon.icon; path = "Bit Slicer/bitslicericon.icon"; sourceTree = "<group>"; };
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; usesTabs = 1; };
 		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; usesTabs = 1; };
 		72AA79841A2413B4005A9BD6 /* ZGScriptPromptDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptDelegate.h; path = "Bit Slicer/ZGScriptPromptDelegate.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -868,6 +870,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72A360522E9DF9BF00E7C8AD /* bitslicericon.icon */,
 				7235B7A524D7C1050029580A /* yasm */,
 				77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */,
 				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
@@ -1578,6 +1581,7 @@
 				72D051CB1960A41F00EC532A /* Registers View.xib in Resources */,
 				72D051AC1960891900EC532A /* Backtrace View.xib in Resources */,
 				72DBC8F01B7657F20092ED75 /* LICENSE in Resources */,
+				72A360532E9DF9BF00E7C8AD /* bitslicericon.icon in Resources */,
 				72D051A91960890800EC532A /* Data Inspector View.xib in Resources */,
 				726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */,
 				724A9F2119A1657500E72C9D /* [Code] Dump Memory Range.strings in Resources */,
@@ -2543,6 +2547,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = bitslicericon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
@@ -2656,6 +2662,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = bitslicericon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
