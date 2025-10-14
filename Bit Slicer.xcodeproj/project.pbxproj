@@ -190,7 +190,6 @@
 		77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
 		77F115A817D2E87E009E002A /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115A717D2E87E009E002A /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */; };
-		77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AD17D2EAE4009E002A /* bitslicericon.iconset */; };
 		77F115B317D2EAFE009E002A /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 77F115B217D2EAFE009E002A /* Credits.rtf */; };
 		77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115CC17D2ED64009E002A /* ZGMemoryViewerController.m */; };
 		77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115CF17D2ED74009E002A /* ZGVerticalScrollerRepresenter.m */; };
@@ -686,7 +685,6 @@
 		77F115A617D2E87E009E002A /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VDKQueue.h; path = deps/VDKQueue.h; sourceTree = "<group>"; };
 		77F115A717D2E87E009E002A /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VDKQueue.m; path = deps/VDKQueue.m; sourceTree = "<group>"; };
 		77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = bitslicerdocicon.iconset; path = "Bit Slicer/bitslicerdocicon.iconset"; sourceTree = "<group>"; };
-		77F115AD17D2EAE4009E002A /* bitslicericon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = bitslicericon.iconset; path = "Bit Slicer/bitslicericon.iconset"; sourceTree = "<group>"; };
 		77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Bit_Slicer-Info.plist"; path = "Bit Slicer/Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
 		77F115B217D2EAFE009E002A /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = "Bit Slicer/Credits.rtf"; sourceTree = "<group>"; };
 		77F115CB17D2ED64009E002A /* ZGMemoryViewerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryViewerController.h; path = "Bit Slicer/ZGMemoryViewerController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -873,7 +871,6 @@
 				72A360522E9DF9BF00E7C8AD /* bitslicericon.icon */,
 				7235B7A524D7C1050029580A /* yasm */,
 				77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */,
-				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
 				77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */,
 				72DBC8EF1B7657F20092ED75 /* LICENSE */,
 				77F115B217D2EAFE009E002A /* Credits.rtf */,
@@ -1538,7 +1535,6 @@
 				72B5F56B2E92B89D0017B779 /* [Code] Notifications.strings in Resources */,
 				7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */,
 				724A9F2519A1657500E72C9D /* [Code] Memory Viewer Status Bar.strings in Resources */,
-				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
 				726CA2C819606E1D00A6AD40 /* Edit Value Dialog.xib in Resources */,
 				724A9F1F19A1657500E72C9D /* [Code] Debugger.strings in Resources */,
 				726CA2A919606D0000A6AD40 /* Code Injection Window.xib in Resources */,
