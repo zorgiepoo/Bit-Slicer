@@ -1,0 +1,41 @@
+{
+  "fill" : "system-dark",
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "glass" : false,
+          "hidden" : false,
+          "image-name-specializations" : [
+            {
+              "value" : "Light@2x.png"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "Dark@2x.png"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "Mono@2x.png"
+            }
+          ],
+          "name" : "Dark@2x"
+        }
+      ],
+      "shadow" : {
+        "kind" : "none",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "macOS"
+    ]
+  }
+}
