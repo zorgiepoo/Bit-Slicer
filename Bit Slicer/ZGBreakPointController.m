@@ -84,7 +84,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	mach_port_t _exceptionPort;
 	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
 	dispatch_source_t _Nullable _watchPointTimer;
-	dispatch_source_t _Nullable _hardwareBreakpointPointTimer;
+	dispatch_source_t _Nullable _hardwareBreakpointTimer;
 	NSMutableDictionary<NSNumber *, NSMutableArray<ZGCodeInjectionHandler *> *> *_codeInjectionMappings;
 	BOOL _delayedTermination;
 }
@@ -1558,9 +1558,9 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 		@synchronized(self)
 		{
-			if (success && self->_hardwareBreakpointPointTimer == NULL && (self->_hardwareBreakpointPointTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())) != NULL)
+			if (success && self->_hardwareBreakpointTimer == NULL && (self->_hardwareBreakpointTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())) != NULL)
 			{
-				dispatch_source_t hardwareBreakpointTimer = self->_hardwareBreakpointPointTimer;
+				dispatch_source_t hardwareBreakpointTimer = self->_hardwareBreakpointTimer;
 				
 				dispatch_source_set_timer(hardwareBreakpointTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC / 2, NSEC_PER_SEC / 10);
 				dispatch_source_set_event_handler(hardwareBreakpointTimer, ^{
@@ -1620,13 +1620,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 {
 	@synchronized(self)
 	{
-		if (_hardwareBreakpointPointTimer != NULL && breakPoint.type == ZGBreakPointInstruction && breakPoint.usesHardware)
+		if (_hardwareBreakpointTimer != NULL && breakPoint.type == ZGBreakPointInstruction && breakPoint.usesHardware)
 		{
 			BOOL shouldKeepTimer = [_breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *nextBreakPoint){ return (BOOL)(nextBreakPoint.type == ZGBreakPointInstruction && breakPoint != nextBreakPoint && nextBreakPoint.usesHardware); }];
 			if (!shouldKeepTimer)
 			{
-				dispatch_source_cancel((dispatch_source_t _Nonnull)_hardwareBreakpointPointTimer);
-				_hardwareBreakpointPointTimer = NULL;
+				dispatch_source_cancel((dispatch_source_t _Nonnull)_hardwareBreakpointTimer);
+				_hardwareBreakpointTimer = NULL;
 			}
 		}
 		
