@@ -84,6 +84,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	mach_port_t _exceptionPort;
 	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
 	dispatch_source_t _Nullable _watchPointTimer;
+	dispatch_source_t _Nullable _hardwareBreakpointPointTimer;
 	NSMutableDictionary<NSNumber *, NSMutableArray<ZGCodeInjectionHandler *> *> *_codeInjectionMappings;
 	BOOL _delayedTermination;
 }
@@ -1305,7 +1306,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		mach_msg_type_number_t stateCount;
 		if (!ZGGetDebugThreadState(&debugState, threadList[threadIndex], &stateCount))
 		{
-			ZG_LOG(@"ERROR: ZGGetDebugThreadState failed on adding watchpoint for thread %u, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
+			ZG_LOG(@"ERROR: ZGGetDebugThreadState failed on adding hardware breakpoint for thread %u, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
 			continue;
 		}
 		
@@ -1554,6 +1555,31 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	if (breakPoint.usesHardware)
 	{
 		success = [self updateThreadListInHardwareBreakPoint:breakPoint];
+		
+		@synchronized(self)
+		{
+			if (success && self->_hardwareBreakpointPointTimer == NULL && (self->_hardwareBreakpointPointTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())) != NULL)
+			{
+				dispatch_source_t hardwareBreakpointTimer = self->_hardwareBreakpointPointTimer;
+				
+				dispatch_source_set_timer(hardwareBreakpointTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC / 2, NSEC_PER_SEC / 10);
+				dispatch_source_set_event_handler(hardwareBreakpointTimer, ^{
+					for (ZGBreakPoint *existingBreakPoint in [self breakPoints])
+					{
+						if (existingBreakPoint.type != ZGBreakPointInstruction || !existingBreakPoint.usesHardware)
+						{
+							continue;
+						}
+						
+						if (!existingBreakPoint.dead && ![self updateThreadListInHardwareBreakPoint:existingBreakPoint])
+						{
+							existingBreakPoint.dead = YES;
+						}
+					}
+				});
+				dispatch_resume(hardwareBreakpointTimer);
+			}
+		}
 	}
 	else
 	{
@@ -1594,6 +1620,16 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 {
 	@synchronized(self)
 	{
+		if (_hardwareBreakpointPointTimer != NULL && breakPoint.type == ZGBreakPointInstruction && breakPoint.usesHardware)
+		{
+			BOOL shouldKeepTimer = [_breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *nextBreakPoint){ return (BOOL)(nextBreakPoint.type == ZGBreakPointInstruction && breakPoint != nextBreakPoint && nextBreakPoint.usesHardware); }];
+			if (!shouldKeepTimer)
+			{
+				dispatch_source_cancel((dispatch_source_t _Nonnull)_hardwareBreakpointPointTimer);
+				_hardwareBreakpointPointTimer = NULL;
+			}
+		}
+		
 		NSMutableArray<ZGBreakPoint *> *currentBreakPoints = [NSMutableArray arrayWithArray:[self breakPoints]];
 		[currentBreakPoints removeObject:breakPoint];
 		
