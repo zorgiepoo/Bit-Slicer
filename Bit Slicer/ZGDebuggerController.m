@@ -263,7 +263,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	self.desiredProcessInternalName = [coder decodeObjectOfClass:[NSString class] forKey:ZGDebuggerProcessInternalName];
 	[self updateRunningProcesses];
 	[self setAndPostLastChosenInternalProcessName];
-	[self readMemory:nil];
+	[self readMemoryAndBaseAddressFromMappedFilePath:YES];
 }
 
 - (NSString *)windowNibName
@@ -326,7 +326,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	
 	if (shouldReadMemory)
 	{
-		[self readMemory:nil];
+		[self readMemoryAndBaseAddressFromMappedFilePath:YES];
 	}
 }
 
@@ -407,7 +407,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 		[self toggleBacktraceAndRegistersViews:NSControlStateValueOff];
 		if (oldProcess != nil)
 		{
-			[self readMemory:nil];
+			[self readMemoryAndBaseAddressFromMappedFilePath:YES];
 		}
 	}
 }
@@ -1004,7 +1004,17 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	}
 }
 
-- (IBAction)readMemory:(id)sender
+- (IBAction)readMemory:(id)__unused sender
+{
+	if (self.addressTextField.stringValue.length == 0)
+	{
+		return;
+	}
+	
+	[self readMemoryAndBaseAddressFromMappedFilePath:NO];
+}
+
+- (void)readMemoryAndBaseAddressFromMappedFilePath:(BOOL)baseAddressFromMappedFilePath
 {
 	void (^cleanupOnFailure)(void) = ^{
 		self->_instructions = [NSArray array];
@@ -1024,7 +1034,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 	ZGMemoryAddress calculatedMemoryAddress = 0;
 	BOOL didFindSymbol = NO;
 
-	if (_mappedFilePath != nil && sender == nil)
+	if (_mappedFilePath != nil && baseAddressFromMappedFilePath)
 	{
 		ZGMachBinary *targetBinary = [ZGMachBinary machBinaryWithPartialImageName:(NSString * _Nonnull)_mappedFilePath inProcess:self.currentProcess fromCachedMachBinaries:machBinaries error:NULL];
 		
@@ -1310,7 +1320,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 		}
 		else
 		{
-			[self readMemory:self];
+			[self readMemoryAndBaseAddressFromMappedFilePath:NO];
 		}
 	}
 	else

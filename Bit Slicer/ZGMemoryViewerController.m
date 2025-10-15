@@ -523,6 +523,11 @@
 
 - (IBAction)changeMemoryView:(id)__unused sender
 {
+	if (self.addressTextField.stringValue.length == 0)
+	{
+		return;
+	}
+	
 	[self changeMemoryViewWithSelectionLength:DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
 }
 

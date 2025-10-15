@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24127" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24410" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24127"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24410"/>
+        <capability name="Search Toolbar Item" minToolsVersion="12.0" minSystemVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,7 +17,7 @@
                 <outlet property="_splitView" destination="239" id="mm1-lA-4RG"/>
                 <outlet property="_statusTextField" destination="QFr-ST-Ct0" id="KWB-Po-Ehn"/>
                 <outlet property="_stepExecutionSegmentedControl" destination="hed-Ji-GwK" id="Zj5-rL-JHM"/>
-                <outlet property="addressTextField" destination="ztk-ei-XwG" id="HE9-HV-rHU"/>
+                <outlet property="addressTextField" destination="r1N-WP-GcX" id="7Y6-PZ-tiD"/>
                 <outlet property="navigationSegmentedControl" destination="vkH-Yd-fy0" id="Ky9-Xf-TmK"/>
                 <outlet property="runningApplicationsPopUpButton" destination="fpR-fU-ajG" id="98g-ZN-oRL"/>
                 <outlet property="window" destination="5" id="37"/>
@@ -318,24 +319,21 @@
                             </connections>
                         </segmentedControl>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address/Symbol" paletteLabel="Address/Symbol" sizingBehavior="auto" id="u3o-PN-adL">
+                    <searchToolbarItem implicitItemIdentifier="CE8FB7ED-7277-44DE-8101-CE969B059409" label="Search" paletteLabel="Search" bordered="YES" visibilityPriority="1001" id="PE8-E1-Qtu" userLabel="Address/Symbol Search">
                         <nil key="toolTip"/>
-                        <textField key="view" focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ztk-ei-XwG">
-                            <rect key="frame" x="0.0" y="14" width="171" height="24"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="49z-Sq-ig3"/>
-                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="175" id="UDK-Sx-ERW"/>
-                            </constraints>
-                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" title="0x0" bezelStyle="round" id="mHS-Rp-HdH">
-                                <font key="font" metaFont="system"/>
+                        <searchField key="view" focusRingType="none" verticalHuggingPriority="750" textCompletion="NO" id="r1N-WP-GcX">
+                            <rect key="frame" x="0.0" y="0.0" width="100" height="21"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsWholeSearchString="YES" id="zhU-WX-AoQ">
+                                <font key="font" usesAppearanceFont="YES"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
+                            </searchFieldCell>
                             <connections>
-                                <action selector="readMemory:" target="-2" id="TZ7-hI-kO0"/>
+                                <action selector="readMemory:" target="-2" id="aqS-ua-T1w"/>
                             </connections>
-                        </textField>
-                    </toolbarItem>
+                        </searchField>
+                    </searchToolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="gez-eo-N4r"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="e3V-8d-LIG"/>
                 </allowedToolbarItems>
@@ -345,7 +343,7 @@
                     <toolbarItem reference="KQE-fj-qqG"/>
                     <toolbarItem reference="yIQ-3L-cfP"/>
                     <toolbarItem reference="e3V-8d-LIG"/>
-                    <toolbarItem reference="u3o-PN-adL"/>
+                    <searchToolbarItem reference="PE8-E1-Qtu"/>
                 </defaultToolbarItems>
                 <connections>
                     <outlet property="delegate" destination="-2" id="VTQ-HO-QQB"/>
