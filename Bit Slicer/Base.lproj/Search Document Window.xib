@@ -236,9 +236,8 @@
                 <rect key="frame" x="0.0" y="0.0" width="875" height="248"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iy4-iu-99I">
+                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iy4-iu-99I" userLabel="Scroll View">
                         <rect key="frame" x="0.0" y="22" width="875" height="226"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
                             <rect key="frame" x="0.0" y="0.0" width="875" height="226"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -660,7 +659,11 @@
                     </customView>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="trailing" secondItem="Iy4-iu-99I" secondAttribute="trailing" id="84w-fd-oZj"/>
                     <constraint firstAttribute="trailing" secondItem="HM4-wv-mcJ" secondAttribute="trailing" id="H3J-Rj-mIq"/>
+                    <constraint firstItem="Iy4-iu-99I" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" id="gVg-m0-GJh"/>
+                    <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" id="ig7-YM-GQ7"/>
+                    <constraint firstItem="HM4-wv-mcJ" firstAttribute="top" secondItem="Iy4-iu-99I" secondAttribute="bottom" id="j7Y-r5-BT4"/>
                     <constraint firstItem="HM4-wv-mcJ" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" id="nKj-KK-hqm"/>
                     <constraint firstAttribute="bottom" secondItem="HM4-wv-mcJ" secondAttribute="bottom" id="yxE-Uh-OPh"/>
                 </constraints>
