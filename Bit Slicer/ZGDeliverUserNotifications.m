@@ -32,8 +32,7 @@
 
 #import "ZGDeliverUserNotifications.h"
 #import <UserNotifications/UserNotifications.h>
-
-#define ZGUserNotificationReplyCategory @"ZGUserNotificationReplyCategory"
+#import "ZGNullability.h"
 
 #define ZGLocalizedStringFromNotificationsTable(string) NSLocalizedStringFromTable((string), @"[Code] Notifications", nil)
 
@@ -41,13 +40,13 @@ void ZGInitializeDeliveredNotificationCategories(void)
 {
 	UNTextInputNotificationAction *textInputNotificationAction = [UNTextInputNotificationAction actionWithIdentifier:@"REPLY_ACTION" title:ZGLocalizedStringFromNotificationsTable(@"notificationReplyButtonTitle") options:0 textInputButtonTitle:ZGLocalizedStringFromNotificationsTable(@"notificationSendButtonTitle") textInputPlaceholder:@""];
 	
-	UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:ZGUserNotificationReplyCategory actions:@[textInputNotificationAction] intentIdentifiers:@[] options:0];
+	UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:ZGUserNotificationScriptReplyCategory actions:@[textInputNotificationAction] intentIdentifiers:@[] options:0];
 	
 	UNUserNotificationCenter *notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
 	[notificationCenter setNotificationCategories:[NSSet setWithObject:category]];
 }
 
-void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitle, NSString *informativeText, NSString * _Nullable replyActionIdentifier, NSDictionary<NSString *, id> *userInfo)
+void ZGDeliverUserNotification(NSString *title, NSString * _Nullable subtitle, NSString *informativeText, NSString *notificationIdentifier, NSString * _Nullable categoryIdentifier, NSDictionary<NSString *, id> * _Nullable userInfo)
 {
 	UNUserNotificationCenter *notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
 	UNAuthorizationOptions authorizationOptions = UNAuthorizationOptionAlert;
@@ -60,47 +59,27 @@ void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitl
 		dispatch_async(dispatch_get_main_queue(), ^{
 			UNMutableNotificationContent *notificationContent = [[UNMutableNotificationContent alloc] init];
 			notificationContent.title = title;
-			notificationContent.subtitle = subtitle;
+			
+			if (subtitle != nil)
+			{
+				notificationContent.subtitle = ZGUnwrapNullableObject(subtitle);
+			}
+			
 			notificationContent.body = informativeText;
-			notificationContent.userInfo = userInfo;
 			
-			NSString *requestIdentifier;
-			if (replyActionIdentifier != nil)
+			if (userInfo != nil)
 			{
-				notificationContent.categoryIdentifier = ZGUserNotificationReplyCategory;
-				requestIdentifier = replyActionIdentifier;
-			}
-			else
-			{
-				static uint64_t genericNotificationIDCounter = 0;
-				
-				requestIdentifier = [NSString stringWithFormat:@"GENERIC_%llu", genericNotificationIDCounter];
-				genericNotificationIDCounter++;
+				notificationContent.userInfo = ZGUnwrapNullableObject(userInfo);
 			}
 			
-			UNTimeIntervalNotificationTrigger *trigger;
-			if (replyActionIdentifier != nil && [NSApp isActive])
+			if (categoryIdentifier != nil)
 			{
-				trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:5.0 repeats:NO];
-			}
-			else
-			{
-				trigger = nil;
+				notificationContent.categoryIdentifier = ZGUnwrapNullableObject(categoryIdentifier);
 			}
 			
-			UNNotificationRequest *notificationRequest = [UNNotificationRequest requestWithIdentifier:requestIdentifier content:notificationContent trigger:trigger];
+			UNNotificationRequest *notificationRequest = [UNNotificationRequest requestWithIdentifier:notificationIdentifier content:notificationContent trigger:nil];
 			
 			[notificationCenter addNotificationRequest:notificationRequest withCompletionHandler:nil];
 		});
 	}];
-}
-
-void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString * _Nullable replyActionIdentifier, NSDictionary<NSString *, id> *userInfo)
-{
-	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, replyActionIdentifier, userInfo);
-}
-
-void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText)
-{
-	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, nil, @{});
 }

@@ -410,7 +410,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		
 		if ((![NSApp isActive] || ![self->_loggerWindowController.window isVisible]))
 		{
-			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name]);
+			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name], [NSString stringWithFormat:@"ZGScript_%p", (void *)self], nil, nil);
 		}
 	});
 	
@@ -816,6 +816,11 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 	return _scriptPromptWindowController.isAttached;
 }
 
+- (NSString *)_notificationIdentifierForScriptPromptHash:(NSNumber *)scriptPromptHash
+{
+	return [NSString stringWithFormat:@"ZGScript_prompt%@", scriptPromptHash.stringValue];
+}
+
 - (void)showScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate
 {
 	if (![self hasAttachedPrompt])
@@ -824,7 +829,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		if (windowController != nil)
 		{
 			NSNumber *scriptPromptHash = @(scriptPrompt.hash);
-			ZGDeliverUserNotificationWithReply(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), windowController.currentProcess.name, scriptPrompt.message, scriptPromptHash.stringValue, @{ZGNotificationIdentifierUserInfoKey : scriptPromptHash});
+			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), windowController.currentProcess.name, scriptPrompt.message, [self _notificationIdentifierForScriptPromptHash:scriptPromptHash], ZGUserNotificationScriptReplyCategory, @{ZGNotificationIdentifierUserInfoKey : scriptPromptHash});
 			
 			[_scriptPromptWindowController attachToWindow:ZGUnwrapNullableObject(windowController.window) withScriptPrompt:scriptPrompt delegate:delegate];
 		}
@@ -842,7 +847,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 - (void)removeUserNotificationsForScriptPrompt:(ZGScriptPrompt *)scriptPrompt
 {
 	UNUserNotificationCenter *notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
-	NSArray<NSString *> *notificationIdentifiers = @[[@(scriptPrompt.hash) stringValue]];
+	NSArray<NSString *> *notificationIdentifiers = @[[self _notificationIdentifierForScriptPromptHash:@(scriptPrompt.hash)]];
 	
 	[notificationCenter removeDeliveredNotificationsWithIdentifiers:notificationIdentifiers];
 	[notificationCenter removePendingNotificationRequestsWithIdentifiers:notificationIdentifiers];

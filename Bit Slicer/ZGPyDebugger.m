@@ -66,6 +66,7 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	int8_t processType;
+	uint8_t userNotifyCounter;
 	PyObject *virtualMemoryException;
 	PyObject *debuggerException;
 	__unsafe_unretained ZGPyDebugger *objcSelf;
@@ -76,6 +77,8 @@ static PyMemberDef Debugger_members[] =
 {
 	{NULL, 0, 0, 0, NULL}
 };
+
+#define MAX_USER_NOTIFICATIONS_BUFFER 3
 
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
 #define declareDebugPrototypeMethodWithKeywords(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args, PyObject *kwargs);
@@ -264,6 +267,7 @@ static PyTypeObject DebuggerType =
 		debuggerObject->processIdentifier = process.processID;
 		debuggerObject->processTask = process.processTask;
 		debuggerObject->processType = process.type;
+		debuggerObject->userNotifyCounter = 0;
 		debuggerObject->virtualMemoryException = scriptingInterpreter.virtualMemoryException;
 		debuggerObject->debuggerException = scriptingInterpreter.debuggerException;
 		debuggerObject->breakPointDelegate = self;
@@ -362,7 +366,7 @@ static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
+static PyObject *Debugger_notify(DebuggerClass *self, PyObject *args)
 {
 	Py_buffer title, informativeText;
 	if (!PyArg_ParseTuple(args, "s*s*:notify", &title, &informativeText))
@@ -381,9 +385,16 @@ static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 		NSString *titleString = [[NSString alloc] initWithBytes:title.buf length:(NSUInteger)title.len encoding:NSUTF8StringEncoding];
 		NSString *informativeTextString = [[NSString alloc] initWithBytes:informativeText.buf length:(NSUInteger)informativeText.len encoding:NSUTF8StringEncoding];
 		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			ZGDeliverUserNotification(titleString, nil, informativeTextString);
-		});
+		if (titleString != nil && informativeTextString != nil)
+		{
+			uint8_t currentUserNotifyCounter = self->userNotifyCounter;
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				ZGDeliverUserNotification(titleString, nil, informativeTextString, [NSString stringWithFormat:@"ZGScript%p_notify%u", (void *)self, currentUserNotifyCounter], nil, nil);
+			});
+			
+			self->userNotifyCounter = (self->userNotifyCounter + 1) % MAX_USER_NOTIFICATIONS_BUFFER;
+		}
 		
 		retValue = Py_BuildValue("");
 	}

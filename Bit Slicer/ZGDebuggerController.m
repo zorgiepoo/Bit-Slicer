@@ -2380,7 +2380,7 @@ static ZGHotKey *_decodeHotKeyForKey(NSString *keyValue)
 		
 		if (breakPoint.error == nil && shouldShowNotification)
 		{
-			ZGDeliverUserNotification(ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationTitle"), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationMessage"), currentBreakPoint.variable.addressStringValue]);
+			ZGDeliverUserNotification(ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationTitle"), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationMessage"), currentBreakPoint.variable.addressStringValue], ZGUserNotificationDebuggerStoppedIdentifier, nil, nil);
 		}
 		else if (breakPoint.error != nil)
 		{

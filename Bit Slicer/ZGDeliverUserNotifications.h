@@ -36,9 +36,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define ZGNotificationIdentifierUserInfoKey @"ZGNotificationIdentifierUserInfo"
 
+#define ZGUserNotificationScriptReplyCategory @"ZGUserNotificationScriptReplyCategory"
+
+#define ZGUserNotificationSearchIdentifier @"ZGUserNotificationSearchIdentifier"
+#define ZGUserNotificationWatchVariableIdentifier @"ZGUserNotificationWatchVariableIdentifier"
+#define ZGUserNotificationDebuggerStoppedIdentifier @"ZGUserNotificationDebuggerStoppedIdentifier"
+#define ZGUserNotificationMemoryDumpedIdentifier @"ZGUserNotificationMemoryDumpedIdentifier"
+
 void ZGInitializeDeliveredNotificationCategories(void);
 
-void ZGDeliverUserNotification(NSString *title, NSString * _Nullable subtitle, NSString *informativeText);
-void ZGDeliverUserNotificationWithReply(NSString *title, NSString * _Nullable subtitle, NSString *informativeText, NSString * _Nullable replyActionIdentifier, NSDictionary<NSString *, id> * _Nullable userInfo);
+void ZGDeliverUserNotification(NSString *title, NSString * _Nullable subtitle, NSString *informativeText, NSString *notificationIdentifier, NSString * _Nullable categoryIdentifier, NSDictionary<NSString *, id> * _Nullable userInfo);
 
 NS_ASSUME_NONNULL_END
