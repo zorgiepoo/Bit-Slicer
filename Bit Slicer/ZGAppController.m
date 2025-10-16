@@ -90,6 +90,7 @@
 	IBOutlet NSMenu * _Nonnull _fileMenu;
 	IBOutlet NSMenuItem * _Nonnull _newDocumentMenuItem;
 	IBOutlet NSMenuItem * _Nonnull _showFontsMenuItem;
+	IBOutlet NSMenuItem * _Nonnull _deleteMenuItem;
 	
 	IBOutlet NSMenuItem * _Nonnull _checkForUpdatesMenuItem;
 }
@@ -201,6 +202,13 @@
 		[_showFontsMenuItem setKeyEquivalent:@"T"];
 		
 		NSMenuItem *newTabMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"New Tab", nil) action:@selector(createNewTabbedWindow:) keyEquivalent:@"t"];
+		
+		if (@available(macOS 26, *))
+		{
+			newTabMenuItem.image = [NSImage imageWithSystemSymbolName:@"plus.rectangle.on.rectangle" accessibilityDescription:nil];
+			
+			_deleteMenuItem.image = [NSImage imageWithSystemSymbolName:@"delete.left" accessibilityDescription:nil];
+		}
 		
 		[newTabMenuItem setKeyEquivalentModifierMask:NSEventModifierFlagCommand];
 		[newTabMenuItem setTarget:self];

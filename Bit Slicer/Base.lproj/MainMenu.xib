@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24408" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24410" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24408"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24410"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -792,6 +792,7 @@ CA
         <customObject id="695" customClass="ZGAppController">
             <connections>
                 <outlet property="_checkForUpdatesMenuItem" destination="1093" id="Wmh-K2-WgX"/>
+                <outlet property="_deleteMenuItem" destination="202" id="tNc-fA-acK"/>
                 <outlet property="_fileMenu" destination="81" id="z29-58-6oQ"/>
                 <outlet property="_newDocumentMenuItem" destination="82" id="7xw-87-BcJ"/>
                 <outlet property="_showFontsMenuItem" destination="196-mO-a1w" id="nyT-PT-bA7"/>
