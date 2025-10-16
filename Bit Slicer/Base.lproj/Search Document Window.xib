@@ -231,7 +231,6 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="362" y="330" width="875" height="248"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1470" height="922"/>
-            <value key="minSize" type="size" width="875" height="248"/>
             <view key="contentView" id="aTX-qN-msi">
                 <rect key="frame" x="0.0" y="0.0" width="875" height="248"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -327,10 +326,11 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="pdf-AY-ffZ">
-                            <rect key="frame" x="1" y="222" width="720" height="16"/>
+                            <rect key="frame" x="0.0" y="11" width="0.0" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="q9s-b7-KVu">
+                            <rect key="frame" x="-17" y="17" width="17" height="11"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" wantsLayer="YES" id="FQj-2P-but">
@@ -651,6 +651,7 @@
                             <constraint firstItem="SfW-co-kf4" firstAttribute="centerY" secondItem="HM4-wv-mcJ" secondAttribute="centerY" id="CND-x1-Wyb"/>
                             <constraint firstItem="8dg-I8-jgu" firstAttribute="centerX" secondItem="HM4-wv-mcJ" secondAttribute="centerX" id="Jlo-cB-8iv"/>
                             <constraint firstAttribute="height" constant="22" id="KJt-uP-jmP"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="875" id="Op7-I0-xDy"/>
                             <constraint firstItem="8dg-I8-jgu" firstAttribute="centerY" secondItem="HM4-wv-mcJ" secondAttribute="centerY" id="VjN-vZ-r0c"/>
                             <constraint firstAttribute="trailing" secondItem="SfW-co-kf4" secondAttribute="trailing" constant="10" id="dOh-5N-6EJ"/>
                             <constraint firstItem="zKb-Ip-63U" firstAttribute="leading" secondItem="HM4-wv-mcJ" secondAttribute="leading" constant="10" id="iqO-eb-LCD"/>
@@ -661,6 +662,7 @@
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="Iy4-iu-99I" secondAttribute="trailing" id="84w-fd-oZj"/>
                     <constraint firstAttribute="trailing" secondItem="HM4-wv-mcJ" secondAttribute="trailing" id="H3J-Rj-mIq"/>
+                    <constraint firstItem="HM4-wv-mcJ" firstAttribute="top" relation="greaterThanOrEqual" secondItem="aTX-qN-msi" secondAttribute="top" constant="226" id="OQk-jm-Jae"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" id="gVg-m0-GJh"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" id="ig7-YM-GQ7"/>
                     <constraint firstItem="HM4-wv-mcJ" firstAttribute="top" secondItem="Iy4-iu-99I" secondAttribute="bottom" id="j7Y-r5-BT4"/>
