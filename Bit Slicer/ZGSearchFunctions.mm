@@ -3024,25 +3024,55 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 				newRegion = [pageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
 			}
 			
-			if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
-			{
-				// Read all the pages enclosing the start and end variable address
-				// Reading the entire region may be too expensive
-				ZGMemoryAddress startPageAddress = variableAddress - (variableAddress % pageSize);
-				ZGMemoryAddress endPageAddress = (variableAddress + dataSize) + (pageSize - ((variableAddress + dataSize) % pageSize));
-				ZGMemorySize totalRegionSize = (endPageAddress - startPageAddress);
-				
-				lastUsedRegion = [[ZGRegion alloc] initWithAddress:startPageAddress size:totalRegionSize];
-				
-				void *bytes = nullptr;
-				if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))
+				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
 				{
-					lastUsedRegion->_bytes = bytes;
-				}
-				else
-				{
-					lastUsedRegion = nil;
-				}
+					// Read all the pages enclosing the start and end variable address
+					// Reading the entire region may be too expensive, but don't cross the current VM region boundary.
+					ZGMemoryAddress startPageAddress = variableAddress - (variableAddress % pageSize);
+					ZGMemoryAddress rawEndAddress = variableAddress + dataSize;
+					ZGMemoryAddress endPageAddress = rawEndAddress;
+					if (rawEndAddress % pageSize != 0)
+					{
+						endPageAddress += pageSize - (rawEndAddress % pageSize);
+					}
+					
+					ZGMemoryAddress regionEndAddress = newRegion->_address + newRegion->_size;
+					if (endPageAddress > regionEndAddress)
+					{
+						endPageAddress = regionEndAddress;
+					}
+					
+					ZGMemorySize totalRegionSize = (endPageAddress > startPageAddress) ? (endPageAddress - startPageAddress) : 0;
+					
+					if (totalRegionSize != 0)
+					{
+						lastUsedRegion = [[ZGRegion alloc] initWithAddress:startPageAddress size:totalRegionSize];
+						
+						void *bytes = nullptr;
+						if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))
+						{
+							lastUsedRegion->_bytes = bytes;
+						}
+						else
+						{
+							// Fall back to the minimum required range so candidates near region edges are not dropped
+							// just because an aligned page read could not be satisfied.
+							lastUsedRegion = [[ZGRegion alloc] initWithAddress:variableAddress size:dataSize];
+							
+							if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))
+							{
+								lastUsedRegion->_bytes = bytes;
+							}
+							else
+							{
+								lastUsedRegion = nil;
+							}
+						}
+					}
+					else
+					{
+						lastUsedRegion = nil;
+					}
 			}
 			else
 			{
