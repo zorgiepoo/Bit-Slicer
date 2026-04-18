@@ -1454,12 +1454,20 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		}
 		
 		BOOL wroteValue = NO;
+#if TARGET_CPU_ARM64
+		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (uint8_t *)&threadState, &wroteValue);
+#else
 		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (uint8_t *)&threadState + sizeof(zg_state_hdr_t), &wroteValue);
+#endif
 		if (wroteValue) needsToWriteGeneralRegisters = YES;
 		
 		if (success && !wroteValue && hasVectorRegisters)
 		{
+#if TARGET_CPU_ARM64
+			success = writeRegister(vectorRegisterOffsetsDictionary, registerString, value, (uint8_t *)&vectorState, &wroteValue);
+#else
 			success = writeRegister(vectorRegisterOffsetsDictionary, registerString, value, (uint8_t *)&vectorState + sizeof(zg_state_hdr_t), &wroteValue);
+#endif
 			if (wroteValue) needsToWriteVectorRegisters = YES;
 		}
 		
