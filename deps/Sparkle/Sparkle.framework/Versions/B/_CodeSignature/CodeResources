@@ -6,7 +6,7 @@
 	<dict>
 		<key>Resources/.DS_Store</key>
 		<data>
-		0yiaIHX70GP5IFhGVOcquASw8dw=
+		nvcXhwcWJAE63KSQlOgw1SGytRo=
 		</data>
 		<key>Resources/Base.lproj/Sparkle.strings</key>
 		<data>
@@ -14,7 +14,7 @@
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		OEaXBvxP1yfm2dLql4zhFAX6Hc0=
+		0w8+CGQN3ou5u/RFvwbnzdKk/q0=
 		</data>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
 		<data>
@@ -57,10 +57,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			Tyikk9Dh2MjjcuPYer0RVO3d6Tc=
+			SYpSsDjQv93YFJnoSVSa58AY9Fo=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"4f28a493d0e1d8c8e372e3d87abd1154eddde937" or cdhash H"a4977096196bf54f28583088a37ad63a07fddcea"</string>
+			<string>cdhash H"498a52b038d0bfddd81499e849549ae7c018f45a" or cdhash H"b03a5d54a17706e623ede8b98cef8af5742b1d54"</string>
 		</dict>
 		<key>Headers/SPUAppcastSigningValidationStatus.h</key>
 		<dict>
@@ -297,7 +297,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			d/3fqBi6LwzyupXsX88YxXihagdSQl8qcmXZ3KbvM64=
+			MMpurOWNZnMHdsFwbDK61v1rXO3sUqAGoq0YPA5+wzI=
 			</data>
 		</dict>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
@@ -350,10 +350,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			V+Mma02nFdCdZmF5DNzVnGwE+bw=
+			pfhD5GsYCcGpbKyHGvcG7ZoiL4g=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"57e3266b4da715d09d6661790cdcd59c6c04f9bc" or cdhash H"45edb0e8efcba1ccabded7e0d2fc5f104253b330"</string>
+			<string>cdhash H"a5f843e46b1809c1a96cac871af706ed9a222f88" or cdhash H"49d08b0ffd9e4a82813410e0a4493b4b222f6cd6"</string>
 		</dict>
 	</dict>
 	<key>rules</key>

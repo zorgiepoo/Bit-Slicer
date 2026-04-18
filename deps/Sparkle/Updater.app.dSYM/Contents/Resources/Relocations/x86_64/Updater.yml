@@ -1,6 +1,6 @@
 ---
 triple:          'x86_64-apple-darwin'
-binary-path:     '/Users/msp/Documents/Programming/Sparkle/build/Sparkle.dHTS9d/Build/Products/Release/Updater.app/Contents/MacOS/Updater'
+binary-path:     '/Users/msp/Documents/Programming/Sparkle/build/Sparkle.mrvlLi/Build/Products/Release/Updater.app/Contents/MacOS/Updater'
 relocations:
   - { offset: 0x27, size: 0x8, addend: 0x0, symName: '-[SPUAppcastItemState initWithMajorUpgrade:criticalUpdate:informationalUpdate:minimumUpdateVersionIsOK:minimumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK:arm64HardwareRequirementIsOK:]', symObjAddr: 0x0, symBinAddr: 0x100008C40, symSize: 0x7C }
   - { offset: 0x26F, size: 0x8, addend: 0x0, symName: '-[SPUAppcastItemState initWithMajorUpgrade:criticalUpdate:informationalUpdate:minimumUpdateVersionIsOK:minimumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK:arm64HardwareRequirementIsOK:]', symObjAddr: 0x0, symBinAddr: 0x100008C40, symSize: 0x7C }
@@ -31,8 +31,8 @@ relocations:
   - { offset: 0x16C1, size: 0x8, addend: 0x0, symName: _SPUUnarchiveRootObjectSecurely, symObjAddr: 0x80, symBinAddr: 0x100001591, symSize: 0x7E }
   - { offset: 0x18D2, size: 0x8, addend: 0x0, symName: '+[SUAppcastItem supportsSecureCoding]', symObjAddr: 0x0, symBinAddr: 0x10000160F, symSize: 0xB }
   - { offset: 0x193D, size: 0x8, addend: 0x0, symName: '+[SUAppcastItem emptyAppcastItem]', symObjAddr: 0x121D, symBinAddr: 0x10000282C, symSize: 0x35 }
-  - { offset: 0x1968, size: 0x8, addend: 0x0, symName: _emptyAppcastItem.emptyAppcastItem, symObjAddr: 0x13670, symBinAddr: 0x1000176A8, symSize: 0x0 }
-  - { offset: 0x197E, size: 0x8, addend: 0x0, symName: _emptyAppcastItem.onceToken, symObjAddr: 0x13678, symBinAddr: 0x1000176B0, symSize: 0x0 }
+  - { offset: 0x1968, size: 0x8, addend: 0x0, symName: _emptyAppcastItem.emptyAppcastItem, symObjAddr: 0x13668, symBinAddr: 0x1000176A8, symSize: 0x0 }
+  - { offset: 0x197E, size: 0x8, addend: 0x0, symName: _emptyAppcastItem.onceToken, symObjAddr: 0x13670, symBinAddr: 0x1000176B0, symSize: 0x0 }
   - { offset: 0x23E9, size: 0x8, addend: 0x0, symName: '+[SUAppcastItem supportsSecureCoding]', symObjAddr: 0x0, symBinAddr: 0x10000160F, symSize: 0xB }
   - { offset: 0x2419, size: 0x8, addend: 0x0, symName: '-[SUAppcastItem initWithCoder:]', symObjAddr: 0xB, symBinAddr: 0x10000161A, symSize: 0xBB7 }
   - { offset: 0x2B47, size: 0x8, addend: 0x0, symName: '-[SUAppcastItem encodeWithCoder:]', symObjAddr: 0xBC2, symBinAddr: 0x1000021D1, symSize: 0x401 }
