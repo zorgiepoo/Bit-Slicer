@@ -176,7 +176,7 @@
 
 + (BOOL)getUserID:(uid_t *)outUserID forProcessIdentifier:(pid_t)processIdentifier
 {
-	struct kinfo_proc processInfo;
+	struct kinfo_proc processInfo = {0};
 	size_t processInfoSize = sizeof(processInfo);
 	int nameBuffer[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, processIdentifier};
 	
