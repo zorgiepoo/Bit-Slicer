@@ -1713,19 +1713,25 @@
 		else
 		{
 			// We failed to grant access to this process the user is trying to search in
-			// Notify the user why this may be the case
+			// Notify the user why this may be the case. Capture the process up front so the
+			// diagnosis and the resulting alert always refer to the same one, even if the
+			// selected process changes while the checks run.
+			ZGProcess *process = self.currentProcess;
 			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-				BOOL isProtectedByEntitlement = [self isCurrentProcessProtectedByEntitlement];
-				BOOL isRunningAsDifferentUser = [self isCurrentProcessRunningAsDifferentUser];
+				BOOL isProtectedByEntitlement = [self isProcessProtectedByEntitlement:process];
+				BOOL knownToRunAsDifferentUser = [self isProcessKnownToRunAsDifferentUser:process];
 				dispatch_async(dispatch_get_main_queue(), ^{
-					if (isProtectedByEntitlement || !isRunningAsDifferentUser)
+					// Only blame elevated privileges when we positively know the target runs as a
+					// different user; if that couldn't be determined, fall back to the more general
+					// (and actionable) security protections message rather than guessing
+					if (isProtectedByEntitlement || !knownToRunAsDifferentUser)
 					{
-						ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), self.currentProcess.name], self);
+						ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), process.name], self);
 					}
 					else
 					{
 						// Not protected by entitlements but running as a different/root user, so Bit Slicer likely needs elevated privileges to access it
-						ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), self.currentProcess.name]);
+						ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), process.name]);
 					}
 				});
 			});
@@ -1733,10 +1739,10 @@
 	}
 }
 
-- (BOOL)isCurrentProcessProtectedByEntitlement
+- (BOOL)isProcessProtectedByEntitlement:(ZGProcess *)process
 {
 	char pathBuffer[PROC_PIDPATHINFO_MAXSIZE] = {0};
-	int numberOfBytesRead = proc_pidpath(self.currentProcess.processID, pathBuffer, sizeof(pathBuffer));
+	int numberOfBytesRead = proc_pidpath(process.processID, pathBuffer, sizeof(pathBuffer));
 	if (numberOfBytesRead > 0)
 	{
 		NSURL *fileURL = [[NSURL alloc] initFileURLWithFileSystemRepresentation:pathBuffer isDirectory:NO relativeToURL:nil];
@@ -1773,10 +1779,17 @@
 	return NO;
 }
 
-- (BOOL)isCurrentProcessRunningAsDifferentUser
+// Returns YES only when the target is known to run as a user other than the one running
+// Bit Slicer. A same-user process and a failed user id lookup (e.g. the process exited before
+// it could be read) both return NO, so an unknown result is treated the same as a same-user
+// process rather than assuming the target needs elevated privileges.
+//
+// Because ZGProcessList only lists other users' processes while Bit Slicer runs as root, a
+// different-user result is normally only reachable in a root session.
+- (BOOL)isProcessKnownToRunAsDifferentUser:(ZGProcess *)process
 {
 	uid_t processUserID;
-	return ([ZGProcess getUserID:&processUserID forProcessIdentifier:self.currentProcess.processID] && processUserID != getuid());
+	return ([ZGProcess getUserID:&processUserID forProcessIdentifier:process.processID] && processUserID != getuid());
 }
 
 // Show help for being unable to search likely due to security protections
