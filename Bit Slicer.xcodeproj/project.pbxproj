@@ -24,6 +24,7 @@
 		721B3C4D2AED913200F85660 /* ZGSearchProtectionMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */; };
 		721B3C4E2AED91DC00F85660 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1163417D2EF6D009E002A /* NSStringAdditions.m */; };
 		722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */; };
+		DEC0DE0000000000000000B1 /* ProcessUserIDTest.m in Sources */ = {isa = PBXBuildFile; fileRef = DEC0DE0000000000000000F1 /* ProcessUserIDTest.m */; };
 		722CAAE119BBB5A1009C6AAE /* SearchVirtualMemoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */; };
 		722CAAE219BBD7EE009C6AAE /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
 		722EE77D1B193ABD00934EF3 /* ZGVirtualMemoryStringReading.m in Sources */ = {isa = PBXBuildFile; fileRef = 722EE77C1B193ABD00934EF3 /* ZGVirtualMemoryStringReading.m */; };
@@ -316,6 +317,7 @@
 		72130FFA2BF00FBD00691AED /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Edit Variable Address.strings"; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VariableDisplayTest.m; sourceTree = "<group>"; usesTabs = 1; };
+		DEC0DE0000000000000000F1 /* ProcessUserIDTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProcessUserIDTest.m; sourceTree = "<group>"; usesTabs = 1; };
 		722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchVirtualMemoryTest.m; sourceTree = "<group>"; usesTabs = 1; };
 		722EE74D1B18D8B000934EF3 /* ZGChosenProcessDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGChosenProcessDelegate.h; path = "Bit Slicer/ZGChosenProcessDelegate.h"; sourceTree = "<group>"; };
 		722EE74E1B18F8CC00934EF3 /* ZGShowMemoryWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGShowMemoryWindow.h; path = "Bit Slicer/ZGShowMemoryWindow.h"; sourceTree = "<group>"; };
@@ -1189,6 +1191,7 @@
 				77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */,
 				77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */,
 				722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */,
+				DEC0DE0000000000000000F1 /* ProcessUserIDTest.m */,
 				77E2BBA818FD88A700E41FA0 /* Supporting Files */,
 			);
 			path = "Bit Slicer Tests";
@@ -1587,6 +1590,7 @@
 				77E2BBB718FD8F6B00E41FA0 /* ZGCalculator.m in Sources */,
 				77A5B03019189CC9002BEC69 /* BinarySearchTest.m in Sources */,
 				722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */,
+				DEC0DE0000000000000000B1 /* ProcessUserIDTest.m in Sources */,
 				776B62E6193126B7004BF4A0 /* ByteArraySearchTest.mm in Sources */,
 				77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */,
 				77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */,

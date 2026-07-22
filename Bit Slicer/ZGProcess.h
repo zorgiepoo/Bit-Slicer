@@ -76,6 +76,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)hasGrantedAccess;
 
+// Reads the user id that the given process is running as.
+// Returns YES and sets *outUserID on success, or NO if the process could not be found.
++ (BOOL)getUserID:(uid_t *)outUserID forProcessIdentifier:(pid_t)processIdentifier;
+
 - (ZGMemorySize)pointerSize;
 
 @end

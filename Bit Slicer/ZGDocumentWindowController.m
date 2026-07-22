@@ -65,6 +65,7 @@
 #import "ZGNullability.h"
 #import "ZGCalculator.h"
 #import <libproc.h>
+#import <unistd.h>
 #import <Security/CodeSigning.h>
 #import <Security/SecCode.h>
 
@@ -1715,14 +1716,15 @@
 			// Notify the user why this may be the case
 			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
 				BOOL isProtectedByEntitlement = [self isCurrentProcessProtectedByEntitlement];
+				BOOL isRunningAsDifferentUser = [self isCurrentProcessRunningAsDifferentUser];
 				dispatch_async(dispatch_get_main_queue(), ^{
-					if (isProtectedByEntitlement)
+					if (isProtectedByEntitlement || !isRunningAsDifferentUser)
 					{
 						ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), self.currentProcess.name], self);
 					}
 					else
 					{
-						// While we don't show apps that are running as root user, some processes can still require the debugger running as root to access them
+						// Not protected by entitlements but running as a different/root user, so Bit Slicer likely needs elevated privileges to access it
 						ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), self.currentProcess.name]);
 					}
 				});
@@ -1769,6 +1771,12 @@
 		}
 	}
 	return NO;
+}
+
+- (BOOL)isCurrentProcessRunningAsDifferentUser
+{
+	uid_t processUserID;
+	return ([ZGProcess getUserID:&processUserID forProcessIdentifier:self.currentProcess.processID] && processUserID != getuid());
 }
 
 // Show help for being unable to search likely due to security protections

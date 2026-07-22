@@ -174,6 +174,27 @@
     return MACH_PORT_VALID(_processTask);
 }
 
++ (BOOL)getUserID:(uid_t *)outUserID forProcessIdentifier:(pid_t)processIdentifier
+{
+	struct kinfo_proc processInfo;
+	size_t processInfoSize = sizeof(processInfo);
+	int nameBuffer[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, processIdentifier};
+	
+	if (sysctl(nameBuffer, sizeof(nameBuffer) / sizeof(*nameBuffer), &processInfo, &processInfoSize, NULL, 0) != 0)
+	{
+		return NO;
+	}
+	
+	// A matching process fills in the structure; a missing one leaves the size at 0
+	if (processInfoSize == 0)
+	{
+		return NO;
+	}
+	
+	*outUserID = processInfo.kp_eproc.e_ucred.cr_uid;
+	return YES;
+}
+
 - (ZGMemorySize)pointerSize
 {
 	return ZG_PROCESS_POINTER_SIZE(_type);
