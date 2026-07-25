@@ -1,0 +1,12 @@
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "E8L-gt-bay"; */
+"E8L-gt-bay.title" = "取消";
+
+/* Class = "NSTextFieldCell"; title = "Address:"; ObjectID = "En6-Kd-M7t"; */
+"En6-Kd-M7t.title" = "地址：";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "Ln7-Xd-Cjr"; */
+"Ln7-Xd-Cjr.title" = "好";
+
+/* Class = "NSTextFieldCell"; title = "[address] will be substituted with the pointer value read at address. \nbase(\"executable\") will be substituted with the address of executable.\nsymbol(\"symbol\") will be substituted with the address of symbol.\nlabel(\"label\") will be substituted with the address of label."; ObjectID = "yr8-jR-NWj"; */
+"yr8-jR-NWj.title" = "[address] 将被替换为在该地址读取到的指针值。\nbase(\"executable\") 将被替换为可执行文件的地址。\nsymbol(\"symbol\") 将被替换为符号的地址。\nlabel(\"label\") 将被替换为标签的地址。";

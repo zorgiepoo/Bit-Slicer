@@ -1,0 +1,465 @@
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "5"; */
+"5.title" = "前置全部窗口";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "19"; */
+"19.title" = "窗口";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "23"; */
+"23.title" = "最小化";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "24"; */
+"24.title" = "窗口";
+
+/* Class = "NSMenu"; title = "AMainMenu"; ObjectID = "29"; */
+"29.title" = "AMainMenu";
+
+/* Class = "NSMenuItem"; title = "Bit Slicer"; ObjectID = "56"; */
+"56.title" = "Bit Slicer";
+
+/* Class = "NSMenu"; title = "Bit Slicer"; ObjectID = "57"; */
+"57.title" = "Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "About Bit Slicer"; ObjectID = "58"; */
+"58.title" = "关于 Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Open…"; ObjectID = "72"; */
+"72.title" = "打开…";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "73"; */
+"73.title" = "关闭";
+
+/* Class = "NSMenuItem"; title = "Save"; ObjectID = "75"; */
+"75.title" = "存储";
+
+/* Class = "NSMenuItem"; title = "Save As…"; ObjectID = "80"; */
+"80.title" = "存储为…";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "文件";
+
+/* Class = "NSMenuItem"; title = "New"; ObjectID = "82"; */
+"82.title" = "新建";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "文件";
+
+/* Class = "NSMenuItem"; title = "Revert to Saved"; ObjectID = "112"; */
+"112.title" = "复原为已存储的版本";
+
+/* Class = "NSMenuItem"; title = "Open Recent"; ObjectID = "124"; */
+"124.title" = "打开最近使用";
+
+/* Class = "NSMenu"; title = "Open Recent"; ObjectID = "125"; */
+"125.title" = "打开最近使用";
+
+/* Class = "NSMenuItem"; title = "Clear Menu"; ObjectID = "126"; */
+"126.title" = "清除菜单";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "偏好设置…";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "服务";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "服务";
+
+/* Class = "NSMenuItem"; title = "Hide Bit Slicer"; ObjectID = "134"; */
+"134.title" = "隐藏 Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Quit Bit Slicer"; ObjectID = "136"; */
+"136.title" = "退出 Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "隐藏其他";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "全部显示";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "197"; */
+"197.title" = "拷贝";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "198"; */
+"198.title" = "全选";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "199"; */
+"199.title" = "剪切";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "202"; */
+"202.title" = "删除";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "203"; */
+"203.title" = "粘贴";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "205"; */
+"205.title" = "编辑";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "207"; */
+"207.title" = "撤销";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "215"; */
+"215.title" = "重做";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "217"; */
+"217.title" = "编辑";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "239"; */
+"239.title" = "缩放";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "295"; */
+"295.title" = "视图";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "296"; */
+"296.title" = "视图";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "298"; */
+"298.title" = "自定义工具栏…";
+
+/* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "470"; */
+"470.title" = "粘贴并匹配样式";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "491"; */
+"491.title" = "帮助";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "492"; */
+"492.title" = "帮助";
+
+/* Class = "NSMenuItem"; title = "Bit Slicer Wiki"; ObjectID = "493"; */
+"493.title" = "Bit Slicer 维基";
+
+/* Class = "NSMenuItem"; title = "Variable"; ObjectID = "564"; */
+"564.title" = "变量";
+
+/* Class = "NSMenu"; title = "Variable"; ObjectID = "565"; */
+"565.title" = "变量";
+
+/* Class = "NSMenuItem"; title = "Clear Variables"; ObjectID = "655"; */
+"655.title" = "清除变量";
+
+/* Class = "NSMenuItem"; title = "Add Variable"; ObjectID = "659"; */
+"659.title" = "添加变量";
+
+/* Class = "NSMenu"; title = "Add Variable"; ObjectID = "660"; */
+"660.title" = "添加变量";
+
+/* Class = "NSMenuItem"; title = "8-bit Integer"; ObjectID = "661"; */
+"661.title" = "8 位整数";
+
+/* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "662"; */
+"662.title" = "16 位整数";
+
+/* Class = "NSMenuItem"; title = "32-bit integer"; ObjectID = "663"; */
+"663.title" = "32 位整数";
+
+/* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "664"; */
+"664.title" = "64 位整数";
+
+/* Class = "NSMenuItem"; title = "Float"; ObjectID = "665"; */
+"665.title" = "单精度浮点";
+
+/* Class = "NSMenuItem"; title = "Double"; ObjectID = "666"; */
+"666.title" = "双精度浮点";
+
+/* Class = "NSMenuItem"; title = "8-bit String"; ObjectID = "667"; */
+"667.title" = "8 位字符串";
+
+/* Class = "NSMenuItem"; title = "Freeze Variables"; ObjectID = "681"; */
+"681.title" = "冻结变量";
+
+/* Class = "NSMenuItem"; title = "16-bit String"; ObjectID = "684"; */
+"684.title" = "16 位字符串";
+
+/* Class = "NSMenuItem"; title = "Pause Target"; ObjectID = "689"; */
+"689.title" = "暂停目标";
+
+/* Class = "NSMenuItem"; title = "Pause Target When in Background"; ObjectID = "J5a-3q-dai"; */
+"J5a-3q-dai.title" = "目标在后台时暂停";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Value…"; ObjectID = "691"; */
+"691.title" = "编辑变量值…";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Address…"; ObjectID = "762"; */
+"762.title" = "编辑变量地址…";
+
+/* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "765"; */
+"765.title" = "指针";
+
+/* Class = "NSMenuItem"; title = "Memory"; ObjectID = "782"; */
+"782.title" = "内存";
+
+/* Class = "NSMenu"; title = "Memory"; ObjectID = "783"; */
+"783.title" = "内存";
+
+/* Class = "NSMenuItem"; title = "Show Memory Viewer"; ObjectID = "801"; */
+"801.title" = "显示内存查看器";
+
+/* Class = "NSMenuItem"; title = "Byte Grouping"; ObjectID = "JYw-6Z-hi6"; */
+"JYw-6Z-hi6.title" = "字节分组";
+
+/* Class = "NSMenuItem"; title = "Store All Values"; ObjectID = "811"; */
+"811.title" = "存储所有值";
+
+/* Class = "NSMenuItem"; title = "Store All Values After Searches"; ObjectID = "aRT-pt-mFr"; */
+"aRT-pt-mFr.title" = "搜索后存储所有值";
+
+/* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "830"; */
+"830.title" = "字节数组";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Size…"; ObjectID = "833"; */
+"833.title" = "编辑变量大小…";
+
+/* Class = "NSMenuItem"; title = "Enter Full Screen"; ObjectID = "837"; */
+"837.title" = "进入全屏幕";
+
+/* Class = "NSMenuItem"; title = "Show Data Inspector"; ObjectID = "848"; */
+"848.title" = "显示数据检查器";
+
+/* Class = "NSMenuItem"; title = "NOP Variables"; ObjectID = "857"; */
+"857.title" = "NOP 变量";
+
+/* Class = "NSMenuItem"; title = "Show Variable"; ObjectID = "863"; */
+"863.title" = "显示变量";
+
+/* Class = "NSMenu"; title = "Show Variable"; ObjectID = "864"; */
+"864.title" = "显示变量";
+
+/* Class = "NSMenuItem"; title = "Memory Viewer"; ObjectID = "865"; */
+"865.title" = "内存查看器";
+
+/* Class = "NSMenuItem"; title = "Debugger"; ObjectID = "866"; */
+"866.title" = "调试器";
+
+/* Class = "NSMenuItem"; title = "Change Memory Protection…"; ObjectID = "872"; */
+"872.title" = "更改内存保护…";
+
+/* Class = "NSMenuItem"; title = "Dump Memory in Range…"; ObjectID = "874"; */
+"874.title" = "转储内存范围…";
+
+/* Class = "NSMenuItem"; title = "Dump All Memory…"; ObjectID = "875"; */
+"875.title" = "转储所有内存…";
+
+/* Class = "NSMenuItem"; title = "Debug"; ObjectID = "930"; */
+"930.title" = "调试";
+
+/* Class = "NSMenu"; title = "Debug"; ObjectID = "931"; */
+"931.title" = "调试";
+
+/* Class = "NSMenuItem"; title = "Show Debugger"; ObjectID = "950"; */
+"950.title" = "显示调试器";
+
+/* Class = "NSMenuItem"; title = "Add Breakpoint"; ObjectID = "1019"; */
+"1019.title" = "添加断点";
+
+/* Class = "NSMenuItem"; title = "Remove All Breakpoints"; ObjectID = "1020"; */
+"1020.title" = "移除所有断点";
+
+/* Class = "NSMenuItem"; title = "Registers Qualifier"; ObjectID = "1027"; */
+"1027.title" = "寄存器限定符";
+
+/* Class = "NSMenu"; title = "Registers Qualifier"; ObjectID = "1028"; */
+"1028.title" = "寄存器限定符";
+
+/* Class = "NSMenu"; title = "Interpreted Architecture"; ObjectID = "vV8-3a-ezp"; */
+"vV8-3a-ezp.title" = "解释的架构";
+
+/* Class = "NSMenuItem"; title = "Automatic"; ObjectID = "rWs-2Z-FeI"; */
+"rWs-2Z-FeI.title" = "自动";
+
+/* Class = "NSMenuItem"; title = "Intel"; ObjectID = "w1U-cj-wiW"; */
+"w1U-cj-wiW.title" = "Intel";
+
+/* Class = "NSMenuItem"; title = "ARM"; ObjectID = "kZY-ld-8iB"; */
+"kZY-ld-8iB.title" = "ARM";
+
+/* Class = "NSMenuItem"; title = "Watch Variable"; ObjectID = "1047"; */
+"1047.title" = "监视变量";
+
+/* Class = "NSMenu"; title = "Watch Variable"; ObjectID = "1048"; */
+"1048.title" = "监视变量";
+
+/* Class = "NSMenuItem"; title = "Write Accesses…"; ObjectID = "1050"; */
+"1050.title" = "写入访问…";
+
+/* Class = "NSMenuItem"; title = "Read & Write Accesses…"; ObjectID = "1052"; */
+"1052.title" = "读取和写入访问…";
+
+/* Class = "NSMenuItem"; title = "Continue Execution"; ObjectID = "1061"; */
+"1061.title" = "继续执行";
+
+/* Class = "NSMenuItem"; title = "Jump to Instruction"; ObjectID = "1062"; */
+"1062.title" = "跳转到指令";
+
+/* Class = "NSMenuItem"; title = "Step Execution"; ObjectID = "1068"; */
+"1068.title" = "单步执行";
+
+/* Class = "NSMenu"; title = "Step Execution"; ObjectID = "1069"; */
+"1069.title" = "单步执行";
+
+/* Class = "NSMenuItem"; title = "Into Instruction"; ObjectID = "1071"; */
+"1071.title" = "步入指令";
+
+/* Class = "NSMenuItem"; title = "Over Instruction"; ObjectID = "1072"; */
+"1072.title" = "步过指令";
+
+/* Class = "NSMenuItem"; title = "Out of Function"; ObjectID = "1073"; */
+"1073.title" = "步出函数";
+
+/* Class = "NSMenuItem"; title = "Signed"; ObjectID = "1083"; */
+"1083.title" = "有符号";
+
+/* Class = "NSMenuItem"; title = "Unsigned"; ObjectID = "1084"; */
+"1084.title" = "无符号";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "1087"; */
+"1087.title" = "拷贝地址";
+
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "Y5k-Nh-cGe"; */
+"Y5k-Nh-cGe.title" = "拷贝原始地址";
+
+/* Class = "NSMenuItem"; title = "Check for Updates…"; ObjectID = "1093"; */
+"1093.title" = "检查更新…";
+
+/* Class = "NSMenuItem"; title = "Back"; ObjectID = "1101"; */
+"1101.title" = "后退";
+
+/* Class = "NSMenuItem"; title = "Forward"; ObjectID = "1102"; */
+"1102.title" = "前进";
+
+/* Class = "NSMenuItem"; title = "Go to Call Address"; ObjectID = "1106"; */
+"1106.title" = "前往调用地址";
+
+/* Class = "NSMenuItem"; title = "Report a Bug"; ObjectID = "1110"; */
+"1110.title" = "报告 Bug";
+
+/* Class = "NSMenuItem"; title = "Visit Forums"; ObjectID = "1112"; */
+"1112.title" = "访问论坛";
+
+/* Class = "NSMenuItem"; title = "Send Feedback"; ObjectID = "1113"; */
+"1113.title" = "发送反馈";
+
+/* Class = "NSMenuItem"; title = "Show Colors"; ObjectID = "0uh-KE-NmN"; */
+"0uh-KE-NmN.title" = "显示颜色";
+
+/* Class = "NSMenuItem"; title = "Show Fonts"; ObjectID = "196-mO-a1w"; */
+"196-mO-a1w.title" = "显示字体";
+
+/* Class = "NSMenuItem"; title = "Script"; ObjectID = "24i-VE-23z"; */
+"24i-VE-23z.title" = "脚本";
+
+/* Class = "NSMenu"; title = "Kern"; ObjectID = "25p-uh-76y"; */
+"25p-uh-76y.title" = "字距";
+
+/* Class = "NSMenuItem"; title = "Baseline"; ObjectID = "3RC-ke-Gw9"; */
+"3RC-ke-Gw9.title" = "基线";
+
+/* Class = "NSMenuItem"; title = "Underline"; ObjectID = "3g5-A2-zqi"; */
+"3g5-A2-zqi.title" = "下划线";
+
+/* Class = "NSMenuItem"; title = "Loosen"; ObjectID = "6K6-gD-zol"; */
+"6K6-gD-zol.title" = "变松";
+
+/* Class = "NSMenuItem"; title = "Tighten"; ObjectID = "6TI-1H-4rH"; */
+"6TI-1H-4rH.title" = "变紧";
+
+/* Class = "NSMenuItem"; title = "Use All"; ObjectID = "7Xb-k6-JO5"; */
+"7Xb-k6-JO5.title" = "全部使用";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "FdO-x6-qZB"; */
+"FdO-x6-qZB.title" = "都不使用";
+
+/* Class = "NSMenuItem"; title = "Copy Style"; ObjectID = "HDJ-Hn-OD2"; */
+"HDJ-Hn-OD2.title" = "拷贝样式";
+
+/* Class = "NSMenuItem"; title = "Show Logs"; ObjectID = "HuH-Wa-MAW"; */
+"HuH-Wa-MAW.title" = "显示日志";
+
+/* Class = "NSMenuItem"; title = "Relativize Variables"; ObjectID = "Ica-nv-keu"; */
+"Ica-nv-keu.title" = "相对化变量";
+
+/* Class = "NSMenuItem"; title = "Superscript"; ObjectID = "Ixp-J7-PA4"; */
+"Ixp-J7-PA4.title" = "上标";
+
+/* Class = "NSMenuItem"; title = "Lower"; ObjectID = "JJ8-60-TYn"; */
+"JJ8-60-TYn.title" = "降低";
+
+/* Class = "NSMenu"; title = "Baseline"; ObjectID = "Ldv-6l-XC4"; */
+"Ldv-6l-XC4.title" = "基线";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "MCt-YM-vTL"; */
+"MCt-YM-vTL.title" = "都不使用";
+
+/* Class = "NSMenuItem"; title = "Bigger"; ObjectID = "PKM-Cr-39O"; */
+"PKM-Cr-39O.title" = "增大";
+
+/* Class = "NSMenuItem"; title = "Bold"; ObjectID = "TSu-oj-2rv"; */
+"TSu-oj-2rv.title" = "粗体";
+
+/* Class = "NSMenuItem"; title = "Paste Style"; ObjectID = "W33-GA-dhg"; */
+"W33-GA-dhg.title" = "粘贴样式";
+
+/* Class = "NSMenu"; title = "Font"; ObjectID = "WH3-yD-KY0"; */
+"WH3-yD-KY0.title" = "字体";
+
+/* Class = "NSMenuItem"; title = "Ligatures"; ObjectID = "Ydj-ck-VMA"; */
+"Ydj-ck-VMA.title" = "连字";
+
+/* Class = "NSMenuItem"; title = "Inject Code…"; ObjectID = "bRt-cV-8Ks"; */
+"bRt-cV-8Ks.title" = "注入代码…";
+
+/* Class = "NSMenuItem"; title = "Font"; ObjectID = "cy3-aR-hDp"; */
+"cy3-aR-hDp.title" = "字体";
+
+/* Class = "NSMenuItem"; title = "Search Pointers to Variable"; ObjectID = "dr1-2H-Uqa"; */
+"dr1-2H-Uqa.title" = "搜索指向变量的指针";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "e4N-vH-vLR"; */
+"e4N-vH-vLR.title" = "使用默认值";
+
+/* Class = "NSMenuItem"; title = "Subscript"; ObjectID = "flM-3a-hRj"; */
+"flM-3a-hRj.title" = "下标";
+
+/* Class = "NSMenuItem"; title = "Set Breakpoint Condition…"; ObjectID = "knB-aR-Qem"; */
+"knB-aR-Qem.title" = "设置断点条件…";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "lF7-1X-Xbh"; */
+"lF7-1X-Xbh.title" = "使用默认值";
+
+/* Class = "NSMenuItem"; title = "Kern"; ObjectID = "oZ1-K9-3if"; */
+"oZ1-K9-3if.title" = "字距";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "rt6-Mi-AnR"; */
+"rt6-Mi-AnR.title" = "使用默认值";
+
+/* Class = "NSMenuItem"; title = "Donate…"; ObjectID = "sUz-q6-lOh"; */
+"sUz-q6-lOh.title" = "捐赠…";
+
+/* Class = "NSMenuItem"; title = "Smaller"; ObjectID = "t9E-uQ-noM"; */
+"t9E-uQ-noM.title" = "缩小";
+
+/* Class = "NSMenuItem"; title = "Italic"; ObjectID = "ure-VC-LSA"; */
+"ure-VC-LSA.title" = "斜体";
+
+/* Class = "NSMenuItem"; title = "Raise"; ObjectID = "w8p-W4-UKB"; */
+"w8p-W4-UKB.title" = "升高";
+
+/* Class = "NSMenu"; title = "Ligatures"; ObjectID = "yrk-rh-Kmb"; */
+"yrk-rh-Kmb.title" = "连字";
+
+/* Class = "NSMenu"; title = "Interpreted Architecture"; ObjectID = "BaG-A0-N8t"; */
+"BaG-A0-N8t.title" = "解释的架构";
+
+/* Class = "NSMenu"; title = "Byte Grouping"; ObjectID = "EMn-H5-KKf"; */
+"EMn-H5-KKf.title" = "字节分组";
+
+/* Class = "NSMenuItem"; title = "Write Accesses to Base Address…"; ObjectID = "gOJ-hH-dww"; */
+"gOJ-hH-dww.title" = "对基址的写入访问…";
+
+/* Class = "NSMenuItem"; title = "Read & Write Accesses to Base Address…"; ObjectID = "KQm-HB-Xdh"; */
+"KQm-HB-Xdh.title" = "对基址的读取和写入访问…";
+
+/* Class = "NSMenuItem"; title = "Add Hardware Breakpoint"; ObjectID = "K1B-4z-mlg"; */
+"K1B-4z-mlg.title" = "添加硬件断点";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Label…"; ObjectID = "uQ5-Wj-45I"; */
+"uQ5-Wj-45I.title" = "编辑变量标签…";

@@ -1,0 +1,30 @@
+
+/* Class = "NSBox"; title = "Box"; ObjectID = "86H-Wp-nuT"; */
+"86H-Wp-nuT.title" = "Box";
+
+/* Class = "NSTextFieldCell"; title = "Beginning Address"; ObjectID = "T3N-9g-brJ"; */
+"T3N-9g-brJ.title" = "起始地址";
+
+/* Class = "NSTextFieldCell"; title = "Ending Address"; ObjectID = "dZL-uw-7Rv"; */
+"dZL-uw-7Rv.title" = "结束地址";
+
+/* Class = "NSButtonCell"; title = "Ignore Data Alignment"; ObjectID = "mdD-ud-Xce"; */
+"mdD-ud-Xce.title" = "忽略数据对齐";
+
+/* Class = "NSButtonCell"; title = "Include Shared Memory"; ObjectID = "qqP-sp-LSO"; */
+"qqP-sp-LSO.title" = "包含共享内存";
+
+/* Class = "NSTextFieldCell"; title = "Search options:"; ObjectID = "seP-AL-18W"; */
+"seP-AL-18W.title" = "搜索选项：";
+
+/* Class = "NSTextFieldCell"; title = "Address search options:"; ObjectID = "sbD-E1-xBo"; */
+"sbD-E1-xBo.title" = "地址搜索选项：";
+
+/* Class = "NSButtonCell"; title = "Include only static, stack, and heap data"; ObjectID = "1hP-Mb-YbX"; */
+"1hP-Mb-YbX.title" = "仅包含静态、栈和堆数据";
+
+/* Class = "NSButtonCell"; title = "Exclude static data from system libraries"; ObjectID = "pLQ-os-5a7"; */
+"pLQ-os-5a7.title" = "排除系统库中的静态数据";
+
+/* Class = "NSButtonCell"; title = "Stop traversing at first static address"; ObjectID = "98q-h1-4Kx"; */
+"98q-h1-4Kx.title" = "在首个静态地址处停止遍历";

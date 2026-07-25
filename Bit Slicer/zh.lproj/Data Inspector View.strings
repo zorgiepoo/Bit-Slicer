@@ -1,0 +1,33 @@
+
+/* Class = "NSMenuItem"; title = "Floats"; ObjectID = "69"; */
+"69.title" = "浮点数";
+
+/* Class = "NSMenuItem"; title = "Signed Int"; ObjectID = "70"; */
+"70.title" = "有符号整数";
+
+/* Class = "NSMenuItem"; title = "big"; ObjectID = "83"; */
+"83.title" = "大端";
+
+/* Class = "NSMenuItem"; title = "little"; ObjectID = "84"; */
+"84.title" = "小端";
+
+/* Class = "NSMenuItem"; title = "Unsigned Int"; ObjectID = "93"; */
+"93.title" = "无符号整数";
+
+/* Class = "NSMenuItem"; title = "UTF-8"; ObjectID = "94"; */
+"94.title" = "UTF-8";
+
+/* Class = "NSMenuItem"; title = "SLEB128"; ObjectID = "Zh9-Vv-mpr"; */
+"Zh9-Vv-mpr.title" = "SLEB128";
+
+/* Class = "NSMenuItem"; title = "ULEB128"; ObjectID = "glG-XB-fsS"; */
+"glG-XB-fsS.title" = "ULEB128";
+
+/* Class = "NSMenuItem"; title = "Binary"; ObjectID = "MIA-go-iIQ"; */
+"MIA-go-iIQ.title" = "二进制";
+
+/* Class = "NSMenuItem"; title = "decimal"; ObjectID = "eCt-49-RSK"; */
+"eCt-49-RSK.title" = "十进制";
+
+/* Class = "NSMenuItem"; title = "hexadecimal"; ObjectID = "FAh-do-3LY"; */
+"FAh-do-3LY.title" = "十六进制";

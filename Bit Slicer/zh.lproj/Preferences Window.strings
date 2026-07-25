@@ -1,0 +1,21 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "1"; */
+"1.title" = "preferences_title";
+
+/* Class = "NSToolbarItem"; label = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.label" = "更新";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.paletteLabel" = "更新";
+
+/* Class = "NSToolbarItem"; label = "Scripts"; ObjectID = "kPj-yB-vNE"; */
+"kPj-yB-vNE.label" = "脚本";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Scripts"; ObjectID = "kPj-yB-vNE"; */
+"kPj-yB-vNE.paletteLabel" = "脚本";
+
+/* Class = "NSToolbarItem"; label = "Shortcuts"; ObjectID = "kgo-oj-XB3"; */
+"kgo-oj-XB3.label" = "快捷键";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Shortcuts"; ObjectID = "kgo-oj-XB3"; */
+"kgo-oj-XB3.paletteLabel" = "快捷键";

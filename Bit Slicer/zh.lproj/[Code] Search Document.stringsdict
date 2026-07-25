@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>displayingValuesLabelFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>显示中 %#@values@</string>
+		<key>values</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lu</string>
+			<key>other</key>
+			<string>_NUM_ 个值</string>
+		</dict>
+	</dict>
+
+	<key>foundValuesLabelFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>找到 %#@values@</string>
+		<key>values</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lu</string>
+			<key>other</key>
+			<string>_NUM_ 个值…</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

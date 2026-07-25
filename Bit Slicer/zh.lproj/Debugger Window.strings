@@ -1,0 +1,93 @@
+
+/* Class = "NSWindow"; title = "Debugger"; ObjectID = "5"; */
+"5.title" = "调试器";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "127"; */
+"127.title" = "拷贝";
+
+/* Class = "NSMenuItem"; title = "NOP Instruction"; ObjectID = "155"; */
+"155.title" = "NOP 指令";
+
+/* Class = "NSMenuItem"; title = "Jump to Instruction"; ObjectID = "156"; */
+"156.title" = "跳转到指令";
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "261"; */
+"261.title" = "在内存查看器中显示";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "286"; */
+"286.title" = "拷贝地址";
+
+/* Class = "NSMenuItem"; title = "Copy Raw Address"; ObjectID = "Iwu-Sv-lDF"; */
+"Iwu-Sv-lDF.title" = "拷贝原始地址";
+
+/* Class = "NSMenuItem"; title = "Go to Call Address"; ObjectID = "292"; */
+"292.title" = "前往调用地址";
+
+/* Class = "NSTableColumn"; headerCell.title = "Address"; ObjectID = "4OJ-Sj-EC7"; */
+"4OJ-Sj-EC7.headerCell.title" = "地址";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "BKb-RB-2tf"; */
+"BKb-RB-2tf.title" = "Text Cell";
+
+/* Class = "NSMenuItem"; title = "Set Breakpoint Condition…"; ObjectID = "FMB-Ym-nZO"; */
+"FMB-Ym-nZO.title" = "设置断点条件…";
+
+/* Class = "NSToolbarItem"; label = "Continue"; ObjectID = "KQE-fj-qqG"; */
+"KQE-fj-qqG.label" = "继续";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Continue"; ObjectID = "KQE-fj-qqG"; */
+"KQE-fj-qqG.paletteLabel" = "继续";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "Quq-lP-8lz"; */
+"Quq-lP-8lz.title" = "OtherViews";
+
+/* Class = "NSToolbarItem"; label = "Target"; ObjectID = "V6x-9g-MBo"; */
+"V6x-9g-MBo.label" = "目标";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Target"; ObjectID = "V6x-9g-MBo"; */
+"V6x-9g-MBo.paletteLabel" = "目标";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "aiN-oG-EaF"; */
+"aiN-oG-EaF.title" = "Text Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Bytes"; ObjectID = "bfc-Km-I9g"; */
+"bfc-Km-I9g.headerCell.title" = "字节";
+
+/* Class = "NSTableColumn"; headerCell.title = "Instruction"; ObjectID = "hhm-Yo-i9h"; */
+"hhm-Yo-i9h.headerCell.title" = "指令";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "jN6-XG-Ypp"; */
+"jN6-XG-Ypp.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "0x0"; ObjectID = "mHS-Rp-HdH"; */
+"mHS-Rp-HdH.title" = "0x0";
+
+/* Class = "NSTableColumn"; headerCell.title = "Break"; ObjectID = "pCd-L4-hx2"; */
+"pCd-L4-hx2.headerCell.title" = "断点";
+
+/* Class = "NSToolbarItem"; label = "Back/Forward"; ObjectID = "saO-Gp-UGR"; */
+"saO-Gp-UGR.label" = "后退/前进";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Back/Forward"; ObjectID = "saO-Gp-UGR"; */
+"saO-Gp-UGR.paletteLabel" = "后退/前进";
+
+/* Class = "NSMenuItem"; title = "Inject Code…"; ObjectID = "sc9-6G-u0H"; */
+"sc9-6G-u0H.title" = "注入代码…";
+
+/* Class = "NSTableColumn"; headerCell.title = "Symbols"; ObjectID = "t9W-pd-V9s"; */
+"t9W-pd-V9s.headerCell.title" = "符号";
+
+/* Class = "NSToolbarItem"; label = "Address/Symbol"; ObjectID = "u3o-PN-adL"; */
+"u3o-PN-adL.label" = "地址/符号";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Address/Symbol"; ObjectID = "u3o-PN-adL"; */
+"u3o-PN-adL.paletteLabel" = "地址/符号";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "y3E-4i-zXd"; */
+"y3E-4i-zXd.title" = "Text Cell";
+
+/* Class = "NSToolbarItem"; label = "Step"; ObjectID = "yIQ-3L-cfP"; */
+"yIQ-3L-cfP.label" = "单步";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Step"; ObjectID = "yIQ-3L-cfP"; */
+"yIQ-3L-cfP.paletteLabel" = "单步";

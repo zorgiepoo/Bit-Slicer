@@ -1,0 +1,9 @@
+
+/* Class = "NSWindow"; title = "Logs"; ObjectID = "1"; */
+"1.title" = "日志";
+
+/* Class = "NSButtonCell"; title = "Clear"; ObjectID = "11"; */
+"11.title" = "清除";
+
+/* Class = "NSTextFieldCell"; title = "logged_x_messages"; ObjectID = "15"; */
+"15.title" = "logged_x_messages";
