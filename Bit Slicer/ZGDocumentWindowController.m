@@ -65,6 +65,7 @@
 #import "ZGNullability.h"
 #import "ZGCalculator.h"
 #import <libproc.h>
+#import <mach-o/loader.h>
 #import <Security/CodeSigning.h>
 #import <Security/SecCode.h>
 
@@ -1712,18 +1713,25 @@
 		else
 		{
 			// We failed to grant access to this process the user is trying to search in
-			// Notify the user why this may be the case
+			// Notify the user why this may be the case, using the same process for the diagnosis and the alert
+			ZGProcess *process = self.currentProcess;
 			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-				BOOL isProtectedByEntitlement = [self isCurrentProcessProtectedByEntitlement];
+				BOOL isIOSApp = [self isProcessAnIOSApp:process];
+				BOOL isProtectedByEntitlement = !isIOSApp && [self isProcessProtectedByEntitlement:process];
 				dispatch_async(dispatch_get_main_queue(), ^{
-					if (isProtectedByEntitlement)
+					if (isIOSApp)
 					{
-						ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), self.currentProcess.name], self);
+						// Disabling system protections won't help for these apps because they won't launch afterwards
+						ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureIOSAppAlertMessageFormat"), process.name]);
+					}
+					else if (isProtectedByEntitlement)
+					{
+						ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), process.name], self);
 					}
 					else
 					{
 						// While we don't show apps that are running as root user, some processes can still require the debugger running as root to access them
-						ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), self.currentProcess.name]);
+						ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), process.name]);
 					}
 				});
 			});
@@ -1731,10 +1739,10 @@
 	}
 }
 
-- (BOOL)isCurrentProcessProtectedByEntitlement
+- (BOOL)isProcessProtectedByEntitlement:(ZGProcess *)process
 {
 	char pathBuffer[PROC_PIDPATHINFO_MAXSIZE] = {0};
-	int numberOfBytesRead = proc_pidpath(self.currentProcess.processID, pathBuffer, sizeof(pathBuffer));
+	int numberOfBytesRead = proc_pidpath(process.processID, pathBuffer, sizeof(pathBuffer));
 	if (numberOfBytesRead > 0)
 	{
 		NSURL *fileURL = [[NSURL alloc] initFileURLWithFileSystemRepresentation:pathBuffer isDirectory:NO relativeToURL:nil];
@@ -1769,6 +1777,29 @@
 		}
 	}
 	return NO;
+}
+
+- (BOOL)isProcessAnIOSApp:(ZGProcess *)process
+{
+	char pathBuffer[PROC_PIDPATHINFO_MAXSIZE] = {0};
+	int numberOfBytesRead = proc_pidpath(process.processID, pathBuffer, sizeof(pathBuffer));
+	if (numberOfBytesRead <= 0)
+	{
+		return NO;
+	}
+	
+	NSString *filePath = [NSString stringWithUTF8String:pathBuffer];
+	if (filePath == nil)
+	{
+		return NO;
+	}
+	
+	// We have no access to the process, so read the platform from the executable on disk.
+	// The header and file path addresses aren't used for retrieving the platform.
+	ZGMachBinary *machBinary = [[ZGMachBinary alloc] initWithHeaderAddress:0x0 filePathAddress:0x0];
+	ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoFromFilePath:filePath process:process];
+	
+	return machBinaryInfo.platform == PLATFORM_IOS;
 }
 
 // Show help for being unable to search likely due to security protections

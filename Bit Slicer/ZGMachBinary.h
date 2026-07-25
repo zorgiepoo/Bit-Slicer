@@ -58,6 +58,7 @@ extern NSString * const ZGFailedImageName;
 + (NSArray<NSString *> *)filePathsForMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries inProcess:(ZGProcess *)process;
 - (nullable NSString *)filePathInProcess:(ZGProcess *)process;
 
+- (nullable ZGMachBinaryInfo *)machBinaryInfoFromFilePath:(NSString *)filePath process:(ZGProcess *)process;
 - (nullable ZGMachBinaryInfo *)machBinaryInfoInProcess:(ZGProcess *)process;
 
 @end
