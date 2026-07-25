@@ -63,6 +63,10 @@ typedef struct
 		{
 			maxNumberOfSegmentCommands++;
 		}
+		else if (loadCommand->cmd == LC_BUILD_VERSION && loadCommand->cmdsize >= sizeof(struct build_version_command))
+		{
+			_platform = ((const struct build_version_command *)(const void *)commandBytes)->platform;
+		}
 	}
 	
 	if (maxNumberOfSegmentCommands == 0)

@@ -189,3 +189,6 @@
 
 /* Alert Message indicating that searching is failing due to the target runnning with elevated privileges */
 "searchFailureElevatedPrivilegesAlertMessageFormat" = "%@ cannot be searched because it may be running with elevated privileges.";
+
+/* Alert Message indicating that searching is failing because the target is an iOS App Store app */
+"searchFailureIOSAppAlertMessageFormat" = "%@ невозможно просканировать, так как приложения iOS из App Store нельзя отлаживать.";

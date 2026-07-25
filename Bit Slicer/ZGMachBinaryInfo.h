@@ -46,6 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ZGMemoryAddress firstInstructionAddress; // aka location of __text section
 @property (nonatomic, readonly) NSRange totalSegmentRange;
 
+// Platform the binary targets as a PLATFORM_* value from <mach-o/loader.h>, or 0 if it doesn't have a build version
+@property (nonatomic, readonly) uint32_t platform;
+
 - (nullable NSString *)segmentNameAtAddress:(ZGMemoryAddress)address;
 
 @end
