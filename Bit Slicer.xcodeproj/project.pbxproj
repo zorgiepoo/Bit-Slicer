@@ -2666,10 +2666,7 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(PROJECT_DIR)/deps/Sparkle",
 					"$(PROJECT_DIR)/deps/python",
-					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 					"$(PROJECT_DIR)/deps/DDMathParser",
-					"$(PROJECT_DIR)/deps/HexFiend",
-					"$(PROJECT_DIR)/deps/capstone",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -2710,6 +2707,12 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/deps/ShortcutRecorder",
+					"$(PROJECT_DIR)/deps/HexFiend",
+					"$(PROJECT_DIR)/deps/capstone",
+				);
 				WARNING_CFLAGS = (
 					"-Weverything",
 					"-Wno-objc-missing-property-synthesis",
@@ -2790,10 +2793,7 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(PROJECT_DIR)/deps/Sparkle",
 					"$(PROJECT_DIR)/deps/python",
-					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 					"$(PROJECT_DIR)/deps/DDMathParser",
-					"$(PROJECT_DIR)/deps/HexFiend",
-					"$(PROJECT_DIR)/deps/capstone",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
@@ -2831,6 +2831,12 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/deps/ShortcutRecorder",
+					"$(PROJECT_DIR)/deps/HexFiend",
+					"$(PROJECT_DIR)/deps/capstone",
+				);
 				WARNING_CFLAGS = (
 					"-Weverything",
 					"-Wno-objc-missing-property-synthesis",
