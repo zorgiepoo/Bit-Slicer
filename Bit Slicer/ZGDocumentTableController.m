@@ -63,7 +63,7 @@
 	ZGTableView * _Nullable _variablesTableView;
 }
 
-#define ZGVariableRowsType @"ZGVariableRowsType"
+#define ZGVariableRowsType @"com.zgcoder.BitSlicer.variable-rows-type"
 
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 
@@ -503,30 +503,33 @@
 	return YES;
 }
 
-- (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pasteboard
+- (id<NSPasteboardWriting> _Nullable)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
-	[pasteboard declareTypes:@[ZGVariableRowsType, ZGVariablePboardType] owner:self];
-	
-	NSMutableArray<NSNumber *> *rows = [[NSMutableArray alloc] init];
-	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL * __unused stop) {
-		[rows addObject:@(index)];
-	}];
-	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableRowsType];
-	
+	// The row being dragged may not be reflected in selectedRowIndexes yet
+	// (e.g, dragging a row that isn't already selected), so make sure it's included regardless
+	NSIndexSet *selectedRowIndexes = tableView.selectedRowIndexes;
+	NSIndexSet *rowIndexes = [selectedRowIndexes containsIndex:(NSUInteger)row] ? selectedRowIndexes : [NSIndexSet indexSetWithIndex:(NSUInteger)row];
+
 	NSArray<ZGVariable *> *variables = [_documentData.variables objectsAtIndexes:rowIndexes];
-	
+
 	NSError *archiveError = nil;
 	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
 	if (data == nil)
 	{
 		NSLog(@"Error: failed to write document variables to pasteboard: %@", archiveError);
-		return NO;
+		return nil;
 	}
-	else
-	{
-		[pasteboard setData:data forType:ZGVariablePboardType];
-		return YES;
-	}
+
+	NSMutableArray<NSNumber *> *rows = [[NSMutableArray alloc] init];
+	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL * __unused stop) {
+		[rows addObject:@(index)];
+	}];
+
+	NSPasteboardItem *pasteboardItem = [[NSPasteboardItem alloc] init];
+	[pasteboardItem setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableRowsType];
+	[pasteboardItem setData:data forType:ZGVariablePboardType];
+
+	return pasteboardItem;
 }
 
 #pragma mark Table View Data Source Methods

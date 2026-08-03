@@ -43,7 +43,7 @@
 {
 	__weak id <ZGBacktraceViewControllerDelegate> _Nullable _delegate;
 	BOOL _shouldIgnoreTableSelection;
-	
+
 	IBOutlet NSTableView *_tableView;
 }
 
@@ -95,21 +95,29 @@
 
 #pragma mark Table View
 
-- (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+- (id<NSPasteboardWriting> _Nullable)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
+	// The row being dragged may not be reflected in selectedRowIndexes yet
+	// (e.g, dragging a row that isn't already selected), so make sure it's included regardless
+	NSIndexSet *selectedRowIndexes = tableView.selectedRowIndexes;
+	NSIndexSet *rowIndexes = [selectedRowIndexes containsIndex:(NSUInteger)row] ? selectedRowIndexes : [NSIndexSet indexSetWithIndex:(NSUInteger)row];
+
 	NSArray<ZGVariable *> *variables = [[_backtrace.instructions objectsAtIndexes:rowIndexes] zgMapUsingBlock:^(ZGInstruction *instruction) {
 		return instruction.variable;
 	}];
-	
+
 	NSError *archiveError = nil;
 	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:variables requiringSecureCoding:YES error:&archiveError];
 	if (data == nil)
 	{
 		NSLog(@"Error: failed to write backtrace rows to pasteboard: %@", archiveError);
-		return NO;
+		return nil;
 	}
-	
-	return [pboard setData:data forType:ZGVariablePboardType];
+
+	NSPasteboardItem *pasteboardItem = [[NSPasteboardItem alloc] init];
+	[pasteboardItem setData:data forType:ZGVariablePboardType];
+
+	return pasteboardItem;
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView

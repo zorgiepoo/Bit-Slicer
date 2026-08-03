@@ -34,7 +34,7 @@
 #import "NSStringAdditions.h"
 #import "ZGNullability.h"
 
-NSString *ZGVariablePboardType = @"ZGVariablePboardType";
+NSString *ZGVariablePboardType = @"com.zgcoder.BitSlicer.variable-pboard-type";
 
 #define ZGAddressKey @"ZGAddressKey"
 #define ZGSizeKey	 @"ZGSizeKey"
